@@ -3,6 +3,7 @@
 (provide (all-defined-out))
 
 (require racket/fixnum
+         (only-in racket/list index-of)
          "../rkt/int.rkt"
          "sets.rkt"
          )
@@ -112,7 +113,7 @@
 	 (perm (map cadr ltarget))
 	 (iperm
 	  (build-list n
-	    (lambda (i) (list-ref perm i)))))
+	    (lambda (i) (index-of perm i)))))
     (cont ulist
 	  sorted
 	  (lambda (l) (permute perm l))
