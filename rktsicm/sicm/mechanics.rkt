@@ -1,0 +1,45 @@
+#lang racket/base
+
+(require "mechanics/action.rkt"
+         "mechanics/canonical.rkt"
+         "mechanics/dual.rkt"
+         "mechanics/gamma-bar.rkt"
+         "mechanics/Hamiltonian.rkt"
+         "mechanics/Lagrangian.rkt"
+         "mechanics/Lagrangian-transformations.rkt"
+         "mechanics/Lie-transform.rkt"
+         "mechanics/Noether.rkt"
+         "mechanics/pendulum.rkt"
+         "mechanics/point-transformation.rkt"
+         "mechanics/qualitative.rkt"
+         "mechanics/rigid.rkt"
+         "mechanics/rotation.rkt"
+         "mechanics/Routhian.rkt"
+         ;sections.scm skipped -> this seemed geared towards output
+         "mechanics/symplectic.rkt"
+         "mechanics/time-evolution.rkt"
+         ;point-transformation already provides F->K, not sure which is more courant
+         (except-in "mechanics/time-varying.rkt" F->K)
+         "mechanics/universal.rkt"
+         )
+
+(provide (all-from-out "mechanics/action.rkt"
+                       "mechanics/canonical.rkt"
+                       "mechanics/dual.rkt"
+                       "mechanics/gamma-bar.rkt"
+                       "mechanics/Hamiltonian.rkt"
+                       "mechanics/Lagrangian.rkt"
+                       "mechanics/Lagrangian-transformations.rkt"
+                       "mechanics/Lie-transform.rkt"
+                       "mechanics/Noether.rkt"
+                       "mechanics/pendulum.rkt"
+                       "mechanics/point-transformation.rkt"
+                       "mechanics/qualitative.rkt"
+                       "mechanics/rigid.rkt"
+                       "mechanics/rotation.rkt"
+                       "mechanics/Routhian.rkt"
+                       "mechanics/symplectic.rkt"
+                       "mechanics/time-evolution.rkt"
+                       "mechanics/time-varying.rkt"
+                       "mechanics/universal.rkt"
+                       ))

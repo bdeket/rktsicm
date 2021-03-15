@@ -1,0 +1,329 @@
+#lang racket/base
+
+(provide (all-defined-out)
+         (all-from-out "cstm/vectors.rkt"))
+(require racket/fixnum
+         "cstm/vectors.rkt"
+         "../general/assert.rkt"
+         "cstm/express.rkt"
+         "cstm/generic-apply.rkt"
+         "iterat.rkt"
+         "numbers.rkt"
+         "cstm/numeric.rkt"
+         "types.rkt"
+         "utils.rkt"
+         )
+
+;;;;            Vectors
+
+
+;;; This file makes the identification of the Scheme VECTOR data
+;;; type with mathematical n-dimensional vectors.  These are 
+;;; interpreted as column vectors by the matrix package.
+
+;;; Thus we inherit the constructors VECTOR and MAKE-VECTOR,
+;;; the selectors VECTOR-LENGTH and VECTOR-REF,
+;;; the mutator VECTOR-SET!, and zero-based indexing.  
+;;; We also get the iterator MAKE-INITIALIZED-VECTOR, 
+;;; and the predicate VECTOR?
+
+(define ((v:elementwise f) . vectors)
+  (assert (and (not (null? vectors))
+	       (andmap vector? vectors)))
+  (let ((n (v:dimension (car vectors))))
+    (assert (andmap (lambda (m)
+                      (fx= (v:dimension m) n))
+                    (cdr vectors)))
+    (v:generate
+     (vector-length (car vectors))
+     (lambda (i)
+       (g:apply f
+		(map (lambda (v) (vector-ref v i))
+		     vectors))))))
+
+(define vector:elementwise v:elementwise)
+
+(define (v:zero? v)
+  (vector-forall g:zero? v))
+
+(define (v:make-zero n)
+  (make-vector n :zero))
+
+(define (v:zero-like v)
+  (v:generate (vector-length v)
+	      (lambda (i)
+		(g:zero-like (vector-ref v i)))))
+
+(define (literal-vector name dimension)
+  (v:generate dimension
+	      (lambda (i)
+		(string->symbol
+		 (string-append (symbol->string name)
+				"^"
+				(number->string i))))))
+
+
+(define (v:make-basis-unit n i)	; #(0 0 ... 1 ... 0) n long, 1 in ith position
+  (v:generate n (lambda (j) (if (fx= j i) :one :zero))))
+
+(define (v:basis-unit? v)
+  (let ((n (vector-length v)))
+    (let lp ((i 0) (ans #f))
+      (cond ((fx= i n) ans)
+	    ((g:zero? (vector-ref v i))
+	     (lp (fx+ i 1) ans))
+	    ((and (g:one? (vector-ref v i)) (not ans))
+	     (lp (fx+ i 1) i))
+	    (else #f)))))
+
+
+(define (vector=vector v1 v2)
+  (vector-forall g:= v1 v2))
+
+(define (vector+vector v1 v2)
+  (v:generate (vector-length v1)
+    (lambda (i)
+      (g:+ (vector-ref v1 i)
+	   (vector-ref v2 i)))))
+    
+(define (vector-vector v1 v2)
+  (v:generate (vector-length v1)
+    (lambda (i)
+      (g:- (vector-ref v1 i)
+	   (vector-ref v2 i)))))
+
+(define (v:negate v)
+  (v:generate (vector-length v)
+    (lambda (i)
+      (g:negate (vector-ref v i)))))
+
+(define (v:scale s)
+  (lambda (v)
+    (v:generate (vector-length v)
+      (lambda (i)
+	(g:* s (vector-ref v i))))))
+
+(define (scalar*vector s v)
+  (v:generate (vector-length v)
+    (lambda (i)
+      (g:* s (vector-ref v i)))))
+
+(define (vector*scalar v s)
+  (v:generate (vector-length v)
+    (lambda (i)
+      (g:* (vector-ref v i) s))))
+
+(define (vector/scalar v s)
+  (v:generate (vector-length v)
+    (lambda (i)
+      (g:/ (vector-ref v i) s))))
+
+
+(define (v:inner-product v1 v2)
+  (assert (and (vector? v1) (vector? v2))
+	  "Not vectors -- INNER-PRODUCT" (list v1 v2))
+  (let ((n (v:dimension v1)))
+    (assert (fx= n (v:dimension v2))
+	    "Not same dimension -- INNER-PRODUCT" (list v1 v2))
+    (let lp ((i 0) (ans :zero))
+      (if (fx= i n)
+	  ans
+	  (lp (fx+ i 1)
+	      (g:+ ans
+		   (g:* (g:conjugate (vector-ref v1 i))
+			(vector-ref v2 i))))))))
+    
+(define (v:square v)
+  (v:dot-product v v))
+
+(define (v:cube v)
+  (scalar*vector (v:dot-product v v) v))
+
+
+(define (euclidean-norm v)
+  (g:sqrt (v:dot-product v v)))
+
+(define (complex-norm v)
+  (g:sqrt (v:inner-product v v)))
+
+(define (maxnorm v)
+  (vector-accumulate max g:magnitude :zero v))
+
+
+(define (v:make-unit v)
+  (scalar*vector (g:invert (euclidean-norm v))
+		 v))
+
+(define (v:unit? v)
+  (g:one? (v:dot-product v v)))
+
+
+(define (v:conjugate v)
+  ((v:elementwise g:conjugate) v))
+
+(define (general-inner-product addition multiplication :zero)
+  (define (ip v1 v2)
+    (let ((n (vector-length v1)))
+      (when (not (fx= n (vector-length v2)))
+	  (error "Unequal dimensions -- INNER-PRODUCT" v1 v2))
+      (if (fx= n 0)
+	  :zero
+	  (let loop ((i 1)
+		     (ans (multiplication (vector-ref v1 0)
+					  (vector-ref v2 0))))
+	    (if (fx= i n)
+		ans
+		(loop (fx+ i 1)
+		      (addition ans
+				(multiplication (vector-ref v1 i)
+						(vector-ref v2 i)))))))))
+  ip)
+
+(define (v:apply vec args)
+  (v:generate (vector-length vec)
+    (lambda (i)
+      (g:apply (vector-ref vec i) args))))
+
+(define (v:arity v)
+  (let ((n (vector-length v)))
+    (cond ((fx= n 0)
+	   (error "I don't know the arity of the empty vector"))
+	  (else
+	   (let lp ((i 1) (a (g:arity (vector-ref v 0))))
+	     (if (fx= i n)
+		 a
+		 (let ((b (joint-arity a (g:arity (vector-ref v i)))))
+		   (if b
+		       (lp (+ i 1) b)
+		       #f))))))))
+
+(define (v:partial-derivative vector varspecs)
+  ((v:elementwise
+    (lambda (f)
+      (generic:partial-derivative f varspecs)))
+   vector))
+
+(define (v:inexact? v)
+  (vector-exists g:inexact? v))
+
+
+
+(assign-operation generic:type                v:type            vector?)
+(assign-operation generic:type-predicate      v:type-predicate  vector?)
+(assign-operation generic:arity               v:arity           vector?)
+(assign-operation generic:inexact?            v:inexact?        vector?)
+
+(assign-operation generic:zero-like           v:zero-like       vector?)
+
+(assign-operation generic:zero?               v:zero?           vector?)
+(assign-operation generic:negate              v:negate          vector?)
+(assign-operation generic:magnitude           complex-norm    vector?)
+(assign-operation generic:abs                 euclidean-norm  vector?)
+(assign-operation generic:conjugate           v:conjugate       vector?)
+
+(assign-operation generic:=           vector=vector       vector? vector?)
+(assign-operation generic:+           vector+vector       vector? vector?)
+(assign-operation generic:-           vector-vector       vector? vector?)
+
+(assign-operation generic:*           scalar*vector       scalar? vector?)
+(assign-operation generic:*           vector*scalar       vector? scalar?)
+
+(assign-operation generic:/           vector/scalar       vector? scalar?)
+
+(assign-operation generic:solve-linear-right    vector/scalar       vector? scalar?)
+(assign-operation generic:solve-linear-left    (lambda (x y) (vector/scalar y x))   scalar? vector?)
+(assign-operation generic:solve-linear         (lambda (x y) (vector/scalar y x))   scalar? vector?)
+
+
+
+;;; subsumed by s:dot-product
+;;; (assign-operation generic:dot-product v:dot-product   vector? vector?)
+
+(assign-operation generic:cross-product v:cross-product   vector? vector?)
+
+(assign-operation generic:dimension v:dimension  vector?)
+
+
+#| ;;; Should be subsumed by deriv:pd in deriv.scm.
+(assign-operation generic:partial-derivative
+		  v:partial-derivative
+		  vector? any?)
+|#
+
+#| ;;; Should be subsumed by s:apply in structs.scm.
+(assign-operation generic:apply       v:apply           vector? any?)
+|#
+
+
+;;; Abstract vectors generalize vector quantities.
+
+(define (abstract-vector symbol)
+  (make-literal vector-type-tag symbol))
+
+(define (av:arity v)
+  ;; Default is vector of numbers.
+  (get-property v 'arity *at-least-zero*))
+
+(define (av:zero-like v)
+  (let ((z (abstract-vector (list 'zero-like v))))
+    (add-property! z 'zero #t)
+    z))
+
+(define (make-vector-combination operator [reverse? #f])
+  (if reverse?
+      (lambda operands 
+	(make-combination vector-type-tag
+			  operator operands))
+      (lambda operands 
+	(make-combination vector-type-tag
+			  operator (reverse operands)))))
+
+(assign-operation generic:type           v:type             abstract-vector?)
+(assign-operation generic:type-predicate v:type-predicate   abstract-vector?)
+(assign-operation generic:arity          av:arity           abstract-vector?)
+
+(assign-operation generic:inexact? (has-property? 'inexact) abstract-vector?)
+
+(assign-operation generic:zero-like      av:zero-like       abstract-vector?)
+
+(assign-operation generic:zero?    (has-property? 'zero)    abstract-vector?)
+
+(assign-operation generic:negate     (make-vector-combination 'negate)     abstract-vector?)
+(assign-operation generic:magnitude  (make-vector-combination 'magnitude)  abstract-vector?)
+(assign-operation generic:abs        (make-vector-combination 'abs)        abstract-vector?)
+(assign-operation generic:conjugate  (make-vector-combination 'conjugate)  abstract-vector?)
+
+;(assign-operation derivative (make-vector-combination 'derivative) abstract-vector?)
+
+
+;(assign-operation generic:= vector=vector abstract-vector? abstract-vector?)
+(assign-operation generic:+  (make-vector-combination '+) abstract-vector? abstract-vector?)
+(assign-operation generic:+  (make-vector-combination '+) vector?          abstract-vector?)
+(assign-operation generic:+  (make-vector-combination '+ 'r)       abstract-vector? vector?)
+
+
+(assign-operation generic:-  (make-vector-combination '-) abstract-vector? abstract-vector?)
+(assign-operation generic:-  (make-vector-combination '-) vector?          abstract-vector?)
+(assign-operation generic:-  (make-vector-combination '-) abstract-vector? vector?)
+		     
+(assign-operation generic:*  (make-numerical-combination '*)    abstract-vector? abstract-vector?)
+(assign-operation generic:*  (make-numerical-combination '*)    vector?          abstract-vector?)
+(assign-operation generic:*  (make-numerical-combination '* 'r) abstract-vector? vector?)
+(assign-operation generic:*  (make-vector-combination '*)       scalar?          abstract-vector?)
+(assign-operation generic:*  (make-vector-combination '* 'r)    abstract-vector? scalar?)
+		     
+(assign-operation generic:/  (make-vector-combination '/)       abstract-vector? scalar?)
+
+
+(assign-operation generic:dot-product
+                  (make-vector-combination 'dot-product)
+   abstract-vector? abstract-vector?)
+
+(assign-operation generic:partial-derivative
+		  (make-vector-combination 'partial-derivative)
+		  abstract-vector? any?)
+
+;;; I don't know what to do here -- GJS.  This is part of the literal
+;;; function problem.
+
+;(assign-operation generic:apply  v:apply              abstract-vector? any?)

@@ -1,0 +1,266 @@
+#lang racket/base
+
+(provide (all-defined-out))
+
+(require racket/fixnum
+         racket/vector
+         "../../kernel-intr.rkt"
+         "../../general/assert.rkt"
+         "../../general/table.rkt"
+         )
+
+;;; The advance-generator is used with 1-step adaptive integrators to
+;;;  to advance a state by a given increment in the independent
+;;;  variable, in the face of variable-stepsize advancers.
+
+#| For examples
+
+((advance-generator
+  ((quality-control rk4 4)		;integration method
+   (lambda (v) v)			;x' = x
+   .0001))				;error tolerated
+ #(1.0)					;initial state (at t = t0)
+ 1.0					;proceed to t = t0 + 1
+ 0.1					;first step no larger than .1
+ 0.5					;no step larger than .5
+ (lambda (ns dt h cont)
+   (pp ns)
+   (cont))
+ (lambda (ns dt sdt)
+   ;; assert ns = #(2.718...)
+   ;; assert dt = 1.000...+-
+   (list ns dt sdt)))
+
+((advance-generator
+  (bulirsch-stoer-lisptran		;integrator
+   (lambda (vin vout)			;x'= x
+     (vector-set! vout 0
+		  (vector-ref vin 0)))
+   1					;1 dimension
+   .0001))				;error tolerated
+ #(1.0)
+ 1.0
+ 0.1
+ 0.5
+ (lambda (ns dt h cont)
+   (pp (list dt ns))
+   (cont))
+ (lambda (ns dt sdt)
+   ;; assert ns = #(2.718...)
+   ;; assert dt = 1.000...+-
+   (list ns dt sdt)))
+|#
+
+(define (advance-generator advancer)
+  (define (advance start-state goal-increment h-suggested max-h 
+		   continue done)
+    ;; done = (lambda (end-state current-increment h-suggested) ... )
+    ;; continue = (lambda (state current-increment h-taken next)
+    ;;     where next = (lambda () ...))
+    (let lp ((state start-state)
+	     (current-increment 0.0)
+	     (h (min-step-size goal-increment h-suggested max-h))
+             (h-suggested h-suggested))
+      (when advance-wallp?
+	  (println `(advance: ,current-increment ,state ,h)))
+      (if (close-enuf? goal-increment current-increment
+		       *independent-variable-tolerance*)
+	  (done state current-increment h-suggested)
+	  (continue state current-increment h
+	    (lambda ()
+	      (advancer state h
+		(lambda (new-state step-obtained h-suggested)
+		  (let ((ndt (+ current-increment step-obtained)))
+		    (lp new-state
+                        ndt
+                        (min-step-size (- goal-increment ndt)
+                                       h-suggested
+                                       max-h)
+                        h-suggested)))))))))
+  advance)
+
+
+(define advance-wallp? #f)
+
+(define (first-with-sign-of-second x y)
+  (if (> y 0.0)
+      (abs x)
+      (- (abs x))))
+
+(define (min-step-size step-required h-suggested max-h)
+  (let ((h-allowed (min (abs h-suggested) (abs max-h))))
+    (if (<= (abs step-required) h-allowed)
+	step-required
+	(first-with-sign-of-second h-allowed step-required))))
+
+
+(define *independent-variable-tolerance* 1.0e-100)
+
+#| For making a stream of states
+
+((stream-of-states
+  (advance-generator
+   ((quality-control rk4 4)		;integration method
+    (lambda (v) v)			;x' = x
+    .0001)))				;error tolerated
+ #(1.0)					;initial state (at t = t0)
+ 1.0					;proceed to t = t0 + 1
+ 0.1					;first step no larger than .1
+ 0.5					;no step larger than .5
+ )
+|#
+
+(define (stream-of-states advance)
+  (lambda (state step-required h-suggested max-h)
+    (advance state step-required h-suggested max-h
+	     (lambda (state step-achieved h cont)
+	       (stream-cons state (cont)))
+	     (lambda (state step-achieved h-suggested)
+	       (stream-cons state empty-stream)))))
+
+
+;;; Utilities for ODE integrators.
+
+(define (vector-fixed-point-with-failure update start measure succeed fail)
+  ;; update  = (lambda (x cont)
+                 ;; cont = (lambda (nx fx) ...)
+                 ;; ...)
+  ;; succeed = (lambda (nx fx count) ...)
+  ;; fail    = (lambda () ...)
+  (let improve ((last-value start) (count 1))
+    (if (> (maxnorm last-value) *vector-fixed-point-ridiculously-large*)
+	(fail last-value last-value)
+	(update last-value
+		(lambda (value fvalue)
+		  (let ((d (measure value last-value)))
+		    (when *fixed-point-wallpaper*
+			(println
+			 `(vector-fixed-point ,count d ,d ,start ,value)))
+		    (if (< d 2.0)
+			(succeed value fvalue count)
+			(if (fx> count *vector-fixed-point-iteration-loss*)
+			    (fail value fvalue)
+			    (improve value (+ 1 count))))))))))
+
+
+
+(define *vector-fixed-point-iteration-loss* 20)
+
+(define *vector-fixed-point-ridiculously-large* 1.0e50)
+
+(define *fixed-point-wallpaper* #f)
+
+;;; Error measures
+
+(define (parse-error-measure tolerance-specification [multiplier 1.0])
+  (cond ((number? tolerance-specification) ;uniform relative error -- scale = 1
+	 (max-norm (* multiplier tolerance-specification)))
+	((procedure? tolerance-specification) ;arbitrary user-supplied procedure
+	 tolerance-specification)
+	(else
+	 (error "Unknown tolerance specification -- PARSE-ERROR-MEASURE"))))
+
+(define (vector-metric summarize accumulate each-component)
+  (define (the-metric v1 v2)
+    (let ((n (vector-length v1)))
+      (assert (fx= (vector-length v2) n))
+      (let lp ((i 0) (accumulation 0.0))
+	(if (fx= i n)
+	    (summarize accumulation n)
+	    (lp (fx+ 1 i)
+		(accumulate (each-component (vector-ref v1 i)
+					    (vector-ref v2 i)
+					    i)
+			    accumulation))))))
+  the-metric)
+
+;;; Can specify for each component the breakpoints between relative
+;;; error and absolute error measure and can specify the weights.
+
+(define *norm-breakpoint* 1e-10)
+
+;;; The lp-norm is not the traditional one.  It has an extra n in the
+;;; denominator to make it comparable in size to the max-norm with
+;;; unity weights.  (Of course, as p gets very large the lp-norm will
+;;; approach the same value as the max-norm.)
+
+(define (lp-norm p [tolerance *machine-epsilon*]
+                 [breakpoints (lambda (i) *norm-breakpoint*)]
+                 [weights (lambda (i) 1.0)])
+  (let ((q (/ 1 p))
+        (tt (/ 2 tolerance)))
+    (vector-metric (lambda (a n)
+                     (expt (/ a
+                              (* n (n:sigma weights 0 (fx- n 1))))
+                           q))
+                   +
+                   (lambda (x y i)
+                     (* (expt (* (/ (magnitude (- x y))
+                                    (+ (+ (magnitude x) (magnitude y))
+                                       (* 2.0 (breakpoints i))))
+                                 tt)
+                              p)
+                        (weights i))))))
+
+(define (max-norm [tolerance *machine-epsilon*]
+                  [breakpoints (lambda (i) *norm-breakpoint*)]
+                  [weights (lambda (i) 1.0)])
+  (let ((tt (/ 2 tolerance)))
+    (vector-metric (lambda (a n) (* a tt))
+                   max
+                   (lambda (x y i)
+                     (* (/ (magnitude (- x y))
+                           (+ (+ (magnitude x) (magnitude y))
+                              (* 2.0 (breakpoints i))))
+                        (weights i))))))
+
+;;; For integrators that need a partial Jacobian, we need to be able
+;;; to clip and pad vectors.
+
+;;; A dimension is either single, in which case no clipping and
+;;; padding is necessary, or it is a triplet of 
+;;;   (state-size start-index end-index)
+;;; such that the Jacobian only applies to the coordinates from
+;;; start-index (inclusive) to end-index (exclusive).
+
+(define (vector-clipper dimension)
+  (cond ((number? dimension)
+	 (lambda (x) x))
+	((list? dimension)
+	 (let ((start (cadr dimension)) (end (caddr dimension)))
+	   (lambda (v) (vector-copy v start end))))
+	(else (error "Bad dimension -- VECTOR-CLIPPER" dimension))))
+
+(define (vector-padder dimension)
+  (cond ((number? dimension)
+	 (lambda (x) x))
+	((list? dimension)
+	 (let* ((state-size (car dimension))
+		(start (cadr dimension))
+		(end (caddr dimension))
+		(j-size (fx- end start)))
+	   (lambda (v)
+	     (build-vector state-size
+	       (lambda (i)
+		 (if (and (or (fx< start i)
+			      (fx= start i))
+			  (fx< i end))
+		     (vector-ref v (fx- i start))
+		     0.0))))))
+	(else (error "Bad dimension -- VECTOR-PADDER" dimension))))
+
+(define (J-dimension dimension)
+  (cond ((number? dimension) dimension)
+	((list? dimension) (fx- (caddr dimension) (cadr dimension)))
+	(else (error "Bad dimension -- J-DIMENSION" dimension))))
+
+
+
+
+(define integrator-table (make-table "integrator-table" assq))
+
+(define (add-integrator! name maker-procedure needs)
+  (adjoin-to-list! name integrator-table 'integrators)
+  (put! integrator-table maker-procedure name 'maker)
+  (put! integrator-table needs name 'needs)
+  (void))

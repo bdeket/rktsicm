@@ -1,0 +1,308 @@
+#lang racket/base
+
+(provide (all-defined-out)
+         (all-from-out "cstm/types.rkt")
+         operator? differential?)
+;*r* copy/adapted from the scmutils library
+;;;; This is needed to load particular types
+
+(require racket/fixnum
+         "../parameters.rkt"
+         "cstm/types.rkt"
+         "cstm/s-operator.rkt"
+         "cstm/diff.rkt"
+         "../rkt/applyhook.rkt"
+         "cstm/generic.rkt")
+
+(define (make-type type-tag abstract-type-tag
+		   quantity-predicate concrete-predicate abstract-predicate)
+  (list type-tag abstract-type-tag
+	quantity-predicate concrete-predicate abstract-predicate))
+
+(define (type-tag type)
+  (car type))
+
+(define (abstract-type-tag type)
+  (cadr type))
+
+(define (quantity-predicate type)
+  (caddr type))
+
+(define (concrete-predicate type)
+  (cadddr type))
+
+(define (abstract-predicate type)
+  (car (cddddr type)))
+
+;*r* part moved to types-def.rkt
+
+(define (abstract-quantity? x)
+  (memq (g:type x) abstract-type-tags))
+
+
+;> from express.scm
+;;; Abstract quantities are represented with a type-tagged property list,
+;;; implemented as an alist.
+
+;*r* change this to hash, since racket doesn't use mlists by default
+;*r* abstract-quantity needs to be (or/c symbol? (pair? symbol? hash?))
+
+(define ((has-property? property-name) abstract-quantity)
+  (cond
+    [(pair? abstract-quantity)
+     (and (hash? abstract-quantity)
+          (hash-ref property-name (cdr abstract-quantity) #f))]
+    [(symbol? abstract-quantity)
+     (if (eq? property-name 'expression)
+         (list 'expression abstract-quantity)
+         (error "Symbols have only EXPRESSION properties"))]
+    [else
+     (error "Bad abstract quantity")]))
+
+(define (get-property abstract-quantity property-name [default #f])
+  (cond
+    [(pair? abstract-quantity)
+     (hash-ref (cdr abstract-quantity) property-name default)]
+    [(symbol? abstract-quantity)
+     (if (eq? property-name 'expression)
+         abstract-quantity
+         default)]
+    [else
+     (error "Bad abstract quantity")]))
+	 
+;*r* this is potentially different: originally new properties were added
+;*r* at the back of the list (even if they already existed)
+;*r* so a lookup would find the first added, not the last
+;*r* TODO: check this works ok
+
+(define (add-property! abstract-quantity property-name property-value)
+  (if (pair? abstract-quantity)
+      (hash-set! (cdr abstract-quantity) property-name property-value)
+      (error "Bad abstract quantity -- ADD-PROPERTY!")))
+;< from express.scm
+
+;;; NUMBER? is defined by Scheme system
+
+(define (abstract-number? x)
+  (or (literal-number? x)
+      (symbol? x)))
+
+(define (literal-number? x)
+  (and (pair? x)
+       (eq? (car x) number-type-tag)))
+
+(define (literal-real? x)
+  (and (literal-number? x)
+       ((has-property? 'real) x)))
+
+(define (numerical-quantity? x)
+  (or (number? x)
+      (abstract-number? x)
+      (and (differential? x)
+	   (numerical-quantity? (differential-of x)))
+      ;TODO
+      #;(and (with-units? x)
+	   (numerical-quantity? (u:value x)))))
+
+(define (with-units? x)
+  (and (pair? x)
+       (eq? (car x) with-units-type-tag)))
+
+(define (units? x)
+  (or (eq? x '&unitless)
+      (and (pair? x)
+	   (eq? (car x) unit-type-tag))))
+
+
+(define *number*
+  (make-type '*number* '*number* numerical-quantity? number? abstract-number?))
+
+
+(define (compound-type-tag? x)
+  ;; Will need to add tensors, etc.
+  (memq x compound-type-tags))
+
+(define (not-compound? x)
+  (not (or (vector? x)
+	   (and (pair? x)
+		(compound-type-tag? (car x))))))
+
+(define (scalar? x)
+  (not (or (vector? x)
+	   (and (pair? x)
+		(compound-type-tag? (car x)))
+	   (function? x))))
+
+;;; Scheme vectors are used to represent concrete vectors.
+;;; VECTOR? is defined by Scheme system
+
+(define (abstract-vector? x)
+  (and (pair? x)
+       (eq? (car x) vector-type-tag)))
+
+(define (vector-quantity? v)
+  (or (vector? v)
+      (abstract-vector? v)
+      (and (differential? v)
+	   (vector-quantity? (differential-of v)))))
+
+
+(define *vector*
+  (make-type vector-type-tag
+	     abstract-vector-type-tag
+	     vector-quantity? vector? abstract-vector?))
+
+
+(define (quaternion? v)
+  (and (pair? v)
+       (eq? (car v) quaternion-type-tag)))
+
+(define (quaternion-quantity? v)
+  (quaternion? v))
+
+
+(define (up? x)
+  ;;(and (pair? x) (eq? (car x) up-type-tag))
+  (vector? x))
+
+(define (abstract-up? x)
+  (and (pair? x) (eq? (car x) abstract-up-type-tag)))
+
+(define (up-quantity? v)
+  (or (up? v)
+      (abstract-up? v)
+      (and (differential? v)
+	   (up-quantity? (differential-of v)))))
+
+
+(define *up*
+  (make-type up-type-tag
+	     abstract-up-type-tag
+	     vector-quantity? up? abstract-up?))
+
+
+(define (down? x)
+  (and (pair? x)
+       (eq? (car x) down-type-tag)))
+
+(define (abstract-down? x)
+  (and (pair? x) (eq? (car x) abstract-down-type-tag)))
+
+(define (down-quantity? v)
+  (or (down? v)
+      (abstract-down? v)
+      (and (differential? v)
+	   (down-quantity? (differential-of v)))))
+
+
+(define *down*
+  (make-type
+   down-type-tag
+   abstract-down-type-tag
+   down-quantity? down? abstract-down?))
+
+(define (structure? x)
+  (or (up? x) (down? x)))
+
+
+(define (abstract-structure? x)
+  (or (abstract-up? x) (abstract-down? x)))
+
+
+(define (matrix? m)		
+  (and (pair? m)
+       (eq? (car m) matrix-type-tag)))
+
+(define (matrix-quantity? m)
+  (or (matrix? m)
+      (abstract-matrix? m)
+      (and (differential? m)
+	   (matrix-quantity? (differential-of m)))))
+
+(define (abstract-matrix? m)
+  (and (pair? m)
+       (eq? (car m) abstract-matrix-type-tag)))
+
+(define *matrix*
+  (make-type matrix-type-tag
+	     abstract-matrix-type-tag
+	     matrix-quantity? matrix? abstract-matrix?))
+
+(define (square-matrix? matrix)
+  (and (matrix? matrix)
+       (fx= (caadr matrix) (cdadr matrix))))
+
+(define (square-abstract-matrix? matrix)
+  (and (pair? matrix)
+       (eq? (car matrix) abstract-matrix-type-tag)
+       ((has-property? 'square) matrix)))
+
+(define (not-operator? x)
+  (not (operator? x)))
+
+
+(define (function-quantity? f)
+  (procedure? f))			;apply hooks are procedures.
+
+(define (function? f)
+  (and (procedure? f)
+       (not (operator? f))))
+
+(define (cofunction? f)			;may be combined with a function
+  (not (operator? f)))
+
+(define (abstract-function? f)
+  (and (typed-or-abstract-function? f)
+       (f:expression f)))
+
+(define (typed-function? f)
+  (and (typed-or-abstract-function? f)
+       (not (f:expression f))))
+
+(define (typed-or-abstract-function? f)
+  (and (apply-hook? f)
+       (eq? (car (apply-hook-extra f))
+	    function-type-tag)))
+
+;> from litfun.scm
+(define (f:expression f)
+  (if (typed-or-abstract-function? f)
+      (if (*literal-reconstruction*)
+	  (cadddr (cdr (apply-hook-extra f)))
+	  (cadddr (apply-hook-extra f)))
+      #f))
+;< from litfun.scm
+
+(define *function*
+  (make-type function-type-tag
+	     abstract-function-type-tag
+	     function-quantity? function? abstract-function?))
+
+
+(define (not-differential? obj)
+  (not (differential? obj)))
+
+
+(define (series? s)
+  (and (pair? s)
+       (eq? (car s) series-type-tag)))
+
+(define (not-series? s)
+  (not (series? s)))
+
+
+(define (not-differential-or-compound? x)
+  (not (or (vector? x)
+	   (and (pair? x)
+		(or (compound-type-tag? (car x))
+		    (eq? (car x) differential-type-tag))))))
+
+(define (not-d-c-u? x)
+  (not (or (eq? x '&unitless)
+	   (vector? x)
+	   (and (pair? x)
+		(or (compound-type-tag? (car x))
+		    (eq? (car x) differential-type-tag)
+		    (eq? (car x) with-units-type-tag)
+		    (eq? (car x) unit-type-tag))))))
+

@@ -1,0 +1,275 @@
+#lang racket/base
+
+(provide (all-defined-out))
+
+(require racket/fixnum
+         racket/flonum
+         "flovec.rkt"
+         )
+
+;;;; White Noise Generation
+
+(define (make-noise-vector method state length)
+  (let ((v (flo:make-vector length)))
+    (do ((i 0 (fx+ i 1)))
+	((fx= i length))
+      (flo:vector-set! v i (method state)))
+    v))
+
+(define (make-uniform-noise-vector state length)
+  (let ((v (flo:make-vector length)))
+    (do ((i 0 (fx+ i 1)))
+	((fx= i length))
+      (flo:vector-set! v i (fl- (random) .5)))
+    v))
+
+(define (make-gaussian-noise-vector:polar-method state length)
+  (let ((length (if (odd? length) (+ length 1) length)))
+    (let ((v (flo:make-vector length))
+	  (t (flo:make-vector 3)))
+      (let ((x1 (lambda () (flo:vector-ref t 0)))
+	    (set-x1! (lambda (x) (flo:vector-set! t 0 x)))
+	    (x2 (lambda () (flo:vector-ref t 1)))
+	    (set-x2! (lambda (x) (flo:vector-set! t 1 x)))
+	    (s (lambda () (flo:vector-ref t 2)))
+	    (set-s! (lambda (x) (flo:vector-set! t 2 x))))
+;(declare (integrate-operator x1 set-x1! x2 set-x2! s set-s!))
+	(do ((i 0 (fx+ i 2)))
+	    ((fx= i length))
+	  (let loop ()
+	    (set-x1! (random))
+	    (set-x1! (fl- (fl+ (x1) (x1)) 1.))
+	    (set-x2! (random))
+	    (set-x2! (fl- (fl+ (x2) (x2)) 1.))
+	    (set-s!  (fl+ (fl* (x1) (x1)) (fl* (x2) (x2))))
+	    (if (fl< (s) 1.)
+		(begin
+		  (set-s! (flsqrt (fl/ (fl* -2. (fllog (s))) (s))))
+		  (flo:vector-set! v i (fl* (x1) (s)))
+		  (flo:vector-set! v (fx+ i 1) (fl* (x2) (s))))
+		(loop)))))
+      v)))
+
+(define (marsaglia-maclaren-method f f-limits h v)
+  ;; F is the (1-sided) normalized probability density function.
+  ;; F-LIMITS is special; see Knuth text and code below.
+  ;; H is the number of divisions per horizontal unit.
+  ;; V is the number of divisions per vertical unit.
+  ;; Assumptions:
+  ;; (1) F is defined for non-negative reals.
+  ;; (2) F is positive and monotonically non-increasing.
+  ;; (3) The total area under F is 1.
+  ;; (4) Nearly all of F's area occurs between 0 and 3.
+  ;; (5) H and V are exact powers of two.
+  ;; **** The procedure MM-WORST-CASE is specifically for the Gaussian PDF.
+  (call-with-values (lambda () (mm-tables f f-limits h v))
+    (lambda (aj sj pj qj dj bj fj+6h)
+      (let ((h*3 (* h 3))
+	    (hv (exact->inexact (* h v)))
+	    (h (exact->inexact h)))
+	(lambda (state)
+	  (let ((body
+		 (lambda (U)
+		   (let ((a
+			  (flo:vector-ref aj
+					  (inexact->exact (truncate (fl* U hv))))))
+		     (if (fl< a 0.)
+			 (let loop ((j 0))
+			   (cond ((fx= j h*3)
+				  (mm-worst-case state))
+				 ((fl< U (flo:vector-ref pj j))
+				  (if (fl< U (flo:vector-ref qj j))
+				      (fl+ (flo:vector-ref sj j)
+					     (fl/ (random) h))
+				      (mm-algorithm-L state
+						      h
+						      (flo:vector-ref sj j)
+						      (flo:vector-ref dj j)
+						      (flo:vector-ref bj j)
+						      (vector-ref fj+6h j))))
+				 (else
+				  (loop (fx+ j 1)))))
+			 (fl+ a (fl/ (random) h)))))))
+	    (let ((U (random)))
+	      (if (fl< U .5)
+		  (body (fl* U 2.))
+		  (fl- 0.0 (body (fl* (fl- U .5) 2.)))))))))))
+
+(define (mm-algorithm-L state h s a/b b f)
+  (let loop ()
+    (call-with-values
+	(lambda ()
+	  (let ((U (random))
+		(V (random)))
+	    (if (fl< V U)
+		(values V U)
+		(values U V))))
+      (lambda (U V)
+	(let ((X (fl+ s (fl/ U h))))
+	  (if (and (fl> V a/b)
+		   (fl> V (fl+ U (fl/ (f X) b))))
+	      (loop)
+	      X))))))
+
+(define (mm-worst-case state)
+  (let loop ()
+    (let ((U (random))
+	  (V (random)))
+      (let ((W (fl+ (fl* U U) (fl* V V))))
+	(if (fl< W 1.)
+	    (let ((T (flsqrt (fl/ (fl- 9. (fl* 2. (fllog W))) W))))
+	      (let ((X (fl* U T)))
+		(if (fl< X 3.)
+		    (let ((X (fl* V T)))
+		      (if (fl< X 3.)
+			  (loop)
+			  X))
+		    X)))
+	    (loop))))))
+
+(define (mm-tables f f-limits h v)
+  (let ((pj (mm-pj f h v)))
+    (let ((pj+6h (mm-pj+6h f h)))
+      (call-with-values (lambda () (mm-abj f f-limits h pj+6h))
+	(lambda (aj bj)
+	  (let ((*pj (mm-*pj h pj (mm-pj+3h f h pj) pj+6h)))
+	    (values (vector->flonum-vector (mm-large-table h v pj))
+		    (vector->flonum-vector (mm-sj h))
+		    (vector->flonum-vector *pj)
+		    (vector->flonum-vector (mm-qj h *pj pj+6h))
+		    (vector->flonum-vector (mm-dj aj bj))
+		    (vector->flonum-vector bj)
+		    (mm-fj+6h f h pj+6h))))))))
+
+(define (mm-large-table h v pj)
+  (let ((h*3 (* h 3))
+	(hv (* h v)))
+    (let ((table (make-vector hv -1)))
+      (let loop ((j 0) (i 0))
+	(when (not (= j h*3))
+	    (let ((i* (+ i (* (vector-ref pj j) hv))))
+	      (for ([i (in-range i i*)])
+                (vector-set! table i (/ j h)))
+	      (loop (+ j 1) i*))))
+      table)))
+
+(define (mm-sj h)
+  (build-vector (+ (* h 3) 1)
+    (lambda (j)
+      (/ j h))))
+
+(define (mm-pj f h v)
+  (build-vector (* h 3)
+    (let ((hv (* h v)))
+      (lambda (j)
+	(/ (inexact->exact (truncate (* v (f (/ (+ j 1) h))))) hv)))))
+
+(define (mm-pj+3h f h pj)
+  (build-vector (* h 3)
+    (lambda (j)
+      (- (/ (f (/ (+ j 1) h)) h)
+	 (vector-ref pj j)))))
+
+(define (mm-pj+6h f h)
+  (build-vector (* h 3)
+    (lambda (j)
+      (let ((xu (/ (+ j 1) h)))
+	(- (simpsons-rule f (/ j h) xu 128)
+	   (/ (f xu) h))))))
+
+(define (mm-abj f f-limits h pj+6h)
+  (let ((h*3 (* h 3)))
+    (let ((aj (make-vector h*3))
+	  (bj (make-vector h*3)))
+      (do ((j 0 (+ j 1)))
+	  ((= j h*3))
+	(let ((xu (/ (+ j 1) h)))
+	  (call-with-values (lambda () (f-limits (/ j h) xu))
+	    (lambda (a b)
+	      (let ((fxu (f xu))
+		    (p (vector-ref pj+6h j)))
+		(vector-set! aj j (/ (- a fxu) p))
+		(vector-set! bj j (/ (- b fxu) p)))))))
+      (values aj bj))))
+
+(define (mm-dj aj bj)
+  (build-vector (vector-length aj)
+    (lambda (j)
+      (/ (vector-ref aj j) (vector-ref bj j)))))
+
+(define (mm-*pj h pj pj+3h pj+6h)
+  (let ((h*3 (* h 3)))
+    (let ((*pj (make-vector (+ h*3 1))))
+      (do ((j 0 (+ j 1)))
+	  ((= j h*3))
+	(vector-set! *pj j
+		     (+ (if (= j 0)
+			    (do ((j 0 (+ j 1))
+				 (p 0 (+ p (vector-ref pj j))))
+				((= j h*3) p))
+			    (vector-ref *pj (- j 1)))
+			(vector-ref pj+3h j)
+			(vector-ref pj+6h j))))
+      (vector-set! *pj h*3 1)
+      *pj)))
+
+(define (mm-qj h *pj pj+6h)
+  (build-vector (* h 3)
+    (lambda (j)
+      (- (vector-ref *pj j) (vector-ref pj+6h j)))))
+
+(define (mm-fj+6h f h pj+6h)
+  (build-vector (* h 3)
+    (lambda (j)
+      (let ((base (exact->inexact (f (/ (+ j 1) h))))
+	    (scale (exact->inexact (vector-ref pj+6h j))))
+	(lambda (x)
+	  (fl/ (fl- (f x) base) scale))))))
+
+(define (simpsons-rule f a b n/2)
+  (let ((b-a (- b a))
+	(n (* 2 n/2)))
+    (let ((x
+	   (lambda (i)
+	     (+ a (* (/ i n) b-a)))))
+      (let loop ((i 1) (sum (f a)))
+	(let ((i (+ i 1))
+	      (sum (+ sum (* 4 (f (x i))))))
+	  (if (= i n)
+	      (/ (* (/ b-a n) (+ sum (f b))) 3)
+	      (loop (+ i 1)
+		    (+ sum (* 2 (f (x i)))))))))))
+
+(define one-sided-unit-gaussian-pdf
+  (let ((sqrt-pi/2 (sqrt (* 2 (atan 1 1)))))
+    (lambda (x)
+      (/ (exp (/ (* x x) -2))
+	 sqrt-pi/2))))
+
+(define (one-sided-unit-gaussian-pdf-limits xl xu)
+  (let ((xd (- xu xl))
+	(fxl (one-sided-unit-gaussian-pdf xl))
+	(fxu (one-sided-unit-gaussian-pdf xu)))
+    (if (<= xu 1)
+	(values fxl (* (+ 1 (* xd xu)) fxu))
+	(values
+	 (let ((y (/ (- fxu fxl) xd)))
+	   (let ((x
+		  (let ((f
+			 (lambda (x)
+			   (* (- x) (one-sided-unit-gaussian-pdf x)))))
+		    (let ((limit (* (abs y) 1e-6))
+			  (d0 (/ xd 2)))
+		      (let loop ((x (+ xl d0)) (d (/ d0 2)))
+			(let ((fx (f x)))
+			  (cond ((< (abs (- fx y)) limit)
+				 x)
+				((< fx y)
+				 (when (>= x xu) (error "Can't find root."))
+				 (loop (+ x d) (/ d 2)))
+				(else
+				 (when (<= x xl) (error "Can't find root."))
+				 (loop (- x d) (/ d 2))))))))))
+	     (- (one-sided-unit-gaussian-pdf x)
+		(* y (- x xl)))))
+	 fxl))))
