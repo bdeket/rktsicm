@@ -96,7 +96,7 @@
 |#
 
 (define (simplify exp)
-  ((access clean-differentials rule-environment)
+  (clean-differentials
    (flush-derivative
     (flush-literal-function-constructors
      (ham:simplify
