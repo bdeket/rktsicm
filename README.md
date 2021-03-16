@@ -10,6 +10,12 @@ Currently everything compiles. More testing will be needed to check that everyth
 raco pkg install git://github.com/bdeket/rktsicm/?path=rktsicm
 ```
 
+#### use:
+```
+#lang sicm
+```
+or `(require sicm)`
+
 #### goals:
 
 - [ ] add tests
