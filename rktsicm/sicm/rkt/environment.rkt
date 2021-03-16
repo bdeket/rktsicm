@@ -18,9 +18,10 @@
 (define (environment-bound? env sym)
   (and (member sym (namespace-mapped-symbols env)) #t))
 
-(define (environment-assign! env sym v)
-  (namespace-set-variable-value! sym v #f env))
-(define environment-define environment-assign!)
+(define (environment-assign! env sym v #:bind? [bind? #f])
+  (namespace-set-variable-value! sym v bind? env))
+(define (environment-define env sym v)
+  (environment-assign! env sym v #:bind? #t))
 
 ;probalby wrong TODO
 (define (lexical-unbound? env sym) (not (environment-bound? env sym)))

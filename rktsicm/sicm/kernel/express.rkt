@@ -1,8 +1,10 @@
 #lang racket/base
 
-(require racket/fixnum)
+(require racket/fixnum
+         (only-in racket/base [object-name procedure-name]))
 (provide (all-defined-out)
-         (all-from-out "cstm/express.rkt"))
+         (all-from-out "cstm/express.rkt")
+         procedure-name)
 
 (require racket/port
          "cstm/express.rkt"
@@ -165,14 +167,6 @@
                      (namespace-variable-value b #t #f e)))]
                #:when (eq? object o))
     b))
-
-(define (procedure-name f)
-  (define s (call-with-output-string
-             (λ (out) (print f out))))
-  (define n (regexp-match #px"(?<=^#<procedure:).*(?=>$)" s))
-  (define ans (if n (car n) (gensym 'lambda)))
-  (println `(procedure-name ,f => ,ans))
-  ans)
 
 (define (procedure-expression f)
   (or (eq-get f 'function-name)

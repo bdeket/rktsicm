@@ -1,11 +1,11 @@
-#lang s-exp "../kernel.rkt"
+#lang s-exp "../../kernel.rkt"
 
 (require rackunit)
 
 ;some examples litered troughout the files of calculus/*
 ;kernel
-(require "../solve.rkt"
-         "../general/list-utils.rkt")
+(require "../../solve.rkt"
+         "../../general/list-utils.rkt")
 
 (define-syntax-rule (hypothetical x) (make-hypothetical 'x #f))
 ;***************************************************************************************************

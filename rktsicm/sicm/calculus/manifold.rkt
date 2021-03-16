@@ -343,16 +343,16 @@
 
 (define (install-coordinates coordinate-system
                              [coordinate-prototype default-object])
+  (define env (current-namespace))
   (define (install-symbol name value)
-    (when (environment-bound? user-generic-environment name)
+    (when (environment-bound? env name)
         (begin
           (writeln `(clobbering ,name))
           (set! *saved-environment-values*
                 (cons (cons name
-                            (environment-lookup user-generic-environment
-                                                name))
+                            (environment-lookup env name))
                       *saved-environment-values*))))
-    (environment-define user-generic-environment name value))
+    (environment-define env name value))
   (define (install-symbols s)
     (s:foreach (lambda (symval)
                  (install-symbol (car symval) (cadr symval)))

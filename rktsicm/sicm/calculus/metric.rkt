@@ -283,7 +283,7 @@
 
 (define (metric->inverse-components metric basis)
   (define (the-coeffs m)
-    (let ((g_ij ((metric->components metric basis) m))
+    (let ((g_ij (g:apply (metric->components metric basis) (list m)))
 	  (1form-basis (basis->1form-basis basis)))
       (let ((g^ij
 	     (s:inverse (typical-object 1form-basis)
