@@ -78,12 +78,12 @@
       (lambda (V)
 	(let ((CV (Cartan-forms V)))
 	  (lambda (U)
-	    (let ((u-components (1form-basis U)))
+	    (let ((u-components (g:apply 1form-basis (list U))))
 	      (let ((deriv-components
 		     (+ (V u-components)
 			(* CV u-components))))
 		(define (the-derivative f)
-		  (* (vector-basis f) deriv-components))
+		  (* (g:apply vector-basis (list f)) deriv-components))
 		(procedure->vector-field the-derivative
 		  `((nabla ,(diffop-name V))
 		    ,(diffop-name U)))))))))))	  

@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/fixnum)
+(require racket/fixnum
+         racket/list)
 (provide (all-defined-out))
 
 ;*r* copy/adapted from the scmutils library
@@ -12,9 +13,8 @@
 (define list:generate build-list)
 
 (define (list-with-substituted-coord lst i x)
-  (append (car lst i)
-	  (list x)
-	  (cdr (cdr lst i))))
+  (define-values (head tail) (split-at lst i))
+  `(,@head ,x ,@(cdr tail)))
 
 ;;;           Structural Vectors
 
