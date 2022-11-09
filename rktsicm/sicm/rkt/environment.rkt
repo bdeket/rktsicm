@@ -2,8 +2,10 @@
 
 (require (for-syntax racket/base)
          racket/function)
+(require (only-in "racket-help.rkt" rktsicm-logger))
 
 (provide (all-defined-out))
+(define-logger environment #:parent rktsicm-logger)
 
 (define system-global-environment (make-base-namespace))
 (define user-generic-environment  (make-base-namespace))
@@ -32,7 +34,7 @@
 (define-syntax-rule (access var env)
   (namespace-variable-value 'var #t
                             (λ ()
-                              (printf "warning: ~a not found in ~a\n" 'var env)
+                              (log-environment-warning (format "warning: ~a not found in ~a" 'var env))
                               not-defined)
                             env))
 (define (make-primitive-procedure var [arity #f])

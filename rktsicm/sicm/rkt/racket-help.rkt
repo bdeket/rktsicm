@@ -11,13 +11,14 @@
 (define ignored-error (gensym 'ignored-error))
 (define (ignored-error? x) (eq? ignored-error x))
 
+
+(define-logger rktsicm)
 (define (warn . rst)
   (cond
-    [(null? rst) (println "warning")]
+    [(null? rst) (log-rktsicm-warning "warning")]
     [else
-     (print (car rst))
-     (for ([p (in-list (cdr rst))]) (printf " ~a" p))
-     (newline)]))
+     (log-rktsicm-warning (car rst))
+     (for ([p (in-list (cdr rst))]) (log-rktsicm-warning (format " ~a" p)))]))
 
 
 (define (for-all? lst pred) (andmap pred lst))

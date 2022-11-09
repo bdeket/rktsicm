@@ -4,6 +4,7 @@
          racket/list
          racket/math
          racket/stream)
+(require (only-in "racket-help.rkt" warn))
 
 (provide (all-defined-out))
 
@@ -40,8 +41,8 @@
 (define *angular* '&angular)
 (define symbolic-operators '())
 
-(define (diff-memoize-1arg fct) (println "diff-memoize-1arg: not moizing") fct)
-(define (diff-memoize-2arg fct) (println "diff-memoize-2arg: not moizing") fct)
+(define (diff-memoize-1arg fct) (warn (format "diff-memoize-1arg: not moizing - ~a" fct)) fct)
+(define (diff-memoize-2arg fct) (warn (format "diff-memoize-2arg: not moizing - ~a" fct)) fct)
 
 (todo div-coeff "???")
 (todo sub-coeff "???")
@@ -73,7 +74,7 @@
 (define-syntax-rule (access var env)
   (namespace-variable-value 'var #t
                             (λ ()
-                              (printf "warning: ~a not found in ~a\n" 'var env)
+                              (warn (format "warning: ~a not found in ~a\n" 'var env))
                               not-defined)
                             env))
 
