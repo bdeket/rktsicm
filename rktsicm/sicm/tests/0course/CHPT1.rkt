@@ -1,5 +1,6 @@
 #lang s-exp "../../main.rkt"
 
+(module+ test
 (require rackunit
          plot)
 
@@ -225,4 +226,4 @@
 
   (L-central-polar (/ (* 'm1 'm2) (+ 'm1 'm2))
                    (gravitational-energy 'G 'm1 'm2))
-)
+))
