@@ -372,11 +372,8 @@
 	    "I cannot handle this arity -- TYPED-FUNCTION")
     (assert (fx= (length domain-types) (car arity))
 	    "Inconsistent arity -- TYPED-FUNCTION")
-    (let ((apply-hook (make-apply-hook #f #f)))
-      (set-apply-hook-procedure! apply-hook function)
-      (set-apply-hook-extra! apply-hook
-        (list '*function* domain-types range-type #f))
-      apply-hook)))
+    (make-apply-hook function
+                     (list '*function* domain-types range-type #f))))
 
 
 (define (literal-function? f)
@@ -416,22 +413,22 @@
 (define (litfun fexp arity range-type domain-types call)
   ;;(assert (exactly-n? arity)
   ;;        "I cannot handle this arity -- LITERAL-FUNCTION")
-  (let ((apply-hook (make-apply-hook #f #f)))
-    (let ((litf
-	   (cond ((equal? arity *exactly-zero*)
-		  (lambda () (literal-apply apply-hook '())))
-		 ((equal? arity *exactly-one*)
-		  (lambda (x) (literal-apply apply-hook (list x))))
-		 ((equal? arity *exactly-two*)
-		  (lambda (x y) (literal-apply apply-hook (list x y))))
-		 ((equal? arity *exactly-three*)
-		  (lambda (x y z) (literal-apply apply-hook (list x y z))))
-		 (else
-		  (lambda args (literal-apply apply-hook args))))))
-      (set-apply-hook-procedure! apply-hook litf)
-      (set-apply-hook-extra! apply-hook
-        (list '*function* domain-types range-type fexp call))
-      apply-hook)))
+  (define apply-hook
+    (make-apply-hook
+     (procedure-rename
+      (cond ((equal? arity *exactly-zero*)
+             (lambda () (literal-apply apply-hook '())))
+            ((equal? arity *exactly-one*)
+             (lambda (x) (literal-apply apply-hook (list x))))
+            ((equal? arity *exactly-two*)
+             (lambda (x y) (literal-apply apply-hook (list x y))))
+            ((equal? arity *exactly-three*)
+             (lambda (x y z) (literal-apply apply-hook (list x y z))))
+            (else
+             (lambda args (literal-apply apply-hook args))))
+      'literal-function)
+     (list '*function* domain-types range-type fexp call)))
+  apply-hook)
 
 
 (define (literal-apply apply-hook args)
