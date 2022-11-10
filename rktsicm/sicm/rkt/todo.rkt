@@ -13,6 +13,9 @@
 ;; TODO's find right way to do this
 
 (define-syntax-rule (todo id _ ...) (define (id . rst) (error (format "~a: TODO" 'id))))
+(define-syntax (errr stx)
+  (syntax-case stx ()
+    [(_ id) (syntax/loc #'id (error (format "~a: TODO" 'id)))]))
 (define-syntax (todos stx)
   (syntax-case stx ()
     [(todos name cases ...)
@@ -24,11 +27,12 @@
                                      (cddr x)]
                                     [else (list (car x))]))
                                 (syntax->datum #'(cases ...))))])
-       #`(begin
+       (quasisyntax/loc #'name
+         (begin
            (module name racket/base
              (provide id ...)
-             (define (id . rst) (error (format "~a: TODO" 'id))) ...)
-           #,(datum->syntax stx `(require ',#'name))))]))
+             (define (id . rst) ((λ (sym)#,(syntax/loc stx (error (format "~a: TODO" sym)))) 'id)) ...)
+           #,(datum->syntax stx `(require ',#'name)))))]))
 
 (todo set-cdr!)
 (todo set-car!)

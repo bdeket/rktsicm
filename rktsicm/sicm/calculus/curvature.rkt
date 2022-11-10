@@ -8,12 +8,8 @@
          "manifold.rkt"
          "form-fields.rkt"
          "vector-fields.rkt"
-         (only-in "../rkt/todo.rkt" todos)
+         (only-in "../mechanics/Hamiltonian.rkt" commutator)
          )
-
-(todos todo
-       [commutator "mechanics/Hamiltonian"])
-(require 'todo)
 
 ;;; Riemann curvature "tensor" is pretty easy
 
