@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require (only-in racket/function arity-includes?)
-         (only-in "../rkt/racket-help.rkt" warn)
+         (only-in "../rkt/racket-help.rkt" rktsicm-logger)
          (only-in "../rkt/environment.rkt" generic-environment)
          "cstm/types.rkt"
          "cstm/genenv.rkt")
@@ -9,6 +9,9 @@
 (provide make-generic-operator
          assign-operation
          get-operator-record)
+
+(define-logger generics #:parent rktsicm-logger)
+
 ;;;;           Most General Generic-Operator Dispatch
 
 ;;; Generic-operator dispatch is implemented here by a discrimination
@@ -37,7 +40,7 @@
 (define (make-tree [han #f])
   (tree '() #f han))
 
-(define (make-find-in-tree tree)
+(define (make-find-in-tree name tree)
   (λ (arguments)
     (or
      (let loop ([args arguments]
@@ -57,7 +60,7 @@
 (struct operator-record (name arity finder tree) #:transparent)
 (define (make-operator-record name arity)
   (define tree (make-tree))
-  (define find-in-tree (make-find-in-tree tree))
+  (define find-in-tree (make-find-in-tree name tree))
   (operator-record name arity find-in-tree tree))
 
 (define *generic-operator-table* (make-hasheq))
@@ -66,7 +69,7 @@
 (define (get-operator-record operator)
   (hash-ref *generic-operator-table* operator
             (λ () (define ans (get-symbol-operator-record operator))
-              (when ans (warn (format "get-operator-record using symbolic reference: ~a" operator)))
+              (when ans (log-generics-warning (format "get-operator-record using symbolic reference: ~a" operator)))
               ans)))
 (define (get-symbol-operator-record operator)
   (hash-ref *generic-symbol-operator-table* operator #f))
@@ -165,7 +168,7 @@
       [(null? keys)
        (when (equal? (tree-rst? tree) (not rest?)) (set-tree-rst?! tree rest?))
        (when (tree-han tree)
-         (warn (format "Replacing handler for generic ~a: ~a -> ~a"
+         (log-generics-warning (format "Replacing handler for generic ~a: ~a -> ~a"
                        (operator-record-name record) (tree-han tree) handler)))
        (set-tree-han! tree handler)]
       [(assq (car keys) (tree-branch tree))
