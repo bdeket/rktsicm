@@ -97,14 +97,14 @@
 
 (define ((Euler->omega angles-path) t)
   (define (M-on-path t)
-    (Euler->M (angles-path t)))
+    (Euler->M (g:apply angles-path (list t))))
   (define (w-cross t)
     (* ((D M-on-path) t)
        (transpose (M-on-path t))))
   (antisymmetric->column-matrix (w-cross t)))
 
 (define ((Euler->omega-body angles-path) t)
-  (* (transpose (Euler->M (angles-path t)))
+  (* (transpose (Euler->M (g:apply angles-path (list t))))
      ((Euler->omega angles-path) t)))
 
 #|
