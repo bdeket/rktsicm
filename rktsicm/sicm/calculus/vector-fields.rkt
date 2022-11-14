@@ -126,13 +126,12 @@
 ;;; combination.  This is for any basis, not just a coordinate basis.
 ;;; The components are evaluated at the point, not the coordinates.
 
-;TODO : check we don't need g:*
 (define (basis-components->vector-field components vector-basis)
   (procedure->vector-field
    (lambda (f)
      (lambda (point)
-       (* ((vector-basis f) point)
-	  (components point))))
+       (* (s:apply (s:apply vector-basis (list f)) (list point))
+	  (s:apply components (list point)))))
    `(+ ,@(map (lambda (component basis-element)
 		`(* ,(diffop-name component)
 		    ,(diffop-name basis-element)))
