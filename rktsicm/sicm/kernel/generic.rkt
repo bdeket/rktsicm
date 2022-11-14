@@ -13,7 +13,7 @@
 
 ;;; Unary Operators 
 
-(define (g:transpose thing [shape #f])
+(define (g:transpose thing [shape default-object])
   (if (default-object? shape)
       (generic:transpose thing)
       (s:transpose1 thing shape)))
