@@ -61,8 +61,7 @@
 	((function? op) 0)
 	(else (error "Bad rank " op))))
 
-(define (rank->arity n)
-  (cons n n))
+(define (rank->arity n) n)
 
 (define (procedure->nform-field proc n [name 'unnamed-nform-field])
   (if (= n 0)
