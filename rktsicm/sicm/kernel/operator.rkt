@@ -205,7 +205,7 @@
   (assert (equal? (operator-arity op) *exactly-one*) "o:exp")
   (make-operator (lambda (g)
 	     (lambda x
-	       (g:apply ((series:value exp-series (list op)) g) x)))
+	       (g:apply (g:apply (series:value exp-series (list op)) (list g)) x)))
 	   `(exp ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
