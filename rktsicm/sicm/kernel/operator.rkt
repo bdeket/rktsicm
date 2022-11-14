@@ -205,7 +205,7 @@
   (assert (equal? (operator-arity op) *exactly-one*) "o:exp")
   (make-operator (lambda (g)
 	     (lambda x
-	       (g:apply (g:apply (series:value exp-series (list op)) (list g)) x)))
+	       (g:apply (series:value (series:value exp-series (list op)) (list g)) x)))
 	   `(exp ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -215,7 +215,7 @@
   (assert (equal? (operator-arity op) *exactly-one*) "o:cos")
   (make-operator (lambda (g)
 	     (lambda x
-	       (g:apply ((series:value cos-series (list op)) g) x)))
+	       (g:apply (series:value (series:value cos-series (list op)) (list g)) x)))
 	   `(cos ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -225,7 +225,7 @@
   (assert (equal? (operator-arity op) *exactly-one*) "o:sin")
   (make-operator (lambda (g)
 	     (lambda x
-	       (g:apply ((series:value sin-series (list op)) g) x)))
+	       (g:apply (series:value (series:value sin-series (list op)) (list g)) x)))
 	   `(sin ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
