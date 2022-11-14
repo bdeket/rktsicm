@@ -2,42 +2,64 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/racket-help.rkt"
+(require racket/syntax
+         "../rkt/racket-help.rkt"
          )
 
-(define *suppressed-argument-list* '())
-
-(define *suppressed-argument-list-counter* 0)
-
-(define (suppress-arguments arguments)
-  (let ((n (+ (length *suppressed-argument-list*) 1)))
-    (set! *suppressed-argument-list-counter*
-	  (+ *suppressed-argument-list-counter* 1))
-    (set! *suppressed-argument-list*
-	  (cons (cons arguments
-		      (symbol "args."
-			      *suppressed-argument-list-counter*))
-		*suppressed-argument-list*))
-    n))
-
-(define (show-suppressed-arguments)
-  (println (map (lambda (al)
-	     `(,(cdr al) = ,@(car al)))
-	   *suppressed-argument-list*)))
+(define *suppressed-argument-list* (make-parameter '()))
+(define *suppressed-argument-list-counter* (make-parameter 0))
+(define *rename-list* (make-parameter #hash()))
 
 (define (clear-arguments)
-  (set! *suppressed-argument-list* '())
-  (set! *suppressed-argument-list-counter* 0)
+  (*suppressed-argument-list* '())
+  (*suppressed-argument-list-counter* 0)
+  (*rename-list* #hash())
   0)
+
+(define (suppress-arguments arguments)
+  (let ((n (+ (length (*suppressed-argument-list*)) 1)))
+    (*suppressed-argument-list-counter* (+ (*suppressed-argument-list-counter*) 1))
+    (*suppressed-argument-list*
+     (cons (cons arguments
+                 (format-symbol "args.~a"
+                                (*suppressed-argument-list-counter*)))
+           (*suppressed-argument-list*)))
+    n))
+
+(define (rename-part arg rep) (*rename-list* (hash-set (*rename-list*) arg rep)))
+
+(define (show-suppressed-arguments)
+  (map (lambda (al)
+             `(,(cdr al) = ,@(car al)))
+           (*suppressed-argument-list*)))
 
 (define (arg-suppressor expression)
   (if (pair? expression)
-      (let ((v (assoc (cdr expression) *suppressed-argument-list*)))
-	(if v
-	    (list (arg-suppressor (car expression)) (cdr v))
-	    (cons (arg-suppressor (car expression))
-		  (arg-suppressor (cdr expression)))))
+      (let ((v (assoc (cdr expression) (*suppressed-argument-list*))))
+        (if v
+            (list (arg-suppressor (car expression)) (cdr v))
+            (cons (arg-suppressor (car expression))
+                  (arg-suppressor (cdr expression)))))
       expression))
+(define (arg-suppressor+ expression)
+  (if (pair? expression)
+      (let ((v (assoc (cdr expression) (*suppressed-argument-list*))))
+        (if v
+            (arg-suppressor+ (car expression))
+            (cons (arg-suppressor+ (car expression))
+                  (arg-suppressor+ (cdr expression)))))
+      expression))
+
+(define rename-expression
+  (let ([g (gensym)])
+    (λ (expr)
+      (define rep (hash-ref (*rename-list*) expr g))
+      (cond
+        [(eq? rep g)
+         (if (pair? expr)
+             (map rename-expression expr)
+             expr)]
+        [else rep]))))
 
 #|
 ;;; For example
