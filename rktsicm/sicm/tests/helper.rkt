@@ -5,10 +5,14 @@
          racket/match
          racket/list
          syntax/srcloc
-         "../main.rkt")
+         racket/syntax
+         (only-in "../kernel-gnrc.rkt" simplify)
+         "../display/suppress-args.rkt")
 
-(provide check-unique-match? check-simplified?)
+(provide check-unique-match? check-simplified?
+         clear-arguments suppress-arguments rename-part)
 
+;***************************************************************************************************
 (define-syntax (check-unique-match? stx)
   (syntax-case stx ()
     [(_ term (ids ...) pattern)
@@ -61,6 +65,7 @@
                                       `(+ (* 4 ,x)
                                           (* ,y ,z)))))))
 
+;***************************************************************************************************
 (define-syntax (check-simplified? stx)
   (syntax-case stx ()
     [(_ term pattern)
@@ -69,8 +74,8 @@
                               (syntax-column stx)
                               (syntax-position stx)
                               (syntax-span stx))])
-       #`(let ([T (simplify term)]
-               [P (simplify pattern)])
+       #`(let ([T (simplify (rename-expression (arg-suppressor+ (simplify term))))]
+               [P (simplify (rename-expression (arg-suppressor+ (simplify pattern))))])
            (with-check-info*
             (list (make-check-name '|check-simplified?|)
                   (make-check-actual T)
