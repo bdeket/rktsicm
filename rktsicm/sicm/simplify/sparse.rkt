@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          "fpf.rkt"
@@ -29,11 +29,11 @@
 
 (define (sparse-univariate? p)
   (and (pair? p)
-       (fx= (length (sparse-exponents (car p)))
+       (fix:= (length (sparse-exponents (car p)))
 	      1)))
 
 (define (sparse-constant? p)
-  (and (fx= (length p) 1)
+  (and (fix:= (length p) 1)
        (sparse-constant-term? (car p))))
 
 (define (sparse-one-term? t)
@@ -61,7 +61,7 @@
 (define (sparse-identity-term arity-n varnum)
   (sparse-term (build-list arity-n
 			      (lambda (i)
-				(if (fx= i varnum) 1 0)))
+				(if (fix:= i varnum) 1 0)))
 	       1))
 
 (define (sparse-linear arity-n varnum root)
@@ -79,16 +79,16 @@
 ;;; Graded Lexicographical Order
 
 (define (sparse:>exponents? fs1 fs2)
-  (let ((o1 (reduce fx+ 0 fs1))
-	(o2 (reduce fx+ 0 fs2)))
-    (cond ((fx> o1 o2) #t)
-	  ((fx< o1 o2) #f)
+  (let ((o1 (reduce fix:+ 0 fs1))
+	(o2 (reduce fix:+ 0 fs2)))
+    (cond ((fix:> o1 o2) #t)
+	  ((fix:< o1 o2) #f)
 	  (else
 	   (let lp ((l1 fs1) (l2 fs2))
 	     (cond ((null? l1) #f)
 		   ((null? l2) #t)
-		   ((fx> (car l1) (car l2)) #t)
-		   ((fx< (car l1) (car l2)) #f)
+		   ((fix:> (car l1) (car l2)) #t)
+		   ((fix:< (car l1) (car l2)) #f)
 		   (else (lp (cdr l1) (cdr l2)))))))))
 
 #|
@@ -98,8 +98,8 @@
   (let lp ((l1 fs1) (l2 fs2))
     (cond ((null? l1) #f)
 	  ((null? l2) #t)
-	  ((fx> (car l1) (car l2)) #t)
-	  ((fx< (car l1) (car l2)) #f)
+	  ((fix:> (car l1) (car l2)) #t)
+	  ((fix:< (car l1) (car l2)) #f)
 	  (else (lp (cdr l1) (cdr l2))))))
 |#
 
@@ -266,7 +266,7 @@
   (if (null? p)
       0
       (begin
-	(assert (fx= (length x)
+	(assert (fix:= (length x)
 		       (length (sparse-exponents (car p)))))
 	(apply +
 	       (map (lambda (term)

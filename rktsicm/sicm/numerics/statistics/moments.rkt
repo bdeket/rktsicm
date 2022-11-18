@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../general/assert.rkt")
 
@@ -18,9 +18,9 @@
     (assert (not (zero? n))
 	    "Need some data -- v:mean")
     (let lp ((i 0) (sum 0))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  (/ sum n)
-	  (lp (fx+ i 1)
+	  (lp (fix:+ i 1)
 	      (+ sum (vector-ref v i)))))))
 
 ;;; Watch out! The following program incorporates
@@ -40,13 +40,13 @@
     (assert (not (and (one? n) sample?))
 	    "Need more data -- v:sample-variance")
     (let lp ((i 0) (sumsq 0) (sum 0))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  (/ (- sumsq (/ (square sum) n))
 	     (if (not sample?)
 		 n
-		 (fx- n 1)))
+		 (fix:- n 1)))
 	  (let ((y (- (vector-ref v i) mean)))
-	    (lp (fx+ i 1)
+	    (lp (fix:+ i 1)
 		(+ sumsq (square y))
 		(+ sum y)))))))
     
@@ -66,10 +66,10 @@
   (let ((n (vector-length v))
 	(mean (v:mean v)))
     (let lp ((i 0) (sum 0))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  (/ sum n)
 	  (let ((y (abs (- (vector-ref v i) mean))))
-	    (lp (fx+ i 1)
+	    (lp (fix:+ i 1)
 		(+ sum y)))))))
 
 ;;; We can calculate them all at once
@@ -82,11 +82,11 @@
     (assert (not (and (one? n) sample?))
 	    "Need more data -- sample-variance")
     (let lp ((i 0) (sum 0) (sumsq 0) (sumcb 0) (sumqu 0) (asum 0))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  (let* ((var (/ (- sumsq (/ (square sum) n))
 			 (if (not sample?)
 			     n
-			     (fx- n 1))))
+			     (fix:- n 1))))
 		 (std (sqrt var))
 		 (skew (/ sumcb (* n var std)))
 		 (kurt (- (/ sumqu (* n (square var))) 3.0))
@@ -96,7 +96,7 @@
 		 (yy (* y y))
 		 (yyy (* y yy))
 		 (yyyy (* y yyy)))
-	    (lp (fx+ i 1)
+	    (lp (fix:+ i 1)
 		(+ sum y)
 		(+ sumsq yy)
 		(+ sumcb yyy)

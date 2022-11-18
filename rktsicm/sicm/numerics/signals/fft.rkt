@@ -2,7 +2,7 @@
 
 (provide (except-out (all-defined-out) ->flonum))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/vector
          "../../kernel-intr.rkt"
          "cph-dsp/fft.rkt"
@@ -41,12 +41,12 @@
 	     (w*-list (map conjugate w-list))
 	     (fperiod (exact->inexact period)))
 	(define (ft data)
-	  (if (fx= period (length data))
+	  (if (fix:= period (length data))
 	      (map (lambda (z) (/ z fperiod))
 		   (fft-internal data w*-list))
 	      (error "Wrong length data record -- FT" period)))
 	(define (ift data)
-	  (if (fx= period (length data))
+	  (if (fix:= period (length data))
 	      (fft-internal data w-list)
 	      (error "Wrong length data record -- IFT" period)))
 	(list period ft ift))
@@ -58,7 +58,7 @@
 (define (power-of-2? n)
   (and (exact? n) (integer? n) (positive? n)
        (let lp ((n n))
-	 (or (fx= n 1)
+	 (or (fix:= n 1)
 	     (and (even? n)
 		  (lp (quotient n 2)))))))
 
@@ -69,12 +69,12 @@
   (let ((n/2 (quotient n 2))
 	(2pi/n (/ 2pi (exact->inexact n))))
     (let loop ((k 0))
-      (if (fx= k n/2)
+      (if (fix:= k n/2)
 	  '()
 	  (let ((fk (exact->inexact k)))
 	    (cons (make-rectangular (cos (* 2pi/n fk))
 				    (sin (* 2pi/n fk)))
-		  (loop (fx+ 1 k))))))))
+		  (loop (fix:+ 1 k))))))))
 
 
 ;;; Useful for testing FFT programs
@@ -128,12 +128,12 @@
 	     (w*-list (map conjugate w-list))
 	     (fperiod (exact->inexact period)))
 	(define (ft data)
-	  (if (fx= period (length data))
+	  (if (fix:= period (length data))
 	      (map (lambda (z) (/ z fperiod))
 		   (fft-internal data w-list))
 	      (error "Wrong length data record -- FT" period)))
 	(define (ift data)
-	  (if (fx= period (length data))
+	  (if (fix:= period (length data))
 	      (fft-internal data w*-list)
 	      (error "Wrong length data record -- IFT" period)))
 	(list period ft ift))
@@ -175,7 +175,7 @@
 
 (define (fft-check-data-length data period)
   (when (not
-       (fx= period 
+       (fix:= period 
               ((cond ((vector? data) vector-length)
                      ((list? data) length)
                      (else (error "Wrong type data -- FT" data)))
@@ -183,7 +183,7 @@
       (error "Wrong length data record -- FFT" period)))
 
 (define (fft-spread-complex-vector data reals imags period)
-  (do ((i 0 (fx+ i 1))) ((fx= i period))
+  (do ((i 0 (fix:+ i 1))) ((fix:= i period))
     (flo:vector-set! reals i
                      (->flonum (real-part (vector-ref data i))))
     (flo:vector-set! imags i

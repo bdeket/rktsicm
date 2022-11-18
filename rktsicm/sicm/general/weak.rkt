@@ -2,7 +2,7 @@
 
 (provide (except-out (all-defined-out)))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          (only-in "../rkt/todo.rkt" todo set-car! set-cdr!))
 
 (todo clean-expression-table "canonicalizer")
@@ -46,7 +46,7 @@
 
 (define (weak-length weak-list)
   (if (weak-pair? weak-list)
-      (fx+ (weak-length (weak-cdr weak-list)) 1)
+      (fix:+ (weak-length (weak-cdr weak-list)) 1)
       0))
 
 ;;; Weak-alist searches.  These scan a weak alist for an object,

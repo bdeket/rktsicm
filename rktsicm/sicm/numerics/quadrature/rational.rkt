@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/flonum
          "../../kernel-intr.rkt"
          "../statistics/gauss.rkt"
@@ -112,7 +112,7 @@
       (fl* h (fl+ (fl/ (fl+ (exact->inexact (f a))
 				    (exact->inexact (f b)))
 			     2.0)
-		      (flo:sigma fx 1 (fx- n 1)))))))
+		      (flo:sigma fx 1 (fix:- n 1)))))))
 
 (define (trapezoid-using-previous-sum f a b Sn/2 n)
   (let ((h (fl/ (fl- b a) (exact->inexact n))))
@@ -120,7 +120,7 @@
 	   (lambda (i)
 	     (exact->inexact
 	      (f (fl+ a (fl* (exact->inexact
-                                  (fx- (fx+ i i) 1)) h)))))))
+                                  (fix:- (fix:+ i i) 1)) h)))))))
       (fl+ (fl/ Sn/2 2.0)
 	     (fl* h (flo:sigma fx 1 (quotient n 2)))))))
 
@@ -132,16 +132,16 @@
 	     (lambda (i)
 	       (exact->inexact
 		(f (fl+ a (fl+ h/2 (fl* (exact->inexact i) h))))))))
-	(fl* h (flo:sigma fx 0 (fx- n 1)))))))
+	(fl* h (flo:sigma fx 0 (fix:- n 1)))))))
 
 ;;; Utilities
 
 #|
 (define (flo:sigma f low high)
   (let lp ((i low) (sum 0.0))
-    (if (fx> i high)
+    (if (fix:> i high)
 	sum
-	(lp (fx+ i 1) (flo:+ sum (f i))))))
+	(lp (fix:+ i 1) (flo:+ sum (f i))))))
 
 (define (flo:sigma-list l)  ; from small end up
   (if (null? (cdr l)) 
@@ -153,10 +153,10 @@
 
 (define (flo:sigma f low high)
   (let lp ((i low) (sum 0.0) (c 0.0))
-    (if (fx> i high)
+    (if (fix:> i high)
 	sum
 	(let* ((y (fl- (f i) c)) (t (fl+ sum y)))
-	  (lp (fx+ i 1) t (fl- (fl- t sum) y))))))
+	  (lp (fix:+ i 1) t (fl- (fl- t sum) y))))))
 
 (define (flo:sigma-list lst)
   (let lp ((lst lst) (sum 0.0) (c 0.0))

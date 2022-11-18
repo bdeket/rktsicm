@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt")
 
 ;;;;                    COMCON.SCM
@@ -26,7 +26,7 @@
 	((and (pair? n)
 	      (exact-integer? (car n))
 	      (exact-integer? (cdr n))
-	      (fx= (car n) (cdr n)))
+	      (fix:= (car n) (cdr n)))
 	 (lambdafy (car n) body-generator))
 	((pair? n)
 	 ;; In Scheme 7.5 #f=() so (3) and (3 . #f) are not distinguished.
@@ -39,9 +39,9 @@
 (define (make-bound-variables n)
   ;;n is a general arity
   (let do-loop ((i 0) (names '()))
-    (if (fx= i n)
+    (if (fix:= i n)
         names
-        (do-loop (fx+ 1 i)
+        (do-loop (fix:+ 1 i)
                  (cons (gensym 'x) names)))))
 
 

@@ -1,7 +1,7 @@
 #lang racket/base
 
 (provide (all-defined-out))
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
          "generic-extra.rkt"
          "numeric.rkt"
@@ -14,8 +14,8 @@
 (define v:dimension vector-length)
 
 (define (v:cross-product v w)
-  (assert (and (fx= (vector-length v) 3)
-	       (fx= (vector-length w) 3))
+  (assert (and (fix:= (vector-length v) 3)
+	       (fix:= (vector-length w) 3))
 	  "Cross product of non-3-dimensional vectors?"
 	  (list v w))
   (let ((v0 (vector-ref v 0))
@@ -32,12 +32,12 @@
   (assert (and (vector? v1) (vector? v2))
 	  "Not vectors -- V:DOT-PRODUCT" (list v1 v2))
   (let ((n (v:dimension v1)))
-    (assert (fx= n (v:dimension v2))
+    (assert (fix:= n (v:dimension v2))
 	    "Not same dimension -- V:DOT-PRODUCT" (list v1 v2))
     (let lp ((i 0) (ans :zero))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  ans
-	  (lp (fx+ i 1)
+	  (lp (fix:+ i 1)
 	      (g:+ ans
 		   (g:* (vector-ref v1 i)
 			(vector-ref v2 i))))))))

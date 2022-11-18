@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "../kernel-gnrc.rkt"
@@ -60,11 +60,11 @@
 	     (cond ((structure? x)
 		    (let ((n (s:length x)))
 		      (let lp ((i 0))
-			(if (fx= i n)
+			(if (fix:= i n)
 			    'done
 			    (begin
 			      (walk (s:ref x i) (s:ref dummy i))
-			      (lp (fx+ i 1)))))))
+			      (lp (fix:+ i 1)))))))
 		   ((pair? x)
 		    (for-each walk x y))		    
 		   (else
@@ -88,11 +88,11 @@
 	     (cond ((structure? x)
 		    (let ((n (s:length x)))
 		      (let lp ((i 0))
-			(if (fx= i n)
+			(if (fix:= i n)
 			    'done
 			    (begin
 			      (walk (s:ref x i) (s:ref dummy i))
-			      (lp (fx+ i 1)))))))
+			      (lp (fix:+ i 1)))))))
 		   ((pair? x)
 		    (for-each walk x dummy))		    
 		   (else

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/vector
          "../../kernel-intr.rkt"
          "singular.rkt"
@@ -66,13 +66,13 @@
 	 (ipiv (make-vector n #f))	;not a legitimate index
 	 (indxr (make-vector n 0))
 	 (indxc (make-vector n 0)))
-    (when (not (fx= n (num-cols A)))
+    (when (not (fix:= n (num-cols A)))
 	(error "Non-square matrix -- gj-solve-linear-system" n))
-    (when (not (fx= n (vector-length b)))
+    (when (not (fix:= n (vector-length b)))
 	(error "Incompatible sizes --  gj-solve-linear-system" n))
 
     (let iloop ((i 0))			;runs over columns
-      (if (fx= i n)
+      (if (fix:= i n)
 	  'done
 	  (let ((big *minimum-allowable-gj-pivot*)
 		(irow 0) (icol 0) (pivinv 0))
@@ -82,12 +82,12 @@
 	    ;;  have already picked a pivot.  
 
 	    (let jloop ((j 0))	                        ;runs over rows
-	      (if (fx= j n)
+	      (if (fix:= j n)
 		  'done
 		  (begin
 		    (when (not (vector-ref ipiv j))	;row is free
 			(let kloop ((k 0))              ;runs over columns 
-			  (if (fx= k n)
+			  (if (fix:= k n)
 			      'done
 			      (begin
 				(when (not (vector-ref ipiv k))
@@ -96,8 +96,8 @@
 					  (begin (set! big ajk)
 						 (set! irow j)
 						 (set! icol k)))))
-				(kloop (fx+ k 1))))))
-		    (jloop (fx+ j 1)))))
+				(kloop (fix:+ k 1))))))
+		    (jloop (fix:+ j 1)))))
 	    ;(bkpt "gug")
 	    (when (= *minimum-allowable-gj-pivot* big) (fail (singular-matrix-error)))
 	    (vector-set! ipiv icol #t)
@@ -107,16 +107,16 @@
 	    ;; Pivot element must be on diagonal.
 	    ;; The following swaps two rows unless they are already 
 	    ;;   the same row.  It will work if the = test is removed.
-	    (when (not (fx= irow icol))
+	    (when (not (fix:= irow icol))
 		(begin
 		  (let lloop ((l 0))
-		      (if (fx= l n)
+		      (if (fix:= l n)
 			  'done
 			  (let ((dum (array-ref A irow l)))
 			    (array-set! A irow l
 					(array-ref A icol l))
 			    (array-set! A icol l dum)
-			    (lloop (fx+ l 1)))))
+			    (lloop (fix:+ l 1)))))
 		  ;;more generally, b can be a matrix
 		  ;;if so,replace this loop by one similar to the
 		  ;;one above
@@ -134,55 +134,55 @@
 	      (set! pivinv (invert aii))
 	      (array-set! A icol icol 1))
 	    (let lloop ((l 0))
-	      (if (fx= l n)
+	      (if (fix:= l n)
 		  'done
 		  (begin (array-set! A icol l
 				     (* (array-ref A icol l) pivinv))
-			 (lloop (fx+ l 1)))))
+			 (lloop (fix:+ l 1)))))
 	    ;;more generally, as above....
 	    (vector-set! b icol (* (vector-ref b icol) pivinv))
 
 	    ;;for each row, except the pivot row, do row reduction by
 	    ;;subtracting the appropriate multiple of the pivot row.
 	    (let llloop ((ll 0))
-	      (when (fx= ll n)
+	      (when (fix:= ll n)
 		  'done
 		  (begin
-		    (when (not (fx= ll icol))
+		    (when (not (fix:= ll icol))
 			(let ((dum (array-ref A ll icol)))
 			  (array-set! A ll icol 0)
 			  (let lloop ((l 0))
-			    (if (fx= l n)
+			    (if (fix:= l n)
 				'done
 				(begin
 				  (array-set! A ll l
 					      (- (array-ref A ll l)
 						 (* (array-ref A icol l)
 						    dum)))
-				  (lloop (fx+ l 1)))))
+				  (lloop (fix:+ l 1)))))
 			  (vector-set! b ll
 				       (- (vector-ref b ll)
 					  (* (vector-ref b icol)
 					     dum)))))
-		    (llloop (fx+ ll 1)))))
-	    (iloop (fx+ i 1)))))
+		    (llloop (fix:+ ll 1)))))
+	    (iloop (fix:+ i 1)))))
     ;;end of matrix reduction
 
     ;;interchange the columns of the matrix, according to the
     ;;permutation specified by INDEXR and INDEXC
-    (let lloop ((l (fx- n 1)))
-      (if (fx< l 0)
+    (let lloop ((l (fix:- n 1)))
+      (if (fix:< l 0)
 	  'done
 	  (let ((kswap (vector-ref indxr l))
 		(cswap (vector-ref indxc l)))
-	    (when (not (fx= kswap cswap))
+	    (when (not (fix:= kswap cswap))
 		(let kloop ((k 0))
-		  (if (fx= k n)
+		  (if (fix:= k n)
 		      'done
 		      (let ((dum (array-ref A k kswap)))
 			(array-set! A k kswap
 				    (array-ref A k cswap))
 			(array-set! A k cswap dum)
-			(kloop (fx+ k 1))))))
-	    (lloop (fx- l 1))))))
+			(kloop (fix:+ k 1))))))
+	    (lloop (fix:- l 1))))))
   (succeed b A))

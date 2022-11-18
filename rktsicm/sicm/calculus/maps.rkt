@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../rkt/default-object.rkt"
          "../general/assert.rkt"
@@ -69,7 +69,7 @@
 (define (literal-manifold-map name source target)
   (let ((n (source 'dimension))
 	(m (target 'dimension)))
-    (let ((sig (if (fx= n 1) (-> Real Real) (-> (UP* Real n) Real))))
+    (let ((sig (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
       (compose (target '->point)
 	       (s:generate m 'up
 			   (lambda (i)
@@ -409,7 +409,7 @@ r0
 	((pullback-function mu:N->M) omega-on-M)
 	(let ((the-pullback
 	       (lambda args
-		 (assert (fx= (length args) k))
+		 (assert (fix:= (length args) k))
 		 (lambda (n)
 		   ((apply omega-on-M
 			   (map (effective-pushforward mu:N->M n)

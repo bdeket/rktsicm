@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "cstm/matrices.rkt"))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "cstm/matrices.rkt"
          "../general/list-utils.rkt"
          "../general/assert.rkt"
@@ -36,7 +36,7 @@
 	  "Not an array -- ARRAY->MATRIX" array)
   (let ((nrows (num-rows array)) (ncols (num-cols array)))
     (assert
-     (vector-forall (lambda (row) (fx= (vector-length row) ncols))
+     (vector-forall (lambda (row) (fix:= (vector-length row) ncols))
 		    array)
      "Not all rows have same length -- ARRAY->MATRIX" array)
     (tag-matrix nrows ncols array)))
@@ -147,7 +147,7 @@
   (let ((nrows (length rows)))
     (let ((ncols (length (car rows))))
       (assert (andmap (lambda (row)
-                        (and (list? row) (fx= ncols (length row))))
+                        (and (list? row) (fix:= ncols (length row))))
                       (cdr rows)))
       (m:generate nrows ncols
 		  (lambda (i j)
@@ -162,7 +162,7 @@
   (let ((ncols (length cols)))
     (let ((nrows (length (car cols))))
       (assert (andmap (lambda (col)
-                        (and (list? col) (fx= nrows (length col))))
+                        (and (list? col) (fix:= nrows (length col))))
                       (cdr cols)))
       (m:generate nrows ncols
 		  (lambda (i j)
@@ -189,8 +189,8 @@
   (let ((nrows (m:num-rows (car matrices)))
 	(ncols (m:num-cols (car matrices))))
     (assert (andmap (lambda (m)
-                      (and (fx= (m:num-rows m) nrows)
-                           (fx= (m:num-cols m) ncols)))
+                      (and (fix:= (m:num-rows m) nrows)
+                           (fix:= (m:num-cols m) ncols)))
                     (cdr matrices)))
     (m:generate nrows ncols
 		(lambda (i j)
@@ -205,16 +205,16 @@
 ;;;   by dropping a given row and column.
 
 (define (m:minor m i j)
-  (m:generate (fx- (m:num-rows m) 1)
-	      (fx- (m:num-cols m) 1)
+  (m:generate (fix:- (m:num-rows m) 1)
+	      (fix:- (m:num-cols m) 1)
     (lambda (a b)
       (matrix-ref m
-		  (if (fx< a i)
+		  (if (fix:< a i)
 		      a
-		      (fx+ a 1))
-		  (if (fx< b j)
+		      (fix:+ a 1))
+		  (if (fix:< b j)
 		      b
-		      (fx+ b 1))))))
+		      (fix:+ b 1))))))
 
 
 (define (m:zero? matrix)
@@ -223,13 +223,13 @@
 	(n (m:num-cols matrix))
 	(mat (matrix->array matrix)))
     (let rowlp ((i 0))
-      (if (fx= i m)
+      (if (fix:= i m)
 	  #t
 	  (let collp ((j 0))
-	    (if (fx= j n)
-		(rowlp (fx+ i 1))
+	    (if (fix:= j n)
+		(rowlp (fix:+ i 1))
 		(if (g:zero? (array-ref mat i j))
-		    (collp (fx+ j 1))
+		    (collp (fix:+ j 1))
 		    #f)))))))
 
 (define (m:make-zero n [m n])
@@ -244,26 +244,26 @@
 (define (m:make-identity n)
   (m:generate n n
     (lambda (i j)
-      (if (fx= i j) :one :zero))))
+      (if (fix:= i j) :one :zero))))
 
 (define (m:identity? matrix)
   (assert (matrix? matrix)
 	  "Not a matrix -- IDENTITY?" matrix)
   (let ((dim (m:num-rows matrix))
 	(mat (matrix->array matrix)))
-    (and (fx= dim (m:num-cols matrix))
+    (and (fix:= dim (m:num-cols matrix))
 	 (let rowlp ((i 0))
-	   (if (fx= i dim)
+	   (if (fix:= i dim)
 	       #t
 	       (let collp ((j 0))
-		 (if (fx= j dim)
-		     (rowlp (fx+ i 1))
-		     (if (fx= i j)
+		 (if (fix:= j dim)
+		     (rowlp (fix:+ i 1))
+		     (if (fix:= i j)
 			 (if (g:one? (array-ref mat i j))
-			     (collp (fx+ j 1))
+			     (collp (fix:+ j 1))
 			     #f)
 			 (if (g:zero? (array-ref mat i j))
-			     (collp (fx+ j 1))
+			     (collp (fix:+ j 1))
 			     #f)))))))))
 
 (define (m:one-like m)
@@ -278,7 +278,7 @@
   (let ((n (vector-length diag)))
     (m:generate n n
       (lambda (i j)
-	(if (fx= i j)
+	(if (fix:= i j)
 	    (vector-ref diag i)
 	    :zero)))))
 
@@ -286,24 +286,24 @@
   (assert (matrix? matrix) "Not a matrix -- DIAGONAL?" matrix)
   (let ((dim (m:num-rows matrix))
 	(mat (matrix->array matrix)))
-    (and (fx= dim (m:num-cols matrix))
+    (and (fix:= dim (m:num-cols matrix))
 	 (let rowlp ((i 0))
-	   (if (fx= i dim)
+	   (if (fix:= i dim)
 	       #t
 	       (let collp ((j 0))
-		 (if (fx= j dim)
-		     (rowlp (fx+ i 1))
-		     (if (fx= i j)
-			 (collp (fx+ j 1))
+		 (if (fix:= j dim)
+		     (rowlp (fix:+ i 1))
+		     (if (fix:= i j)
+			 (collp (fix:+ j 1))
 			 (if (g:zero? (array-ref mat i j))
-			     (collp (fx+ j 1))
+			     (collp (fix:+ j 1))
 			     #f)))))))))
 
 
 (define (matrix=matrix m1 m2)
   (assert (and (matrix? m1) (matrix? m2)))
-  (and (fx= (m:num-rows m1) (m:num-rows m2))
-       (fx= (m:num-cols m1) (m:num-cols m2))
+  (and (fix:= (m:num-rows m1) (m:num-rows m2))
+       (fix:= (m:num-cols m1) (m:num-cols m2))
        (vector-forall
 	 (lambda (row1 row2)
 	   (vector-forall g:= row1 row2))
@@ -317,8 +317,8 @@
 	(ncols (m:num-cols matrix1))
 	(m1 (matrix->array matrix1))
 	(m2 (matrix->array matrix2)))
-    (assert (and (fx= nrows (m:num-rows matrix2))
-		 (fx= ncols (m:num-cols matrix2)))
+    (assert (and (fix:= nrows (m:num-rows matrix2))
+		 (fix:= ncols (m:num-cols matrix2)))
 	    "Matrices of unequal size -- addition"
 	    (list binop matrix1 matrix2))
     (tag-matrix nrows ncols
@@ -347,10 +347,10 @@
 	(m2c (m:num-cols matrix2))
 	(m1 (matrix->array matrix1))
 	(m2 (matrix->array matrix2)))
-    (assert (fx= m1c m2r)
+    (assert (fix:= m1c m2r)
 	    "Matrix sizes do not match -- MATRIX*MATRIX"
 	    (list m1 m2))
-    (let ((m1cm1 (fx- m1c 1)))
+    (let ((m1cm1 (fix:- m1c 1)))
       (m:generate m1r m2c
         (lambda (i j)
 	  (let ((r1i (vector-ref m1 i)))
@@ -368,19 +368,19 @@
   (assert (matrix? M) "Not a matrix -- EXPT")
   (cond ((or (not (integer? n)) (inexact? n))
 	 (error "Only integer powers allowed -- M:EXPT"))
-	((fx< n 0) 
-	 (m:expt (m:invert M) (fx- 0 n)))
-	((fx= 0 n)
+	((fix:< n 0) 
+	 (m:expt (m:invert M) (fix:- 0 n)))
+	((fix:= 0 n)
 	 (m:make-identity (m:num-rows M)))
 	(else
 	 (let loop ((count n))
-	   (cond ((fx= count 1) M)
+	   (cond ((fix:= count 1) M)
 		 ((even? count) 
-		  (let ((a (loop (fxquotient count 2))))
+		  (let ((a (loop (fix:quotient count 2))))
 		    (matrix*matrix a a)))
 		 (else
 		  (matrix*matrix M
-				 (loop (fx- count 1)))))))))
+				 (loop (fix:- count 1)))))))))
 
 
 (define (matrix*scalar matrix k)
@@ -481,11 +481,11 @@
   (assert (matrix? matrix) "Not a matrix -- TRACE")
   (let ((rows (m:num-rows matrix))
 	(m (matrix->array matrix)))
-    (assert (fx= rows (m:num-cols matrix))
+    (assert (fix:= rows (m:num-cols matrix))
 	    "Not a square matrix -- TRACE" matrix)
     (g:sigma (lambda (j) (array-ref m j j))
 	     0
-	     (fx- rows 1))))
+	     (fix:- rows 1))))
 
 (define (m:conjugate mat)
   ((m:elementwise g:conjugate) mat))
@@ -553,19 +553,19 @@
 			  (let ((term
 				 (matrix-ref m row (car remaining-columns))))
 			    (if (easy-zero? term)
-				(loop (fx+ index 1)
+				(loop (fix:+ index 1)
 				      (cdr remaining-columns)
 				      answer)
 				(let ((contrib
 				       (mul term
-					    (c-det (fx+ row 1)
+					    (c-det (fix:+ row 1)
 						   (delete-nth index
 							       active-column-list)))))
 				  (if (even? index)
-				      (loop (fx+ index 1)
+				      (loop (fix:+ index 1)
 					    (cdr remaining-columns)
 					    (add answer contrib))
-				      (loop (fx+ index 1)
+				      (loop (fix:+ index 1)
 					    (cdr remaining-columns)
 					    (sub answer contrib))))))))))))
 	(c-det 0 (build-list (m:dimension m) values))))
@@ -584,7 +584,7 @@
       (lambda (A B)
 	(assert (and (matrix? A)
 		     (column-matrix? B)
-		     (fx= (m:dimension A) (m:num-rows B))))
+		     (fix:= (m:dimension A) (m:num-rows B))))
 	(let ((bv (m:nth-col B 0))
 	      (d (det A))
 	      (At (m:transpose A)))
@@ -603,7 +603,7 @@
   (let ((det (general-determinant add sub mul zero?)))
     (define (matinv A)
       (let ((dim (m:dimension A)))
-	(if (fx= dim 1)
+	(if (fix:= dim 1)
 	    (m:generate 1 1
 	      (lambda (i j) (div one (matrix-ref A 0 0))))
 	    (let* ((d (det A)) (-d (sub zero d)))
@@ -688,16 +688,16 @@
 (define (m:arity mat)
   (let ((n (m:num-rows mat)) (m (m:num-cols mat)))
     (let rowlp ((i 0) (a *at-least-zero*))
-      (if (fx= i n)	      
+      (if (fix:= i n)	      
 	  a
 	  (let collp ((j 0) (a a))
-	    (if (fx= j m)
-		(rowlp (fx+ i 1) a)
+	    (if (fix:= j m)
+		(rowlp (fix:+ i 1) a)
 		(let ((b
 		       (joint-arity a
 				    (g:arity (matrix-ref mat i j)))))
 		  (if b
-		      (collp (fx+ j 1) b)
+		      (collp (fix:+ j 1) b)
 		      #f))))))))
 
 (define (m:partial-derivative matrix varspecs)

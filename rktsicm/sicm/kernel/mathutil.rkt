@@ -4,8 +4,7 @@
          (all-from-out "cstm/mathutil.rkt")
          g:identity)
 
-(require racket/fixnum
-         racket/vector
+(require racket/vector
          "cstm/mathutil.rkt"
          "cstm/s-operator.rkt"
          "../general/list-utils.rkt"

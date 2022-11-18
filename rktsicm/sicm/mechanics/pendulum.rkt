@@ -376,7 +376,7 @@ program would not work without the principal-range call
     (let ((f (term n)))
       (if (and (< (abs f) eps) (< (abs lastf) eps))
 	  sum
-	  (loop (fx+ n 1) (+ sum f) f)))))
+	  (loop (fix:+ n 1) (+ sum f) f)))))
 ;;; purpose of checking last two is 
 ;;; to prevent some premature terminations
 ;;; because a term is "accidently" zero

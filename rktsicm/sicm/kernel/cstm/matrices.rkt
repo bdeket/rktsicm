@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
          "../iterat.rkt"
          "../types.rkt"
@@ -31,24 +31,24 @@
 (define (m:dimension mat)
   (assert (matrix? mat) "Not a matrix -- DIMENSION" mat)
   (let ((d (m:num-rows mat)))
-    (assert (fx= d (m:num-cols mat))
+    (assert (fix:= d (m:num-cols mat))
 	    "Not a square matrix -- DIMENSION" mat)
     d))
 
 (define (matrix-size mat)
   (assert (matrix? mat) "Not a matrix -- SIZE" mat)
-  (fx* (m:num-rows mat) (m:num-cols mat)))
+  (fix:* (m:num-rows mat) (m:num-cols mat)))
 
 
 ;;; Single columns or rows are often important.
 
 (define (column-matrix? m)
   (and (matrix? m)
-       (fx= (m:num-cols m) 1)))
+       (fix:= (m:num-cols m) 1)))
 
 (define (row-matrix? m)
   (and (matrix? m)
-       (fx= (m:num-rows m) 1)))
+       (fix:= (m:num-rows m) 1)))
 
 (define (matrix-ref m i j)
   (vector-ref (vector-ref (matrix->array m) i) j))
@@ -61,6 +61,6 @@
   (tag-matrix nrows ncols (generate-array nrows ncols proc)))
 
 (define (m:submatrix A lowrow hirow+1 lowcol hicol+1)
-  (m:generate (fx- hirow+1 lowrow) (fx- hicol+1 lowcol)
+  (m:generate (fix:- hirow+1 lowrow) (fix:- hicol+1 lowcol)
     (lambda (i j)
-      (matrix-ref A (fx+ i lowrow) (fx+ j lowcol)))))
+      (matrix-ref A (fix:+ i lowrow) (fix:+ j lowcol)))))

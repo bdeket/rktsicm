@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          racket/list)
 (provide (all-defined-out))
 
@@ -29,43 +29,43 @@
 		  vectors)))))
 
 (define (vector-forall p? . vectors)
-  (let lp ((i (fx- (vector-length (car vectors)) 1)))
-    (cond ((fx= i 0)
+  (let lp ((i (fix:- (vector-length (car vectors)) 1)))
+    (cond ((fix:= i 0)
 	   (apply p? (map (lambda (v) (vector-ref  v i))
 			  vectors)))
 	  ((apply p? (map (lambda (v) (vector-ref  v i))
 			  vectors))
-	   (lp (fx- i 1)))
+	   (lp (fix:- i 1)))
 	  (else #f))))
 
 (define (vector-exists p? . vectors)
-  (let lp ((i (fx- (vector-length (car vectors)) 1)))
-    (cond ((fx= i 0)
+  (let lp ((i (fix:- (vector-length (car vectors)) 1)))
+    (cond ((fix:= i 0)
 	   (apply p? (map (lambda (v) (vector-ref  v i))
 			  vectors)))
 	  ((apply p? (map (lambda (v) (vector-ref  v i))
 			  vectors))
 	   #t)
 	  (else 
-	   (lp (fx- i 1))))))
+	   (lp (fix:- i 1))))))
 
 
 (define (vector-accumulate acc fun init v)
   (let ((l (vector-length v)))
-    (if (fx= l 0)
+    (if (fix:= l 0)
 	init
 	(let loop ((i 1)
 		   (ans (fun (vector-ref v 0))))
-	  (if (fx= i l)
+	  (if (fix:= i l)
 	      ans
-	      (loop (fx+ i 1)
+	      (loop (fix:+ i 1)
 		    (acc ans (fun (vector-ref v i)))))))))
 
 
 (define (vector-with-substituted-coord v i x)
   (build-vector (vector-length v)
     (lambda (j)
-      (if (fx= j i)
+      (if (fix:= j i)
 	  x
 	  (vector-ref v j)))))
 
@@ -124,7 +124,7 @@
 (define (array-with-substituted-col A k V)
   (generate-array (num-rows A) (num-cols A)
     (lambda (i j)
-      (if (fx= j k)
+      (if (fix:= j k)
 	  (vector-ref V i)
 	  (array-ref A i j)))))
 

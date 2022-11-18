@@ -6,7 +6,7 @@
 ;*r* copy/adapted from the scmutils library
 ;;;; This is needed to load particular types
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../parameters.rkt"
          "cstm/types.rkt"
          "cstm/s-operator.rkt"
@@ -230,7 +230,7 @@
 
 (define (square-matrix? matrix)
   (and (matrix? matrix)
-       (fx= (caadr matrix) (cdadr matrix))))
+       (fix:= (caadr matrix) (cdadr matrix))))
 
 (define (square-abstract-matrix? matrix)
   (and (pair? matrix)

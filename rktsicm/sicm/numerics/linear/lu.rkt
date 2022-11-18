@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "singular.rkt"
          )
@@ -88,9 +88,9 @@
     (lu-decompose-internal M
                            (lambda (A p s)
                              (let loop ((i 0) (prod s))
-                               (if (fx= i n)
+                               (if (fix:= i n)
                                    prod
-                                   (loop (fx+ i 1)
+                                   (loop (fix:+ i 1)
                                          (* prod (array-ref A i i))))))
                            allow-zero-pivot)))
 
@@ -107,33 +107,33 @@
          ;; We must copy the matrix, since Crout's algorithm clobbers it.
          (m (array-copy m)))
     (let jloop ((j 0))
-      (if (fx< j n)
+      (if (fix:< j n)
           (begin
             (let iloop ((i 0))		;compute elements above diagonal
-              (when (not (fx> i j))
+              (when (not (fix:> i j))
                 (begin (array-set! m i j (lu-upper-eqn i j m))
-                       (iloop (fx+ i 1)))))
-            (let iloop ((i (fx+ j 1))) ;compute elements below diagonal
-              (when (fx< i n)
+                       (iloop (fix:+ i 1)))))
+            (let iloop ((i (fix:+ j 1))) ;compute elements below diagonal
+              (when (fix:< i n)
                 (begin (array-set! m i j (lu-lower-eqn i j m))
-                       (iloop (fx+ i 1)))))
+                       (iloop (fix:+ i 1)))))
             (let* ((pivot-info (lu-find-best-pivot m j n))
                    (pivot (car pivot-info))
                    (pivot-index (cdr pivot-info)))
               (if (bad-pivot? pivot)
-                  (singular-matrix (lambda () (jloop (fx+ j 1))))
+                  (singular-matrix (lambda () (jloop (fix:+ j 1))))
                   (let ((inverted-pivot (invert pivot)))
                     (lu-row-swap m j pivot-index perms)
-                    (when (not (fx= j pivot-index))
-                      (set! sign (fx- 0 sign)))
-                    (let iloop ((i (fx+ j 1))) ;divide through by pivot
-                      (if (fx= i n)
+                    (when (not (fix:= j pivot-index))
+                      (set! sign (fix:- 0 sign)))
+                    (let iloop ((i (fix:+ j 1))) ;divide through by pivot
+                      (if (fix:= i n)
                           'done
                           (begin (array-set! m i j
                                              (* (array-ref m i j)
                                                 inverted-pivot))
-                                 (iloop (fx+ i 1)))))
-                    (jloop (fx+ j 1))))))
+                                 (iloop (fix:+ i 1)))))
+                    (jloop (fix:+ j 1))))))
           (succeed m perms sign)))))
 
 (define tiny-pivot-bugger-factor
@@ -153,34 +153,34 @@
 
 (define (lu-find-best-pivot m j n)
   (let ((column (build-vector n (lambda (i) (array-ref m i j)))))
-    (let iloop ((i (fx+ j 1))
+    (let iloop ((i (fix:+ j 1))
                 (bestindex j)
                 (bestpivot (vector-ref column j)))
-      (if (fx= i n)
+      (if (fix:= i n)
           (cons bestpivot bestindex)
           (let* ((p (vector-ref column i)))
             (if (better-pivot? p bestpivot)
-                (iloop (fx+ i 1) i p)
-                (iloop (fx+ i 1) bestindex bestpivot)))))))
+                (iloop (fix:+ i 1) i p)
+                (iloop (fix:+ i 1) bestindex bestpivot)))))))
 
 (define (better-pivot? p1 p2)
   (> (magnitude p1) (magnitude p2)))
 
 
 (define (lu-upper-eqn i j m)
-  (if (fx= i 0)
+  (if (fix:= i 0)
       (array-ref m i j)
       (let kloop ((k 0) (sum 0))
-        (if (fx= k i)
+        (if (fix:= k i)
             (- (array-ref m i j) sum)
-            (kloop (fx+ k 1)
+            (kloop (fix:+ k 1)
                    (+ sum (* (array-ref m i k) (array-ref m k j))))))))
 
 (define (lu-lower-eqn i j m)
   (let kloop ((k 0) (sum 0))
-    (if (fx= k j)
+    (if (fix:= k j)
         (- (array-ref m i j) sum)
-        (kloop (fx+ k 1)
+        (kloop (fix:+ k 1)
                (+ sum (* (array-ref m i k) (array-ref m k j)))))))
 
 (define (lu-row-swap  m i1 i2 perms)
@@ -188,7 +188,7 @@
     (let ((temp (vector-ref vector i)))
       (vector-set! vector i (vector-ref vector j))
       (vector-set! vector j temp)))
-  (when (not (fx= i1 i2))
+  (when (not (fix:= i1 i2))
     (begin (swap-elements perms i1 i2)
            ;;uses fact that matrix is a vector of rows
            (swap-elements m i1 i2))))
@@ -197,36 +197,36 @@
 
 (define (lu-backsubstitute-internal m perm b)
   (let* ((n (vector-length b))
-         (top (fx- n 1))
+         (top (fix:- n 1))
          (y (make-vector n '()))
          (x (make-vector n '())))
     (let fdloop ((i 0))
-      (when (fx< i n)
+      (when (fix:< i n)
         (begin
           (vector-set! y i
                        (- (vector-ref b (vector-ref perm i))
                           (let jloop ((j 0) (sum 0))
-                            (if (fx= j i)
+                            (if (fix:= j i)
                                 sum
-                                (jloop (fx+ j 1)
+                                (jloop (fix:+ j 1)
                                        (+ sum
                                           (* (vector-ref y j)
                                              (array-ref m i j))))))))
-          (fdloop (fx+ i 1)))))
+          (fdloop (fix:+ i 1)))))
     (let bkloop ((i top))
-      (when (not (fx< i 0))
+      (when (not (fix:< i 0))
         (begin
           (vector-set! x i
                        (/ (- (vector-ref y i)
-                             (let jloop ((j (fx+ i 1)) (sum 0))
-                               (if (fx= j n)
+                             (let jloop ((j (fix:+ i 1)) (sum 0))
+                               (if (fix:= j n)
                                    sum
-                                   (jloop (fx+ j 1)
+                                   (jloop (fix:+ j 1)
                                           (+ sum
                                              (* (vector-ref x j)
                                                 (array-ref m i j)))))))
                           (array-ref m i i)))
-          (bkloop (fx- i 1)))))
+          (bkloop (fix:- i 1)))))
     x))
 
 ;;; In the case of a homogeneous system we can solve if the matrix is 
@@ -244,13 +244,13 @@
     (lu-decompose-internal AA
                            (lambda (LU permutation sign)
                              (let lp ((i 0))
-                               (if (fx= i n)
+                               (if (fix:= i n)
                                    '()
                                    (let ((v (lu-null-vector-internal LU i maxel)))
                                      (cond ((heuristic-zero-vector? v maxel) '())
                                            ((heuristic-zero-vector? (matrix*vector A v) maxel)
-                                            (cons (v:make-unit v) (lp (fx+ i 1))))
-                                           (else (lp (fx+ i 1))))))))
+                                            (cons (v:make-unit v) (lp (fix:+ i 1))))
+                                           (else (lp (fix:+ i 1))))))))
                            allow-zero-pivot)))
 
 
@@ -269,26 +269,26 @@
 
 (define (lu-null-vector-internal m k maxel)
   (let* ((n (num-rows m))
-         (top (fx- n 1))
+         (top (fix:- n 1))
          (x (make-vector n '())))
     (let bkloop ((i top) (acount 0))
-      (when (not (fx< i 0))
+      (when (not (fix:< i 0))
         (let ((p (array-ref m i i)))
           (if (heuristically-zero? p maxel)
               (begin
-                (if (fx= acount k)
+                (if (fix:= acount k)
                     (vector-set! x i 1)
                     (vector-set! x i 0))
-                (bkloop (fx- i 1) (fx+ acount 1)))
-              (let ((s (let jloop ((j (fx+ i 1)) (sum 0))
-                         (if (fx= j n)
+                (bkloop (fix:- i 1) (fix:+ acount 1)))
+              (let ((s (let jloop ((j (fix:+ i 1)) (sum 0))
+                         (if (fix:= j n)
                              sum
-                             (jloop (fx+ j 1)
+                             (jloop (fix:+ j 1)
                                     (+ sum
                                        (* (vector-ref x j)
                                           (array-ref m i j))))))))
                 (vector-set! x i (/ (- s) p))
-                (bkloop (fx- i 1) acount))))))
+                (bkloop (fix:- i 1) acount))))))
     x))
 
 (define heuristic-zero-test-bugger-factor
@@ -311,7 +311,7 @@
   (let ((n (m:num-rows m)))
     (m:generate n n
                 (lambda (i j)
-                  (if (fx> i j)
+                  (if (fix:> i j)
                       0
                       (matrix-ref m i j))))))
 
@@ -319,8 +319,8 @@
   (let ((n (m:num-rows m)))
     (m:generate n n
                 (lambda (i j)
-                  (cond ((fx< i j) 0)
-                        ((fx= i j) 1)
+                  (cond ((fix:< i j) 0)
+                        ((fix:= i j) 1)
                         (else (matrix-ref m i j)))))))
 
 

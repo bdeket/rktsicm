@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "list-utils.rkt")
 
 ;;;; Simple-minded common-subexpression eliminator.  
@@ -132,11 +132,11 @@
                       [vcell (findf (λ (x) (equal? expression (entry-expr x))) local-expressions-seen)])
                   (cond
                     [vcell
-                     (set-entry-cntr! vcell (fx+ (entry-cntr vcell) 1))
+                     (set-entry-cntr! vcell (fix:+ (entry-cntr vcell) 1))
                      (entry-name vcell)]
                     #;(vcell
                        ;; Increment reference count
-                       (set-car! (cddr vcell) (fx+ (caddr vcell) 1))
+                       (set-car! (cddr vcell) (fix:+ (caddr vcell) 1))
                        (cadr vcell))
                     [else
                      (define name (gensym))
@@ -159,7 +159,7 @@
       ((seen)
        (let lp ((entries (reverse local-expressions-seen)) (results '()))
          (cond ((null? entries) (reverse results))
-               ((fx= (entry-cntr (car entries)) 1)
+               ((fix:= (entry-cntr (car entries)) 1)
                 (define vcell (car entries))
                 (for-each
                  (lambda (entry)

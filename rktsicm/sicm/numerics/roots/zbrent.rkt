@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt")
 
 ;;;; Finds roots of function f in domain from x1 to x2.
@@ -26,7 +26,7 @@
 		      (b x2) (fb fb)
 		      (c x1)  (fc fa)
 		      (d (- x2 x1)) (e (- x2 x1)))
-      (cond ((fx= iter itmax)
+      (cond ((fix:= iter itmax)
 	     (list #f b iter))
 	    ((or (and (> fb 0) (> fc 0))
 		 (and (< fb 0) (< fc 0)))
@@ -55,7 +55,7 @@
 			       (if (> xm 0.0)
 				   (abs tol1)
 				   (- (abs tol1)))))))
-		   (lp (fx+ iter 1) b fb nb (f nb) c fc d e)))
+		   (lp (fix:+ iter 1) b fb nb (f nb) c fc d e)))
 	       (cond ((or (<= (abs xm) tol1) (= fb 0.0))
 		      (list #t b iter))
 		     ((and (>= (abs e) tol1) (> (abs fa) (abs fb)))

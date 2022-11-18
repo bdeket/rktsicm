@@ -5,7 +5,7 @@
 
 
 (require (only-in racket/function arity-includes? normalize-arity)
-         racket/fixnum)
+         "../../rkt/fixnum.rkt")
 
 (module+ test
   (require rackunit))
@@ -28,11 +28,11 @@
 
 (define (exactly-n? arity)
   (and (integer? arity)
-       (fx<= 0 arity)))
+       (fix:<= 0 arity)))
 
 (define (any-number? arity)
   (and (arity-at-least? arity)
-       (fx= (arity-at-least-value arity) 0)))
+       (fix:= (arity-at-least-value arity) 0)))
 
 (define (arity-min ar)
   (cond

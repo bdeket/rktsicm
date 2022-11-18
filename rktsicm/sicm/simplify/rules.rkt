@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "../kernel/cstm/sym-rules.rkt"))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel/cstm/sym-rules.rkt"
          "../kernel-gnrc.rkt"
          "../general/memoize.rkt"
@@ -185,10 +185,10 @@
   (and (integer? x) (odd? x)))
 
 (define (even-positive-integer? x)
-  (and (even-integer? x) (fx> x 1)))
+  (and (even-integer? x) (fix:> x 1)))
 
 (define (odd-positive-integer? x)
-  (and (odd-integer? x) (fx> x 2)))
+  (and (odd-integer? x) (fix:> x 2)))
 
 (define (universal-reductions exp)
   (let ((vars (variables-in exp)))
@@ -321,13 +321,13 @@
      (and sqrt-expt-simplify?
 	  (let ((xs (rcf:simplify x)))
 	     (assume! `(= (sqrt (expt ,xs ,n))
-                          (expt ,xs ,(quotient (fx- n 1) 2)))
+                          (expt ,xs ,(quotient (fix:- n 1) 2)))
                       'simsqrt2)))
-     (* (sqrt (: x)) (expt (: x) (: (quotient (fx- n 1) 2)))) )
+     (* (sqrt (: x)) (expt (: x) (: (quotient (fix:- n 1) 2)))) )
 
    ( (expt (sqrt (? x)) (? n odd-integer?))
      none
-     (* (sqrt (: x)) (expt (: x) (: (quotient (fx- n 1) 2)))) )
+     (* (sqrt (: x)) (expt (: x) (: (quotient (fix:- n 1) 2)))) )
    
    ( (/ (? x) (sqrt (? x)))
      none

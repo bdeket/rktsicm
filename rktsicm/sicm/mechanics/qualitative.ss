@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          (only-in racket/math exact-floor)
          "../kernel-gnrc.rkt"
          "../numerics/roots/bisect.rkt"
@@ -190,11 +190,11 @@
                (error "Map failed" x y)))))))
 
 (define ((iterated-map map n) x y continue fail)
-  (when (fx< n 0) (error "iterated-map: cannot invert map"))
+  (when (fix:< n 0) (error "iterated-map: cannot invert map"))
   (let loop ((x x) (y y) (i n))
-    (if (fx= i 0) 
+    (if (fix:= i 0) 
 	(continue x y)
 	(map x y
 	     (lambda (nx ny)
-	       (loop nx ny (fx- i 1)))
+	       (loop nx ny (fix:- i 1)))
 	     fail))))

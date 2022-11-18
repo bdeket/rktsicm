@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../rkt/default-object.rkt"
          "../general/assert.rkt"
@@ -56,7 +56,7 @@
 		      ((manifold-point? arg) manifold-point?)
 		      (else #f)))
 	      args)))
-    (cond ((and (fx= (length types) 1)
+    (cond ((and (fix:= (length types) 1)
 		(eq? (car types) manifold-point?))
 	   (declare-argument-types! f types)
 	   ((X f) (car args)))
@@ -113,7 +113,7 @@
 	(lambda (T)
 	  (let ((arg-types (argument-types T)))
 	    (define (the-derivative . args)
-	      (assert (fx= (length args) (length arg-types)))
+	      (assert (fix:= (length args) (length arg-types)))
 	      (let ((VT
 		     (let lp ((types arg-types) (args args) (targs '()) (factors '()))
 		       (if (null? types)

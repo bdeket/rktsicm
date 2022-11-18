@@ -2,7 +2,7 @@
 
 (provide (all-defined-out)
          (all-from-out "cstm/vectors.rkt"))
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "cstm/vectors.rkt"
          "../general/assert.rkt"
          "cstm/express.rkt"
@@ -32,7 +32,7 @@
 	       (andmap vector? vectors)))
   (let ((n (v:dimension (car vectors))))
     (assert (andmap (lambda (m)
-                      (fx= (v:dimension m) n))
+                      (fix:= (v:dimension m) n))
                     (cdr vectors)))
     (v:generate
      (vector-length (car vectors))
@@ -64,16 +64,16 @@
 
 
 (define (v:make-basis-unit n i)	; #(0 0 ... 1 ... 0) n long, 1 in ith position
-  (v:generate n (lambda (j) (if (fx= j i) :one :zero))))
+  (v:generate n (lambda (j) (if (fix:= j i) :one :zero))))
 
 (define (v:basis-unit? v)
   (let ((n (vector-length v)))
     (let lp ((i 0) (ans #f))
-      (cond ((fx= i n) ans)
+      (cond ((fix:= i n) ans)
 	    ((g:zero? (vector-ref v i))
-	     (lp (fx+ i 1) ans))
+	     (lp (fix:+ i 1) ans))
 	    ((and (g:one? (vector-ref v i)) (not ans))
-	     (lp (fx+ i 1) i))
+	     (lp (fix:+ i 1) i))
 	    (else #f)))))
 
 
@@ -123,12 +123,12 @@
   (assert (and (vector? v1) (vector? v2))
 	  "Not vectors -- INNER-PRODUCT" (list v1 v2))
   (let ((n (v:dimension v1)))
-    (assert (fx= n (v:dimension v2))
+    (assert (fix:= n (v:dimension v2))
 	    "Not same dimension -- INNER-PRODUCT" (list v1 v2))
     (let lp ((i 0) (ans :zero))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  ans
-	  (lp (fx+ i 1)
+	  (lp (fix:+ i 1)
 	      (g:+ ans
 		   (g:* (g:conjugate (vector-ref v1 i))
 			(vector-ref v2 i))))))))
@@ -164,16 +164,16 @@
 (define (general-inner-product addition multiplication :zero)
   (define (ip v1 v2)
     (let ((n (vector-length v1)))
-      (when (not (fx= n (vector-length v2)))
+      (when (not (fix:= n (vector-length v2)))
 	  (error "Unequal dimensions -- INNER-PRODUCT" v1 v2))
-      (if (fx= n 0)
+      (if (fix:= n 0)
 	  :zero
 	  (let loop ((i 1)
 		     (ans (multiplication (vector-ref v1 0)
 					  (vector-ref v2 0))))
-	    (if (fx= i n)
+	    (if (fix:= i n)
 		ans
-		(loop (fx+ i 1)
+		(loop (fix:+ i 1)
 		      (addition ans
 				(multiplication (vector-ref v1 i)
 						(vector-ref v2 i)))))))))
@@ -186,11 +186,11 @@
 
 (define (v:arity v)
   (let ((n (vector-length v)))
-    (cond ((fx= n 0)
+    (cond ((fix:= n 0)
 	   (error "I don't know the arity of the empty vector"))
 	  (else
 	   (let lp ((i 1) (a (g:arity (vector-ref v 0))))
-	     (if (fx= i n)
+	     (if (fix:= i n)
 		 a
 		 (let ((b (joint-arity a (g:arity (vector-ref v i)))))
 		   (if b

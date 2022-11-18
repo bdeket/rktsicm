@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../../rkt/fixnum.rkt"
          racket/flonum
          "flovec.rkt"
          )
@@ -11,15 +11,15 @@
 
 (define (make-noise-vector method state length)
   (let ((v (flo:make-vector length)))
-    (do ((i 0 (fx+ i 1)))
-	((fx= i length))
+    (do ((i 0 (fix:+ i 1)))
+	((fix:= i length))
       (flo:vector-set! v i (method state)))
     v))
 
 (define (make-uniform-noise-vector state length)
   (let ((v (flo:make-vector length)))
-    (do ((i 0 (fx+ i 1)))
-	((fx= i length))
+    (do ((i 0 (fix:+ i 1)))
+	((fix:= i length))
       (flo:vector-set! v i (fl- (random) .5)))
     v))
 
@@ -34,8 +34,8 @@
 	    (s (lambda () (flo:vector-ref t 2)))
 	    (set-s! (lambda (x) (flo:vector-set! t 2 x))))
 ;(declare (integrate-operator x1 set-x1! x2 set-x2! s set-s!))
-	(do ((i 0 (fx+ i 2)))
-	    ((fx= i length))
+	(do ((i 0 (fix:+ i 2)))
+	    ((fix:= i length))
 	  (let loop ()
 	    (set-x1! (random))
 	    (set-x1! (fl- (fl+ (x1) (x1)) 1.))
@@ -46,7 +46,7 @@
 		(begin
 		  (set-s! (flsqrt (fl/ (fl* -2. (fllog (s))) (s))))
 		  (flo:vector-set! v i (fl* (x1) (s)))
-		  (flo:vector-set! v (fx+ i 1) (fl* (x2) (s))))
+		  (flo:vector-set! v (fix:+ i 1) (fl* (x2) (s))))
 		(loop)))))
       v)))
 
@@ -75,7 +75,7 @@
 					  (inexact->exact (truncate (fl* U hv))))))
 		     (if (fl< a 0.)
 			 (let loop ((j 0))
-			   (cond ((fx= j h*3)
+			   (cond ((fix:= j h*3)
 				  (mm-worst-case state))
 				 ((fl< U (flo:vector-ref pj j))
 				  (if (fl< U (flo:vector-ref qj j))
@@ -88,7 +88,7 @@
 						      (flo:vector-ref bj j)
 						      (vector-ref fj+6h j))))
 				 (else
-				  (loop (fx+ j 1)))))
+				  (loop (fix:+ j 1)))))
 			 (fl+ a (fl/ (random) h)))))))
 	    (let ((U (random)))
 	      (if (fl< U .5)

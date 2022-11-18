@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../rkt/default-object.rkt"
          "../../rkt/undefined.rkt"
@@ -226,7 +226,7 @@
 									 d))))
 			   (nverr (error-measure ncorr corrected)))
 		      (if (< nverr verr)
-			  (lp corrected ncorr (fx+ count 1))
+			  (lp corrected ncorr (fix:+ count 1))
 			  (begin (when pc-wallp? (println `(pc failed: ,nverr ,verr)))
 				 (fail)))))))))
 	trapstep))))
@@ -321,7 +321,7 @@
 			  (let* ((ncorr (corrector corrected))
 				 (nverr (error-measure ncorr corrected)))
 			    (if (< nverr verr)
-				(lp corrected ncorr (fx+ count 1))
+				(lp corrected ncorr (fix:+ count 1))
 				(begin (when pc-wallp?
 					   (println `(gj nr failed: ,nverr ,verr)))
 				       (fail)))))))))

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
@@ -60,15 +60,15 @@ v1_bar(w(v2_bar))(x) - v2_bar(w(v1_bar))(x)
 
 (define (exterior-derivative-procedure kform)
   (let ((k (get-rank kform)))
-    (if (fx= k 0)
+    (if (fix:= k 0)
 	(differential-of-function kform)
 	(let ((the-k+1form
 	       (lambda vectors	
-		 (assert (fx= (length vectors) (fx+ k 1)))
+		 (assert (fix:= (length vectors) (fix:+ k 1)))
 		 (lambda (point)
 		   (let ((n ((point->manifold point) 'dimension)))
 		     ;;(s:dimension (manifold-point-representation point))
-		     (if (fx< k n)
+		     (if (fix:< k n)
 			 (sigma
 			  (lambda (i)
 			    (let ((rest (delete-nth i vectors)))
@@ -77,20 +77,20 @@ v1_bar(w(v2_bar))(x) - v2_bar(w(v1_bar))(x)
 				     point))
 				 (sigma
 				  (lambda (j)
-				    (* (if (even? (fx+ i j)) +1 -1)
+				    (* (if (even? (fix:+ i j)) +1 -1)
 				       ((apply kform
 					       (cons
 						(commutator (g:ref vectors i)
 							    (g:ref vectors j))
 						;; j-1 because already deleted i.
-						(delete-nth (fx- j 1)
+						(delete-nth (fix:- j 1)
 							    rest)))
 					point)))
-				  (fx+ i 1) k))))
+				  (fix:+ i 1) k))))
 			  0 k)
 			 0))))))
 	  (procedure->nform-field the-k+1form
-				  (fx+ (get-rank kform) 1)
+				  (fix:+ (get-rank kform) 1)
 				  `(d ,(diffop-name kform)))))))
 
 (define exterior-derivative
@@ -216,20 +216,20 @@ v1_bar(w(v2_bar))(x) - v2_bar(w(v1_bar))(x)
 
 (define (((exterior-derivative-helper kform) #!rest vectors) point)
   (let ((k (get-rank kform)))
-    (assert (fx= (length vectors) (fx+ k 1)))
+    (assert (fix:= (length vectors) (fix:+ k 1)))
     (let ((n ((point->manifold point) 'dimension)))
       ;;(s:dimension (manifold-point-representation point))
-      (cond ((fx= k 0)
+      (cond ((fix:= k 0)
 	     (((ref vectors 0) kform) point))		 
-	    ((fx< k n)
+	    ((fix:< k n)
 	     (let ((constant-vector-fields
 		    (map (lambda (v)
 			   (make-constant-vector-field point v))
 			 vectors)))
 	       (let lp ((i 0) (sum 0))
-		 (if (fx= i (fx+ k 1))
+		 (if (fix:= i (fix:+ k 1))
 		     sum
-		     (lp (fx+ i 1)
+		     (lp (fix:+ i 1)
 			 (let ((h (ref constant-vector-fields i)))
 			   (+ sum
 			      (* (if (even? i) 1 -1)

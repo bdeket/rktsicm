@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          racket/vector
          "../kernel-gnrc.rkt"
          "../general/assert.rkt"
@@ -22,7 +22,7 @@
 
 (define (H-state? s)
   (and (up? s)
-       (fx= (s:length s) 3)
+       (fix:= (s:length s) 3)
        (numerical-quantity? (ref s 0))
        (or (and (numerical-quantity? (ref s 1))
                 (numerical-quantity? (ref s 2)))
@@ -33,7 +33,7 @@
 
 (define (compatible-H-state? s)
   (and (down? s)
-       (fx= (s:length s) 3)
+       (fix:= (s:length s) 3)
        (numerical-quantity? (ref s 0))
        (or (and (numerical-quantity? (ref s 1))
                 (numerical-quantity? (ref s 2)))
@@ -44,7 +44,7 @@
 
 
 (define (state->p state)
-  (when (not (and (vector? state) (fx> (vector-length state) 2)))
+  (when (not (and (vector? state) (fix:> (vector-length state) 2)))
     (error "Cannot extract momentum from" state))
   (ref state 2))
 
@@ -597,8 +597,8 @@
 |#
 
 (define ((Poisson-bracket f g) x)
-  (let ((fx (f x)) (gx (g x)))
-    (cond ((or (structure? fx) (structure? gx))
+  (let ((fix: (f x)) (gx (g x)))
+    (cond ((or (structure? fix:) (structure? gx))
            (s:map/r (lambda (af)
                       (s:map/r (lambda (ag)
                                  ((Poisson-bracket
@@ -606,7 +606,7 @@
                                    (compose (apply component ag) g))
                                   x))
                                (structure->access-chains gx)))
-                    (structure->access-chains fx)))
+                    (structure->access-chains fix:)))
           (else
            ((- (* ((partial 1) f) ((partial 2) g))
                (* ((partial 2) f) ((partial 1) g)))

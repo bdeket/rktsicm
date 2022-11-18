@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
@@ -19,12 +19,12 @@
 (define (gcd-Dp p)
   ;; Compute the gcd of the all the partial derivatives of p
   (let ((n (poly:arity p)))
-    (if (fx= n 0)
+    (if (fix:= n 0)
 	poly:one
 	(let lp ((i 1) (ans (poly:partial-derivative p (list 0))))
-	  (if (or (fx= i n) (poly:one? ans))
+	  (if (or (fix:= i n) (poly:one? ans))
 	      ans
-	      (lp (fx+ i 1)
+	      (lp (fix:+ i 1)
 		  (poly:gcd (poly:partial-derivative p (list i))
 			    ans)))))))
     
@@ -74,9 +74,9 @@
 		(not (= f 1))))
 	  (cons (car factors)
 		(map (lambda (f n)
-		       (symb:expt f (fx+ n 1)))
+		       (symb:expt f (fix:+ n 1)))
 		     (cdr factors)
-		     (build-list (fx- (length factors) 1) values)))))
+		     (build-list (fix:- (length factors) 1) values)))))
 
 (define (split-polynomial->expression P)
   (let ((factors (factor-polynomial-expression P)))
@@ -196,9 +196,9 @@
 		 (lp (cdr factors)
 		     (if (odd? e) (symb:* odds b) odds)
 		     (let ((power (quotient e 2)))
-		       (cond ((fx> power 1)
+		       (cond ((fix:> power 1)
 			      (symb:* evens (symb:expt b power)))
-			     ((fx= power 1)
+			     ((fix:= power 1)
 			      (symb:* evens b))
 			     (else evens))))))
 	      (else
@@ -236,9 +236,9 @@
 		     (lp (cdr factors)
 			 odds
 			 (let ((power (quotient e 2)))
-			   (cond ((fx> power 1)
+			   (cond ((fix:> power 1)
 				  (symb:* evens (symb:expt b power)))
-				 ((fx= power 1)
+				 ((fix:= power 1)
 				  (symb:* evens b))
 				 (else evens))))
 		     (lp (cdr factors)

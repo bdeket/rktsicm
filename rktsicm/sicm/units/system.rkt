@@ -3,7 +3,6 @@
 (provide (except-out (all-defined-out) unit-system))
 
 (require (for-syntax racket/base)
-         racket/fixnum
          "../rkt/default-object.rkt"
          (only-in "../rkt/environment.rkt" environment-bound? environment-define environment-assign! scmutils-base-environment generic-environment)
          "../general/assert.rkt"
@@ -47,7 +46,7 @@
                   (let* ((unit-name (car base-spec))
                          (exponents
                           (build-vector n
-                                        (lambda (j) (if (fx= i j) 1 0))))
+                                        (lambda (j) (if (fix:= i j) 1 0))))
                          (unit (make-unit system-name exponents 1)))
                     (when (environment-bound? scmutils-base-environment
                                               unit-name)

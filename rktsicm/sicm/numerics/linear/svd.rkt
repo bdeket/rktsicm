@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../rkt/undefined.rkt"
          )
@@ -128,14 +128,14 @@
 
     (do-up 0 n			;DO 300 I=1,N
       (lambda (i)
-	(set! l (fx+ i 1))
+	(set! l (fix:+ i 1))
 	;; Perform column Householder
 	;; (write-line "column Householder")
 	(vector-set! *svd.rv1* i (* scale g))
 	(set! g 0.0)
 	(set! s 0.0)
 	(set! scale 0.0)
-        (when (not (fx> i (fx- m 1)))
+        (when (not (fix:> i (fix:- m 1)))
           (do-up i m
                  (lambda (k)
                    (set! scale
@@ -152,7 +152,7 @@
             (set! g (if (negative? f) (sqrt s) (- (sqrt s))))
             (set! h (- (* f g) s))
             (array-set! *svd.u* i i (- f g))
-            (when (not (fx= i (fx- n 1)))
+            (when (not (fix:= i (fix:- n 1)))
               (do-up l n
                      (lambda (j)
                        (set! s 0.0)
@@ -180,7 +180,7 @@
 	(set! s 0.0)
 	(set! scale 0.0)
 
-        (when (not (or (fx> i (fx- m 1)) (fx= i (fx- n 1))))
+        (when (not (or (fix:> i (fix:- m 1)) (fix:= i (fix:- n 1))))
           (do-up l n
                  (lambda (k)
                    (set! scale (+ scale (magnitude (array-ref *svd.u* i k))))))
@@ -201,7 +201,7 @@
                        (lambda (k)
                          (vector-set! *svd.rv1* k (/ (array-ref *svd.u* i k) h))))
 
-                (when (not (fx= i (fx- m 1)))
+                (when (not (fix:= i (fix:- m 1)))
                     (do-up l m
                            (lambda (j)
                              (set! s 0.0)
@@ -229,9 +229,9 @@
     ;; Accumulation of right-hand transformations
 
     (when matv
-	(do-down (fx- n 1) -1
+	(do-down (fix:- n 1) -1
 	  (lambda (i)
-	    (when (not (fx= i (fx- n 1)))
+	    (when (not (fix:= i (fix:- n 1)))
 		(begin
 		 (when (not (= g 0.0))
 		     (begin
@@ -264,17 +264,17 @@
     ;; Accumulation of left-hand transformations
 
     (when matu
-      (do-down (fx- (if (fx< m n) m n) 1) -1
+      (do-down (fix:- (if (fix:< m n) m n) 1) -1
 	(lambda (i)
-	  (set! l (fx+ i 1))
+	  (set! l (fix:+ i 1))
 	  (set! g (vector-ref *svd.w* i))
-	  (when (not (fx= i (fx- n 1)))
+	  (when (not (fix:= i (fix:- n 1)))
 	      (do-up l n
 		(lambda (j)
 		  (array-set! *svd.u* i j 0.0))))
 	  (when (not (zero? g))
 	      (begin
-	       (when (not (fx= i (fx- (if (fx< m n) m n) 1)))
+	       (when (not (fix:= i (fix:- (if (fix:< m n) m n) 1)))
 		   (do-up l n
 		     (lambda (j)
 		       (set! s 0.0)
@@ -306,7 +306,7 @@
     
     (do-down (- n 1) -1
       (lambda (k)
-	(set! k1 (fx- k 1))
+	(set! k1 (fix:- k 1))
 	(set! its 0)
 	(set! flag1 #f)
 	(set! flag2 #f)
@@ -318,24 +318,24 @@
 	       (set! flag1 #f)
 	       (set! flag2 #f)
 	       (let ll-lp ((ll k))
-		 (when (not (or (fx< l 0) flag1 flag2))
+		 (when (not (or (fix:< l 0) flag1 flag2))
 		     (begin
 		      (set! l ll)
-		      (set! l1 (fx- l 1))
+		      (set! l1 (fix:- l 1))
 		      (set! flag1 (= (+ (magnitude (vector-ref *svd.rv1* l)) anorm) anorm))
 		      (when (not flag1)
 			  (set! flag2
 				(= (+ (magnitude (vector-ref *svd.w* l1))
 				      anorm)
 				   anorm)))
-		      (ll-lp (fx- ll 1)))))
+		      (ll-lp (fix:- ll 1)))))
 	       (when (not flag1)
 		   (begin
 		    (set! c 0.0)
 		    (set! s 1.0)
 		    (set! flag3 #f)
 		    (let i-lp ((i l))
-			 (when (not (or (fx> i k) flag3))
+			 (when (not (or (fix:> i k) flag3))
 			     (begin 
 			      (set! f (* s (vector-ref *svd.rv1* i)))
 			      (vector-set! *svd.rv1* i (* c (vector-ref *svd.rv1* i)))
@@ -348,23 +348,23 @@
 				   (set! c (/ g h))
 				   (set! s (/ (- f) h))
 				   (when matu
-				       (do ((j 0 (fx+ j 1)))
-					   ((fx= j m))
+				       (do ((j 0 (fix:+ j 1)))
+					   ((fix:= j m))
 					   (set! y (array-ref *svd.u* j l1))
 					   (set! z (array-ref *svd.u* j i))
 					   (array-set! *svd.u* j l1 (+ (* y c) (* z s)))
 					   (array-set! *svd.u* j i (+ (* (- y) s) (* z c)))))))
-			      (i-lp (fx+ i 1)))))))
+			      (i-lp (fix:+ i 1)))))))
 
 	       ;; test for convergence
 
 	       (set! z (vector-ref *svd.w* k))
-	       (cond ((fx= l k)
+	       (cond ((fix:= l k)
 		      (set! convergence #t))
 		     (else
-		      (when (fx= its 30)
+		      (when (fix:= its 30)
 			  (error "SVD: No convergence after 30 iterations."))
-		      (set! its (fx+ its 1))
+		      (set! its (fix:+ its 1))
 		      (set! x (vector-ref *svd.w* l))
 		      (set! y (vector-ref *svd.w* k1))
 		      (set! g (vector-ref *svd.rv1* k1))
@@ -380,9 +380,9 @@
 				 x))
 		      (set! c 1.0)
 		      (set! s 1.0)
-		      (do-up l (fx+ k1 1)
+		      (do-up l (fix:+ k1 1)
 			(lambda (i1)
-			  (set! i (fx+ i1 1))
+			  (set! i (fix:+ i1 1))
 			  (set! g (vector-ref *svd.rv1* i))
 			  (set! y (vector-ref *svd.w* i))
 			  (set! h (* s g))
@@ -556,7 +556,7 @@
     (svd h
 	 (lambda (u sigma v w)
 	   (let elp ((eps 1e-10) (m m))
-	     (if (fx= m 0)
+	     (if (fix:= m 0)
 		 'done
 		 (let ((inverted-w
 			(let ((wmin (* eps (apply max (vector->list w)))))
@@ -574,7 +574,7 @@
 					 (matrix-matrix (matrix*matrix h inv)
 							(m:make-identity n))))))
 			     
-		   (elp (/ eps 3) (fx- m 1)))))))))
+		   (elp (/ eps 3) (fix:- m 1)))))))))
 
 
 ;;; Before 13 LU is better than SVD, but SVD eventually wins.

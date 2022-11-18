@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt")
 
 ;;; UNIFORM-RANDOM produces an inexact number x,    0 <= x < 1
@@ -32,30 +32,30 @@
 
 (define (gaussian-random-list d)
   (let lp ((j d) (t '()))
-    (if (fx= j 0)
+    (if (fix:= j 0)
 	t
 	(gaussian-random-pair
 	 (lambda (x1 x2)
-	   (if (fx= j 1)
+	   (if (fix:= j 1)
 	       (cons x1 t)
-	       (lp (fx- j 2) (cons x1 (cons x2 t)))))))))
+	       (lp (fix:- j 2) (cons x1 (cons x2 t)))))))))
 
 
 ;;; Makes a list of n 2-vectors of gaussian-distributed random numbers  
 
 (define (gaussian-random-pairs n)
-  (if (fx= n 0) 
+  (if (fix:= n 0) 
       '()
       (cons (gaussian-random-pair vector)
-	    (gaussian-random-pairs (fx- n 1)))))
+	    (gaussian-random-pairs (fix:- n 1)))))
 
 ;;; Makes a list of n d-vectors of gaussian-distributed random numbers  
 
 (define (gaussian-random-tuples d n)
-  (if (fx= n 0) 
+  (if (fix:= n 0) 
       '()
       (cons (list->vector (gaussian-random-list d))
-	    (gaussian-random-tuples d (fx- n 1)))))
+	    (gaussian-random-tuples d (fix:- n 1)))))
 
 ;;; For adding zero-mean noise with a given standard deviation to a vector.
 

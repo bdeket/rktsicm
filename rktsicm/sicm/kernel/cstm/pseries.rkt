@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
          "generic-extra.rkt"
          "../strutl.rkt"
@@ -66,7 +66,7 @@
   (assert (and (integer? exponent) (positive? exponent) (series? series)))
   (make-series (series:arity series)
 	       (stream:inflate (series->stream series)
-			       (fx- exponent 1))))
+			       (fix:- exponent 1))))
 
 (define (negate-stream s) (map-stream g:negate s))
 
@@ -98,7 +98,7 @@
 (define integrate-helper
   (lambda (s n)
     (stream-cons (g:/ (stream-first s) n)
-		 (integrate-helper (stream-rest s) (fx+ n 1)))))
+		 (integrate-helper (stream-rest s) (fix:+ n 1)))))
 
 (define (*integrate-series series constant-term)
   (make-series (series:arity series)

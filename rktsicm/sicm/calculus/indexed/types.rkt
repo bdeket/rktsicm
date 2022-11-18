@@ -2,8 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
-         "../../general/assert.rkt"
+(require "../../general/assert.rkt"
          "../../general/eq-properties.rkt"
          )
 

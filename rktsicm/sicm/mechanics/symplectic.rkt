@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "canonical.rkt"
          "Hamiltonian.rkt"
@@ -130,13 +130,13 @@
 |#
 
 (define (J-matrix n)                    ;degrees of freedom
-  (let ((2n+1 (fx+ (fx* 2 n) 1)))
+  (let ((2n+1 (fix:+ (fix:* 2 n) 1)))
     (m:generate 2n+1 2n+1
        (lambda (a b) 
-	 (cond ((fx= a 0) 0)
-               ((fx= b 0) 0)
-               ((fx= (fx+ a n) b) 1)
-	       ((fx= (fx+ b n) a) -1)
+	 (cond ((fix:= a 0) 0)
+               ((fix:= b 0) 0)
+               ((fix:= (fix:+ a n) b) 1)
+	       ((fix:= (fix:+ b n) a) -1)
 	       (else 0))))))
 
 
@@ -273,11 +273,11 @@
       (- J (* M J (transpose M))))))
 
 (define (symplectic-unit n)
-  (let ((2n (fx* 2 n)))
+  (let ((2n (fix:* 2 n)))
     (m:generate 2n 2n
        (lambda (a b) 
-	 (cond ((fx= (fx+ a n) b) 1)
-	       ((fx= (fx+ b n) a) -1)
+	 (cond ((fix:= (fix:+ a n) b) 1)
+	       ((fix:= (fix:+ b n) a) -1)
 	       (else 0))))))
 
 #|

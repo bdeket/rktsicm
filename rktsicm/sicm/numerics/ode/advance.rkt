@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/vector
          "../../kernel-intr.rkt"
          "../../general/assert.rkt"
@@ -138,7 +138,7 @@
 			 `(vector-fixed-point ,count d ,d ,start ,value)))
 		    (if (< d 2.0)
 			(succeed value fvalue count)
-			(if (fx> count *vector-fixed-point-iteration-loss*)
+			(if (fix:> count *vector-fixed-point-iteration-loss*)
 			    (fail value fvalue)
 			    (improve value (+ 1 count))))))))))
 
@@ -163,11 +163,11 @@
 (define (vector-metric summarize accumulate each-component)
   (define (the-metric v1 v2)
     (let ((n (vector-length v1)))
-      (assert (fx= (vector-length v2) n))
+      (assert (fix:= (vector-length v2) n))
       (let lp ((i 0) (accumulation 0.0))
-	(if (fx= i n)
+	(if (fix:= i n)
 	    (summarize accumulation n)
-	    (lp (fx+ 1 i)
+	    (lp (fix:+ 1 i)
 		(accumulate (each-component (vector-ref v1 i)
 					    (vector-ref v2 i)
 					    i)
@@ -191,7 +191,7 @@
         (tt (/ 2 tolerance)))
     (vector-metric (lambda (a n)
                      (expt (/ a
-                              (* n (n:sigma weights 0 (fx- n 1))))
+                              (* n (n:sigma weights 0 (fix:- n 1))))
                            q))
                    +
                    (lambda (x y i)
@@ -238,20 +238,20 @@
 	 (let* ((state-size (car dimension))
 		(start (cadr dimension))
 		(end (caddr dimension))
-		(j-size (fx- end start)))
+		(j-size (fix:- end start)))
 	   (lambda (v)
 	     (build-vector state-size
 	       (lambda (i)
-		 (if (and (or (fx< start i)
-			      (fx= start i))
-			  (fx< i end))
-		     (vector-ref v (fx- i start))
+		 (if (and (or (fix:< start i)
+			      (fix:= start i))
+			  (fix:< i end))
+		     (vector-ref v (fix:- i start))
 		     0.0))))))
 	(else (error "Bad dimension -- VECTOR-PADDER" dimension))))
 
 (define (J-dimension dimension)
   (cond ((number? dimension) dimension)
-	((list? dimension) (fx- (caddr dimension) (cadr dimension)))
+	((list? dimension) (fix:- (caddr dimension) (cadr dimension)))
 	(else (error "Bad dimension -- J-DIMENSION" dimension))))
 
 

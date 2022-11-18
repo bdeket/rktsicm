@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/vector
          "s-operator.rkt"
          "../../general/list-utils.rkt"
@@ -16,12 +16,12 @@
          )
 
 (define (g:sigma f low high)
-  (if (fx> low high)
+  (if (fix:> low high)
       0
-      (let lp ((i (fx+ low 1)) (sum (f low)))
-	(if (fx> i high)
+      (let lp ((i (fix:+ low 1)) (sum (f low)))
+	(if (fix:> i high)
 	    sum
-	    (lp (fx+ i 1) (g:+ sum (f i)))))))
+	    (lp (fix:+ i 1) (g:+ sum (f i)))))))
 
 (define (ref-internal x selectors)
   (cond ((null? selectors) x)
@@ -152,25 +152,25 @@
 		  (error "Unknown selector type -- REF" x i js)))))))
 
 (define (adjust-index i n)
-  (if (fx< i 0)
-      (let ((j (fx+ n i)))
-	(when (fx< j 0)
+  (if (fix:< i 0)
+      (let ((j (fix:+ n i)))
+	(when (fix:< j 0)
 	    (error "Bad index -- REF" i))
 	j)
       (begin
-	(when (not (fx< i n))
+	(when (not (fix:< i n))
 	    (error "Bad index -- REF" i))
 	i)))
 
 (define (adjust-end i n)
-  (let ((n (fx+ n 1)))
-    (if (fx< i 0)
-	(let ((j (fx+ n i)))
-	  (when (fx< j 0)
+  (let ((n (fix:+ n 1)))
+    (if (fix:< i 0)
+	(let ((j (fix:+ n i)))
+	  (when (fix:< j 0)
 	      (error "Bad index -- REF" i))
 	  j)
 	(begin
-	  (when (not (fx< i n))
+	  (when (not (fix:< i n))
 	      (error "Bad index -- REF" i))
 	  i))))
 

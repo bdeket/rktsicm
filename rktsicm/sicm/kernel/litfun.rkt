@@ -5,7 +5,7 @@
          f:expression)
 
 (require (only-in racket/list make-list)
-         racket/fixnum
+         "../rkt/fixnum.rkt"
          (only-in "../rkt/racket-help.rkt" symbol)
          "../rkt/applyhook.rkt"
          "../general/logic-utils.rkt"
@@ -118,7 +118,7 @@
 		      (lp (cdr args)
 			  #f
 			  #t
-			  (append types (make-list (fx- (car args) 1) curtype)))
+			  (append types (make-list (fix:- (car args) 1) curtype)))
 		      (error "Bad type arguments" starred rest)))
 		 (else
 		  (lp (cdr args)
@@ -276,9 +276,9 @@
 		(cond ((vector? datum)
 		       (let ((n (vector-length datum)))
 			 (let lp ((i 0) (preds type-predicates))
-			   (cond ((fx= i n) #t)
+			   (cond ((fix:= i n) #t)
 				 (((car preds) (vector-ref datum i))
-				  (lp (fx+ i 1)
+				  (lp (fix:+ i 1)
 				      (if (null? (cdr preds))
 					  preds
 					  (cdr preds))))
@@ -296,9 +296,9 @@
 		(cond ((test? datum)
 		       (let ((n (s:length datum)))
 			 (let lp ((i 0) (preds type-predicates))
-			   (cond ((fx= i n) #t)
+			   (cond ((fix:= i n) #t)
 				 (((car preds) (s:ref datum i))
-				  (lp (fx+ i 1)
+				  (lp (fix:+ i 1)
 				      (if (null? (cdr preds))
 					  preds
 					  (cdr preds))))
@@ -316,11 +316,11 @@
 
 (define (all-satisfied type-preds structure)
   (let ((n (length type-preds)))
-    (and (fx= n (s:length structure))
+    (and (fix:= n (s:length structure))
 	 (let lp ((types type-preds) (i 0))
-	   (cond ((fx= i n) #t)
+	   (cond ((fix:= i n) #t)
 		 (((car types) (s:ref structure i))
-		  (lp (cdr types) (fx+ i 1)))
+		  (lp (cdr types) (fix:+ i 1)))
 		 (else #f))))))
 
 (define (type-expression->type-tag type-expression)
@@ -369,7 +369,7 @@
   (let ((arity (g:arity function)))
     (assert (exactly-n? arity)
 	    "I cannot handle this arity -- TYPED-FUNCTION")
-    (assert (fx= (length domain-types) (car arity))
+    (assert (fix:= (length domain-types) (car arity))
 	    "Inconsistent arity -- TYPED-FUNCTION")
     (make-apply-hook function
                      (list '*function* domain-types range-type #f))))
@@ -478,8 +478,8 @@
 	   (let ((fexp		  
 		  (let ((is (reverse indices)))
 		    (if (equal? (g:arity apply-hook) *exactly-one*) ;univariate
-			(if (fx= (car is) 0)
-			    (if (fx= (length indices) 1)
+			(if (fix:= (car is) 0)
+			    (if (fix:= (length indices) 1)
 				(symb:derivative (f:expression apply-hook))
 				`((partial ,@(cdr is))
 				  ,(f:expression apply-hook)))
@@ -512,9 +512,9 @@
   (cond ((structure? v)
 	 (let ((n (s:length v)))
 	   (let lp ((i 0) (ut '()))
-	     (if (fx= i n)
+	     (if (fix:= i n)
 		 ut
-		 (lp (fx+ i 1)
+		 (lp (fix:+ i 1)
 		     (union-differential-tags
 		      ut
 		      (accumulate-tags (s:ref v i))))))))

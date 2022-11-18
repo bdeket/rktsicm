@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          )
 
@@ -172,8 +172,8 @@
                       xm
                       (let ((fxm (f xm)))
                         (if (< (* fx1 fxm) 0.0)
-                            (loop xm fxm x1 fx1 (fx+ iter 1))
-                            (loop x0 fx0 xm fxm (fx+ iter 1)))))))))))
+                            (loop xm fxm x1 fx1 (fix:+ iter 1))
+                            (loop x0 fx0 xm fxm (fix:+ iter 1)))))))))))
 
 #|
 ;;; for example

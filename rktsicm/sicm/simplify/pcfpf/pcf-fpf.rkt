@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../general/list-utils.rkt"
          "../../kernel/utils.rkt"
          "../fpf.rkt"
@@ -37,7 +37,7 @@
 
 (define (gcd-check-same-arity u v)
   (let ((au (poly:arity u)))
-    (when (not (fx= au (poly:arity v)))
+    (when (not (fix:= au (poly:arity v)))
 	(error "Unequal arities -- poly:gcd" u v))
     au))
     
@@ -83,7 +83,7 @@
 	    (map (lambda (s-term)
 		   (sparse-term (cons degree (sparse-exponents s-term))
 				(sparse-coefficient s-term)))
-		 (lp c (fx- arity 1)))
+		 (lp c (fix:- arity 1)))
 	    (lp r arity)))))))
 
 (define (sparse->pcf s)

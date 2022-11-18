@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          (only-in racket/list index-of)
          "../rkt/int.rkt"
          "sets.rkt"
@@ -52,10 +52,10 @@
 	  (let lp2 ((l rest) (increment 0))
 	    (if (null? l)
 		(lp1 rest
-		     (fx+ count increment))
+		     (fix:+ count increment))
 		(lp2 (cdr l)
 		     (if (not (member (car l) bigger))
-			 (fx+ increment 1)
+			 (fix:+ increment 1)
 			 increment))))))))
 
 (define (split-permutations original-list list-of-permutations cont)
@@ -81,11 +81,11 @@
 	  (let lp2 ((l rest) (increment 0))
 	    (if (null? l)
 		(lp1 rest
-		     (fx+ count increment))
+		     (fix:+ count increment))
 		(lp2 (cdr l)
 		     (if (int:> (car l) first)
 			 increment
-			 (fx+ increment 1)))))))))
+			 (fix:+ increment 1)))))))))
 
 ;;; Given a permutation (represented as a list of numbers),
 ;;;  and a list to be permuted, construct the list so permuted.
@@ -140,14 +140,14 @@
 (define (subpermute the-map lst)
   (let* ((n (length lst)))
     (let lp ((i 0) (source lst) (answer '()))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  (reverse answer)
 	  (let ((entry (assoc i the-map)))
 	    (if (not entry)
-		(lp (fx+ i 1)
+		(lp (fix:+ i 1)
 		    (cdr source)
 		    (cons (car source) answer))
-		(lp (fx+ i 1)
+		(lp (fix:+ i 1)
 		    (cdr source)
 		    (cons (list-ref lst (cdr entry)) answer))))))))
 

@@ -26,8 +26,8 @@
        (eqv? (cdr u) (cdr v))))
 
 #;(define (pair-eqv-hash-mod key modulus)
-  (fxremainder
-   (fxxor (eqv-hash-mod (car key) modulus)
+  (fix:remainder
+   (fix:xor (eqv-hash-mod (car key) modulus)
           (eqv-hash-mod (cdr key) modulus))
    modulus))
 

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "advance.rkt"
          "qc.rkt"
@@ -47,7 +47,7 @@
 			    (vector+vector xn (scalar*vector dt (f corrected))))
 			   (nverr (error-measure ncorr corrected)))
 		      (if (< nverr verr)
-			  (lp corrected ncorr (fx+ count 1))
+			  (lp corrected ncorr (fix:+ count 1))
 			  (begin (when pc-wallp? (println `(pc failed: ,nverr ,verr)))
 				 (fail)))))))))
 	estep))))

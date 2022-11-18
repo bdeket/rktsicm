@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
          "sparse.rkt"
@@ -26,19 +26,19 @@
 ;;; find a representation for the terms of the polynomial.
 
 (define (sparse-interpolate f n d)
-  (let* ((rargs0 (build-list (fx- n 1) interpolate-random))
+  (let* ((rargs0 (build-list (fix:- n 1) interpolate-random))
 	 (f1 (lambda (x) (apply f x rargs0)))
 	 (p1 (univariate-interpolate f1 d)))
     (let stagelp			;p has k vars interpolated
 	((k 1) (p p1) (rargs rargs0))
-      (if (fx= k n)
+      (if (fix:= k n)
 	  p
 	  (let* ((fk
 		  (lambda (xk+1)
 		    (lambda x1-xk
 		      (apply f (append x1-xk (list xk+1) (cdr rargs))))))
 		 (xk+1s
-		  (build-list (fx+ d 1) interpolate-random))
+		  (build-list (fix:+ d 1) interpolate-random))
 		 (ps
 		  (map (lambda (xk+1)
 			 (interpolate-skeleton (fk xk+1) p))
@@ -55,7 +55,7 @@
 			 (univariate-interpolate-values xk+1s (car css)
 			  (lambda (cp) (cons cp (clp (cdr css))))
 			  (lambda () (stagelp k p rargs)))))))
-	      (stagelp (fx+ k 1) (expand-poly p cps) (cdr rargs))))))))
+	      (stagelp (fix:+ k 1) (expand-poly p cps) (cdr rargs))))))))
 
 #|
 (sparse-interpolate
@@ -79,9 +79,9 @@
 		       skeleton))
 		 (ws
 		  (let lp ((i (length ks)) (argl ones) (fs '()))
-		    (if (fx= i 0)
+		    (if (fix:= i 0)
 			(reverse fs);WAS REVERSE!
-			(lp (fx- i 1)
+			(lp (fix:- i 1)
 			    (map * argl args)
 			    (cons (apply f argl) fs))))))
 	    (solve-vandermonde-t-system ks ws
@@ -193,7 +193,7 @@
 #|
 (define (old-univariate-interpolate-values xs fs succeed fail)
   (let ((n (length xs)))
-    (assert (fx= n (length fs)))
+    (assert (fix:= n (length fs)))
     (let* ((exponents (iota n))
 	   (matrix
 	    (matrix-by-row-list
@@ -241,10 +241,10 @@
 		'both-failed))))))))
 
 (let lp ((i 100000))
-  (if (fx= i 0)
+  (if (fix:= i 0)
       'done
       (begin (check 30)
-	     (lp (fx- i 1)))))
+	     (lp (fix:- i 1)))))
 
 ;;; Increase failure rate to about 40% for size 30 problems.
 (set! *interpolate-size* 1000)

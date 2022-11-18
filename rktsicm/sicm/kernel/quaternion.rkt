@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require racket/vector
-         racket/fixnum
+         "../rkt/fixnum.rkt"
          "../general/logic-utils.rkt"
          "generic.rkt"
          "matrices.rkt"
@@ -214,7 +214,7 @@
   (let ((v (quaternion->vector q)))
     (let ((n 4))
       (let lp ((i 1) (a (g:arity (vector-ref v 0))))
-	(if (fx= i n)
+	(if (fix:= i n)
 	    a
 	    (let ((b (joint-arity a (g:arity (vector-ref v i)))))
 	      (if b

@@ -3,7 +3,7 @@
 (provide (except-out (all-defined-out) ->fl)
          (all-from-out 'flo:vector))
 
-(require racket/fixnum
+(require "../../../rkt/fixnum.rkt"
          racket/flonum
          racket/vector
          )
@@ -100,12 +100,12 @@
 			      'FLO:SUBVECTOR-MOVE!)
   (guarantee-flonum-vector target 'FLO:SUBVECTOR-MOVE!)
   (guarantee-nonnegative-fixnum start-target 'FLO:SUBVECTOR-MOVE!)
-  (let ((end-target (fx+ start-target (fx- end-source start-source))))
+  (let ((end-target (fix:+ start-target (fix:- end-source start-source))))
     (guarantee-flonum-subvector-range target start-target end-target
 				      'FLO:SUBVECTOR-MOVE!)
     (cond
       [(eq? source target)
-       (define up? (fx< start-source start-target))
+       (define up? (fix:< start-source start-target))
        (for ([v (if up?
                     (in-flo:vector source (- end-source 1) (- start-source 1) -1)
                     (in-flo:vector source start-source end-source))]
@@ -164,7 +164,7 @@
   (define (flo:set-vector-length! vector n)
     (guarantee-flonum-vector vector 'FLO:SET-VECTOR-LENGTH!)
     (guarantee-nonnegative-fixnum n 'FLO:SET-VECTOR-LENGTH!)
-    (when (not (fx<= n (flo:vector-length vector)))
+    (when (not (fix:<= n (flo:vector-length vector)))
       (raise-range-error 'FLO:SET-VECTOR-LENGTH!
                          "FLO:VECTOR"
                          "length "
@@ -178,7 +178,7 @@
     (raise-argument-error procedure "flo:vector" object)))
 
 (define (guarantee-nonnegative-fixnum object procedure)
-  (when (not (and (fixnum? object) (fx>= object 0)))
+  (when (not (and (fixnum? object) (fix:>= object 0)))
     (raise-argument-error procedure "non-negative fixnum" object)))
 
 (define (guarantee-flonum-subvector v s e procedure)
@@ -188,14 +188,14 @@
   (guarantee-flonum-subvector-range v s e procedure))
 
 (define (guarantee-flonum-subvector-range v s e procedure)
-  (when (not (fx<= s e))
+  (when (not (fix:<= s e))
     (raise-range-error procedure
                        "FLO:VECTOR"
                        "end"
                        e
                        (flonum-vector->vector vector)
                        s (flo:vector-length vector) 0))
-  (when (not (fx<= e (flo:vector-length v)))
+  (when (not (fix:<= e (flo:vector-length v)))
     (raise-range-error procedure
                        "FLO:VECTOR"
                        "end"

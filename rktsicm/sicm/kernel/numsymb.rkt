@@ -5,7 +5,7 @@
 ;*r* copy/adapted from the scmutils library
 ;;;;              NUMSYMB.SCM
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "cstm/numsymb.rkt"
          "../rkt/default-object.rkt"
          "../general/assert.rkt"
@@ -735,7 +735,7 @@
 	 `(,(symb:expt 'derivative 2) ,(car (operands f))))
 	((ederivative? f)
 	 `(,(symb:expt 'derivative
-		       (fx+ (cadr (operands (operator f)))
+		       (fix:+ (cadr (operands (operator f)))
 			      1))
 	   ,(car (operands f))))
 	(else

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../parameters.rkt"
          "../general/assert.rkt"
@@ -34,7 +34,7 @@
 
 (define (make-SR-coordinates frame 4tuple)
    (assert (vector? 4tuple))
-   (assert (fx= (vector-length 4tuple) 4))
+   (assert (fix:= (vector-length 4tuple) 4))
    (eq-put! 4tuple 'SR-coordinates #t)
    (claim! 4tuple frame)
    4tuple)

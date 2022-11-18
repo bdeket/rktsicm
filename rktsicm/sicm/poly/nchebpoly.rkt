@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../simplify.rkt"
          "domain.rkt"
@@ -128,7 +128,7 @@
 (define (trim-cheb-exp cheb eps)
   (let ((r (reverse cheb)))
     (let loop ((sum (abs (car r))) (r r))
-      (if (fx= (length r) 1)
+      (if (fix:= (length r) 1)
           (if (<= sum eps) '(0) r)
           (if (> sum eps)
               (reverse r)
@@ -144,7 +144,7 @@
   (let ((q (poly-domain->canonical p a b)))
     (let ((r (poly->cheb-exp q)))
       (let ((s (trim-cheb-exp r eps)))
-        (if (fx= (length s) (length r)) ;nothing got trimmed
+        (if (fix:= (length s) (length r)) ;nothing got trimmed
             p
             (let ((t (cheb-exp->poly s)))
               (poly-domain->general t a b)))))))
@@ -154,14 +154,14 @@
 (define (cheb-root-list n)
   (define (root i)
     (if (and (odd? n)
-	     (fx= (fx* 2 i) (fx- n 1)))
+	     (fix:= (fix:* 2 i) (fix:- n 1)))
         0
         (- (cos (/ (* (+ i 1/2) pi) n)))))
   (let loop ((i 0))
-    (if (fx= i n)
+    (if (fix:= i n)
         '()
         (cons (root i)
-              (loop (fx+ i 1))))))
+              (loop (fix:+ i 1))))))
 
 ;;; This procedure accepts an integer n > 0 and a real x, and returns
 ;;; a list of the values T[0](x) ... T[n-1](x). If an optional third
@@ -173,14 +173,14 @@
                         (eq? (car optionals) 'HALF))
                    1/2
                    1)))
-    (cond ((fx< n 1) '())
-          ((fx= n 1) (list first))
-          ((fx= n 2) (list first x))
+    (cond ((fix:< n 1) '())
+          ((fix:= n 1) (list first))
+          ((fix:= n 2) (list first x))
           (else (let loop ((ans (list x first)) (a 1) (b x) (count 2))
-                  (if (fx= count n)
+                  (if (fix:= count n)
                       (reverse ans)
                       (let ((next (- (* 2 x b) a)))
-                        (loop (cons next ans) b next (fx+ count 1)))))))))
+                        (loop (cons next ans) b next (fix:+ count 1)))))))))
 
 
 ;;; The following procedure evaluates a cheb-expansion directly, in a
@@ -214,14 +214,14 @@
           (polys (stream-head chebyshev-polynomials n)))
       (let ((vals (map f (map interval-map roots))))
         (let loop ((coeffs '()) (i 0))
-          (if (fx= i n)
+          (if (fix:= i n)
               (reverse coeffs)
               (let ((chebf (lambda (x)
 			     (poly:value (list-ref polys i) x))))
                 (let ((chebvals (map chebf roots)))
                   (let ((sum (a-reduce + (map * vals chebvals))))
                     (let ((term (if (zero? i) (/ sum n) (/ (* 2 sum) n))))
-                      (loop (cons term coeffs) (fx+ i 1))))))))))))
+                      (loop (cons term coeffs) (fix:+ i 1))))))))))))
 
 
 ;;; This procedure accepts a function f, an interval [a,b], a number N

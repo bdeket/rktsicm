@@ -6,7 +6,7 @@
          empty-stream)
 
 (require racket/stream
-         racket/fixnum
+         "../rkt/fixnum.rkt"
          (only-in racket/list make-list)
          "cstm/generic-extra.rkt"
          "cstm/numeric.rkt"
@@ -97,10 +97,10 @@
 					   (stream-rest s2)))))
 
 (define (shorten-stream n s)
-  (if (or (fx= n 0) (stream-empty? s))
+  (if (or (fix:= n 0) (stream-empty? s))
       empty-stream
       (stream-cons (stream-first s)
-		   (shorten-stream (fx- n 1)
+		   (shorten-stream (fix:- n 1)
 				   (stream-rest s)))))
 
 

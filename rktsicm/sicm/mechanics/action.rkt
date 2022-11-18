@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "Lagrangian.rkt"
          "../poly/interp-generic.rkt"
@@ -73,11 +73,11 @@
       (make-path t0 q0 t1 q1 minimizing-qs))))
 
 (define (linear-interpolants x0 x1 n)
-  (let ((dx (- x1 x0)) (n+1 (fx+ n 1)))
+  (let ((dx (- x1 x0)) (n+1 (fix:+ n 1)))
     (let lp ((i 1) (xs '()))
-      (if (fx> i n)
+      (if (fix:> i n)
 	  (reverse xs)
-	  (lp (fx+ i 1)
+	  (lp (fix:+ i 1)
 	      (cons (+ x0 (/ (* i dx) n+1)) xs))))))
 
 #|

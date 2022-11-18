@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          (only-in racket/base [object-name procedure-name]))
 (provide (all-defined-out)
          (all-from-out "cstm/express.rkt")
@@ -107,17 +107,17 @@
 	  ((down? expr)
 	   (cons down-constructor-name
 		 (let lp ((i 0))
-		   (if (fx= i (s:length expr))
+		   (if (fix:= i (s:length expr))
 		       '()
 		       (cons (exprlp (s:ref expr i))
-			     (lp (fx+ i 1)))))))
+			     (lp (fix:+ i 1)))))))
 	  ((up? expr)		;subsumes vector? below.
 	   (cons up-constructor-name
 		 (let lp ((i 0))
-		   (if (fx= i (s:length expr))
+		   (if (fix:= i (s:length expr))
 		       '()
 		       (cons (exprlp (s:ref expr i))
-			     (lp (fx+ i 1)))))))
+			     (lp (fix:+ i 1)))))))
 #|	  
 	  ((vector? expr)
 	   (cons 'vector
@@ -241,8 +241,8 @@
 	((pair? expr1)
 	 (if (pair? expr2)
              (let ((n1 (length expr1)) (n2 (length expr2)))
-               (cond ((fx< n1 n2) #t)
-                     ((fx< n2 n1) #f)
+               (cond ((fix:< n1 n2) #t)
+                     ((fix:< n2 n1) #f)
                      ((expr:< (car expr1) (car expr2)) #t)
                      ((expr:< (car expr2) (car expr1)) #f)
                      (else (expr:< (cdr expr1) (cdr expr2)))))
@@ -250,20 +250,20 @@
 	((pair? expr2) #f)
 	((vector? expr1)
 	 (cond ((vector? expr2)
-		(cond ((fx< (vector-length expr1)
+		(cond ((fix:< (vector-length expr1)
 			      (vector-length expr2))
 		       #t)
-		      ((fx= (vector-length expr1)
+		      ((fix:= (vector-length expr1)
 			      (vector-length expr2))
 		       (let ((n (vector-length expr1)))
 			 (let lp ((i 0))
-			   (cond ((fx= i n) #f)
+			   (cond ((fix:= i n) #f)
 				 ((expr:< (vector-ref expr1 i)
 					  (vector-ref expr2 i))
 				  #t)
 				 ((equal? (vector-ref expr1 i)
 					  (vector-ref expr2 i))
-				  (lp (fx+ i 1)))
+				  (lp (fix:+ i 1)))
 				 (else #f)))))
 		      (else #f)))
 	       (else #f)))

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../rkt/default-object.rkt"
          "../general/list-utils.rkt"
          "../general/sets.rkt"
@@ -38,9 +38,9 @@
 (define (rcf:arity q)	 
   (define (check-same-arity p1 p2)
     (let ((a1 (poly:arity p1)) (a2 (poly:arity p2)))
-      (cond ((fx= a1 0) a2)
-	    ((fx= a2 0) a1)
-	    ((fx= a1 a2) a1)
+      (cond ((fix:= a1 0) a2)
+	    ((fix:= a2 0) a1)
+	    ((fix:= a1 a2) a1)
 	    (else
 	     (error "Unequal arities in RCF" q)))))
   (cond ((ratform? q)
@@ -276,14 +276,14 @@
 
 (define (rcf:expt base exponent)
   (define (expt-iter x count answer)
-    (if (fxzero? count)
+    (if (fix:zero? count)
 	answer
 	(if (even? count)
-	    (expt-iter (rcf:square x) (fxquotient count 2) answer)
-	    (expt-iter x (fx- count 1) (rcf:* x answer)))))
+	    (expt-iter (rcf:square x) (fix:quotient count 2) answer)
+	    (expt-iter x (fix:- count 1) (rcf:* x answer)))))
   (cond ((not (exact-integer? exponent))
 	 (error "Can only raise a RCF to an exact integer power" base exponent))
-	((fx< exponent 0)
+	((fix:< exponent 0)
 	 (rcf:invert (expt-iter base (- exponent) rcf:one)))
 	(else (expt-iter base exponent rcf:one))))
 
@@ -313,7 +313,7 @@
 	    (dr1 (ratform-denominator r1))  (dr2 (ratform-denominator r2)))
 	(let ((dn (poly:degree nr1))
 	      (dd (poly:degree dr1))
-	      (narity (fx+ (poly:arity dr1) 1)))
+	      (narity (fix:+ (poly:arity dr1) 1)))
 	  (let ((nnr1 (poly:extend 1 (poly:principal-reverse nr1)))
 		(ndr1 (poly:extend 1 (poly:principal-reverse dr1))))
 	    (let ((scales (list (cadr (poly:new-variables narity)) 1)))
@@ -325,10 +325,10 @@
 				     (poly:arg-scale ndr1 scales))
 				    nr2
 				    dr2)))
-		(cond ((fx> dn dd)
-		       (rcf:/ pn (poly:* (poly:expt dr2 (fx- dn dd)) pd)))
-		      ((fx< dn dd)
-		       (rcf:/ (poly:* (poly:expt dr2 (fx- dd dn)) pn) pd))
+		(cond ((fix:> dn dd)
+		       (rcf:/ pn (poly:* (poly:expt dr2 (fix:- dn dd)) pd)))
+		      ((fix:< dn dd)
+		       (rcf:/ (poly:* (poly:expt dr2 (fix:- dd dn)) pn) pd))
 		      (else (rcf:/ pn pd))))))))
       (rcf:/ (poly:value (ratform-numerator r1) r2)
 	     (poly:value (ratform-denominator r1) r2))))

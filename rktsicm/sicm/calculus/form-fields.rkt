@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
          "../kernel-gnrc.rkt"
          "dgutils.rkt"
@@ -86,7 +86,7 @@
 (define (literal-1form-field name coordinate-system)
   (let ((n (coordinate-system 'dimension)))
     (let ((function-signature
-	   (if (fx= n 1) (-> Real Real) (-> (UP* Real n) Real))))
+	   (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
       (let ((components
 	     (s:generate n 'down
 			 (lambda (i)

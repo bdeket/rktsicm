@@ -4,7 +4,7 @@
          (all-from-out "cstm/numeric.rkt")
          conjugate)
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          (only-in racket/math conjugate)
          "cstm/numeric.rkt"
          "../general/assert.rkt"
@@ -242,17 +242,17 @@
 
 (define (sigma f low high)
   (let lp ((i low) (sum 0))
-    (if (fx> i high)
+    (if (fix:> i high)
 	sum
-	(lp (fx+ i 1) (+ sum (f i))))))
+	(lp (fix:+ i 1) (+ sum (f i))))))
 |#
 
 (define (sigma f low high)
   (let lp ((i low) (sum 0) (c 0))
-    (if (fx> i high)
+    (if (fix:> i high)
 	sum
 	(let* ((y (- (f i) c)) (t (+ sum y)))
-	  (lp (fx+ i 1) t (- (- t sum) y))))))
+	  (lp (fix:+ i 1) t (- (- t sum) y))))))
 
 #|
 ;;; When adding up 1/n large-to-small we
@@ -283,10 +283,10 @@
 ;;; much better, but slower...
 (define (sigma-kahan f low high)
   (let lp ((i low) (sum 0) (c 0))
-    (if (fx> i high)
+    (if (fix:> i high)
 	sum
 	(let* ((y (- (f i) c)) (t (+ sum y)))
-	  (lp (fx+ i 1) t (- (- t sum) y))))))
+	  (lp (fix:+ i 1) t (- (- t sum) y))))))
 ;Value: sigma-kahan
 
 (sigma-kahan (lambda (x) (/ 1.0 x)) 1 10000000)
@@ -327,10 +327,10 @@
 (define (geometric a r n)
   (define (sigma-kahan f low high)
     (let lp ((i low) (sum 0) (c 0))
-      (if (fx> i high)
+      (if (fix:> i high)
 	  sum
 	  (let* ((y (- (f i) c)) (t (+ sum y)))
-	    (lp (fx+ i 1) t (- (- t sum) y))))))
+	    (lp (fix:+ i 1) t (- (- t sum) y))))))
   (let lp> ((k 0) (sum 0.0))
     (if (> k n)
 	(write-line `(forward-order ,sum))

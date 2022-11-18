@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../simplify.rkt")
 
@@ -64,21 +64,21 @@
 ;;;    (a f(a) f'(a) f"(a) ... ),   (b f(b) f'(b) f"(b) ... )
 
 (define (make-hermite-interpolator n)
-  (let* ((m (fx+ n 1))
-         (2m (fx* 2 m))
+  (let* ((m (fix:+ n 1))
+         (2m (fix:* 2 m))
          (! (lambda (n k) ;k*(k+1)*(k+2)*...*(k+n-1)
               (let loop ((i 0) (prod 1))
-                (if (fx= i n)
+                (if (fix:= i n)
                     prod
-                    (loop (fx+ i 1)
-			  (fx* prod (fx+ k i)))))))
+                    (loop (fix:+ i 1)
+			  (fix:* prod (fix:+ k i)))))))
          (term (lambda (i j)
-                 (if (fx< i m)
-                     (if (fx= j i) (! i 1) 0)
-                     (let ((i (fx- i m)))
-                       (if (fx< j i)
+                 (if (fix:< i m)
+                     (if (fix:= j i) (! i 1) 0)
+                     (let ((i (fix:- i m)))
+                       (if (fix:< j i)
                            0
-                           (! i (fx- j (fx+ i -1))))))))
+                           (! i (fix:- j (fix:+ i -1))))))))
          (mat (m:invert (m:generate 2m 2m term))))
     (define (hermite-interpolator avals bvals)
       (let* ((a (car avals)) (b (car bvals))

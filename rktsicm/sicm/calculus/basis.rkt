@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "dgutils.rkt"
@@ -41,7 +41,7 @@
 
 (define (make-basis vector-basis 1form-basis)
   (let ((n (length (s:fringe vector-basis))))
-    (assert (fx= n (length (s:fringe 1form-basis))))
+    (assert (fix:= n (length (s:fringe 1form-basis))))
     (list '*basis* vector-basis 1form-basis n)))
 
 (define (basis->vector-basis x)

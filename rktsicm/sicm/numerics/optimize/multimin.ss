@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../general/list-utils.rkt"
          "unimin.rkt"
@@ -131,9 +131,9 @@
     (when nelder-wallp? (println (simplex-lowest simplex)))
     (if (stationary? simplex epsilon)
         (list 'ok (simplex-lowest simplex) count)
-        (if (fx= count maxiter)
+        (if (fix:= count maxiter)
             (list 'maxcount (simplex-lowest simplex) count)
-            (limit (nm-step simplex) (fx+ count 1)))))
+            (limit (nm-step simplex) (fix:+ count 1)))))
   (limit (make-simplex start-pt start-step f) 0))
 
 
@@ -270,7 +270,7 @@
                     (newfx (caddr r)))
                 (if (close-enuf? newfx fx ftol) ;convergence criterion
                   (list 'ok (cons newx newfx) count)
-                  (if (fx= count maxiter)
+                  (if (fix:= count maxiter)
                     (list 'maxcount (cons newx newfx) count)
                     (let* ((newgx (g newx))
                            (dx (vector-vector newx x))
@@ -285,7 +285,7 @@
 						(vector->row-matrix Hdg))
 			       (/ -1 (v:dot-product dg Hdg))))
                            (newH (matrix+matrix H (matrix+matrix A B))))
-                      (loop newH newx newfx newgx (fx+ count 1)))))))))))))
+                      (loop newH newx newfx newgx (fix:+ count 1)))))))))))))
 
 
 ;;; The following procedures, DFP and DFP-BRENT, call directly upon
@@ -330,7 +330,7 @@
                     (newfx (caddr r)))
                 (if (close-enuf? newfx fx ftol) ;convergence criterion
                   (list 'ok (cons newx newfx) count)
-                  (if (fx= count maxiter)
+                  (if (fix:= count maxiter)
                     (list 'maxcount (cons newx newfx) count)
                     (let* ((newgx (g newx))
                            (dx (vector-vector newx x))
@@ -355,5 +355,5 @@
                            (newH
 			    (matrix+matrix (matrix+matrix H A)
 					   (matrix+matrix B C))))
-                        (loop newH newx newfx newgx (fx+ count 1)))))))))))))
+                        (loop newH newx newfx newgx (fix:+ count 1)))))))))))))
 

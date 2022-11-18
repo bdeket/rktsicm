@@ -2,7 +2,7 @@
 
 (provide (except-out (all-defined-out) ->fl for))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/flonum
          "../../kernel-intr.rkt"
          "../../rkt/undefined.rkt"
@@ -126,7 +126,7 @@
   ;(declare (integrate n))
   (lambda (i)
     ;(declare (integrate i))
-    (fx< i n)))
+    (fix:< i n)))
 
 (define *max-tableau-depth* undefined-value)
 (define *max-tableau-width* undefined-value)
@@ -144,7 +144,7 @@
   (let ((bulirsch-stoer-integers (stream-cons 1 (bsi 0))))
     (set! bulirsch-stoer-steps
 	  (list->vector
-	   (map (lambda (x) (fx* 2 x))
+	   (map (lambda (x) (fix:* 2 x))
 		(stream-head bulirsch-stoer-integers max-depth))))
     (set! bulirsch-stoer-magic-vectors
 	  (build-vector *max-tableau-depth*
@@ -154,7 +154,7 @@
 		  (exact->inexact
 		   (square (/ (stream-ref bulirsch-stoer-integers m)
 			      (stream-ref bulirsch-stoer-integers
-					  (fx- m (fx+ 1 k)))))))))))))
+					  (fix:- m (fix:+ 1 k)))))))))))))
 
 
 (bulirsch-stoer-setup 10 6)
@@ -238,12 +238,12 @@
 	      ;; Fortran
 	      (c*v+v dim h g$y0 y0 eta_1)
 	      (let lp ((j 2) (eta_j-1 y0) (eta_j eta_1))
-		(if (fx< j n)
+		(if (fix:< j n)
 		    (begin (g eta_j g$eta_j)
 			   (c*v+v dim 2h g$eta_j eta_j-1 eta_j+1)
 			   (g eta_j+1 g$eta_j+1)
 			   (c*v+v dim 2h g$eta_j+1 eta_j eta_j+2)
-			   (lp (fx+ j 2) eta_j+1 eta_j+2))
+			   (lp (fix:+ j 2) eta_j+1 eta_j+2))
 		    (begin (g eta_j g$eta_j)
 			   (c*v+v dim 2h g$eta_j eta_j-1 eta_j+1)
 			   (g eta_j+1 g$eta_j+1)
@@ -326,7 +326,7 @@
 		       (old-out gragg-output1)
 		       (new-out gragg-output2)
 		       (fail #f))	;zero divide would have happened
-	    (if (fx< m *max-tableau-depth*)
+	    (if (fix:< m *max-tableau-depth*)
 		(let ((m1 (min m *max-tableau-width*))
 		      (d (vector-ref bulirsch-stoer-magic-vectors m)))
 		  (modified-midpoint (vector-ref bulirsch-stoer-steps m) new-out)
@@ -358,7 +358,7 @@
 			(println `(bulirsch-stoer-error level: ,m error: ,verr h: ,delta-t)))
 		    ;; In Jack's C program the first two conditions
 		    ;; below are interchanged and the minimum number
-		    ;; of iterations is set to (fx< m 4)
+		    ;; of iterations is set to (fix:< m 4)
 		    (cond ;;(fail) 
                           ;;not good to (outside (* 0.9 delta-t)) or to m-loop with m+1
 			  ((fl< verr 2.0)
@@ -366,8 +366,8 @@
 					 delta-t
 					 (fl* (fl* delta-t bulirsch-stoer-magic-multiplier)
 					    (flexpt bulirsch-stoer-magic-base
-						      (exact->inexact (fx- m m1))))))
-			  ((fx< m 2)
+						      (exact->inexact (fix:- m m1))))))
+			  ((fix:< m 2)
 			   (m-loop (add1 m) verr
 				   new-state-estimate old-state-estimate
 				   new-out old-out #f))

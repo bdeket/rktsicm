@@ -7,7 +7,7 @@
          partition
          )
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          racket/list)
 
 ;;;; List utilities
@@ -48,7 +48,7 @@
 (define (count-elements p? l)
   (let loop ((count 0) (l l))
     (cond ((null? l) count)
-          ((p? (car l)) (loop (fx+ count 1) (cdr l)))
+          ((p? (car l)) (loop (fix:+ count 1) (cdr l)))
           (else (loop count (cdr l))))))
 
 (define (find-first pred lst)
@@ -58,7 +58,7 @@
 
 (define (countsymbols exp)
   (cond ((pair? exp)
-	 (fx+ (countsymbols (car exp))
+	 (fix:+ (countsymbols (car exp))
 		(countsymbols (cdr exp))))
 	((symbol? exp) 1)
 	(else 0)))
@@ -134,13 +134,13 @@
   (cond ((null? lst)
 	 (error "Not in list -- LIST-INDEX-OF" x))
 	((equal? x (car lst)) 0)
-	(else (fx+ (list-index-of x (cdr lst)) 1))))
+	(else (fix:+ (list-index-of x (cdr lst)) 1))))
 
 (define (delete-nth n list)
-  (if (fx= n 0)
+  (if (fix:= n 0)
       (cdr list)
       (cons (car list)
-	    (delete-nth (fx- n 1) (cdr list)))))
+	    (delete-nth (fix:- n 1) (cdr list)))))
 
 (define ((list:elementwise proc) . lists)
   (apply map proc lists))

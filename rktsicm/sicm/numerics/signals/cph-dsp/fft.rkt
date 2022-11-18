@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../../rkt/fixnum.rkt"
          racket/flonum
          "../../../rkt/default-object.rkt"
          "flovec.rkt"
@@ -92,21 +92,21 @@
 
 (define (fxceiling-lg n)
   (do ((n* 1 (arithmetic-shift n* 1)))
-      ((fx>= n* n) n*)))
+      ((fix:>= n* n) n*)))
 
 (define (flo:bit-reverse-vector! data)
   (let ((n (flo:vector-length data))
 	(temp (flo:make-vector 1 0.0)))
     (let ((n/2 (arithmetic-shift n -1))
-	  (n-1 (fx- n 1)))
-      (do ((i 1 (fx+ i 1))
+	  (n-1 (fix:- n 1)))
+      (do ((i 1 (fix:+ i 1))
 	   (j n/2
 	      (let loop ((j j) (k n/2))
-		(if (fx<= k j)
-		    (loop (fx- j k) (arithmetic-shift k -1))
-		    (fx+ j k)))))
-	  ((fx= i n-1))
-	(when (fx< i j)
+		(if (fix:<= k j)
+		    (loop (fix:- j k) (arithmetic-shift k -1))
+		    (fix:+ j k)))))
+	  ((fix:= i n-1))
+	(when (fix:< i j)
 	    (begin
 	      (flo:vector-set! temp 0 (flo:vector-ref data j))
 	      (flo:vector-set! data j (flo:vector-ref data i))
@@ -119,11 +119,11 @@
 	  (temp (flo:make-vector 1 0.0)))
       (flo:vector-set! data 0 (fl/ (flo:vector-ref data 0) n.))
       (flo:vector-set! data n/2 (fl/ (flo:vector-ref data n/2) n.))
-      (do ((i 1 (fx+ i 1)))
-	  ((fx= i n/2))
+      (do ((i 1 (fix:+ i 1)))
+	  ((fix:= i n/2))
 	(flo:vector-set! temp 0 (fl/ (flo:vector-ref data i) n.))
-	(flo:vector-set! data i (fl/ (flo:vector-ref data (fx- n i)) n.))
-	(flo:vector-set! data (fx- n i) (flo:vector-ref temp 0)))))
+	(flo:vector-set! data i (fl/ (flo:vector-ref data (fix:- n i)) n.))
+	(flo:vector-set! data (fix:- n i) (flo:vector-ref temp 0)))))
   (flo:bit-reverse-vector! data))
 
 (define compute-wn-vectors
@@ -135,9 +135,9 @@
 	      (sines (flo:make-vector n/2)))
 	  (flo:vector-set! cosines 0 1.)
 	  (flo:vector-set! sines 0 0.)
-	  (do ((i 1 (fx+ i 1))
+	  (do ((i 1 (fix:+ i 1))
 	       (angle base-angle (fl+ angle base-angle)))
-	      ((fx= i n/2))
+	      ((fix:= i n/2))
 	    (flo:vector-set! cosines i (flcos angle))
 	    (flo:vector-set! sines i (flsin angle)))
 	  (cons cosines sines))))))
@@ -148,10 +148,10 @@
     (do ((le 2 (arithmetic-shift le 1))
 	 (le1 1 le)
 	 (wn-index-delta (arithmetic-shift n -1) (arithmetic-shift wn-index-delta -1)))
-	((fx= wn-index-delta 0))
-      (do ((i1 0 (fx+ i1 le)))
-	  ((fx= i1 n))
-	(let ((i2 (fx+ i1 le1)))
+	((fix:= wn-index-delta 0))
+      (do ((i1 0 (fix:+ i1 le)))
+	  ((fix:= i1 n))
+	(let ((i2 (fix:+ i1 le1)))
 	  (flo:vector-set! temps 2 (flo:vector-ref reals i2))
 	  (flo:vector-set! temps 3 (flo:vector-ref imags i2))
 	  (flo:vector-set! reals i2
@@ -166,14 +166,14 @@
 	  (flo:vector-set! imags i1
 			   (fl+ (flo:vector-ref imags i1)
 				  (flo:vector-ref temps 3)))))
-      (do ((j 1 (fx+ j 1))
-	   (wn-index wn-index-delta (fx+ wn-index wn-index-delta)))
-	  ((fx= j le1))
+      (do ((j 1 (fix:+ j 1))
+	   (wn-index wn-index-delta (fix:+ wn-index wn-index-delta)))
+	  ((fix:= j le1))
 	(flo:vector-set! temps 0 (flo:vector-ref cosines wn-index))
 	(flo:vector-set! temps 1 (flo:vector-ref sines wn-index))
-	(do ((i1 j (fx+ i1 le)))
-	    ((fx>= i1 n))
-	  (let ((i2 (fx+ i1 le1)))
+	(do ((i1 j (fix:+ i1 le)))
+	    ((fix:>= i1 n))
+	  (let ((i2 (fix:+ i1 le1)))
 	    (flo:vector-set! temps 2
 			     (fl+ (fl* (flo:vector-ref reals i2)
 					   (flo:vector-ref temps 0))
@@ -208,8 +208,8 @@
   (let ((reals (car results))
 	(imags (cdr results)))
     (let ((n (flo:vector-length reals)))
-      (do ((i 0 (fx+ i 1)))
-	  ((fx= i n))
+      (do ((i 0 (fix:+ i 1)))
+	  ((fix:= i n))
 	(flo:vector-set!
 	 reals i
 	 (fl+ (fl* (flo:vector-ref reals i)
@@ -222,8 +222,8 @@
   (let ((log-scale-factor (fl/ 10. (fllog 10.))))
     (lambda (reals)
       (let ((n (flo:vector-length reals)))
-	(do ((i 0 (fx+ i 1)))
-	    ((fx= i n))
+	(do ((i 0 (fix:+ i 1)))
+	    ((fix:= i n))
 	  (flo:vector-set!
 	   reals
 	   i
@@ -237,8 +237,8 @@
   (let ((reals (car results))
 	(imags (cdr results)))
     (let ((n (flo:vector-length reals)))
-      (do ((i 0 (fx+ i 1)))
-	  ((fx= i n))
+      (do ((i 0 (fix:+ i 1)))
+	  ((fix:= i n))
 	(flo:vector-set!
 	 reals i
 	 (if (and (fl= 0.0 (flo:vector-ref reals i))
@@ -253,8 +253,8 @@
 	(imags (cdr results)))
     (let ((n (flo:vector-length reals)))
       (let ((result (make-vector n)))
-	(do ((i 0 (fx+ i 1)))
-	    ((fx= i n))
+	(do ((i 0 (fix:+ i 1)))
+	    ((fix:= i n))
 	  (vector-set! result
 		       i
 		       (if (fl= 0.0 (flo:vector-ref imags i))

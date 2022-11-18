@@ -2,7 +2,7 @@
 
 (provide (all-defined-out)
          (all-from-out "cstm/arity.rkt"))
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          (only-in racket/function normalize-arity)
          "../rkt/default-object.rkt"
          "../rkt/undefined.rkt"
@@ -18,15 +18,15 @@
 
 (define (do-up low hi proc)
   ;; execute PROC for values beginning at LOW up to HI (exclusive)
-  (when (fx< low hi)
+  (when (fix:< low hi)
       (begin (proc low)
-	     (do-up (fx+ low 1) hi proc))))
+	     (do-up (fix:+ low 1) hi proc))))
 
 (define (do-down hi low proc)
   ;; execute PROC for values beginning at HI down to LOW (exclusive)
-  (when (fx< low hi)
+  (when (fix:< low hi)
       (begin (proc hi)
-	     (do-down (fx- hi 1) low proc))))
+	     (do-down (fix:- hi 1) low proc))))
 
 (define (sign x)
    (cond ((> x 0) 1)
@@ -359,15 +359,15 @@
 
 
 (define (iterated f n [id default-object])
-  (if (fx< n 0)
+  (if (fix:< n 0)
       (error "I don't know how to invert -- ITERATED" f n)
       (let ((ident (if (default-object? id) identity id)))
-	(if (fx= n 0)
+	(if (fix:= n 0)
 	    ident
 	    (let lp ((n n))
-	      (if (fx= n 1)
+	      (if (fix:= n 1)
 		  f
-		  (compose-2 f (lp (fx- n 1)))))))))
+		  (compose-2 f (lp (fix:- n 1)))))))))
 
 
 ;;; Generalization of fixed point stuff

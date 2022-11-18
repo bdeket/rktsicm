@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          "../linear.rkt"
@@ -28,7 +28,7 @@
 		 (f
 		  (vector-with-substituted-coord xn i
 						 (vector-ref xn-1 i)))))))
-	(assert (fx= N (v:dimension fn)))
+	(assert (fix:= N (v:dimension fn)))
 	(let ((M
 	       (matrix:generate N N
 				(lambda (i j)
@@ -42,9 +42,9 @@
                     fail))))
     (define (good-root? xn xn-1)
       (let lp ((i 0) (diff 0))
-	(if (fx= i N)
+	(if (fix:= i N)
 	    (< diff min-step)
-	    (lp (fx+ i 1)
+	    (lp (fix:+ i 1)
 		(max diff
 		     (magnitude (- (vector-ref xn i)
                                    (vector-ref xn-1 i))))))))

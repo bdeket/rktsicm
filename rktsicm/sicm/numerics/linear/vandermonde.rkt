@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
          "../../general/list-utils.rkt"
          "../../simplify/sparse.rkt"
@@ -23,13 +23,13 @@
         (linear-terms
          (map (lambda (k) (sparse-linear 1 0 k))
               ks)))
-    (assert (fx= n (length ks)))
+    (assert (fix:= n (length ks)))
     (let ((Q
            (foldl sparse-multiply (sparse-one 1)
                   linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
-        (if (fx= i n)
+        (if (fix:= i n)
             (succeed (vector->list x))
             (let ((ki (list-ref ks i))
                   (x-ki (list-ref linear-terms i))
@@ -50,7 +50,7 @@
                                                                   (+ (* (list-ref ws i) c)
                                                                      (vector-ref x j)))))
                                                  Pi)
-                                       (lp (fx+ i 1)))))))))))))
+                                       (lp (fix:+ i 1)))))))))))))
 
 ;;; Transposed Vandermonde systems
 ;;; Given k_i and w_j to find x_i 
@@ -66,13 +66,13 @@
         (linear-terms
          (map (lambda (k) (sparse-linear 1 0 k))
               ks)))
-    (assert (fx= n (length ks)))
+    (assert (fix:= n (length ks)))
     (let ((Q
            (foldl sparse-multiply (sparse-one 1)
                   linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
-        (if (fx= i n)
+        (if (fix:= i n)
             (succeed (vector->list x))
             (let ((ki (list-ref ks i))
                   (x-ki (list-ref linear-terms i))
@@ -93,7 +93,7 @@
                                                                   (+ (* (list-ref ws j) c)
                                                                      (vector-ref x i)))))
                                                  Pi)
-                                       (lp (fx+ i 1)))))))))))))
+                                       (lp (fix:+ i 1)))))))))))))
 
 ;;; Variant transposed Vandermonde systems
 ;;; Given k_i and w_j to find x^i 
@@ -109,13 +109,13 @@
         (linear-terms
          (map (lambda (k) (sparse-linear 1 0 k))
               ks)))
-    (assert (fx= n (length ks)))
+    (assert (fix:= n (length ks)))
     (let ((Q
            (foldl sparse-multiply (sparse-one 1)
                   linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
-        (if (fx= i n)
+        (if (fix:= i n)
             (succeed (vector->list x))
             (let ((ki (list-ref ks i))
                   (x-ki (list-ref linear-terms i))
@@ -136,7 +136,7 @@
                                                                   (+ (* (list-ref ws j) c)
                                                                      (vector-ref x i)))))
                                                  Pi)
-                                       (lp (fx+ i 1)))))))))))))
+                                       (lp (fix:+ i 1)))))))))))))
 
 (define (roots->poly-value ks z)
   (foldl *

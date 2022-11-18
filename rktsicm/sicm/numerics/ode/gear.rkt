@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/flonum
          "../../kernel-intr.rkt"
          "../../rkt/default-object.rkt"
@@ -296,7 +296,7 @@
 			  (gear-control err wins h k naccum niter spice-mode?
 			   (lambda (nh nk) ;good step
 			     (cont h (update-table xc xs)
-				   nfx nh nk (fx+ wins 1) naccum))
+				   nfx nh nk (fix:+ wins 1) naccum))
 			   (lambda (nh nk) ;careful step
 			     (cont h (update-table xc xs)
 				   nfx nh nk 1 0.0))
@@ -306,14 +306,14 @@
 			(gear-step xs
 				   fx
 				   (/ h *gear-fixed-point-failure-contraction*)
-				   (max (fx- k 1) *gear-min-order*) ; was k
+				   (max (fix:- k 1) *gear-min-order*) ; was k
 				   1
 				   0.0
 				   cont))))))
   gear-step)
 
 (define (update-table new table)
-  (if (fx< (length table) *gear-max-order*)
+  (if (fix:< (length table) *gear-max-order*)
       (cons new table)
       (cons new (reverse (cdr (reverse table))))))
 
@@ -342,10 +342,10 @@
 	     (b
 	      (let lp ((i 1) (gc (cdr gear-coeffs)) (xs xs))
 		(let ((x (clip-vector (car xs))))
-		  (if (fx= i order)
+		  (if (fix:= i order)
 		      (scalar*vector (car gc) x)
 		      (vector+vector (scalar*vector (car gc) x)
-				     (lp (fx+ i 1) (cdr gc) (cdr xs)))))))
+				     (lp (fix:+ i 1) (cdr gc) (cdr xs)))))))
 	     (last-fx 0.0))
 	(vector-fixed-point-with-failure
 	 (lambda (x continue)
@@ -378,10 +378,10 @@
 	     (b
 	      (let lp ((i 1) (gc (cdr gear-coeffs)) (xs xs))
 		(let ((x (clip-vector (car xs))))
-		  (if (fx= i order)
+		  (if (fix:= i order)
 		      (scalar*vector (car gc) x)
 		      (vector+vector (scalar*vector (car gc) x)
-				     (lp (fx+ i 1) (cdr gc) (cdr xs))))))))
+				     (lp (fix:+ i 1) (cdr gc) (cdr xs))))))))
 	(f&df b alpha clipped-xp			
 	      convergence-measure
 	      (lambda (x-corr count)	;assumes x-corr is bigger than clipped.
@@ -397,38 +397,38 @@
   ;;  good-step = (lambda (nh nk) ...)
   ;;  bad-step  = (lambda (nh nk) ...)
   (cond (spice-mode
-	 (cond ((fx> niter *spice-order-too-big*)
+	 (cond ((fix:> niter *spice-order-too-big*)
 		(bad-step (spice-contract h niter)
-			  (max (fx- k 1) *gear-min-order*)))
-	       ((fx> niter *spice-step-too-big*)
+			  (max (fix:- k 1) *gear-min-order*)))
+	       ((fix:> niter *spice-step-too-big*)
 		(bad-step (spice-contract h niter) k))
-	       ((fx> niter *spice-good-step*)
+	       ((fix:> niter *spice-good-step*)
 		(careful-step (spice-contract h niter) k))
-	       ((fx> niter *spice-step-too-small*)
+	       ((fix:> niter *spice-step-too-small*)
 		(good-step h k))
-	       ((fx> niter *spice-order-too-small*)
+	       ((fix:> niter *spice-order-too-small*)
 		(good-step (spice-expand h niter) k))
 	       (else
 		(good-step (spice-expand h niter)
-			   (min (fx+ k 1) *gear-max-order*)))))
+			   (min (fix:+ k 1) *gear-max-order*)))))
 	((> err *gear-error-too-big*)			; Have to reduce step.
 	 (let ((contract (expt (+ err *gear-protect*)
-			       (/ -1.0 (exact->inexact (fx+ k 1))))))
+			       (/ -1.0 (exact->inexact (fix:+ k 1))))))
 	   (cond ((< contract (* (exact->inexact k) *gear-decrease-order*))
 		  ;;(write-line `(order-down: ,(max (- k 1) *gear-min-order*)))
 		  (bad-step (* contract *contract-order* h)
-			    (max (fx- k 1) *gear-min-order*)))
+			    (max (fix:- k 1) *gear-min-order*)))
 		 (else (bad-step (* contract h) k)))))
 	;; Step is acceptable.
-	((<= wins (fx* *gear-step-refractory-period* k)) ;do nothing
+	((<= wins (fix:* *gear-step-refractory-period* k)) ;do nothing
 	 (good-step h k))
 	(else
 	 (let ((expand (expt (+ (/ err-accum (exact->inexact wins)) *gear-protect*)
-			     (/ -1.0 (exact->inexact (fx+ k 1))))))
-	   (cond ((fx> wins (fx* *gear-order-refractory-period* k))
+			     (/ -1.0 (exact->inexact (fix:+ k 1))))))
+	   (cond ((fix:> wins (fix:* *gear-order-refractory-period* k))
 		  (careful-step (min (* *gear-damping* expand h)
 				     (* *gear-max-step-increase* h))
-				(min (fx+ k 1) *gear-max-order*)))
+				(min (fix:+ k 1) *gear-max-order*)))
 		 ((and (< *gear-dead-zone-low* expand)
 		       (< expand *gear-dead-zone-high*))
 		  (good-step h k))
@@ -441,14 +441,14 @@
 (define (spice-expand h niter)
   (let* ((m (/ (- 1.0 *spice-step-expansion*)
 	       (exact->inexact
-		(fx- *spice-step-too-small* *spice-order-too-small*))))
+		(fix:- *spice-step-too-small* *spice-order-too-small*))))
 	 (b (- 1.0 (* m (exact->inexact *spice-step-too-small*)))))
     (* (+ (* m (exact->inexact niter)) b) h)))
 
 (define (spice-contract h niter)
   (let* ((m (/ (- *spice-step-reduction* 1.0)
 	       (exact->inexact
-		(fx- *spice-step-too-big* *spice-good-step*))))
+		(fix:- *spice-step-too-big* *spice-good-step*))))
 	 (b (- 1.0 (* m (exact->inexact *spice-good-step*)))))
     (/ h (+ (* m (exact->inexact niter)) b))))
 
@@ -1006,7 +1006,7 @@
 
 (define (gear-error k)
   (let ((C (vector-ref gear-corrector-errors k))
-	(k+1 (fx+ k 1))
+	(k+1 (fix:+ k 1))
 	(dfk 1))			;ugh!
     (lambda (h)
       (* C (expt h k+1) dfk))))
@@ -1017,7 +1017,7 @@
   (let ((s1 (car xs)))
     (generate-vector (vector-length s1)
 		     (lambda (i)
-		       (if (fx= i 0)
+		       (if (fix:= i 0)
 			   t
 			   (vector-ref s1 i))))))
 

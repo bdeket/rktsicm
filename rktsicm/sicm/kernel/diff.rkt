@@ -4,7 +4,7 @@
          (all-from-out "cstm/diff.rkt")
          differential-of)
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "cstm/diff.rkt"
          "cstm/s-operator.rkt"
          "../general/assert.rkt"
@@ -157,8 +157,8 @@
 	(dts2 (differential-tags dterm2)))
     (let ((l1 (length dts1))
 	  (l2 (length dts2)))
-      (or (fx< l1 l2)
-	  (and (fx= l1 l2)
+      (or (fix:< l1 l2)
+	  (and (fix:= l1 l2)
 	       (<dts dts1 dts2))))))
 
 (define (<dts dts1 dts2)

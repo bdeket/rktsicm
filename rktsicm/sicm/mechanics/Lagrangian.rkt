@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../rkt/default-object.rkt"
          "../general/assert.rkt"
          "universal.rkt")
@@ -50,22 +50,22 @@
 ;;; Selectors are provided for the components of a state.
 
 (define (state->t state)
-  (when (not (and (vector? state) (fx> (vector-length state) 0)))
+  (when (not (and (vector? state) (fix:> (vector-length state) 0)))
       (error "Cannot extract time from" state))
  (ref state 0))
 
 (define (state->q state)
-  (when (not (and (vector? state) (fx> (vector-length state) 1)))
+  (when (not (and (vector? state) (fix:> (vector-length state) 1)))
       (error "Cannot extract coordinate from" state))
   (ref state 1))
 
 (define (state->qdot state)
-  (when (not (and (vector? state) (fx> (vector-length state) 2)))
+  (when (not (and (vector? state) (fix:> (vector-length state) 2)))
       (error "Cannot extract velocity from" state))
   (ref state 2))
 
 (define (state->qddot state)
-  (when (not (and (vector? state) (fx> (vector-length state) 3)))
+  (when (not (and (vector? state) (fix:> (vector-length state) 3)))
       (error "Cannot extract acceleration from" state))
   (ref state 3))
     
@@ -108,13 +108,13 @@
 |#
 
 (define (path->state-path q [n 3])
-  (assert (fx> n 1))
+  (assert (fix:> n 1))
   (lambda (t)
     (list->vector
      (cons t
 	   (cons (q t)
-		 (let lp ((i (fx- n 2)) (fi (D q)))
-		   (if (fx= i 0)
+		 (let lp ((i (fix:- n 2)) (fi (D q)))
+		   (if (fix:= i 0)
 		       '()
 		       (cons (fi t)
 			     (lp (- i 1)

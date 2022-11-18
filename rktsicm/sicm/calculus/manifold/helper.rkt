@@ -2,11 +2,11 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-gnrc.rkt")
 
 (define (c:generate n type proc)
-  (if (fx= n 1)
+  (if (fix:= n 1)
       (proc 0)
       (s:generate n type proc)))
 

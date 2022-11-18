@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
@@ -19,7 +19,7 @@
 ;;; There is also a generic version in the file interp-generic.scm.
 (define (lagrange-interpolation-function ys xs)
   (let ((n (length ys)))
-    (assert (fx= (length xs) n))
+    (assert (fix:= (length xs) n))
     (define (poly x)
       (reduce + :zero
 	      (generate-list n
@@ -27,15 +27,15 @@
 		  (/ (reduce * :one
 		       (generate-list n
 		         (lambda (j)
-			   (if (fx= j i)
+			   (if (fix:= j i)
 			       (list-ref ys i)
 			       (- x (list-ref xs j))))))
 		     (let ((xi (list-ref xs i)))
 		       (reduce * :one
 			 (generate-list n
 		           (lambda (j)
-			     (cond ((fx< j i) (- (list-ref xs j) xi))
-				   ((fx= j i) (expt :-one i))
+			     (cond ((fix:< j i) (- (list-ref xs j) xi))
+				   ((fix:= j i) (expt :-one i))
 				   (else    (- xi (list-ref xs j)))))))))))))
     poly))
 

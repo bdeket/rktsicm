@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt"
          "../rkt/default-object.rkt"
          "../rkt/int.rkt"
@@ -75,7 +75,7 @@
 
 (define (all-zeros? exponents)
   (or (null? exponents)
-      (and (fx= 0 (car exponents))
+      (and (fix:= 0 (car exponents))
 	   (all-zeros? (cdr exponents)))))
 
 (define (fpf:make-constant c arity)
@@ -95,7 +95,7 @@
     (lambda (i)
       (fpf:make (list (fpf:make-term
 		       (build-list n
-			 (lambda (j) (if (fx= i j) 1 0)))
+			 (lambda (j) (if (fix:= i j) 1 0)))
 		       :one))))))
 
 
@@ -106,10 +106,10 @@
   (fpf:graded> fs1 fs2))
 
 (define (fpf:graded> fs1 fs2)		;Graded lexicographical order
-  (let ((o1 (reduce fx+ 0 fs1))
-	(o2 (reduce fx+ 0 fs2)))
-    (cond ((fx> o1 o2) #t)
-	  ((fx< o1 o2) #f)
+  (let ((o1 (reduce fix:+ 0 fs1))
+	(o2 (reduce fix:+ 0 fs2)))
+    (cond ((fix:> o1 o2) #t)
+	  ((fix:< o1 o2) #f)
 	  (else
 	   (fpf:lexicographical> fs1 fs2)))))
 
@@ -117,8 +117,8 @@
   (let lp ((l1 fs1) (l2 fs2))
     (cond ((null? l1) #f)
 	  ((null? l2) #t)
-	  ((fx> (car l1) (car l2)) #t)
-	  ((fx< (car l1) (car l2)) #f)
+	  ((fix:> (car l1) (car l2)) #t)
+	  ((fix:< (car l1) (car l2)) #f)
 	  (else (lp (cdr l1) (cdr l2))))))
 
 
@@ -151,7 +151,7 @@
 	      (wta))
 	  (if (and (explicit-fpf? a1)
 		   (explicit-fpf? a2)
-		   (fx= (fpf:arity a1) (fpf:arity a2)))
+		   (fix:= (fpf:arity a1) (fpf:arity a2)))
 	      (fpf:make (terms-op (fpf:terms a1) (fpf:terms a2)))
 	      (wta)))))
 
@@ -240,7 +240,7 @@
   (cond ((null? exponents1) exponents2)
 	((null? exponents2) exponents1)
 	(else
-	 (map fx+ exponents1 exponents2))))
+	 (map fix:+ exponents1 exponents2))))
 
 (define (fpf:square p)
   (fpf:* p p))
@@ -279,7 +279,7 @@
 				 cont))
 	      ((and (explicit-fpf? x)
 		    (explicit-fpf? y)
-		    (fx= (fpf:arity x) (fpf:arity y)))
+		    (fix:= (fpf:arity x) (fpf:arity y)))
 	       (fpf:divide-terms (fpf:terms x) (fpf:terms y) cont))
 	      (else (error "Bad arguments -- FPF:DIVIDE" x y))))))
 

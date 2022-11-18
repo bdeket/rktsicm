@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../rkt/default-object.rkt"
          "../../rkt/int.rkt"
@@ -26,7 +26,7 @@
 ;;; Other implementation of coefficient arithmetic may be constructed
 ;;; by modifying this map.
 
-(define fxzero? int:zero?)
+(define fix:zero? int:zero?)
 
 (define base? number?)
 
@@ -66,7 +66,7 @@
   (poly/make-from-dense arity (list base/one base/zero)))
 
 (define (poly/make-constant arity c)
-  (when (not (fx< (poly/arity c) arity))
+  (when (not (fix:< (poly/arity c) arity))
       (error "Bad constant -- POLY/MAKE-CONSTANT" arity c))
   (poly/make-from-dense arity (list c)))
 
@@ -95,7 +95,7 @@
 	((or (base? p1) (base? p2)) #f)
 	(else
 	 (let ((arity (poly/check-same-arity p1 p2)))
-	   (and (fx= (poly/degree p1) (poly/degree p2))
+	   (and (fix:= (poly/degree p1) (poly/degree p2))
 		(poly/equal? (poly/leading-coefficient p1)
 			     (poly/leading-coefficient p2))
 		(poly/equal? (poly/except-leading-term arity p1)
@@ -104,29 +104,29 @@
 (define (poly/extend n p)
   ;; Interpolates a variable at position n in polynomial p.
   (let* ((arity (poly/arity p))
-	 (narity (if (fx> n arity) (fx+ n 1) (fx+ arity 1))))
-    (if (fx= n 0)
-	(poly/adjoin (fx+ arity 1) 0 p poly/zero)
+	 (narity (if (fix:> n arity) (fix:+ n 1) (fix:+ arity 1))))
+    (if (fix:= n 0)
+	(poly/adjoin (fix:+ arity 1) 0 p poly/zero)
 	(let lp ((p p))
 	  (cond ((poly/zero? p) p)
 		(else
 		 (poly/adjoin narity
 			      (poly/degree p)
-			      (poly/extend (fx- n 1)
+			      (poly/extend (fix:- n 1)
 					   (poly/leading-coefficient p))
 			      (lp (poly/except-leading-term arity p)))))))))
 
 (define (poly/contract n p)
   (if (poly/contractable? n p)
       (let ((arity (poly/arity p)))
-	(if (fx= n 0)
+	(if (fix:= n 0)
 	    (poly/trailing-coefficient p)
 	    (let lp ((p p))
 	      (cond ((poly/zero? p) p)
 		    (else
-		     (poly/adjoin (fx- arity 1)
+		     (poly/adjoin (fix:- arity 1)
 				  (poly/degree p)
-				  (poly/contract (fx- n 1)
+				  (poly/contract (fix:- n 1)
 				    (poly/leading-coefficient p))
 				  (lp
 				   (poly/except-leading-term arity p))))))))
@@ -134,25 +134,25 @@
 
 (define (poly/contractable? n p)
   (or (base? p)
-      (if (fx= n 0)
-	  (fx= (poly/degree p) 0)
-	  (and (fx< n (poly/arity p))
+      (if (fix:= n 0)
+	  (fix:= (poly/degree p) 0)
+	  (and (fix:< n (poly/arity p))
 	       (let lp ((p p))
 		 (cond ((poly/zero? p) #t)
-		       ((poly/contractable? (fx- n 1)
+		       ((poly/contractable? (fix:- n 1)
 					    (poly/leading-coefficient p))
 			(poly/contractable? n
 			  (poly/except-leading-term (poly/arity p) p)))
 		       (else #f)))))))
 
 (define (poly/make-vars arity)
-  (if (fx= arity 0)
+  (if (fix:= arity 0)
       '()
       (let lp1 ((n 1) (l (list poly/identity)))
-	(if (fx= n arity)
+	(if (fix:= n arity)
 	    l
-	    (lp1 (fx+ n 1)
-		 (cons (poly/make-identity (fx+ n 1))
+	    (lp1 (fix:+ n 1)
+		 (cons (poly/make-identity (fix:+ n 1))
 		       (map (lambda (c)
 			      (poly/extend 0 c))
 			    l)))))))
@@ -162,7 +162,7 @@
 (define (poly/check-same-arity p1 p2)
   (cond ((base? p1) (poly/arity p2))
 	((base? p2) (poly/arity p1))
-	((fx= (poly/arity p1) (poly/arity p2))
+	((fix:= (poly/arity p1) (poly/arity p2))
 	 (poly/arity p1))
 	(else (error "Unequal arities -- POLY" p1 p2))))
 
@@ -175,7 +175,7 @@
 	 (let ((degree1 (poly/degree p1))
 	       (degree2 (poly/degree p2))
 	       (arity (poly/check-same-arity p1 p2)))
-	   (cond ((fx= degree1 degree2)
+	   (cond ((fix:= degree1 degree2)
 		  (let ((c (poly/add (poly/leading-coefficient p1)
 				     (poly/leading-coefficient p2)))
 			(s (poly/add (poly/except-leading-term arity p1)
@@ -183,12 +183,12 @@
 		    (if (poly/zero? c)
 			s
 			(poly/adjoin arity degree1 c s))))
-		 ((fx> degree1 degree2)
+		 ((fix:> degree1 degree2)
 		  (poly/adjoin arity degree1
 			       (poly/leading-coefficient p1)
 			       (poly/add (poly/except-leading-term arity p1)
 					 p2)))
-		 (else			;(fx< degree1 degree2)
+		 (else			;(fix:< degree1 degree2)
 		  (poly/adjoin arity degree2
 			       (poly/leading-coefficient p2)
 			       (poly/add p1
@@ -202,7 +202,7 @@
 	 (let ((degree1 (poly/degree p1))
 	       (degree2 (poly/degree p2))
 	       (arity (poly/check-same-arity p1 p2)))
-	   (cond ((fx= degree1 degree2)
+	   (cond ((fix:= degree1 degree2)
 		  (let ((c (poly/sub (poly/leading-coefficient p1)
 				     (poly/leading-coefficient p2)))
 			(s (poly/sub (poly/except-leading-term arity p1)
@@ -210,12 +210,12 @@
 		    (if (poly/zero? c)
 			s
 			(poly/adjoin arity degree1 c s))))
-		 ((fx> degree1 degree2)
+		 ((fix:> degree1 degree2)
 		  (poly/adjoin arity degree1
 			       (poly/leading-coefficient p1)
 			       (poly/sub (poly/except-leading-term arity p1)
 					 p2)))
-		 (else			;(fx< degree1 degree2)
+		 (else			;(fix:< degree1 degree2)
 		  (poly/adjoin arity degree2
 			       (poly/negate (poly/leading-coefficient p2))
 			       (poly/sub p1
@@ -242,7 +242,7 @@
 		       (if (poly/zero? p)
 			   p
 			   (poly/adjoin arity
-					(fx+ d (poly/degree p))
+					(fix:+ d (poly/degree p))
 					(poly/mul c (poly/leading-coefficient p))
 					(loop (poly/except-leading-term arity p)))))
 		     (poly/mul (poly/except-leading-term arity p1)
@@ -307,10 +307,10 @@
 	(else
 	 (let ((arity (poly/check-same-arity u v)))
 	   (let lp ((u u) (cont cont))
-	     (if (fx< (poly/degree u) (poly/degree v))
+	     (if (fix:< (poly/degree u) (poly/degree v))
 		 (cont poly/zero u)
 		 (let ((lead-q-degree
-			(fx- (poly/degree u) (poly/degree v)))
+			(fix:- (poly/degree u) (poly/degree v)))
 		       (lead-q-coeff
 			(poly/quotient (poly/leading-coefficient u)
 				       (poly/leading-coefficient v))))
@@ -386,14 +386,14 @@
       ;;(write-line u)
       (let ((m (poly/degree u))
 	    (cum (poly/leading-coefficient u)))
-	(if (fx< m n)
+	(if (fix:< m n)
 	    (cont u d)
 	    (lp (poly/sub (poly/mul u cvn)
 			  (poly/mul (poly/make-c*x^n arity
 						     cum
-						     (fx- m n))
+						     (fix:- m n))
 				    v))
-		(fx+ d 1)))))))
+		(fix:+ d 1)))))))
 		
 ;;; The following helpers are used in GCD routines
 
@@ -450,7 +450,7 @@
 	  poly/zero
 	  (let lp ((coeffs coeffs))
 	    (let ((n (length coeffs)))
-	      (if (fx= n 1)
+	      (if (fix:= n 1)
 		  (car coeffs)
 		  (let ((n/2 (quotient n 2)))
 		    (let ((ps (poly/random-linear-combination
@@ -494,7 +494,7 @@
     (define (pgcd ppu ppv win lose)
       (when euclid-wallp? (println (list ppu ppv)))
       (cond ((poly/zero? ppv) (win ppu))
-	    ((fxzero? (poly/degree ppv)) (win poly/one))
+	    ((fix:zero? (poly/degree ppv)) (win poly/one))
 	    ((allocated-time-expired?) (lose))
 	    (else
 	     (poly/pseudo-remainder ppu ppv
@@ -564,7 +564,7 @@
     (define (pgcd u v oc)
       (when collins-wallp? (println (list u v)))
       (cond ((poly/zero? v) u)
-	    ((fxzero? (poly/degree v)) poly/one)
+	    ((fix:zero? (poly/degree v)) poly/one)
 	    (else
 	     (poly/pseudo-remainder u v
 	       (lambda (r delta)
@@ -577,7 +577,7 @@
       (cond ((poly/one? u) u)
 	    ((poly/one? v) v)
 	    ((and (base? u) (base? v)) (base/gcd u v))
-	    ((fx>= (poly/degree u) (poly/degree v))
+	    ((fix:>= (poly/degree u) (poly/degree v))
 	     (poly/primitive-part (pgcd u v 0)))
 	    (else
 	     (poly/primitive-part (pgcd v u 0)))))
@@ -706,10 +706,10 @@
 	  (let ((x (cons p1 p2)))
 	    (let ((seen (hash-table/get table x *not-seen*)))
 	      (if (not (eq? seen *not-seen*))
-		  (begin (set! *gcd-hit* (fx+ *gcd-hit* 1))
+		  (begin (set! *gcd-hit* (fix:+ *gcd-hit* 1))
 			 seen)
 		  (let ((ans (poly/gcd p1 p2)))
-		    (set! *gcd-miss* (fx+ *gcd-miss* 1))
+		    (set! *gcd-miss* (fix:+ *gcd-miss* 1))
 		    (hash-table/put! table x ans)
 		    ans))))
 	  (poly/gcd p1 p2)))
@@ -742,7 +742,7 @@
   (build-vector n-random-primes
 			   (lambda (i)
 			     (stream-ref prime-numbers-stream
-					 (fx+ i skip-initial-primes)))))
+					 (fix:+ i skip-initial-primes)))))
 
 (define hash-args-vector
   (build-vector n-random-primes
@@ -769,11 +769,11 @@
 
 (define (poly/derivative-partial p varnum)
   (cond ((base? p) poly/zero)
-	((fx< varnum 1) poly/zero)
-	((fx= varnum 1) (poly/derivative-principal p))
+	((fix:< varnum 1) poly/zero)
+	((fix:= varnum 1) (poly/derivative-principal p))
 	(else
 	 (let ((arity (poly/arity p)))
-	   (when (fx> varnum arity)
+	   (when (fix:> varnum arity)
 	       (error "Bad varnum -- POLY/DERIVATIVE-PARTIAL"
 		      p varnum))
 	   (let lp ((p p))
@@ -781,8 +781,8 @@
 		 poly/zero
 		 (let ((c (poly/leading-coefficient p)))
 		   (let ((d (poly/derivative-partial c
-			      (fx- varnum
-				     (fx- arity
+			      (fix:- varnum
+				     (fix:- arity
 					    (poly/arity c))))))
 		     (if (poly/zero? d)
 			 (lp (poly/except-leading-term arity p))
@@ -793,8 +793,8 @@
 
 
 (define (poly/partial-derivative p varnums) ;compatibility
-  (assert (fx= (length varnums) 1))
-  (poly/derivative-partial p (fx+ (car varnums) 1)))
+  (assert (fix:= (length varnums) 1))
+  (poly/derivative-partial p (fix:+ (car varnums) 1)))
 
 
 (define (poly/derivative-principal p)
@@ -805,10 +805,10 @@
 	  (if (base? p)
 	      poly/zero
 	      (let ((deg (poly/degree p)))
-		(if (fxzero? deg)
+		(if (fix:zero? deg)
 		    poly/zero
 		    (poly/adjoin arity
-		      (fx- deg 1)
+		      (fix:- deg 1)
 		      (poly/mul deg (poly/leading-coefficient p))
 		      (lp (poly/except-leading-term arity p))))))))))
 
@@ -823,14 +823,14 @@
   (if (base? p)
       p
       (let ((arity (poly/arity p)))
-	(when (not (fx= arity (length args)))
+	(when (not (fix:= arity (length args)))
 	    (error "Wrong number of args -- POLY/HORNER" p args))
 	(let lp ((p p) (args args))
 	  (if (base? p)
 	      p
 	      (let ((arity (poly/arity p))
 		    (nargs (length args)))
-		(let ((args (list-tail args (fx- nargs arity))))
+		(let ((args (list-tail args (fix:- nargs arity))))
 		  (poly/hh p
 			   (car args)
 			   (lambda (c) (lp c (cdr args)))))))))))
@@ -860,7 +860,7 @@
 		  (lp (poly/except-leading-term arity restp)
 		      (add (mul coeff-value
 				(raise x
-				      (fx- degree
+				      (fix:- degree
 					     next-degree)))
 			   (eval-coeff next-coeff))
 		      next-degree))))))))
@@ -931,7 +931,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
       a
       (let ((arity (poly/arity a))
 	    (az (magnitude z)))
-	(when (not (fx= arity 1))
+	(when (not (fix:= arity 1))
 	    (error "Wrong arity poly -- POLY/HORNER-WITH-ERROR" a z))
 	(let lp ((degree (poly/degree a))
 		 (p (poly/leading-coefficient a))
@@ -940,20 +940,20 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 		 (e (* 1/2 (magnitude (poly/leading-coefficient a))))
 		 (a (poly/except-leading-term arity a)) )
 	  (let* ((next-degree (poly/degree a))
-		 (n (if (base? a) degree (fx- degree next-degree))))
+		 (n (if (base? a) degree (fix:- degree next-degree))))
 	    (define (finish np nq nr ne)
 	      (if (base? a)
 		  (cont np nq (* 2 nr)
 			(* *machine-epsilon* (+ (- ne (magnitude np)) ne)))
 		  (lp next-degree np nq nr ne
 		      (poly/except-leading-term arity a))))
-	    (cond ((fx= n 1)
+	    (cond ((fix:= n 1)
 		   (let* ((np (+ (* z p) (poly/leading-coefficient a)))
 			  (nq (+ (* z q) p))
 			  (nr (+ (* z r) q))
 			  (ne (+ (* az e) (magnitude np))))
 		     (finish np nq nr ne)))
-		  ((fx= n 2)
+		  ((fix:= n 2)
 		   (let* ((z^n (* z z))
 			  (az^n (magnitude z^n))		 
 			  (np (+ (* z^n p) (poly/leading-coefficient a)))
@@ -962,7 +962,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 			  (ne (+ (* az^n (+ e p)) (magnitude np))))
 		     (finish np nq nr ne)))
 		  (else
-		   (let* ((z^n-2 (expt z (fx- n 2)))
+		   (let* ((z^n-2 (expt z (fix:- n 2)))
 			  (z^n-1 (* z^n-2 z))
 			  (z^n (* z^n-1 z))
 			  (az^n (magnitude z^n))		 
@@ -972,8 +972,8 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 				 (* n (* z^n-1 p))))
 			  (nr (+ (* z^n r)
 				 (* n z^n-1 q)
-				 (* 1/2 n (fx- n 1) z^n-2 p)))
-			  (ne (+ (* az^n (+ e (* (fx- n 1) p)))
+				 (* 1/2 n (fix:- n 1) z^n-2 p)))
+			  (ne (+ (* az^n (+ e (* (fix:- n 1) p)))
 				 (magnitude np))))
 		     (finish np nq nr ne)))))))))
 
@@ -1011,7 +1011,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 (define (poly/make-from-sparse arity termlist)
   (cond ((null? termlist) poly/zero)
 	((and (null? (cdr termlist))
-	      (fx= (caar termlist) 0)	;but degree of a zero is -1!
+	      (fix:= (caar termlist) 0)	;but degree of a zero is -1!
 	      (base? (cdar termlist)))
 	 (cdar termlist))
 	(else	 
@@ -1071,7 +1071,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (case (poly/type p)
     ((*sparse*)
      (let ((terms (poly/termlist p)))
-       (if (fx> (fx- n (fx- (length terms) 1))
+       (if (fix:> (fix:- n (fix:- (length terms) 1))
 		  *dense-break-even*)
 	   (poly/make-from-sparse arity
 	     (poly/sparse/adjoin n c terms))
@@ -1080,7 +1080,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	       (sparse->dense terms))))))
     ((*dense*)
      (let ((terms (poly/termlist p)))
-       (if (fx> (fx- n (fx- (length terms) 1))
+       (if (fix:> (fix:- n (fix:- (length terms) 1))
 		  *dense-break-even*)
 	   (poly/make-from-sparse arity
 	     (poly/sparse/adjoin n c
@@ -1204,12 +1204,12 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (map cdr p))
 
 (define (poly/sparse/coefficient p d)
-  (when (not (and (fixnum? d) (fx>= d 0)))
+  (when (not (and (fixnum? d) (fix:>= d 0)))
       (raise-argument-error 'POLY/SPARSE/COEFFICIENT "nonnegative fixnum" d))
   (let lp ((terms p))
     (cond ((null? terms) base/zero)
-	  ((fx= (caar terms) d) (cdar terms))
-	  ((fx< (caar terms) d) base/zero)
+	  ((fix:= (caar terms) d) (cdar terms))
+	  ((fix:< (caar terms) d) base/zero)
 	  (else (lp (cdr terms))))))
 
 (define (poly/sparse/principal-reverse p)
@@ -1220,7 +1220,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	  (if (null? p)
 	      result
 	      (loop (cdr p)
-		    (cons (cons (fx- degree (caar p)) (cdar p))
+		    (cons (cons (fix:- degree (caar p)) (cdar p))
 			  result)))))))
 
 (define (poly/sparse/lowest-order p)
@@ -1241,7 +1241,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (list base/one base/zero))
 
 (define (poly/dense/degree p)
-  (fx- (length p) 1))
+  (fix:- (length p) 1))
 
 (define (poly/dense/leading-coefficient p)
   (if (null? p) base/zero (car p)))
@@ -1256,13 +1256,13 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 
 (define (poly/dense/adjoin d c p)
   (let ((d* (length p)))
-    (cond ((fx= d d*)
+    (cond ((fix:= d d*)
 	   (cons c p))
-	  ((fx> d d*)
-	   (let loop ((d* (fx+ d* 1)) (p (cons base/zero p)))
-	     (if (fx= d d*)
+	  ((fix:> d d*)
+	   (let loop ((d* (fix:+ d* 1)) (p (cons base/zero p)))
+	     (if (fix:= d d*)
 		 (cons c p)
-		 (loop (fx+ d* 1) (cons base/zero p)))))
+		 (loop (fix:+ d* 1) (cons base/zero p)))))
 	  (else
 	   (error "Term not in order (POLY/ADJOIN):" d c p)))))
 
@@ -1273,9 +1273,9 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	  (else (cons (car p) (loop (cdr p)))))))
 
 (define (poly/dense/coefficient p d)
-  (when (not (and (fixnum? d) (fx>= d 0)))
+  (when (not (and (fixnum? d) (fix:>= d 0)))
       (raise-argument-error 'POLY/DENSE/COEFFICIENT "nonnegative fixnum" d))
-  (list-ref p (fx- (fx- (length p) 1) d)))
+  (list-ref p (fix:- (fix:- (length p) 1) d)))
 
 (define (poly/dense/principal-reverse p)
   (let loop ((p (reverse p)))
@@ -1290,7 +1290,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
     (cond ((null? l)
 	   (error "Should not get here -- POLY/DENSE/LOWEST-ORDER" p))
 	  ((poly/zero? (car l))
-	   (lp (fx+ i 1) (cdr l)))
+	   (lp (fix:+ i 1) (cdr l)))
 	  (else i))))
 
 (define (poly/dense/trailing-coefficient p)
@@ -1298,7 +1298,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
     (cond ((null? l)
 	   (error "Should not get here -- POLY/DENSE/TRAILING-COEFFICIENT" p))
 	  ((poly/zero? (car l))
-	   (lp (fx+ i 1) (cdr l)))
+	   (lp (fix:+ i 1) (cdr l)))
 	  (else (car l)))))
 
 
@@ -1313,10 +1313,10 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	(let ((coeff (car lst))
 	      (terms (cdr lst)))
 	  (if (and (base? coeff) (base/zero? coeff))
-	      (lp terms (fx- degree 1))
+	      (lp terms (fix:- degree 1))
 	      (poly/sparse/adjoin degree
 				  coeff
-				  (lp terms (fx- degree 1))))))))
+				  (lp terms (fix:- degree 1))))))))
 
 (define (sparse->dense lst)
   (if (poly/sparse/zero? lst)
@@ -1328,11 +1328,11 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	  (cons coeff
 		(if (poly/sparse/zero? rest)
 		    (make-list degree base/zero)
-		    (let make-zeros ((degree (fx- degree 1)))
-		      (if (fx= degree (poly/sparse/degree rest))
+		    (let make-zeros ((degree (fix:- degree 1)))
+		      (if (fix:= degree (poly/sparse/degree rest))
 			  (lp rest)
 			  (cons base/zero
-				(make-zeros (fx- degree 1)))))))))))
+				(make-zeros (fix:- degree 1)))))))))))
 
 (define poly/identity (poly/make-identity 1))
 
@@ -1413,7 +1413,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (if (base? p)
       p
       (let ((arity (poly/arity p)))
-	(when (not (fx= arity (length vars)))
+	(when (not (fix:= arity (length vars)))
 	    (error "Poly arity not = vars supplied -- PCF:->EXPRESSION"
 		   p vars))
 	(let ((hh (poly/horner-helper symb:+ symb:* symb:expt)))
@@ -1422,7 +1422,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 		p
 		(let ((arity (poly/arity p))
 		      (nargs (length args)))
-		  (let ((args (list-tail args (fx- nargs arity))))
+		  (let ((args (list-tail args (fix:- nargs arity))))
 		    (hh p (car args)
 			(lambda (c)
 			  (lp c (cdr args))))))))))))

@@ -4,7 +4,6 @@
 
 (require (for-syntax racket/base
                      racket/syntax)
-         racket/fixnum
          "../kernel-gnrc.rkt"
          "../rkt/default-object.rkt"
          "../general/assert.rkt"

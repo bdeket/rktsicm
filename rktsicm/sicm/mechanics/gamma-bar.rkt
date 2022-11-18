@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          racket/vector
          "../kernel-gnrc.rkt"
          "../general/assert.rkt"
@@ -23,7 +23,7 @@
 	(k (vector-length state0)))
     (let ((dt (- t t0)))
       (let loop ((n 2) (sum q0) (dt^n/n! dt))
-	(if (fx= n k)
+	(if (fix:= n k)
 	    sum
 	    (loop (+ n 1)
 		  (+ sum (* (vector-ref state0 n) dt^n/n!))
@@ -194,15 +194,15 @@ a
 
 (define ((generalized-LE Lagrangian) state)
   (let ((m (s:length state)))
-    (assert (and (fx> m 3) (even? m))
+    (assert (and (fix:> m 3) (even? m))
 	    "Incorrect state size for Lagrange Equations")
     (let lp ((i (quotient m 2)) (state state))
-      (if (fx= i 0)
+      (if (fix:= i 0)
 	  0
-	  (- (((expt Dt (fx- i 1))
+	  (- (((expt Dt (fix:- i 1))
 	       ((partial i) Lagrangian))
 	      state)
-	     (lp (fx- i 1) (clip state)))))))
+	     (lp (fix:- i 1) (clip state)))))))
 
 #|
 (define ((L2harmonic m k) state)

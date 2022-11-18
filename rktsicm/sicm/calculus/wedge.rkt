@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../rkt/int.rkt"
          "../general/assert.rkt"
@@ -23,10 +23,10 @@
   (let ((n1 (get-rank form1)) (n2 (get-rank form2)))
     (if (or (zero? n1) (zero? n2))
 	(* form1 form2)
-	(let ((n (fx+ n1 n2))
+	(let ((n (fix:+ n1 n2))
               (k (/ 1 (* (factorial n1) (factorial n2)))))
 	  (define (the-wedge . args)
-	    (assert (fx= (length args) n)
+	    (assert (fix:= (length args) n)
 		    "Wrong number of args to wedge product")
 	    (let ((perms (permutations (build-list n values))))
 	      (g:* k                    ; Error in Singer.
@@ -137,7 +137,7 @@
 	form
 	(let ()
 	  (define (the-alternation . args)
-	    (assert (fx= (length args) n)
+	    (assert (fix:= (length args) n)
 		    "Wrong number of args to alternation")
 	    (let ((perms (permutations (build-list n values))))
 	      (g:* (/ 1 (factorial n))
@@ -156,9 +156,9 @@
   (let ((n1 (get-rank form1)) (n2 (get-rank form2)))
     (if (or (zero? n1) (zero? n2))
         (* form1 form2)
-        (let ((n (fx+ n1 n2)))
+        (let ((n (fix:+ n1 n2)))
           (define (the-product . args)
-            (assert (fx= (length args) n)
+            (assert (fix:= (length args) n)
                     "Wrong number of args to tensor product")
             (define-values (h t) (split-at args n1))
             (* (apply form1 h) (apply form2 t)))

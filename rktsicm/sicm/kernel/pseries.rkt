@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "cstm/pseries+.rkt"))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "cstm/pseries+.rkt"
          "../general/assert.rkt"
          "cstm/generic-apply.rkt"
@@ -179,21 +179,21 @@
 			    (mul-series t
 					(zuras t
 					       (sub-coeff e 1)
-					       (fx+ k 1)))))))
+					       (fix:+ k 1)))))))
 	   (iexpt
 	    (lambda (s e)
-	      (cond ((fx< e 0)
-		     (invert-series (iexpt s (fx- e))))
-		    ((fx= e 0) :one)
-		    ((fx= e 1) s)
+	      (cond ((fix:< e 0)
+		     (invert-series (iexpt s (fix:- e))))
+		    ((fix:= e 0) :one)
+		    ((fix:= e 1) s)
 		    ((even? e)
 		     (square
-		      (iexpt s (fxquotient e 2))))
+		      (iexpt s (fix:quotient e 2))))
 		    (else
 		     (mul-series s
 		       (square
 			(iexpt s
-			       (fxquotient (fx- e 1)
+			       (fix:quotient (fix:- e 1)
 					     2))))))))
 	   (expt
 	    (lambda (s e)
@@ -210,7 +210,7 @@
       (if (null? s)
 	  '()
 	  (stream-cons (g:* n (stream-first s))
-		       (deriv-iter (stream-rest s) (fx+ n 1)))))
+		       (deriv-iter (stream-rest s) (fix:+ n 1)))))
     (define (derivative s varnums)
       (cond ((equal? (series:arity s) *exactly-zero*)
 	     ((series:elementwise
@@ -270,7 +270,7 @@
     (make-series *exactly-one*
 		 (let lp ((i 1) (fn f) (factn 1))
 		   (stream-cons (g:/ (fn x0) factn)
-				(lp (fx+ 1 i)
+				(lp (fix:+ 1 i)
                                     ;TODO: was (derivative fn), not sure if this is right
 				    (g:derivative fn)
 				    (* factn i)))))))

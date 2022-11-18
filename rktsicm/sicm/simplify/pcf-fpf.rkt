@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "pcfpf/pcf-fpf.rkt"))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "pcfpf/pcf-fpf.rkt"
          "../general/resource-limit.rkt"
          "../general/list-utils.rkt"
@@ -33,7 +33,7 @@
 		 (lambda () (poly/gcd-classical u v)))
 	       (with-limited-time 100.0
 		 (lambda () (poly/gcd-sparse u v)))
-	       (and (fx< arity *euclid-breakpoint-arity*)
+	       (and (fix:< arity *euclid-breakpoint-arity*)
 		    (with-limited-time 100.0
 		      (lambda () (poly/gcd-classical u v))))
 	       (poly/gcd-sparse u v)

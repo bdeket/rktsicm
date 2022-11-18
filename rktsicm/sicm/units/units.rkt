@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
          "../kernel/generic.rkt"
          "../kernel/iterat.rkt"
@@ -58,9 +58,9 @@
   (let ((v1 (unit-exponents u1)) (v2 (unit-exponents u2)))
     (let ((n (vector-length v1)))
       (let lp ((i 0))
-        (or (fx= i n)
+        (or (fix:= i n)
             (and (n:= (vector-ref v1 i) (vector-ref v2 i))
-                 (lp (fx+ i 1))))))))
+                 (lp (fix:+ i 1))))))))
 
 (define (same-units? u1 u2)
   (assert (and (units? u1) (units? u2)))

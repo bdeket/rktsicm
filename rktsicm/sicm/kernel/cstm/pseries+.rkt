@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "pseries.rkt"))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "pseries.rkt"
          "generic-apply.rkt"
          "../strutl.rkt"
@@ -27,7 +27,7 @@
 	  (stream-cons first-result
 		       (collect (stream-rest stream-of-procs))))))
   (cond ((equal? (series:arity series) *exactly-one*)
-	 (cond ((fx= (length arguments) 1)
+	 (cond ((fix:= (length arguments) 1)
 		(make-series *exactly-zero*
 		 (map-streams g:*
 			      (series->stream series)

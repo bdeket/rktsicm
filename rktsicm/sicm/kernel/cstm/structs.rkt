@@ -1,7 +1,7 @@
 #lang racket/base
 
 (provide (all-defined-out))
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../types.rkt"
          "../utils.rkt"
          "../iterat.rkt"
@@ -99,7 +99,7 @@
 (define (s:ref v i)
   (if (structure? v)
       (vector-ref (s:->vector v) i)
-      (if (fx= i 0)
+      (if (fix:= i 0)
 	  v
 	  (error "Bad structure -- S:REF" v i))))
 
@@ -112,7 +112,7 @@
                    (vector-with-substituted-coord
                     (s:->vector v)
                     i xi))
-      (if (fx= i 0)
+      (if (fix:= i 0)
           xi
           (error "Bad structure -- S:WITH-SUBSTITUTED-COORD" v i xi))))
 
@@ -126,7 +126,7 @@
         (s:generate (s:length struct)
                     (s:same struct)
                     (lambda (i)
-                      (if (fx= i (car chain))
+                      (if (fix:= i (car chain))
                           (lp (cdr chain) (s:ref struct i))
                           (s:ref struct i)))))))
 
@@ -134,10 +134,10 @@
 (define (s:forall p s)
   (let ((n (s:length s)))
     (let lp ((i 1) (ans (p (s:ref s 0))))
-      (cond ((fx= i n) ans)
+      (cond ((fix:= i n) ans)
             ((not ans) ans)
             (else
-             (lp (fx+ i 1) (p (s:ref s i))))))))  
+             (lp (fix:+ i 1) (p (s:ref s i))))))))  
 
 
 
@@ -175,16 +175,16 @@
        (define n (vector-length thing))
        (let lp ([i 0])
          (cond
-           [(fx= i n) #f]
+           [(fix:= i n) #f]
            [(tlp (vector-ref thing i))]
-           [else (lp (fx+ i 1))]))]
+           [else (lp (fix:+ i 1))]))]
       [(structure? thing)
        (define n (s:length thing))
        (let lp ([i 0])
          (cond
-           [(fx= i n) #f]
+           [(fix:= i n) #f]
            [(tlp (s:ref thing i)) #t]
-           [else (lp (fx+ i 1))]))]
+           [else (lp (fix:+ i 1))]))]
       [(matrix? thing)
        (tlp (matrix->array thing))]
       [(pair? thing)
@@ -221,9 +221,9 @@
     (if (structure? s)
         (let ((n (s:length s)))
           (let lp ((i 0) (ans ans))
-            (if (fx= i n)
+            (if (fix:= i n)
                 ans
-                (lp (fx+ i 1)
+                (lp (fix:+ i 1)
                     (walk (s:ref s i) ans)))))
         (cons s ans)))
   (walk s '()))

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          "fourier.rkt"
@@ -60,8 +60,8 @@
     (sigfun:make (circular-interpolate
 		  (generate-list *nsamples*
 				 (lambda (i)
-				   (let ((x (fx- i (quotient *nsamples* 2))))
-				     (if (fx= 0 x)
+				   (let ((x (fix:- i (quotient *nsamples* 2))))
+				     (if (fix:= 0 x)
 					 height
 					 0))))
 		  span)
@@ -79,8 +79,8 @@
     (sigfun:make (circular-interpolate
 		  (generate-list *nsamples*
 				 (lambda (i)
-				   (let ((x (fx- i ns/2)))
-				     (if (fx= 0 (modulo x ispace))
+				   (let ((x (fix:- i ns/2)))
+				     (if (fix:= 0 (modulo x ispace))
 					 height
 					 0))))
 		  span)

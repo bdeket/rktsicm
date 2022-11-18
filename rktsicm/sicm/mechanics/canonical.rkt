@@ -2,8 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
-         "../kernel-gnrc.rkt"
+(require "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "Lagrangian.rkt"
          "Hamiltonian.rkt"

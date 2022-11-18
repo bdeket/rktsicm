@@ -2,7 +2,7 @@
 
 (provide (all-defined-out)
          (all-from-out "cstm/structs.rkt"))
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "cstm/structs.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
@@ -39,10 +39,10 @@
     (if (structure? s)
         (let ((n (s:length s)))
           (let lp ((i 0))
-            (if (fx= i n)
+            (if (fix:= i n)
                 'done
                 (begin (walk (s:ref s i))
-                       (lp (fx+ i 1))))))
+                       (lp (fix:+ i 1))))))
         (proc s)))
   (walk s))
 
@@ -79,14 +79,14 @@
 
 (define (structure=structure v1 v2)
   (and (eq? (s:same v1) (s:same v2))
-       (fx= (s:length v1) (s:length v2))
+       (fix:= (s:length v1) (s:length v2))
        (vector=vector (s:->vector v1)
                       (s:->vector v2))))
 
 (define (s:binary v:op v1 v2)
   (let ((up/down (s:same v1)))
     (assert (eq? up/down (s:same v2)))
-    (assert (fx= (s:length v1) (s:length v2)))
+    (assert (fix:= (s:length v1) (s:length v2)))
     (s:structure up/down
                  (v:op (s:->vector v1)
                        (s:->vector v2)))))
@@ -127,15 +127,15 @@
 
 (define (s:compatible-elements? v1 v2)
   (let ((n (s:length v1)))
-    (and (fx= n (s:length v2))
+    (and (fix:= n (s:length v2))
          (let lp ((i 0))
-           (cond ((fx= i n) #t)
+           (cond ((fix:= i n) #t)
                  ((or (not (structure? (s:ref v1 i)))
                       (not (structure? (s:ref v2 i))))
-                  (lp (fx+ i 1)))
+                  (lp (fix:+ i 1)))
                  ((s:compatible-for-contraction? (s:ref v1 i)
                                                  (s:ref v2 i))
-                  (lp (fx+ i 1)))
+                  (lp (fix:+ i 1)))
                  (else #f))))))
 
 #|
@@ -211,8 +211,8 @@
 |#
 
 (define (structure:expt t n)
-  (cond ((fx= n 1) t)
-        ((fx> n 1) (g:* t (structure:expt t (fx- n 1))))
+  (cond ((fix:= n 1) t)
+        ((fix:> n 1) (g:* t (structure:expt t (fix:- n 1))))
         (else (error "Cannot: " `(expt ,t ,n)))))
 
 
@@ -235,12 +235,12 @@
 (define (s:square v)
   (let ((vv (s:->vector v)))
     (let ((n (vector-length vv)))
-      (if (fx= n 0)
+      (if (fix:= n 0)
           :zero
           (let lp ((i 1) (sum (g:square (vector-ref vv 0))))
-            (if (fx= i n)
+            (if (fix:= i n)
                 sum
-                (lp (fx+ i 1)
+                (lp (fix:+ i 1)
                     (g:+ sum (g:square (vector-ref vv i))))))))))
 
 (define (s:dot-product v1 v2)
@@ -533,7 +533,7 @@
             (ncols (s:length (s:ref s 0))))
         (if (s:forall (lambda (r)
                         (and (down? r)
-                             (fx= (s:length r) ncols)))
+                             (fix:= (s:length r) ncols)))
                       s)
             (m:generate ndowns ncols
                         (lambda (i j)
@@ -569,7 +569,7 @@
             (ndowns (s:length (s:ref s 0))))
         (if (s:forall (lambda (r)
                         (and (up? r)
-                             (fx= (s:length r) ndowns)))
+                             (fix:= (s:length r) ndowns)))
                       s)
             (m:generate ndowns ncols
                         (lambda (i j)
@@ -603,7 +603,7 @@
       (let ((ndowns (s:length (s:ref s 0))))
         (if (s:forall (lambda (c)
                         (and (up? c)
-                             (fx= (s:length c) ndowns)))
+                             (fix:= (s:length c) ndowns)))
                       s)
             (m:generate ndowns (s:length s)
                         (lambda (i j)
@@ -637,7 +637,7 @@
       (let ((ncols (s:length (s:ref s 0))))
         (if (s:forall (lambda (c)
                         (and (down? c)
-                             (fx= (s:length c) ncols)))
+                             (fix:= (s:length c) ncols)))
                       s)
             (m:generate (s:length s) ncols
                         (lambda (i j)
@@ -1041,17 +1041,17 @@
 
     (let lp ((scripts scripts) (indices '()) (index-number 0))
       (if (not (null? scripts))
-          (cond ((or (fx= index-number index1)
-                     (fx= index-number index2))
+          (cond ((or (fix:= index-number index1)
+                     (fix:= index-number index2))
                  (lp (cdr scripts)
                      (append indices (list 'index))
-                     (fx+ index-number 1)))
+                     (fix:+ index-number 1)))
                 (else
                  (s:generate (cdar scripts) (caar scripts)
                              (lambda (i)
                                (lp (cdr scripts)
                                    (append indices (list i))
-                                   (fx+ index-number 1))))))
+                                   (fix:+ index-number 1))))))
           (g:sigma (lambda (i)
                      (ref-internal struct
                                    (list-with-substituted-coord 
@@ -1059,7 +1059,7 @@
                                      indices index1 i)
                                     index2 i)))
                    0
-                   (fx- (s:length struct) 1))))))
+                   (fix:- (s:length struct) 1))))))
 
 
 ;;; beginning of ultra-flatten
@@ -1080,7 +1080,7 @@
 
 (define (s:dimension s)
   (if (structure? s)
-      (reduce fx+
+      (reduce fix:+
               0
               (map s:dimension
                    (vector->list (s:->vector s))))
@@ -1098,9 +1098,9 @@
 (define (ultra-unflatten shape list)
   (if (structure? shape)
       (let lp ((s '()) (i 0) (list list))
-        (if (fx< i (s:length shape))
+        (if (fix:< i (s:length shape))
             (lp (cons (ultra-unflatten (s:ref shape i) list) s)
-                (fx+ i 1)
+                (fix:+ i 1)
                 (list-tail list (s:dimension (s:ref shape i))))
             (s:structure (s:same shape) (list->vector (reverse s)))
             ))
@@ -1171,12 +1171,12 @@
     (let ((ms
            (ultra-unflatten (compatible-shape rs)
                             (let lp ((j 0))
-                              (if (fx= j ncols)
+                              (if (fix:= j ncols)
                                   '()
                                   (let ((colj (m:nth-col m j)))
                                     (cons (ultra-unflatten col-shape
                                                            (vector->list colj))
-                                          (lp (fx+ j 1)))))))))
+                                          (lp (fix:+ j 1)))))))))
       (when *careful-conversion*
           (assert (numerical-quantity? (g:* ls (g:* ms rs)))
                   "Innapropriate m->s" ls ms rs))

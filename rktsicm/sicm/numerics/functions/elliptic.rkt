@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../quadrature/infinities.rkt"
          )
@@ -218,8 +218,8 @@
 		  (let ((emc (sqrt emc)))
 		    (let ((c (* 0.5 (+ a emc))))
 		      (if (and (> (abs (- a emc)) (* eps a))
-			       (fx< i 13))
-			  (loop c (* a emc) (fx+ i 1) (cons a em) (cons emc en))
+			       (fix:< i 13))
+			  (loop c (* a emc) (fix:+ i 1) (cons a em) (cons emc en))
 			  ;; label 1
 			  (let* ((u (* c u))
 				 (sn (sin u))

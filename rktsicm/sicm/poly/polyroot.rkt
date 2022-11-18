@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
          "../simplify.rkt"
@@ -46,8 +46,8 @@
       (let ((polish (root-polisher kernel-poly)))
 	(let find-loop ((deflated-poly kernel-poly) (roots initial-roots))
 	  (when root-wallp (println (list 'finder-loop deflated-poly roots)))
-	  (if (fx< (poly:degree deflated-poly) 1)
-	      (if (not (fx= (length roots) (poly:degree given-poly)))
+	  (if (fix:< (poly:degree deflated-poly) 1)
+	      (if (not (fix:= (length roots) (poly:degree given-poly)))
 		  (begin (error "Root finder failed" given-poly) 'foo)
 		  (let ((rs
 			 (sort (identify-multiple-roots roots)
@@ -72,8 +72,8 @@
 			       (cons root roots))))))))
     (let ((n (poly:degree given-poly))
 	  (m (lowest-order given-poly)))
-      (cond ((fx< n 1) '())
-	    ((fx= m 0)
+      (cond ((fix:< n 1) '())
+	    ((fix:= m 0)
 	     (search given-poly '()))
 	    (else	;factors of the indeterminate to be removed.
 	     (let ((zero-roots (make-list m 0.0)))
@@ -98,7 +98,7 @@
 (define (rescale-poly-roots poly searcher)
   (let ((Nn (poly:degree poly))
 	(N0 (lowest-order poly)))
-    (if (fx= Nn N0)
+    (if (fix:= Nn N0)
 	0
 	(let ((An (leading-coefficient poly))
 	      (A0 (trailing-coefficient poly)))
@@ -155,7 +155,7 @@
   (let ()
     (define (mult-scan cl)
       (let ((n (length (cluster-elements cl))))
-	(if (fx= n 1)
+	(if (fix:= n 1)
 	    (list (cons 1 (car (cluster-elements cl))))
 	    (let ((mid (/ (apply + (cluster-elements cl)) n)))
 	      (if (< (cluster-diameter cl)
@@ -204,7 +204,7 @@
 			;;  try x^40 + 1 = 0
 			(try (+ xn-1 (/ dx root-searcher-shrink-factor))
 			     xn-1 vxn-1 dvxn-1 
-			     iter-count (fx+ shrink-count 1)))
+			     iter-count (fix:+ shrink-count 1)))
 		       ((< iter-count root-searcher-max-iter)
 			;; Try a desparate root-searcher-jiggle
 			(try (+ xn-1
@@ -235,12 +235,12 @@
 					  (println `(trying-kahan-trick ,iq)))
 				      (try (- xn (* f iq))
 					   xn vxn dvxn
-					   (fx+ iter-count 1) 0))))))))
+					   (fix:+ iter-count 1) 0))))))))
 
 		((< iter-count root-searcher-max-iter)
 		 (improve xn vxn/err
 			  (lambda (xn+1)
-			    (try xn+1 xn vxn dvxn (fx+ iter-count 1) 0))
+			    (try xn+1 xn vxn dvxn (fix:+ iter-count 1) 0))
 			  (lambda ()
 			    ; (error "zero-divide failure")
 			    (when root-wallp

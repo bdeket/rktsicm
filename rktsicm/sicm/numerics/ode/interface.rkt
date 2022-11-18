@@ -2,7 +2,7 @@
 
 (provide (except-out (all-defined-out) ->fl))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/flonum
          "../../kernel-intr.rkt"
          "../../rkt/default-object.rkt"
@@ -291,7 +291,7 @@
 (define *memoizing-sysder* #t)
 
 (define compile-parametric-memoized
-  (let ((sm1 (fx- *max-compiled-sysder-table-size* 1)))
+  (let ((sm1 (fix:- *max-compiled-sysder-table-size* 1)))
     (define (run parametric-sysder parametric-flat-sysder params fstate)
       (let* ((n-params (length params))
 	     (n-state (vector-length fstate))
@@ -300,7 +300,7 @@
 	(if (and *memoizing-sysder* seen)
 	    (cadr seen)
 	    (let ((ans (compile-parametric n-params n-state parametric-flat-sysder)))
-	      (cond ((fx= *compiled-sysder-table-size*
+	      (cond ((fix:= *compiled-sysder-table-size*
 			    *max-compiled-sysder-table-size*)
 		     (set! *compiled-sysder-table*
 			   (cons (list x ans)
@@ -309,7 +309,7 @@
 		     (set! *compiled-sysder-table*
 			   (cons (list x ans) *compiled-sysder-table*))
 		     (set! *compiled-sysder-table-size*
-			   (fx+ *compiled-sysder-table-size* 1))))
+			   (fix:+ *compiled-sysder-table-size* 1))))
 	      ans))))
     run))
 

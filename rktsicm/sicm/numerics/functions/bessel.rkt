@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          )
 
@@ -28,7 +28,7 @@
 (define (round-to-even x)
   (let ((xn (inexact->exact (round x))))
     (if (odd? xn)
-	(fx+ xn 1)
+	(fix:+ xn 1)
 	xn)))
 
 
@@ -164,26 +164,26 @@
 
 (define (bessj n x)
   (let ((acc 40) (bigno 1.0e10) (bigni 1.0e-10))  
-    (cond ((fx= n 0) (bessj0 x))
-	  ((fx= n 1) (bessj1 x))
+    (cond ((fix:= n 0) (bessj0 x))
+	  ((fix:= n 1) (bessj1 x))
 	  ((= x 0.0) 0.0)
 	  ((< x 0.0)
 	   (if (even? n) (bessj n (- x)) (- (bessj n (- x)))))
-	  ((fx< n 0)
+	  ((fix:< n 0)
 	   (if (even? n) (bessj (- n) x) (- (bessj (- n) x))))
 	  (else
 	   (let* ((ax (magnitude x)) (tox (/ 2.0 ax)))
 	     (if (> ax n)
 		 (let lp ((j 1) (bjm (bessj0 ax)) (bj  (bessj1 ax)))
-		   (if (fx= j n)
+		   (if (fix:= j n)
 		       (if (and (< x 0.0) (odd? n)) (- bj) bj)
-		       (lp (fx+ j 1)
+		       (lp (fix:+ j 1)
 			   bj
 			   (- (* j tox bj) bjm))))
 		 (let ((m (round-to-even (+ n (sqrt (* acc n)))))
 		       (bj 1.0) (bjp 0.0) (ans 0.0) (sum 0.0))
 		   (let lp ((j m))
-		     (if (fx= j 0)
+		     (if (fix:= j 0)
 			 (let ((ans (/ ans (- (* 2.0 sum) bj))))
 			   (if (and (< x 0.0) (odd? n)) (- ans) ans))
 			 (let ((bjm (- (* j tox bj) bjp)))
@@ -196,9 +196,9 @@
 				      (set! sum (* sum bigni))))
 			   (when (odd? j)
 			       (set! sum (+ sum bj)))
-			   (when (fx= j n)
+			   (when (fix:= j n)
 			       (set! ans bjp))
-			   (lp (fx- j 1))))))))))))
+			   (lp (fix:- j 1))))))))))))
 
 #|
 ;;; Assymptotic formulae, for testing:
@@ -433,17 +433,17 @@
 |#
 
 (define (bessy n x)
-  (cond ((fx= n 0) (bessy0 x))
-	((fx= n 1) (bessy1 x))
+  (cond ((fix:= n 0) (bessy0 x))
+	((fix:= n 1) (bessy1 x))
 	((not (> x 0))
 	 (error "Argument out of range -- Bessel Y" n x))
-	((fx< n 0)
+	((fix:< n 0)
 	 (if (even? n) (bessy (- n) x) (- (bessy (- n) x))))	
 	(else
 	 (let lp ((i 1) (yn (bessy1 x)) (yn-1 (bessy0 x)))
-	   (if (fx= i n)
+	   (if (fix:= i n)
 	       yn
-	       (lp (fx+ i 1)
+	       (lp (fix:+ i 1)
 		   (- (/ (* 2 i yn) x) yn-1)
 		   yn))))))
 

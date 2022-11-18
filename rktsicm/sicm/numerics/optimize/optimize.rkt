@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          racket/list
          "../../kernel-intr.rkt"
          "unimin.rkt"
@@ -93,7 +93,7 @@
 		     (cons first (llp (cdr proto)))))))
 	    (else
 	     (let ((el (vector-ref vect cur)))
-	       (set! cur (fx+ cur 1))
+	       (set! cur (fix:+ cur 1))
 	       el))))))
 
 #|
@@ -132,12 +132,12 @@
 (define ((bundle-vectors n) qs)
   (let ((dimension (quotient (vector-length qs) n)))
     (let lp ((i 0) (ans '()))
-      (if (fx= i n)
+      (if (fix:= i n)
 	  (reverse ans)
-	  (lp (fx+ i 1)
+	  (lp (fix:+ i 1)
 	      (cons (subvector qs
-			       (fx* i dimension)
-			       (fx* (fx+ i 1) dimension))
+			       (fix:* i dimension)
+			       (fix:* (fix:+ i 1) dimension))
 		    ans))))))
 
 (define (flatten-list-of-vectors l)

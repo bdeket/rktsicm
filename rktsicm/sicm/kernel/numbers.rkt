@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 ;*r* copy/adapted from the scmutils library
 ;;;; Generic Numerical Arithmetic
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../general/sets.rkt"
          "../rkt/default-object.rkt"
          (only-in "../rkt/racket-help.rkt" ignore-errors)
@@ -517,13 +517,13 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 	       (n (m:num-cols z));z was matrix
 	       (mat (matrix->array z)))
 	   (let rowlp ((i 0))
-	     (if (fx= i m)
+	     (if (fix:= i m)
 		 #t
 		 (let collp ((j 0))
-		   (if (fx= j n)
-		       (rowlp (fx+ i 1))
+		   (if (fix:= j n)
+		       (rowlp (fix:+ i 1))
 		       (if (known-real? (array-ref mat i j))
-			   (collp (fx+ j 1))
+			   (collp (fix:+ j 1))
 			   #f)))))))
 	((differential? z)
 	 (andmap (lambda (term)

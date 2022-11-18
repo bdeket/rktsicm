@@ -4,7 +4,7 @@
          (all-from-out "indexed/types.rkt"))
 
 (require "indexed/types.rkt"
-         racket/fixnum
+         "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
@@ -46,7 +46,7 @@
 			       '()))))
 	    "Bad arg types")
     (define (indexed indices)
-      (assert (fx= (length indices) (length arg-types)))
+      (assert (fix:= (length indices) (length arg-types)))
       (apply function
 	     (map (lambda (arg-type arg-index)
 		    (cond ((eq? arg-type vector-field?)
@@ -78,7 +78,7 @@
 			       '()))))
 	    "Bad index types")
     (define (function . args)
-      (assert (fx= (length index-types) (length args)))
+      (assert (fix:= (length index-types) (length args)))
       (assert (andmap (lambda (index-type arg)
 		       (or (and (eq? index-type up) (1form-field? arg))
 			   (and (eq? index-type down) (vector-field? arg))))
@@ -90,7 +90,7 @@
 	      (set! sum (g:+ (g:* (indexed (reverse indices)) term) sum))
 	      (let ((arg (car args)))
 		(let dloop ((i 0))
-		  (when (fx< i n)
+		  (when (fix:< i n)
 		      (begin
 			(aloop (cdr args)
 			       (g:* (cond ((vector-field? arg)
@@ -99,7 +99,7 @@
 					   (arg (g:ref vector-basis i))))
 				    term)
 			       (cons i indices))
-			(dloop (fx+ i 1))))))))
+			(dloop (fix:+ i 1))))))))
 	sum))
     (declare-argument-types! function
       (map (lambda (index-type)
@@ -140,10 +140,10 @@
     (assert i2 "T2 not index typed")
     (let ((nu1 (count-occurrences up i1)) (nd1 (count-occurrences down i1))
           (nu2 (count-occurrences up i2)) (nd2 (count-occurrences down i2)))
-      (let ((nup (fx+ nu1 nu2)) (ndp (fx+ nd1 nd2)))
-	(let ((np (fx+ nup ndp)) (n1 (fx+ nup nd1)))    
+      (let ((nup (fix:+ nu1 nu2)) (ndp (fix:+ nd1 nd2)))
+	(let ((np (fix:+ nup ndp)) (n1 (fix:+ nup nd1)))    
 	  (define (product args)
-	    (assert (fx= (length args) np)
+	    (assert (fix:= (length args) np)
 		    "Wrong number of args to i:outer-product")
 	    (g:* (T1 (append (sublist args 0 nu1)
 			     (sublist args nup n1)))
@@ -208,17 +208,17 @@
     (assert i-types "T not index typed")
     (let ((nu (count-occurrences up i-types))
 	  (nd (count-occurrences down i-types)))
-      (assert (and (fx<= 0 u) (fx< u nu)
-		   (fx<= 0 d) (fx< d nd))
+      (assert (and (fix:<= 0 u) (fix:< u nu)
+		   (fix:<= 0 d) (fix:< d nd))
 	      "Contraction indices not in range")
-      (let ((nuc (fx- nu 1)) (ndc (fx- nd 1)))
+      (let ((nuc (fix:- nu 1)) (ndc (fix:- nd 1)))
 	(define (contraction args)
 	  (sigma (lambda (i)
                    (define-values (h t) (split-at args nuc))
 		   (T (append
 		       (list-with-inserted-coord h #;(take args nuc) u i)
 		       (list-with-inserted-coord t #;(drop args nuc) d i))))
-		 0 (fx- n 1)))
+		 0 (fix:- n 1)))
 	(declare-index-types! contraction
           (append (make-list nuc up) (make-list ndc down)))
 	contraction))))
@@ -281,7 +281,7 @@
 	(coeff-functions
 	 (maybe-simplify-coeff-functions coeff-functions basis)))
     (define (indexed-function . args)
-      (assert (fx= (length args) (length arg-types)))
+      (assert (fix:= (length args) (length arg-types)))
       (for-each (lambda (arg-type arg) (assert (arg-type arg)))
 		arg-types args)
       (g:* (let lp ((args args) (arg-types arg-types))

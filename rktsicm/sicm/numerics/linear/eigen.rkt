@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
          "../../simplify.rkt"
          "../../poly/polyroot.rkt"
@@ -35,12 +35,12 @@
 			   (* cutoff (apply max (map abs (vector->list W))))))
 		      (cons x
 			    (let lp ((i 0))
-			      (cond ((fx= i n) '())
+			      (cond ((fix:= i n) '())
 				    ((< (abs (vector-ref W i)) cutoff)
 				     (cons (m:nth-col V i)
-					   (lp (fx+ i 1))))
+					   (lp (fix:+ i 1))))
 				    (else
-				     (lp (fx+ i 1)))))))))))
+				     (lp (fix:+ i 1)))))))))))
 	 eigenvalues)))
 
 (define (matrix->eigenvalues-eigenvectors matrix)

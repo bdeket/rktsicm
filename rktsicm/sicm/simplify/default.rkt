@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/fixnum
+(require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt"
          "../units.rkt"
          "../rkt/undefined.rkt"
@@ -135,10 +135,10 @@
 (define (simplify-down expr)
   (cons down-constructor-name
 	(let lp ((i 0))
-	  (if (fx= i (s:length expr))
+	  (if (fix:= i (s:length expr))
 	      '()
 	      (cons (g:simplify (s:ref expr i))
-		    (lp (fx+ i 1)))))))
+		    (lp (fix:+ i 1)))))))
 
 (assign-operation generic:simplify simplify-down down?)
 
@@ -146,10 +146,10 @@
 (define (simplify-up expr)
   (cons up-constructor-name
 	(let lp ((i 0))
-	  (if (fx= i (s:length expr))
+	  (if (fix:= i (s:length expr))
 	      '()
 	      (cons (g:simplify (s:ref expr i))
-		    (lp (fx+ i 1)))))))
+		    (lp (fix:+ i 1)))))))
 
 (assign-operation generic:simplify simplify-up up?)
 
