@@ -440,7 +440,7 @@
 	      (range-tag (type-expression->type-tag rtype)))
 	  (assert (&and (map (lambda (p x) (p x)) dpreds args))
 		  "Wrong type argument -- LITERAL-FUNCTION"
-		  (cons fexp args))
+		  (cons fexp (map cons dpreds args)))
 	  (if (eq? range-tag '*function*)
 	      (let ((ans (literal-function `(,fexp ,@args) rtype)))
 		;; properties?
