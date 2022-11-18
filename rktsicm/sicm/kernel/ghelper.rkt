@@ -1,8 +1,8 @@
 #lang racket/base
 
-(require (only-in racket/function arity-includes?)
-         (only-in "../rkt/racket-help.rkt" rktsicm-logger)
+(require (only-in "../rkt/racket-help.rkt" rktsicm-logger)
          (only-in "../rkt/environment.rkt" generic-environment)
+         "cstm/arity.rkt"
          "cstm/types.rkt"
          "cstm/genenv.rkt")
 
@@ -25,11 +25,6 @@
 ;;; is accepted if the second argument is rejected.  Here
 ;;; backtracking is implemented by OR.
 
-(define (arity-min ar)
-  (cond
-    [(integer? ar) ar]
-    [(arity-at-least? ar) (arity-at-least-value ar)]
-    [else (apply min (map arity-min ar))]))
 ;***************************************************************************************************
 ;*                                                                                                 *
 ;***************************************************************************************************

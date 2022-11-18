@@ -1,11 +1,13 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (all-defined-out)
+         (all-from-out "cstm/arity.rkt"))
 (require racket/fixnum
          (only-in racket/function normalize-arity)
          "../rkt/default-object.rkt"
          "../rkt/undefined.rkt"
-         "../general/list-utils.rkt")
+         "../general/list-utils.rkt"
+         "cstm/arity.rkt")
 
 ;;;;                  UTILS.SCM
 ;;; A few utilities
@@ -116,25 +118,7 @@
 
 ;;; Functional operators
 
-;;; Arity is important to special case.
-
-(define *at-least-zero* (arity-at-least 0))
-(define *exactly-zero* 0)
-(define *at-least-one* (arity-at-least 1))
-(define *exactly-one* 1)
-(define *at-least-two* (arity-at-least 2))
-(define *exactly-two* 2)
-(define *at-least-three* (arity-at-least 3))
-(define *exactly-three* 3)
-(define *one-or-two*    '(1 2))
-
-(define (exactly-n? arity)
-  (and (integer? arity)
-       (fx<= 0 arity)))
-
-(define (any-number? arity)
-  (and (arity-at-least? arity)
-       (fx= (arity-at-least-value arity) 0)))
+;;bdk;; arity moved to cstm/arity
 
 (define (compose . fs)
   (compose-n fs))
