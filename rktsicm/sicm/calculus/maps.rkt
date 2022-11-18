@@ -298,7 +298,7 @@ r0
      (lambda (f)
        (lambda (m)
 	 ;;(assert (= m (mu:N->M n)))
-	 ((V-over-mu f) n)))
+	 (g:apply (g:apply V-over-mu (list f)) (list n))))
      `(vector-field-over-map->vector-field
        ,(diffop-name V-over-mu))))
 
