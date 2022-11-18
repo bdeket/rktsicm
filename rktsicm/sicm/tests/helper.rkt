@@ -84,6 +84,7 @@
             (λ () (check-equal? T P)))))]))
 
 (module+ test
+  (require "../main.rkt") ;; needed to use simplified
   (check-simplified? '(+ (* (sin x) (cos y)) (+ 4 5))
                     '(+ 9 (* (cos y) (sin x))))
   (check-exn exn:fail?

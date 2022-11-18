@@ -20,12 +20,11 @@
                          (dphi u)
                          (dphi v)))))
 
-              (check-equal?
-               (simplify
-                ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                   (metric->Christoffel-1 (g-sphere 'R)
                                          (coordinate-system->basis 2-sphere)))
-                 ((2-sphere '->point) (up 'theta0 'phi0))))
+                 ((2-sphere '->point) (up 'theta0 'phi0)))
                '(down
                  (down (down 0 0) (down 0 (* (expt R 2) (sin theta0) (cos theta0))))
                  (down (down 0 (*  (expt R 2) (sin theta0) (cos theta0)))
@@ -42,12 +41,11 @@
                          (dphi u)
                          (dphi v)))))
 
-              (check-equal?
-               (simplify
-                ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                   (metric->Christoffel-2 (g-sphere 'R)
                                          (coordinate-system->basis 2-sphere)))
-                 ((2-sphere '->point) (up 'theta0 'phi0))))
+                 ((2-sphere '->point) (up 'theta0 'phi0)))
                '(down (down (up 0 0)
                             (up 0 (/ (cos theta0) (sin theta0))))
                       (down (up 0 (/ (cos theta0) (sin theta0)))
@@ -71,11 +69,11 @@
                    (* g_01 (+ (* (dx u) (dy v)) (* (dy u) (dx v))))
                    (* g_11 (dy u) (dy v))))
 
-              (check-equal?
-               (simplify (((g-R2 fa fb fc)
+              (check-simplified?
+               (((g-R2 fa fb fc)
                            (literal-vector-field 'u R2-rect)
                            (literal-vector-field 'v R2-rect))
-                          ((R2-rect '->point) (up 'x0 'y0))))
+                          ((R2-rect '->point) (up 'x0 'y0)))
                '(+ (* (v^0 (up x0 y0)) (u^0 (up x0 y0)) (a (up x0 y0)))
                    (* (v^0 (up x0 y0)) (b (up x0 y0)) (u^1 (up x0 y0)))
                    (* (u^0 (up x0 y0)) (v^1 (up x0 y0)) (b (up x0 y0)))
@@ -83,21 +81,23 @@
 
               (define R2-basis (coordinate-system->basis R2-rect))
 
-              (check-equal?
-               (simplify ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                            (metric->Christoffel-1 (g-R2 fa fb fc) R2-basis))
-                          ((R2-rect '->point) (up 'x0 'y0))))
+                          ((R2-rect '->point) (up 'x0 'y0)))
                '(down
                  (down
-                  (down (* 1/2 (((partial 0 0) a) (up x0 y0)))
-                        (+ (((partial 0 0) b) (up x0 y0)) (* -1/2 (((partial 0 1) a) (up x0 y0)))))
-                  (down (* 1/2 (((partial 0 1) a) (up x0 y0)))
-                        (* 1/2 (((partial 0 0) c) (up x0 y0)))))
+                  (down (* 1/2 (((partial 0) a) (up x0 y0)))
+                        (+ (* -1/2 (((partial 1) a) (up x0 y0)))
+                           (((partial 0) b) (up x0 y0))))
+                  (down (* 1/2 (((partial 1) a) (up x0 y0)))
+                        (* 1/2 (((partial 0) c) (up x0 y0)))))
                  (down
-                  (down (* 1/2 (((partial 0 1) a) (up x0 y0)))
-                        (* 1/2 (((partial 0 0) c) (up x0 y0))))
-                  (down (+ (* -1/2 (((partial 0 0) c) (up x0 y0))) (((partial 0 1) b) (up x0 y0)))
-                        (* 1/2 (((partial 0 1) c) (up x0 y0)))))))
+                  (down (* 1/2 (((partial 1) a) (up x0 y0)))
+                        (* 1/2 (((partial 0) c) (up x0 y0))))
+                  (down (+ (((partial 1) b) (up x0 y0))
+                           (* -1/2 (((partial 0) c) (up x0 y0))))
+                        (* 1/2 (((partial 1) c) (up x0 y0)))))))
 
               )
 
@@ -112,12 +112,11 @@
                          (dphi u)
                          (dphi v)))))
               
-              (check-equal?
-               (simplify
-                ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                   (metric->Christoffel-2 (g-sphere 'R)
                                          (coordinate-system->basis 2-sphere)))
-                 ((2-sphere '->point) (up 'theta0 'phi0))))
+                 ((2-sphere '->point) (up 'theta0 'phi0)))
                '(down
                  (down (up 0 0) (up 0 (/ (cos theta0) (sin theta0))))
                  (down (up 0 (/ (cos theta0) (sin theta0)))
@@ -134,11 +133,10 @@
                    (* (square r)
                       (* (dtheta v1) (dtheta v2)))))
 
-              (check-equal?
-               (simplify
-                ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                   (metric->Christoffel-2 polar-metric polar-basis))
-                 ((polar '->point) (up 'r 'theta))))
+                 ((polar '->point) (up 'r 'theta)))
                '(down
                  (down (up 0 0)
                        (up 0 (/ 1 r)))
@@ -156,11 +154,10 @@
                          (* (expt (sin theta) 2)
                             (dphi v1) (dphi v2))))))
 
-              (check-equal?
-               (simplify
-                ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                   (metric->Christoffel-2 spherical-metric spherical-basis))
-                 ((spherical '->point) (up 'r 'theta 'phi))))
+                 ((spherical '->point) (up 'r 'theta 'phi)))
                '(down
                  (down (up 0 0 0) (up 0 (/ 1 r) 0) (up 0 0 (/ 1 r)))
                  (down (up 0 (/ 1 r) 0) (up (* -1 r) 0 0) (up 0 0 (/ (cos theta) (sin theta))))
@@ -206,51 +203,46 @@
                 (make-basis (orthonormal-spherical-Lorentz-vector-basis c^2)
                             (orthonormal-spherical-Lorentz-1form-basis c^2)))
 
-              (check-equal?
-               (simplify ((s:map/r (orthonormal-spherical-Lorentz-1form-basis 'c^2)
+              (check-simplified?
+               ((s:map/r (orthonormal-spherical-Lorentz-1form-basis 'c^2)
                                    (orthonormal-spherical-Lorentz-vector-basis 'c^2))
-                          spherical-Lorentz-point))
+                          spherical-Lorentz-point)
                '(down (up 1 0 0 0) (up 0 1 0 0) (up 0 0 1 0) (up 0 0 0 1)))
 
 
-              (check-equal?
-               (simplify
-                (((spherical-Lorentz-metric 'c^2)
+              (check-simplified?
+               (((spherical-Lorentz-metric 'c^2)
                   (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 0)
                   (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 0))
-                 spherical-Lorentz-point))
+                 spherical-Lorentz-point)
                -1)
 
-              (check-equal?
-               (simplify
-                (((spherical-Lorentz-metric 'c^2)
+              (check-simplified?
+               (((spherical-Lorentz-metric 'c^2)
                   (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 1)
                   (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 1))
-                 spherical-Lorentz-point))
+                 spherical-Lorentz-point)
                1)
 
-              (check-equal?
-               (simplify
+              (check-simplified?
                (((spherical-Lorentz-metric 'c^2)
                      (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 2)
                      (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 2))
-                    spherical-Lorentz-point))
+                    spherical-Lorentz-point)
                1)
 
-              (check-equal?
-               (simplify
+              (check-simplified?
                (((spherical-Lorentz-metric 'c^2)
                      (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 3)
                      (ref (orthonormal-spherical-Lorentz-vector-basis 'c^2) 3))
-                    spherical-Lorentz-point))
+                    spherical-Lorentz-point)
                1)
 
-              (check-equal?
-               (simplify
-                ((Christoffel->symbols
+              (check-simplified?
+               ((Christoffel->symbols
                   (metric->connection-1 (spherical-Lorentz-metric 'c^2)
                                         (orthonormal-spherical-Lorentz-basis 'c^2)))
-                 spherical-Lorentz-point))
+                 spherical-Lorentz-point)
                '(down
                  (down (down 0 0 0 0) (down 0 0 0 0) (down 0 0 0 0) (down 0 0 0 0))
                  (down (down 0 0 0 0) (down 0 0 0 0) (down 0 0 0 0) (down 0 0 0 0))
@@ -266,8 +258,8 @@
                    (metric->connection-2 (spherical-Lorentz-metric 'c^2)
                                          (orthonormal-spherical-Lorentz-basis 'c^2)))
                   spherical-Lorentz-point)))
-              (check-equal?
-               (simplify foo)
+              (check-simplified?
+               foo
                '(down
                  (down (up 0 0 0 0) (up 0 0 0 0) (up 0 0 0 0) (up 0 0 0 0))
                  (down (up 0 0 0 0) (up 0 0 0 0) (up 0 0 0 0) (up 0 0 0 0))
@@ -282,28 +274,28 @@
               ;;; t r theta phi
               ;;; 0 1 2     3
 
-              (check-equal?
-               (simplify (ref foo 3 2 3))
+              (check-simplified?
+               (ref foo 3 2 3)
                '(/ (cos theta) (* r (sin theta))))
 
-              (check-equal?
-               (simplify (ref foo 3 3 2))
+              (check-simplified?
+               (ref foo 3 3 2)
                '(/ (* -1 (cos theta)) (* r (sin theta))))
 
-              (check-equal?
-               (simplify (ref foo 2 1 2))
+              (check-simplified?
+               (ref foo 2 1 2)
                '(/ 1 r))
 
-              (check-equal?
-               (simplify (ref foo 3 1 3))
+              (check-simplified?
+               (ref foo 3 1 3)
                '(/ 1 r))
 
-              (check-equal?
-               (simplify (ref foo 2 2 1))
+              (check-simplified?
+               (ref foo 2 2 1)
                '(/ -1 r))
 
-              (check-equal?
-               (simplify (ref foo 3 3 1))
+              (check-simplified?
+               (ref foo 3 3 1)
                '(/ -1 r))
 
               )

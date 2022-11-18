@@ -11,6 +11,10 @@
   (require rackunit))
 
 ;;; Arity is important to special case.
+(define (exact-arity n)
+  (unless (and (exact-integer? n) (<= 0 n))
+    (raise-argument-error 'exact-arity "exact-positive-integer?" n))
+  n)
 
 (define *at-least-zero* (arity-at-least 0))
 (define *exactly-zero* 0)

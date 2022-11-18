@@ -11,6 +11,7 @@
          "../general/logic-utils.rkt"
          "../parameters.rkt"
          "diff.rkt"
+         "cstm/arity.rkt"
          "cstm/express.rkt"
          "cstm/generic-apply.rkt"
          "numsymb.rkt"
@@ -240,9 +241,7 @@
       [else
        (length->exact-arity 1)])))
 
-(define (length->exact-arity n)
-  (assert (exact-integer? n))
-  (cons n n))
+(define length->exact-arity exact-arity)
 
 
 (define (type-expression->predicate type-expression)

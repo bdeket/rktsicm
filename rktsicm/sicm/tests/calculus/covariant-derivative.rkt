@@ -5,7 +5,34 @@
          "../helper.rkt"
          )
 
-(define calculus/basis
+(define (make-GCF R2-rect-basis)
+  (define (Gijk i j k)
+    (literal-manifold-function
+     (string->symbol
+      (string-append "G^"
+                     (number->string i)
+                     "_"
+                     (number->string j)
+                     (number->string k)))
+     R2-rect))
+  (define G
+    (down (down (up (Gijk 0 0 0)
+                    (Gijk 1 0 0))
+                (up (Gijk 0 1 0)
+                    (Gijk 1 1 0)))
+          (down (up (Gijk 0 0 1)
+                    (Gijk 1 0 1))
+                (up (Gijk 0 1 1)
+                    (Gijk 1 1 1)))))
+  (define CG (make-Christoffel G R2-rect-basis))
+  (values G CG (Christoffel->Cartan CG)))
+
+(void (clear-arguments)
+      (suppress-arguments '((up x0 y0)));<= this removes (up x0 y0) from the below simplified results
+      (rename-part 'derivative 'D)) 
+; ie (fct (up x0 y0)) is converted to fct
+
+(define the-tests
   (test-suite
    "calculus/covariant-derivative"
    (test-case "ORIG:covariant-derivative 1"
@@ -147,4 +174,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests calculus/basis))
+  (run-tests the-tests))

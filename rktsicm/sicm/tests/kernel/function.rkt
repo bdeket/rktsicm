@@ -31,12 +31,12 @@
                 (check-equal? (simplify (transpose-defining-relation (DTf s) g a))
                               0)
                 (check-equal? (simplify (((f:transpose (DTf s)) g) a))
-                              '(+ (* a^0 g_0 (((partial 0 0) T^0) (up x y)))
-                                  (* a^0 g_1 (((partial 0 0) T^1) (up x y)))
-                                  (* a^0 g_2 (((partial 0 0) T^2) (up x y)))
-                                  (* a^1 g_0 (((partial 0 1) T^0) (up x y)))
-                                  (* a^1 g_1 (((partial 0 1) T^1) (up x y)))
-                                  (* a^1 g_2 (((partial 0 1) T^2) (up x y)))))))
+                              '(+ (* a^0 g_0 (((partial 0) T^0) (up x y)))
+                                  (* a^0 g_1 (((partial 0) T^1) (up x y)))
+                                  (* a^0 g_2 (((partial 0) T^2) (up x y)))
+                                  (* a^1 g_0 (((partial 1) T^0) (up x y)))
+                                  (* a^1 g_1 (((partial 1) T^1) (up x y)))
+                                  (* a^1 g_2 (((partial 1) T^2) (up x y)))))))
 
 
    ))
