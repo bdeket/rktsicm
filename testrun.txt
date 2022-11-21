@@ -25,7 +25,6 @@ At line:1 char:1
 calculus/SR-boost > Unnamed test
 FAILURE
 name:       check-simplified?
-1
 params:
   '(simplify
   ((compose
@@ -37,6 +36,7 @@ message:    "timeout = 3s => simplification/calculation too difficult?"
 location:   SR-boost.rkt:31:5
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
+1
 raco test: (submod ".\\sicm\\tests\\calculus\\SR-frames.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 7891 real time: 7915 gc time: 249
+cpu time: 7859 real time: 7861 gc time: 266
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -66,10 +66,6 @@ ERROR
 Bad structure -- S:SAME #<procedure:f:g:+>
 --------------------
 13 success(es) 0 failure(s) 2 error(s) 15 test(s) run
-cpu time: 0 real time: 0 gc time: 0
-cpu time: 0 real time: 0 gc time: 0
-cpu time: 0 real time: 0 gc time: 0
-cpu time: 0 real time: 0 gc time: 0
 2
 raco test: (submod ".\\sicm\\tests\\calculus\\curvature.rkt" test)
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
@@ -194,9 +190,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 32797 real time: 32809 gc time: 142
-cpu time: 22438 real time: 22430 gc time: 188
-cpu time: 2718 real time: 2719 gc time: 15
+cpu time: 33828 real time: 33858 gc time: 187
+cpu time: 21844 real time: 21839 gc time: 142
+cpu time: 2797 real time: 2790 gc time: 16
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 --------------------
