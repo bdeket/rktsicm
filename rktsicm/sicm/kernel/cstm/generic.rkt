@@ -152,7 +152,7 @@
 (define-generic atan1 1)
 (define-generic atan2 2)
 
-(define-generic apply 2)
+(define generic:apply (make-generic-operator 2 'apply))
 
 ; was in simplify/simplify
 
