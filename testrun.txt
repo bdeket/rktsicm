@@ -44,21 +44,15 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8094 real time: 8086 gc time: 298
+cpu time: 8282 real time: 8270 gc time: 314
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\covariant-derivative.rkt" test)
---------------------
-calculus/covariant-derivative > geodesic-equation2
-ERROR
-
-Bad structure -- S:SAME #<procedure:f:g:+>
---------------------
-14 success(es) 0 failure(s) 1 error(s) 15 test(s) run
-1
+15 success(es) 0 failure(s) 0 error(s) 15 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\curvature.rkt" test)
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
@@ -174,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 34297 real time: 34313 gc time: 142
-cpu time: 23235 real time: 23225 gc time: 171
-cpu time: 2968 real time: 2964 gc time: 15
+cpu time: 35343 real time: 35374 gc time: 138
+cpu time: 23907 real time: 23914 gc time: 156
+cpu time: 2937 real time: 2941 gc time: 15
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -226,13 +220,8 @@ raco test: (submod ".\\sicm\\tests\\calculus\\maps.rkt" test)
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\metric.rkt" test)
-application: not a procedure;
- expected a procedure that can be applied to arguments
-  given: '(*down* #((*down* #(#<procedure:f:dot-product> #<procedure:f:dot-product> #<procedure:f:dot-product>)) (*down* #(#<procedure:f:dot-product> #<procedure:f:dot-product> #<procedure:f:dot-product>)) (*down* 
-#(#<procedure:f:dot-product> #<procedure:f:dot-p...
-  arguments...:
-   '#(r theta phi)
-metric.rkt: raco test: non-zero exit: 1
+8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\ode.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
@@ -244,13 +233,13 @@ raco test: (submod ".\\sicm\\tests\\calculus\\vector-calculus.rkt" test)
 calculus/vector-calculus > Test setup for spherical system
 ERROR
 
-Bad point: rectangular (*diff* (() #<procedure:...ector-fields.rkt:96:0>) ((37) 1)) #<procedure:me>
+Bad point: rectangular (*diff* (() #<procedure:...ector-fields.rkt:99:0>) ((37) 1)) #<procedure:me>
 --------------------
 --------------------
 calculus/vector-calculus > R4-rect
 ERROR
 
-Bad point: rectangular (*diff* (() #<procedure:...nel/operator.rkt:168:17>) ((166) 1)) #<procedure:me>
+Bad point: rectangular (*diff* (() #<procedure:...nel/operator.rkt:170:17>) ((166) 1)) #<procedure:me>
 --------------------
 0 success(es) 0 failure(s) 2 error(s) 2 test(s) run
 2
@@ -383,4 +372,4 @@ raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 '(((+ -5 (* 3 x255) (* -1 x256)) (eq:0) (x256 x255)) ((+ -7 (* 3 x255) x256) (eq:1) (x256 x255)))
 '(((+ -5 (* 3 x263) (* -1 x264)) (eq:0) (x264 x263)) ((+ k265 (* 3 x263) x264) (eq:1) (x264 x263 k265)))
-11/233 test failures
+9/240 test failures

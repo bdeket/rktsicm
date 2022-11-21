@@ -145,9 +145,9 @@
 	  (coordinate-system->metric-components coordinate-system))
 	 (Chi (chart coordinate-system)))
   (define ((the-metric v1 v2) m)
-    (let ((gcoeffs (->components (Chi m))))
-      (* (* gcoeffs ((1form-basis v1) m))
-	 ((1form-basis v2) m))))
+    (let ((gcoeffs (g:apply ->components (list (Chi m)))))
+      (* (* gcoeffs (g:apply (g:apply 1form-basis (list v1)) (list m)))
+	 (g:apply (g:apply 1form-basis (list v2)) (list m)))))
   (declare-argument-types! the-metric
 			   (list vector-field? vector-field?))
   the-metric))
@@ -174,7 +174,7 @@
 	     (coordinate-system->metric-components coordinate-system)))
 	 (Chi (chart coordinate-system)))
   (define ((the-inverse-metric w1 w2) m)
-    (let ((gcoeffs (->components (Chi m))))
+    (let ((gcoeffs (g:apply ->components (list (Chi m)))))
       (* (* gcoeffs
 	    (s:map/r (lambda (e) ((w1 e) m))
 		     vector-basis))
@@ -226,8 +226,8 @@
 					 (lambda (j)
 					   (gij i j)))))))
 	  (define (the-metric v1 v2)
-	    (* (* gcoeffs (1form-basis v1))
-	       (1form-basis v2)))
+	    (* (* gcoeffs (g:apply 1form-basis (list v1)))
+	       (g:apply 1form-basis (list v2))))
 	  (declare-argument-types! the-metric
 				   (list vector-field? vector-field?))
 	  the-metric)))))
@@ -545,8 +545,8 @@
   ((R2-rect '->point) (up 'x0 'y0))))
 
 #| Result:
-(up (* (v^0 (up x0 y0)) (((partial 0) w) (up x0 y0)))
-    (* (v^1 (up x0 y0)) (((partial 1) w) (up x0 y0))))
+(+ (* (v^0 (up x0 y0)) (((partial 0) w) (up x0 y0)))
+   (* (v^1 (up x0 y0)) (((partial 1) w) (up x0 y0))))
 |#
 |#
 

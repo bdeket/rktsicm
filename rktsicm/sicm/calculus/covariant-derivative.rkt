@@ -76,7 +76,7 @@
     (let ((vector-basis (basis->vector-basis basis))
           (1form-basis (basis->1form-basis basis)))
       (lambda (V)
-	(let ((CV (Cartan-forms V)))
+	(let ((CV (g:apply Cartan-forms (list V))))
 	  (lambda (U)
 	    (let ((u-components (g:apply 1form-basis (list U))))
 	      (let ((deriv-components
@@ -109,7 +109,7 @@
 	 (1form-basis (basis->1form-basis basis))
 	 (Cartan-forms (Cartan->forms Cartan)))
     (lambda (V)
-      (let ((CV (Cartan-forms V)))
+      (let ((CV (g:apply Cartan-forms (list V))))
 	(lambda (T)
 	  (let ((arg-types (argument-types T)))
 	    (define (the-derivative . args)
@@ -267,7 +267,7 @@
 	       (procedure->1form-field
 		(lambda (u)
 		  (+ (* J (u J-inv))
-		     (* J (* (forms u) J-inv)))))))
+		     (* J (* (g:apply forms (list u)) J-inv)))))))
 	  (make-Cartan omega-prime-forms basis-prime))))))
 
 (define (symmetrize-Christoffel G)
