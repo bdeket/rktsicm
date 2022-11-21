@@ -40,6 +40,67 @@
     [(arity-at-least? ar) (arity-at-least-value ar)]
     [else (apply min (map arity-min ar))]))
 
+(define (joint-arity a1 a2)
+  (if (and a1 a2)
+      (let ()
+        (define (cond1 a1 a2)
+          (if (integer? a1)
+              (if (integer? a2)
+                  (if (= a1 a2) a1 #f)
+                  (cond2 a2 a1))
+              (cond2 a1 a2)))
+        (define (cond2 a1 a2)
+          (if (arity-at-least? a1)
+              (let ([m (arity-at-least-value a1)])
+                (cond
+                  [(integer? a2) (if (<= m a2) a2 #f)]
+                  [(arity-at-least? a2)
+                   (arity-at-least (max m (arity-at-least-value a2)))]
+                  [else (cond3 a2 a1)]))
+              (cond3 a1 a2)))
+        (define (cond3 a1 a2)
+          (cond
+            [(integer? a2) (ormap (λ (x) (cond1 x a2)) a1)]
+            [(arity-at-least? a2)
+             (define m (arity-at-least-value a2))
+             (define l (filter values (map (λ (x) (cond2 a2 x)) a1)))
+             (cond
+               [(null? l) #f]
+               [else (normalize-arity l)])]
+            [else
+             (define l
+               (let loop ([a1 a1][a2 a2])
+                 (cond
+                   [(null? a1) '()]
+                   [(null? a2) '()]
+                   [else
+                    (define a1.0 (car a1))
+                    (define a2.0 (car a2))
+                    (define (ia a1 a1.0 a2 a2.0)
+                      (define m (arity-at-least-value a2.0))
+                      (cond
+                        [(< a1.0 m) (loop (cdr a1) a2)]
+                        [else a1]))
+                    (cond
+                      [(and (integer? a1.0) (integer? a2.0))
+                       (cond
+                         [(< a1.0 a2.0) (loop (cdr a1) a2)]
+                         [(= a1.0 a2.0) (cons a1.0 (loop (cdr a1) (cdr a2)))]
+                         [else (loop a1 (cdr a2))])]
+                      [(and (arity-at-least? a1.0) (arity-at-least? a2.0))
+                       (list
+                        (arity-at-least (max (arity-at-least-value a1.0)
+                                             (arity-at-least-value a2.0))))]
+                      [(integer? a1.0)
+                       (ia a1 a1.0 a2 a2.0)]
+                      [else
+                       (ia a2 a2.0 a1 a1.0)])])))
+             (if (null? l) #f (normalize-arity l))]))
+        (cond1 a1 a2))
+      #f))
+
+
+
 (define (combine-arity A B)
   (unless (procedure-arity? A) (error))
   (unless (procedure-arity? B) (error))
