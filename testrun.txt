@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 7859 real time: 7861 gc time: 266
+cpu time: 7672 real time: 7681 gc time: 249
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -52,21 +52,13 @@ raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\covariant-derivative.rkt" test)
 --------------------
-calculus/covariant-derivative > Testing on forms
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
 calculus/covariant-derivative > geodesic-equation2
 ERROR
 
 Bad structure -- S:SAME #<procedure:f:g:+>
 --------------------
-13 success(es) 0 failure(s) 2 error(s) 15 test(s) run
-2
+14 success(es) 0 failure(s) 1 error(s) 15 test(s) run
+1
 raco test: (submod ".\\sicm\\tests\\calculus\\curvature.rkt" test)
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
@@ -74,16 +66,8 @@ raco test: (submod ".\\sicm\\tests\\calculus\\dgutils.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\exterior-derivative.rkt" test)
---------------------
-calculus/exterior-derivative > first
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
-0 success(es) 0 failure(s) 1 error(s) 1 test(s) run
-1
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\form-fields.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
@@ -190,91 +174,19 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 33828 real time: 33858 gc time: 187
-cpu time: 21844 real time: 21839 gc time: 142
-cpu time: 2797 real time: 2790 gc time: 16
+cpu time: 34172 real time: 34196 gc time: 109
+cpu time: 22828 real time: 22819 gc time: 139
+cpu time: 3047 real time: 3042 gc time: 0
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
---------------------
-calculus/hodge-star > c1
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > some simple tests on 3-dimensional Euclidean space
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > a 2+1 Minkowski space with c=1
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > a 1-1 Minkowski space with c
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > c5
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > Example: Lorentz metric on R^4
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > Claim: this is the interior product in a metric space
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/hodge-star > Electrodynamics
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
-0 success(es) 0 failure(s) 8 error(s) 8 test(s) run
-8
+8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\indexed.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\interior-product.rkt" test)
---------------------
-calculus/interior-product > Claim L_x omega = i_x d omega + d i_x omega (Cartan Homotopy Formula)
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
-0 success(es) 0 failure(s) 1 error(s) 1 test(s) run
-1
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\manifold.rkt" test)
 --------------------
 calculus/manifold > S2p-spherical >>> failing
@@ -311,32 +223,8 @@ Point not covered by S^n-gnomic coordinate patch. #<manifold-point> #<procedure:
 11 success(es) 1 failure(s) 1 error(s) 13 test(s) run
 2
 raco test: (submod ".\\sicm\\tests\\calculus\\maps.rkt" test)
---------------------
-calculus/maps > c4
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/maps > c5
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/maps > pullback commutes with exterior derivative
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
-4 success(es) 0 failure(s) 3 error(s) 7 test(s) run
-3
+7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\metric.rkt" test)
 application: not a procedure;
  expected a procedure that can be applied to arguments
@@ -391,50 +279,14 @@ location:   vector-fields.rkt:107:4
 1 success(es) 1 failure(s) 1 error(s) 3 test(s) run
 2
 raco test: (submod ".\\sicm\\tests\\calculus\\wedge.rkt" test)
---------------------
-calculus/wedge > R3-rect
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-calculus/wedge > dx^dy
-ERROR
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
-0 success(es) 0 failure(s) 2 error(s) 2 test(s) run
-2
+2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\display\\suppress-args.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\permute.rkt" test)
---------------------
-general/permute > factorial
-ERROR
-name:       check-equal?
-location:   permute.rkt:28:14
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1
---------------------
---------------------
-general/permute > number-of-combinations
-ERROR
-name:       check-equal?
-location:   permute.rkt:32:14
-
-factorial: contract violation
-  expected: exact-nonnegative-integer
-  given: 1000000
---------------------
-4 success(es) 0 failure(s) 2 error(s) 6 test(s) run
-2
+6 success(es) 0 failure(s) 0 error(s) 6 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\helper.rkt" test)
 raco test: (submod ".\\sicm\\tests\\kernel\\arity.rkt" test)
 24 success(es) 0 failure(s) 0 error(s) 24 test(s) run
@@ -531,4 +383,4 @@ raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 '(((+ -5 (* 3 x255) (* -1 x256)) (eq:0) (x256 x255)) ((+ -7 (* 3 x255) x256) (eq:1) (x256 x255)))
 '(((+ -5 (* 3 x263) (* -1 x264)) (eq:0) (x264 x263)) ((+ k265 (* 3 x263) x264) (eq:1) (x264 x263 k265)))
-29/233 test failures
+11/233 test failures

@@ -1,11 +1,13 @@
 #lang racket/base
 
 (provide (all-defined-out))
+(module+ for-num (provide exact-quotient binomial-coefficient))
 
 (require "../rkt/fixnum.rkt"
          (only-in racket/list index-of)
          "../rkt/int.rkt"
          "sets.rkt"
+         "assert.rkt"
          )
 
 ;;; Generates a list of all permutations of a list of distinct elements.
@@ -83,7 +85,7 @@
 		(lp1 rest
 		     (fix:+ count increment))
 		(lp2 (cdr l)
-		     (if (int:> (car l) first)
+		     (if (int:>= (car l) first)
 			 increment
 			 (fix:+ increment 1)))))))))
 
@@ -154,19 +156,58 @@
 
 (define (factorial n)
   (define (f n)
-    (if (= n 0)
+    (if (< n 2)
 	1
 	(* n (f (- n 1)))))
-  (when (and (exact-integer? n) (not (negative? n)))
+  (unless (and (exact-integer? n) (not (negative? n)))
     (raise-argument-error 'factorial "exact-nonnegative-integer" n))
   (f n))
 
 (define number-of-permutations factorial)
 
+#| From Sam Ritchie
+
 (define (number-of-combinations  n k)
   (int:quotient (factorial n)
 		(int:* (factorial (int:- n k))
 		       (factorial k))))
+
+Because it doesn't cancel out factors, the numbers get huge and the
+computation is slow. Also big inputs can exceed recursion depth:
+
+3 error> (number-of-combinations 1000000 12)
+;Aborting!: maximum recursion depth exceeded
+
+GJS: Done!  Binomial coefficient was defined in kernel/numeric.scm
+|#
+;;;; originally in kernel/numeric
+(define (exact-quotient n d)
+  (define-values (q r) (quotient/remainder n d))
+  (assert (= 0 r))
+  q)
+
+;;;; originally in kernel/numeric
+(define (binomial-coefficient n m)
+  (assert (and (exact-integer? n) (exact-integer? m) (<= 0 m n)))
+  (let ((d (- n m)))
+    (let ((t (max m d)) (s (min m d)))
+      (define (lp count prod)
+	(if (= count t)
+	    (exact-quotient prod (factorial s))
+	    (lp (- count 1) (* count prod))))
+      (lp n 1))))
+
+(define (number-of-combinations n k)
+  (cond ((< k 1) 1)
+        ((> k n) 0)
+        (else
+         (binomial-coefficient n k))))
+#|
+1 ]=> (number-of-combinations 1000000 12)
+;Value: 2087489902989715894938746580371577443671966248767470771200000000
+;;;; wrong! should be: (calc is correct, comment not)
+;;;;    2087537916209397485013453738892186349699824088113864639583250000
+|#
 
 
 (define (permutation-parity permuted-list original-list)

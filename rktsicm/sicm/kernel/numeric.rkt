@@ -2,6 +2,7 @@
 
 (provide (all-defined-out)
          (all-from-out "cstm/numeric.rkt")
+         (all-from-out (submod "../general/permute.rkt" for-num))
          conjugate)
 
 (require "../rkt/fixnum.rkt"
@@ -9,10 +10,9 @@
          "cstm/numeric.rkt"
          "../general/assert.rkt"
          "../general/memoize.rkt"
-         "../general/permute.rkt"
+         (submod "../general/permute.rkt" for-num)
          "../rkt/default-object.rkt"
          "../rkt/int.rkt"
-         (only-in "../rkt/todo.rkt" access ->environment)
          )
 
 ;;;; Extensions to Scheme numbers
@@ -130,7 +130,7 @@
 (define (csch x)
   (/ 1 (sinh x)))
 
-
+#| moved to general/permute
 (define (exact-quotient n d)
   (define-values (q r) (quotient/remainder n d))
   (assert (= 0 r))
@@ -146,7 +146,7 @@
 	    (exact-quotient prod (factorial s))
 	    (lp (- count 1) (* count prod))))
       (lp n 1))))
-
+|#
 
 (define (stirling-first-kind n k)
   (assert (and (int:<= 1 k) (int:<= k n)))
