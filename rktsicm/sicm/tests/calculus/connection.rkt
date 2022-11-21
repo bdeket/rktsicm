@@ -1,8 +1,8 @@
 #lang racket/base
 
 (require rackunit
+         (rename-in (only-in racket/base time) [time rkt:time])
          "../../main.rkt"
-         "../../rkt/int.rkt"
          "../helper.rkt"
          )
 
@@ -253,7 +253,7 @@
                        (down 0 (/ -1 r) (/ (* -1 (cos theta)) (* r (sin theta))) 0))))
 
               (define foo
-                (time
+                (rkt:time
                  ((Christoffel->symbols
                    (metric->connection-2 (spherical-Lorentz-metric 'c^2)
                                          (orthonormal-spherical-Lorentz-basis 'c^2)))

@@ -1,0 +1,290 @@
+#lang racket/base
+
+(require rackunit
+         "../../main.rkt"
+         "../helper.rkt"
+         )
+
+(rename-part 'derivative 'D)
+
+(define the-tests
+  (test-suite
+   "calculus/maps"
+   (test-case
+    "connection bases & diff"
+    ;;; Explanation of the connection between the basis forms and the
+    ;;; differentials of coordinate functions.
+    (define-coordinates (up x y z) R3-rect)
+    (define R3-rect-point ((R3-rect '->point) (up 'x0 'y0 'z0)))
+    (define-coordinates (up r theta zeta) R3-cyl)
+    (define R3-cyl-point ((R3-cyl '->point) (up 'r0 'theta0 'zeta0)))
+    (define counter-clockwise (- (* x d/dy) (* y d/dx)))
+    (define outward (+ (* x d/dx) (* y d/dy)))
+    (check-simplified? ((dx counter-clockwise) R3-rect-point)
+                       '(* -1 y0))
+    (check-simplified? ((((differential x) counter-clockwise) identity) R3-rect-point)
+                       '(* -1 y0))
+    (check-simplified? ((dx outward) R3-rect-point)
+                       'x0)
+    (check-simplified? ((((differential x) outward) identity) R3-rect-point)
+                       'x0)
+    (check-simplified? ((dy counter-clockwise) R3-rect-point)
+                       'x0)
+    (check-simplified? ((((differential y) counter-clockwise) identity) R3-rect-point)
+                       'x0)
+    (check-simplified? ((dy outward) R3-rect-point)
+                       'y0)
+    (check-simplified? ((((differential y) outward) identity) R3-rect-point)
+                       'y0)
+    (check-simplified? ((dr counter-clockwise) R3-cyl-point)
+                       0)
+    (check-simplified? ((((differential r) counter-clockwise) identity) R3-cyl-point)
+                       0)
+    (check-simplified? ((dr outward) R3-cyl-point)
+                       'r0)
+    (check-simplified? ((((differential r) outward) identity) R3-cyl-point)
+                       'r0)
+    (check-simplified? ((dtheta counter-clockwise) R3-cyl-point)
+                       1)
+    (check-simplified? ((((differential theta) counter-clockwise) identity) R3-cyl-point)
+                       1)
+    (check-simplified? ((dtheta outward) R3-cyl-point)
+                       0)
+    (check-simplified? ((((differential theta) outward) identity) R3-cyl-point)
+                       0))
+   (test-case
+    "c2"
+    (define-coordinates (up x y) R2-rect)
+    (define R2-rect-point ((R2-rect '->point) (up 'x0 'y0)))
+    (define-coordinates t R1-rect)
+    (define mu (literal-manifold-map 'mu R1-rect R2-rect))
+    (define f (literal-scalar-field 'f R2-rect))
+    (check-simplified? ((((differential mu) d/dt) f)
+                        ((R1-rect '->point) 'tau))
+                       '(+ (* (((partial 1) f) (up (mu^0 tau) (mu^1 tau))) ((D mu^1) tau))
+                           (* (((partial 0) f) (up (mu^0 tau) (mu^1 tau))) ((D mu^0) tau))))
+    (check-simplified? ((dx ((differential mu) d/dt))
+                        ((R1-rect '->point) 'tau))
+                       '((D mu^0) tau))
+    (check-simplified? ((dy ((differential mu) d/dt))
+                        ((R1-rect '->point) 'tau))
+                       '((D mu^1) tau))
+    ;;; but this is a fraud... Note that if we have a non-coordinate basis
+    ;;; the dual does not work on the transported vector.
+    (define e0 (literal-vector-field 'e0 R2-rect))
+    (define e1 (literal-vector-field 'e1 R2-rect))
+    (define edual (vector-basis->dual (down e0 e1) R2-rect))
+    (check-exn #px"Bad point: rectangular"
+               (λ () (((ref edual 0) ((differential mu) d/dt))
+                      ((R1-rect '->point) 'tau))))
+    ;;; However, if we kludge the correct argument it gives the expected
+    ;;; answer.
+    (check-simplified? (((ref edual 0)
+                         (procedure->vector-field
+                          (lambda (f)
+                            (lambda (m)
+                              ((((differential mu) d/dt) f)
+                               ((R1-rect '->point) 't))))))
+                        R2-rect-point)
+                       '(/ (+ (* -1 (e1^1 (up x0 y0)) ((D mu^0) t))
+                              (* (e1^0 (up x0 y0)) ((D mu^1) t)))
+                           (+ (* -1 (e0^0 (up x0 y0)) (e1^1 (up x0 y0)))
+                              (* (e0^1 (up x0 y0)) (e1^0 (up x0 y0)))))))
+   (test-case
+    "General path on the sphere"
+    (define-coordinates t R1-rect)
+    (define mu
+      (compose (S2-spherical '->point)
+               (up (literal-function 'theta)
+                   (literal-function 'phi))
+               (R1-rect '->coords)))
+    (define f
+      (compose (literal-function 'f (-> (UP Real Real) Real))
+               (S2-spherical '->coords)))
+    (check-simplified? ((((differential mu) d/dt) f)
+                        ((R1-rect '->point) 't))
+                       '(+ (* ((D theta) t) (((partial 0) f) (up (theta t) (phi t))))
+                           (* (((partial 1) f) (up (theta t) (phi t))) ((D phi) t)))))
+   (test-case
+    "c4"
+    (define-coordinates t R1-rect)
+    (define-coordinates (up theta phi) S2-spherical)
+    (define f (literal-scalar-field 'f S2-spherical))
+    ;;; General path on the sphere
+    (define mu
+      (compose (S2-spherical '->point)
+               (up (literal-function 'theta)
+                   (literal-function 'phi))
+               (R1-rect '->coords)))
+    (check-simplified? ((((vector-field->vector-field-over-map mu) d/dtheta) f)
+                        ((R1-rect '->point) 't))
+                       '(((partial 0) f) (up (theta t) (phi t))))
+    (check-simplified? ((((form-field->form-field-over-map mu) dtheta)
+                         ((differential mu) d/dt))
+                        ((R1-rect '->point) 't))
+                       '((D theta) t))
+    (define foo
+      (basis->basis-over-map mu
+                             (coordinate-system->basis S2-spherical)))
+    (check-simplified? (((basis->1form-basis foo)
+                         (basis->vector-basis foo))
+                        ((R1-rect '->point) 't))
+                       '(up (down 1 0) (down 0 1)))
+    (check-simplified? (((basis->1form-basis foo)
+                         ((differential mu) d/dt))
+                        ((R1-rect '->point) 't))
+                       '(up ((D theta) t) ((D phi) t)))
+    (check-simplified? (((pullback mu) f)
+                        ((R1-rect '->point) 't))
+                       '(f (up (theta t) (phi t))))
+    (check-simplified? ((((pullback mu) dtheta) d/dt)
+                        ((R1-rect '->point) 't))
+                       '((D theta) t))
+    (check-simplified? ((((pullback mu)
+                          (wedge dtheta dphi))
+                         d/dt d/dt)
+                        ((R1-rect '->point) 't))
+                       0))
+   (test-case
+    "c5"
+    (define-coordinates (up x y z) R3-rect)
+    (define-coordinates (up r theta zeta) R3-cyl)
+    (define mu
+      (compose
+       (R3-cyl '->point)
+       (up (literal-function 'mu^r
+                             (-> (UP Real Real Real) Real))
+           (literal-function 'mu^theta
+                             (-> (UP Real Real Real) Real))
+           (literal-function 'mu^zeta
+                             (-> (UP Real Real Real) Real)))
+       (R3-rect '->coords)))
+    (check-simplified? ((((pullback mu) dtheta) d/dx)
+                        ((R3-rect '->point) (up 'x 'y 'z)))
+                       '(((partial 0) mu^theta) (up x y z)))
+    (check-simplified? ((((pullback mu) dtheta) d/dy)
+                        ((R3-rect '->point) (up 'x 'y 'z)))
+                       '(((partial 1) mu^theta) (up x y z)))
+    (check-simplified? ((((pullback mu) dr) d/dx)
+                        ((R3-rect '->point) (up 'x 'y 'z)))
+                       '(((partial 0) mu^r) (up x y z)))
+    (check-simplified? ((((pullback mu) dr) d/dy)
+                        ((R3-rect '->point) (up 'x 'y 'z)))
+                       '(((partial 1) mu^r) (up x y z)))
+    (check-simplified? ((((pullback mu)
+                          (wedge dr dtheta))
+                         d/dx d/dy)
+                        ((R3-rect '->point)
+                         (up 'x 'y 'z)))
+                       '(+ (* (((partial 1) mu^theta) (up x y z))
+                              (((partial 0) mu^r) (up x y z)))
+                           (* -1
+                              (((partial 1) mu^r) (up x y z))
+                              (((partial 0) mu^theta) (up x y z))))))
+   (test-case
+    "c6"
+    (define-coordinates t R1-rect)
+    (define m ((R2-rect '->point) (up 3 4)))
+    (define-coordinates (up x y) R2-rect)
+    (define phi
+      (compose (R2-rect '->point)
+               (up square cube)
+               (R1-rect '->coords)))
+    (check-simplified? ((((pullback phi) (* x dy)) d/dt)
+                        ((R1-rect '->point) 't0))
+                       '(* 3 (expt t0 4)))
+    (define psi
+      (compose (R1-rect '->point)
+               (lambda (v)
+                 (let ((x (ref v 0))
+                       (y (ref v 1)))
+                   (- x y)))
+               (R2-rect '->coords)))
+    (check-simplified? ((((pullback psi) dt)
+                         (literal-vector-field 'u R2-rect))
+                        ((R2-rect '->point) (up 'x0 'y0)))
+                       '(+ (u^0 (up x0 y0)) (* -1 (u^1 (up x0 y0))))))
+   (test-case
+    "pullback commutes with exterior derivative"
+    (define-coordinates (up x y z) R3-rect)
+    (define R3-rect-chi (R3-rect '->coords))
+    (define R3-rect-chi-inverse (R3-rect '->point))
+    (define R3-rect->R (-> (UP Real Real Real) Real))
+    (define m3 ((R3-rect '->point) (up 'x0 'y0 'z0)))
+    (define alpha (literal-function 'alpha R3-rect->R))
+    (define beta (literal-function 'beta R3-rect->R))
+    (define gamma (literal-function 'gamma R3-rect->R))
+    (define theta
+      (+ (* (compose alpha R3-rect-chi) dx)
+         (* (compose beta R3-rect-chi) dy)
+         (* (compose gamma R3-rect-chi) dz)))
+    (define R2-chi (R2-rect '->coords))
+    (define R2-chi-inverse (R2-rect '->point))
+    (define R2-rect->R (-> (UP Real Real) Real))
+    (define X2 (literal-vector-field 'X R2-rect))
+    (define Y2 (literal-vector-field 'Y R2-rect))
+    (define m2 ((R2-rect '->point) (up 'u0 'v0)))
+    (define mu
+      (compose R3-rect-chi-inverse
+               (up (literal-function 'mu^x R2-rect->R)
+                   (literal-function 'mu^y R2-rect->R)
+                   (literal-function 'mu^z R2-rect->R))
+               R2-chi))
+    ;;; first pullback a function
+    (define f
+      (compose (literal-function 'f R3-rect->R)
+               R3-rect-chi))
+    (check-simplified? (((- ((pullback mu) (d f))
+                            (d ((pullback mu) f)))
+                         X2)
+                        m2)
+                       0)
+    ;;; now pullback a form
+    (check-simplified? (R3-rect-chi (mu m2))
+                       '(up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0))))
+    (check-simplified? ((((pullback mu) theta) X2) m2)
+                       '(+
+                         (* (((partial 0) mu^x) (up u0 v0))
+                            (alpha (up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0))))
+                            (X^0 (up u0 v0)))
+                         (* (((partial 1) mu^x) (up u0 v0))
+                            (alpha (up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0))))
+                            (X^1 (up u0 v0)))
+                         (* (((partial 0) mu^y) (up u0 v0))
+                            (beta (up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0))))
+                            (X^0 (up u0 v0)))
+                         (* (((partial 1) mu^y) (up u0 v0))
+                            (beta (up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0))))
+                            (X^1 (up u0 v0)))
+                         (* (((partial 0) mu^z) (up u0 v0))
+                            (X^0 (up u0 v0))
+                            (gamma (up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0)))))
+                         (* (((partial 1) mu^z) (up u0 v0))
+                            (gamma (up (mu^x (up u0 v0)) (mu^y (up u0 v0)) (mu^z (up u0 v0))))
+                            (X^1 (up u0 v0)))))
+    (check-simplified? (((- ((pullback mu) (d theta))
+                            (d ((pullback mu) theta)))
+                         X2 Y2)
+                        m2)
+                       0)
+    ;;; Pullback commutes with wedge
+    (check-simplified? (let ((theta (literal-1form-field 'theta R3-rect))
+                             (phi (literal-1form-field 'phi R3-rect)))
+                         (((- (wedge ((pullback mu) theta) ((pullback mu) phi))
+                              ((pullback mu) (wedge theta phi)))
+                           X2
+                           Y2)
+                          m2))
+                       0)
+    (check-simplified? (let ((theta (literal-manifold-function 'f R3-rect))
+                             (phi (literal-1form-field 'phi R3-rect)))
+                         (((- (wedge ((pullback mu) theta) ((pullback mu) phi))
+                              ((pullback mu) (wedge theta phi)))
+                           X2)
+                          m2))
+                       0))
+   ))
+
+(module+ test
+  (require rackunit/text-ui)
+  (run-tests the-tests))
