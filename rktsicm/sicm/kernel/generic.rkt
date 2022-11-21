@@ -2,7 +2,7 @@
 
 (provide (all-defined-out)
          (all-from-out "cstm/generic-apply.rkt")
-         assign-operation)
+         make-assign-operations)
 
 ;;;; Primitive Generic Operation Declarations
 (require "cstm/generic-apply.rkt"

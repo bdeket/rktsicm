@@ -1,10 +1,12 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../general/assert.rkt"
          "../rkt/int.rkt"
          "cstm/generic-extra.rkt")
+(define-values (assign-operation modarith:assign-operations)
+  (make-assign-operations 'modarith))
 
 ;;;; Modular Integer Arithmetic
 

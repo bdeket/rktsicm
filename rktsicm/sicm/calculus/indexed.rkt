@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "indexed/types.rkt"))
 
 (require "indexed/types.rkt"
@@ -13,6 +13,8 @@
          "manifold.rkt"
          "vector-fields.rkt"
          )
+(define-values (assign-operation indexed:assign-operations)
+  (make-assign-operations 'indexed))
 
 ;;;;    Minimal support for Indexed Objects
 ;;; e.g. the components of tensors relative to a basis.

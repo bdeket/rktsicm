@@ -1,12 +1,14 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          "fourier.rkt"
          "sigfun.rkt"
          )
+(define-values (assign-operation signals:assign-operations)
+  (make-assign-operations 'signals))
 
 ;;;; Signal Language, ideas stolen from SHE (Siebert/Abelson/Sussman).
 

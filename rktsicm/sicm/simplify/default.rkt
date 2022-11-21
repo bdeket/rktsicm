@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../rkt/fixnum.rkt"
          "../kernel-intr.rkt"
@@ -9,6 +9,9 @@
          "../rkt/environment.rkt"
          "rules.rkt"
          )
+(define-values (assign-operation simplify:assign-operations)
+  (make-assign-operations 'simplify))
+
 
 ;;;; Simplifier interface
 ;;;   g:simplify expects typed expressions. produces untyped expressions

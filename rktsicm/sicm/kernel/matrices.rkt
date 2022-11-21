@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/matrices.rkt"))
 
 (require "../rkt/fixnum.rkt"
@@ -19,6 +19,8 @@
          "utils.rkt"
          "cstm/vectors.rkt"
          )
+(define-values (assign-operation matrices:assign-operations)
+  (make-assign-operations 'matrices))
 
 ;;;;               Matrices
 

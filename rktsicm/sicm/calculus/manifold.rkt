@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "manifold/manifold-point.rkt"
                        "manifold/helper.rkt"))
 
@@ -20,6 +20,8 @@
          "vector-fields.rkt"
          "../rkt/environment.rkt"
          )
+(define-values (assign-operation manifold:assign-operations)
+  (make-assign-operations 'manifold))
 
 
 ;;;;  Manifolds are built here.

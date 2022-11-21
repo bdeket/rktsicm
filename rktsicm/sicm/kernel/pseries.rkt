@@ -1,6 +1,6 @@
 #lang debug racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/pseries+.rkt"))
 
 (require "../rkt/fixnum.rkt"
@@ -15,9 +15,8 @@
          (only-in "../rkt/todo.rkt" div-coeff sub-coeff expt-coeff)
          "todo/display-print.rkt"
          )
-
-
-
+(define-values (assign-operation pseries:assign-operations)
+  (make-assign-operations 'pseries))
 
 ;;;; Power-series arithmetic using infinite streams.
 

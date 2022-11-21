@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
@@ -10,6 +10,9 @@
          "indexed/types.rkt"
          "manifold/manifold-point.rkt"
          )
+(define-values (assign-operation vector-fields:assign-operations)
+  (make-assign-operations 'vector-fields))
+
 
 ;;; A vector field is an operator that takes a smooth real-valued
 ;;; function of a manifold and produces a new function on the manifold

@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 ;*r* copy/adapted from the scmutils library
 ;;;; Generic Numerical Arithmetic
 (require "../rkt/fixnum.rkt"
@@ -21,7 +21,8 @@
          "utils.rkt"
          "todo/display-print.rkt"
          )
-
+(define-values (assign-operation numbers:assign-operations)
+  (make-assign-operations 'numbers))
 
 (define (n:type m) number-type-tag)
 (define (n:type-predicate m) numerical-quantity?)

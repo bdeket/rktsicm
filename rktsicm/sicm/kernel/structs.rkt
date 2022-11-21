@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/structs.rkt"))
 (require "../rkt/fixnum.rkt"
          "cstm/structs.rkt"
@@ -18,6 +18,9 @@
          "utils.rkt"
          "vectors.rkt"
          )
+(define-values (assign-operation structs:assign-operations)
+  (make-assign-operations 'structs))
+
 
 ;*r* copy/adapted from the scmutils library
 ;;;;                      Structures

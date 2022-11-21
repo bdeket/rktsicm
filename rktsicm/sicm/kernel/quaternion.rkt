@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require racket/vector
          "../rkt/fixnum.rkt"
@@ -12,6 +12,9 @@
          "utils.rkt"
          "vectors.rkt"
          "todo/display-print.rkt")
+(define-values (assign-operation quaternion:assign-operations)
+  (make-assign-operations 'quaternion))
+
 
 ;;;;        Quaternions
 ;;; 13 August 1998 -- rfrankel, gjs

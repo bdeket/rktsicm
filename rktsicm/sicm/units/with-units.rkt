@@ -1,12 +1,14 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../general/assert.rkt"
          "../kernel/generic.rkt"
          "../kernel/types.rkt"
          "../kernel/utils.rkt"
          "units.rkt")
+(define-values (assign-operation with-units:assign-operations)
+  (make-assign-operations 'with-units))
 
 ;TODO
 (define angular '*angular*)

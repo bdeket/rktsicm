@@ -1,12 +1,15 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../rkt/default-object.rkt"
          "generic.rkt"
          "types.rkt"
          "utils.rkt"
          )
+(define-values (assign-operation function:assign-operations)
+  (make-assign-operations 'function))
+
 
 ;;;;            Functions
 

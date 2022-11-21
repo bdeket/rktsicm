@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
@@ -11,6 +11,8 @@
          "vector-fields.rkt"
          "wedge.rkt"
          )
+(define-values (assign-operation form-fields:assign-operations)
+  (make-assign-operations 'form-fields))
 
 ;;;; 1Form fields
 

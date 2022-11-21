@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/s-operator.rkt"))
 
 (require (only-in racket/list take)
@@ -17,6 +17,8 @@
          "types.rkt"
          "utils.rkt"
          )
+(define-values (assign-operation operator:assign-operations)
+  (make-assign-operations 'operator))
 
 ;;;; Operators
 

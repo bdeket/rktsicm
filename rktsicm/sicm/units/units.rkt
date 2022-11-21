@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
@@ -8,6 +8,8 @@
          "../kernel/iterat.rkt"
          "../kernel/types.rkt"
          "../kernel/numbers.rkt")
+(define-values (assign-operation units:assign-operations)
+  (make-assign-operations 'units))
 
 ;;;; Manipulation of units
 

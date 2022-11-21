@@ -5,8 +5,11 @@
 (require "system.rkt"
          "units.rkt"
          "with-units.rkt"
-         "../kernel.rkt" ;using generic + - * etc...
+         "../kernel-gnrc.rkt" ;using generic + - * etc...
          )
+(void 'INSTALL-GENERICS
+      (units:assign-operations #t)
+      (with-units:assign-operations #t))
 
 ;;;; SI units
 

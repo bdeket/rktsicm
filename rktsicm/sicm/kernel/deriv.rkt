@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../general/logic-utils.rkt"
          "../rkt/default-object.rkt"
@@ -12,6 +12,8 @@
          "types.rkt"
          "utils.rkt"
          )
+(define-values (assign-operation deriv:assign-operations)
+  (make-assign-operations 'deriv))
 
 ;;;;                 General Derivative Procedures
 

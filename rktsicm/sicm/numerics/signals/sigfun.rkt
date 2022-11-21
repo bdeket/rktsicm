@@ -1,11 +1,13 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assign-operation))
 
 (require "../../kernel-intr.rkt"
          "../../rkt/default-object.rkt"
          "../../general/assert.rkt"
          )
+(define-values (assign-operation sigfun:assign-operations)
+  (make-assign-operations 'sigfun))
 
 ;;; A signal function has a span, the domain over which it may be
 ;;; nonzero.  The spans are ordered pairs of numbers.

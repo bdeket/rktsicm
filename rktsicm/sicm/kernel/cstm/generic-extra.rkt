@@ -2,7 +2,7 @@
 
 (provide (all-defined-out)
          (all-from-out "generic.rkt")
-         assign-operation)
+         make-assign-operations)
 
 ;;;; Primitive Generic Operation Declarations
 (require "../ghelper.rkt"

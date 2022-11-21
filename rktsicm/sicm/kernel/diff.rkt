@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/diff.rkt")
          differential-of)
 
@@ -22,6 +22,8 @@
          "types.rkt"
          "utils.rkt"
          )
+(define-values (assign-operation diff:assign-operations)
+  (make-assign-operations 'diff))
 
 ;;;            Calculus of Infinitesimals
 
