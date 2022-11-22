@@ -7,7 +7,7 @@
          "diff.rkt"
          "generic.rkt"
          "mathutil.rkt"
-         "cstm/numeric.rkt"
+         "numeric.rkt"
          "structs.rkt"
          "types.rkt"
          "utils.rkt"

@@ -1,27 +1,54 @@
 #lang racket/base
 
-(require "../rkt/fixnum.rkt"
-         racket/list)
 (provide (all-defined-out))
+
+(require "../rkt/fixnum.rkt"
+         (only-in racket/list split-at)
+         (rename-in racket/base
+                    [build-list make-initialized-list]
+                    [build-vector make-initialized-vector]))
 
 ;*r* copy/adapted from the scmutils library
 ;;;; Structure iterators
 
 ;;;           Structural Lists
 
-(define generate-list build-list)
-(define list:generate build-list)
+#|
+(define (generate-list n proc) ; ==> ( (proc 0) (proc 1) ... (proc n-1) )
+  (let loop ((i (fix:- n 1)) (list '()))
+    (if (fix:< i 0)
+        list
+        (loop (fix:- i 1) (cons (proc i) list)))))
+|#
+
+(define generate-list make-initialized-list)
+(define list:generate make-initialized-list)
 
 (define (list-with-substituted-coord lst i x)
   (define-values (head tail) (split-at lst i))
   `(,@head ,x ,@(cdr tail)))
 
 ;;;           Structural Vectors
+#|
+;;; Scheme supplies
+vector-ref
+vector-set!
+vector
+make-initialized-vector
 
-(define generate-vector build-vector)
+(define (generate-vector size proc)
+  (let ((ans (make-vector size)))
+    (let loop ((i 0))
+      (if (fix:= i size)
+	  ans
+	  (begin (vector-set! ans i (proc i))
+		 (loop (fix:+ i 1)))))))
+|#
+
+(define generate-vector make-initialized-vector)
 
 (define ((vector-elementwise f) . vectors)
-  (build-vector
+  (make-initialized-vector
     (vector-length (car vectors))
     (lambda (i)
       (apply f
@@ -63,7 +90,7 @@
 
 
 (define (vector-with-substituted-coord v i x)
-  (build-vector (vector-length v)
+  (make-initialized-vector (vector-length v)
     (lambda (j)
       (if (fix:= j i)
 	  x
@@ -80,10 +107,10 @@
   (vector-set! (vector-ref m i) j v))
 
 (define (generate-array rows cols proc)
-  (build-vector
+  (make-initialized-vector
    rows
    (lambda (row)
-     (build-vector
+     (make-initialized-vector
       cols
       (lambda (col)
 	(proc row col))))))

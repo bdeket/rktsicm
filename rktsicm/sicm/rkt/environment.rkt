@@ -1,10 +1,11 @@
 #lang racket/base
 
 (require (for-syntax racket/base)
-         racket/function)
+         racket/function
+         (rename-in racket/base [object-name procedure-name]))
 (require (only-in "racket-help.rkt" rktsicm-logger))
 
-(provide (all-defined-out))
+(provide (all-defined-out) procedure-name)
 (define-logger environment #:parent rktsicm-logger)
 
 (define system-global-environment (make-base-namespace))
@@ -89,3 +90,11 @@
 ;(mk use-value)
 ;(mk condition-type:floating-point-underflow)
 ;(mk bind-default-condition-handler)
+
+(define (object-name object . environments)
+  (for*/first ([e (in-list environments)]
+               [b (in-list (namespace-mapped-symbols e))]
+               [o (in-value (namespace-variable-value b #t (λ () (gensym)) e))]
+               #:when (eq? object o))
+    b))
+

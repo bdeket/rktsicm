@@ -5,6 +5,8 @@
          "../helper.rkt"
          )
 
+(define :c (*c*))
+
 (define the-tests
   (test-suite
    "calculus/SR-boost"

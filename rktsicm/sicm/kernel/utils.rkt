@@ -2,11 +2,12 @@
 
 (provide (all-defined-out)
          (all-from-out "cstm/arity.rkt"))
-(require "../rkt/fixnum.rkt"
-         (only-in racket/function normalize-arity)
-         "../rkt/default-object.rkt"
-         "../rkt/undefined.rkt"
+
+(require (only-in "../rkt/glue.rkt"
+                  fix:= fix:< fix:+ fix:- if default-object default-object? undefined-value true)
+         (only-in "../rkt/todo.rkt" pp)
          "../general/list-utils.rkt"
+         "../general/eq-properties.rkt"
          "cstm/arity.rkt")
 
 ;;;;                  UTILS.SCM
@@ -18,13 +19,13 @@
 
 (define (do-up low hi proc)
   ;; execute PROC for values beginning at LOW up to HI (exclusive)
-  (when (fix:< low hi)
+  (if (fix:< low hi)
       (begin (proc low)
 	     (do-up (fix:+ low 1) hi proc))))
 
 (define (do-down hi low proc)
   ;; execute PROC for values beginning at HI down to LOW (exclusive)
-  (when (fix:< low hi)
+  (if (fix:< low hi)
       (begin (proc hi)
 	     (do-down (fix:- hi 1) low proc))))
 
@@ -389,16 +390,15 @@
 
 (define concatenate-names (concatenate-names-maker "."))
 
-
 ;;; Special property of MIT/GNU Scheme
 
 (define *birkholz*
-  #f
-  #;(environment-bound? system-global-environment 'set-fluid!))
+  #f #;
+  (environment-bound? system-global-environment 'set-fluid!))
 
 (define (print-depth [newval #f])
-  (error "TODO")
-  #;(if (or (not newval)
+  (error "TODO") #;
+  (if (or (not newval)
 	  (and (integer? newval)
 	       (positive? newval)))
       (if *birkholz*
@@ -407,8 +407,8 @@
       (error "PRINT-DEPTH: Wrong type argument" newval)))
 
 (define (print-breadth [newval #f])
-  (error "TODO")
-  #;(if (or (not newval)
+  (error "TODO")#;
+  (if (or (not newval)
 	  (and (integer? newval)
 	       (positive? newval)))
       (if *birkholz*
@@ -420,28 +420,28 @@
 ;;;for printing things out
 
 (define (wallp-pp p? . objs)
-  (when p? (for-each p? objs)))
+  (if p? (for-each pp objs)))
 
 (define (pp-it x)
-  (error "TODO")
-  ;(pp x)
+  (pp x)
   x)
 
 (define (watch-it wallp message)
   (lambda (e)
-    (when wallp
+    (if wallp
 	(begin (newline)
 	       (display message)
-               (error "TODO")
-	       #;(pp e)))
+           (pp e)))
     e))
 
-(define (cpp x [port (current-output-port)])
-  (display "#|\n" port)
-  (error "TODO")
-  ;(pp x port true)			; as code 
-  (display "|#\n" port))
-
+(define (cpp x [port default-object])
+  (let ((port
+	 (if (default-object? port)
+	     (current-output-port)
+	     port)))
+    (display "#|\n" port)
+    (pp x port true)			; as code 
+    (display "|#\n" port)))
 
 ;;; Programs may leave notes here
 
@@ -453,7 +453,7 @@
 (define (note-that! note)
   (and note                             ;fail if note is #f
        (begin
-         (when *showing-notes*
+         (if *showing-notes*
              (display-note note))
          (if *taking-notes*
              (begin 
@@ -468,7 +468,7 @@
 (define (display-note note)
   (display "#| ")
   (newline)
-  (error "TODO");(pp note)
+  (pp note)
   (display "|#")
   (newline))
 
@@ -481,8 +481,8 @@
   (display "#| ")
   (for-each (lambda (note)
               (newline)
-              (error "TODO");(pp note)
-              (let ((sig (error "TODO")#;(eq-get note 'rules)))
-                (when sig (error "TODO")#;(pp sig))))
+              (pp note)
+              (let ((sig (eq-get note 'rules)))
+                (if sig (pp sig))))
             *last-notes*)
   (display "|#"))

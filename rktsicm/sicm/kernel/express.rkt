@@ -1,19 +1,19 @@
 #lang racket/base
 
-(require "../rkt/fixnum.rkt"
-         (only-in racket/base [object-name procedure-name]))
 (provide (all-defined-out)
          (all-from-out "cstm/express.rkt")
+         object-name
          procedure-name)
 
 (require racket/port
+         "../rkt/fixnum.rkt"
          "cstm/express.rkt"
          "cstm/s-operator.rkt"
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
          "../general/table.rkt"
          "../rkt/undefined.rkt"
-         (only-in "../rkt/environment.rkt" user-generic-environment generic-environment rule-environment numerical-environment scmutils-base-environment)
+         (only-in "../rkt/environment.rkt" user-generic-environment generic-environment rule-environment numerical-environment scmutils-base-environment procedure-name object-name)
          "cstm/diff.rkt"
          "iterat.rkt"
          "matrices.rkt"
@@ -159,12 +159,11 @@
 ;;; Finds a name, if any, of the given object in the given
 ;;; environments.  If none, value is #f.
 
+#;
 (define (object-name object . environments)
   (for*/first ([e (in-list environments)]
                [b (in-list (namespace-mapped-symbols e))]
-               [o (in-value
-                   (with-handlers ([exn:fail? (λ (x) (gensym))])
-                     (namespace-variable-value b #t #f e)))]
+               [o (in-value (namespace-variable-value b #t (λ () (gensym)) e))]
                #:when (eq? object o))
     b))
 

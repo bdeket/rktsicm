@@ -1,12 +1,10 @@
 #lang racket/base
 
-(require (for-syntax racket/base)
-         racket/list
-         racket/math
-         racket/stream)
-
 (provide (all-defined-out)
          append-map make-list)
+
+(require (for-syntax racket/base)
+         racket/list)
 
 (define ignored-error (gensym 'ignored-error))
 (define (ignored-error? x) (eq? ignored-error x))

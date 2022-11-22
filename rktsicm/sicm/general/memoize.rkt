@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out)))
+(provide (all-defined-out))
 
 (require "../rkt/undefined.rkt"
          "../rkt/int.rkt"
@@ -9,7 +9,6 @@
          (only-in "../rkt/todo.rkt" pp)
          "assert.rkt"
          "weak.rkt"
-         "../kernel/express.rkt"
          )
 
 ;;;; Memoizers

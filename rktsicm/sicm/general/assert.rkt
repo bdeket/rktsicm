@@ -1,6 +1,7 @@
 #lang racket/base
 
 (provide assert)
+
 (require (for-syntax racket/base))
 
 (define-syntax (assert stx)

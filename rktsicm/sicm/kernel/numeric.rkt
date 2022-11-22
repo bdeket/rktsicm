@@ -1,21 +1,90 @@
 #lang racket/base
 
 (provide (all-defined-out)
-         (all-from-out "cstm/numeric.rkt")
+         conjugate
          (all-from-out (submod "../general/permute.rkt" for-num))
-         conjugate)
-
-(require "../rkt/fixnum.rkt"
-         (only-in racket/math conjugate)
-         "cstm/numeric.rkt"
-         "../general/assert.rkt"
-         "../general/memoize.rkt"
-         (submod "../general/permute.rkt" for-num)
-         "../rkt/default-object.rkt"
-         "../rkt/int.rkt"
          )
 
+(require "../rkt/fixnum.rkt"
+         "../rkt/default-object.rkt"
+         "../rkt/int.rkt"
+         "../general/assert.rkt"
+         "../general/memoize.rkt"
+         (only-in racket/math conjugate)
+         (submod "../general/permute.rkt" for-num)
+         )
+(define (exact-rational? x) (and (real? x) (exact? x)))
+(define-values (integer-divide integer-divide-quotient integer-divide-remainder)
+  (let ()
+    (struct integer-divide (quotient remainder) #:transparent)
+    (values (λ (n d)
+              (define-values (q r) (quotient/remainder (inexact->exact n)
+                                                       (inexact->exact d)))
+              (integer-divide q r))
+            integer-divide-quotient
+            integer-divide-remainder)))
+
 ;;;; Extensions to Scheme numbers
+
+;;; Everybody wants to know about these.
+
+(define zero 0)
+(define one 1)
+(define -one -1)
+(define two 2)
+(define three 3)
+
+(define pi (* 4 (atan 1 1)))
+(define -pi (- pi))
+(define pi/6 (/ pi 6))
+(define -pi/6 (- pi/6))
+(define pi/4 (/ pi 4))
+(define -pi/4 (- pi/4))
+(define pi/3 (/ pi 3))
+(define -pi/3 (- pi/3))
+(define pi/2 (/ pi 2))
+(define -pi/2 (- pi/2))
+(define 2pi (+ pi pi))
+(define -2pi (- 2pi))
+
+(define :zero zero)
+(define :one one)
+(define :-one -one)
+(define :two two)
+(define :three three)
+
+(define :pi pi)
+(define :+pi pi)
+(define :-pi -pi)
+(define :pi/6 pi/6)
+(define :+pi/6 pi/6)
+(define :-pi/6 -pi/6)
+(define :pi/4 pi/4)
+(define :+pi/4 pi/4)
+(define :-pi/4 -pi/4)
+(define :pi/3 pi/3)
+(define :+pi/3 pi/3)
+(define :-pi/3 -pi/3)
+(define :pi/2 pi/2)
+(define :+pi/2 pi/2)
+(define :-pi/2 -pi/2)
+(define :2pi 2pi)
+(define :+2pi 2pi)
+(define :-2pi -2pi)
+
+;;; *machine-epsilon* is the smallest number that when added to 1.0
+;;;  gives a different number.
+
+(define *machine-epsilon*
+  (let loop ((e 1.0))
+     (if (= 1.0 (+ e 1.0))
+         (* 2 e)
+         (loop (/ e 2)))))
+
+;;; In 64-bit IEEE-754 floating point 
+;;; *machine-epsilon* = 2.220446049250313e-16 = 2^(-52)
+
+
 ;;; (ulp x) is the distance to the next represented floating-point
 ;;;  number after x.
 
@@ -38,14 +107,22 @@
 
 ;;; (ulpr 1.0) = *machine-epsilon*/2
 
-(define (exact-rational? x)
-  (and (real? x) (exact? x)))
+
+(define *sqrt-machine-epsilon* 
+  (sqrt *machine-epsilon*))
+
+(define :euler 0.57721566490153286)
+
+(define :phi (/ (+ 1 (sqrt 5)) 2))
 
 (define (exact-zero? x)
   (and (number? x) (exact? x) (= x 0)))
 
 (define (exact-one? x)
   (and (number? x) (exact? x) (= x 1)))
+
+(define :ln2 (log 2.0))
+(define :ln10 (log 10.0))
 
 (define (log10 x)
   (/ (log x) :ln10))
@@ -58,6 +135,8 @@
 
 (define (exp2 x)
   (expt 2 x))
+
+(define :minlog -1000.0)
 
 (define (safelog x)
   (if (and (real? x) (> x 0))
@@ -97,7 +176,6 @@
         (- t period))))
 
 
-
 (define (one? x) (= x 1))		; Exactness?
 
 (define (square x) (* x x))
@@ -131,10 +209,19 @@
   (/ 1 (sinh x)))
 
 #| moved to general/permute
+(define (factorial n)
+  (define (f n)
+    (if (= n 0)
+	1
+	(* n (f (- n 1)))))
+  (assert (and (exact-integer? n) (not (negative? n))))
+  (f n))
+
+
 (define (exact-quotient n d)
-  (define-values (q r) (quotient/remainder n d))
-  (assert (= 0 r))
-  q)
+  (let ((qr (integer-divide n d)))
+    (assert (= 0 (integer-divide-remainder qr)))
+    (integer-divide-quotient qr)))
 
 
 (define (binomial-coefficient n m)
@@ -235,7 +322,6 @@
 	    scale))))
 |#
 
-
 #|
 ;;; See below for the reason for using 
 ;;;  the more complex addition formula.
@@ -294,8 +380,8 @@
 
 (- 16.695311365859965 16.69531136585985)
 ;Value: 1.1368683772161603e-13
-|#
 
+|#
 
 #|
 ;;; Harmonic numbers
@@ -366,16 +452,15 @@
 ;Value: done
 |#
 
-
 ;;; The following is arbitrary, but chosen to make Euclid's algorithm 
 ;;; for polynomials over the rationals (defined with pseudo-division)
 ;;; have only small fractions.
 
-
-#| Wrong    
 (define make-rational
+  (λ (n d)(/ (inexact->exact n) (inexact->exact d))) #;  
   (access make-rational (->environment '(runtime number))))
 
+#| Wrong    
 (define (gcd-rational p/q r/s)
   (make-rational (gcd (numerator p/q) (numerator r/s))
 		 (lcm (denominator p/q) (denominator r/s))))
@@ -414,12 +499,15 @@
 	(else 1)))
 
 
+(define *no-rationals-in-divide* #f)
+
 (define (scheme-number-divide n d c)
   (if (and *no-rationals-in-divide*
 	   (exact-integer? n)
 	   (exact-integer? d))
-      (let-values ([(q r) (quotient/remainder n d)])
-	(c q r))
+      (let ((qr (integer-divide n d)))
+	(c (integer-divide-quotient qr)
+	   (integer-divide-remainder qr)))
       (c (/ n d) 0)))
 
 

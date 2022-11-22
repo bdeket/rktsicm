@@ -11,7 +11,7 @@
          "cstm/express.rkt"
          "cstm/generic-apply.rkt"
          "iterat.rkt"
-         "cstm/numeric.rkt"
+         "numeric.rkt"
          "cstm/mathutil.rkt"
          "cstm/pseries+.rkt"
          "cstm/structs.rkt"

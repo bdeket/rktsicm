@@ -4,7 +4,7 @@
 
 (require (only-in "../rkt/todo.rkt" rationalize->exact)
          "cstm/generic.rkt"
-         "cstm/numeric.rkt"
+         "numeric.rkt"
          "numsymb.rkt")
 
 ;;; Some processes, such as finding the roots of a polynomial, can

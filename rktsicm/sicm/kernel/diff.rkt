@@ -14,7 +14,7 @@
          (only-in "../rkt/todo.rkt" diff-memoize-1arg diff-memoize-2arg)
          "generic.rkt"
          "matrices.rkt"
-         "cstm/numeric.rkt"
+         "numeric.rkt"
          "cstm/pseries.rkt"
          "quaternion.rkt"
          "structs.rkt"

@@ -9,7 +9,7 @@
          "cstm/generic-apply.rkt"
          "iterat.rkt"
          "numbers.rkt"
-         "cstm/numeric.rkt"
+         "numeric.rkt"
          "types.rkt"
          "utils.rkt"
          )

@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out)))
+(provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
          (only-in "../rkt/todo.rkt" todo set-car! set-cdr!))

@@ -33,7 +33,7 @@ params:
     (extended-rotation R))
    xi))
 message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   SR-boost.rkt:31:5
+location:   SR-boost.rkt:33:5
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
 1
@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 10719 real time: 10738 gc time: 373
+cpu time: 10453 real time: 10456 gc time: 313
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 44859 real time: 44917 gc time: 283
-cpu time: 30125 real time: 30179 gc time: 220
-cpu time: 3672 real time: 3684 gc time: 32
+cpu time: 50125 real time: 50150 gc time: 221
+cpu time: 33625 real time: 33638 gc time: 298
+cpu time: 4204 real time: 4199 gc time: 15
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -370,6 +370,6 @@ raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x255) (* -1 x256)) (eq:0) (x256 x255)) ((+ -7 (* 3 x255) x256) (eq:1) (x256 x255)))
-'(((+ -5 (* 3 x263) (* -1 x264)) (eq:0) (x264 x263)) ((+ k265 (* 3 x263) x264) (eq:1) (x264 x263 k265)))
+'(((+ -5 (* 3 x310) (* -1 x311)) (eq:0) (x311 x310)) ((+ -7 (* 3 x310) x311) (eq:1) (x311 x310)))
+'(((+ -5 (* 3 x318) (* -1 x319)) (eq:0) (x319 x318)) ((+ k320 (* 3 x318) x319) (eq:1) (x319 x318 k320)))
 9/240 test failures

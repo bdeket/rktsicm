@@ -9,7 +9,7 @@
          "../rkt/fixnum.rkt"
          (only-in racket/list make-list)
          "cstm/generic-extra.rkt"
-         "cstm/numeric.rkt"
+         "numeric.rkt"
          "../rkt/int.rkt"
          (only-in "../rkt/todo.rkt" access ->environment))
 
