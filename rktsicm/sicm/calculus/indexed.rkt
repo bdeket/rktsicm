@@ -376,18 +376,18 @@
   (or (function-quantity? x)
       (numerical-quantity? x)))
 
-(assign-operation generic:* (lambda (x y) zero-manifold-function)
+(assign-operation '* (lambda (x y) zero-manifold-function)
   zero-manifold-function? manifold-function-cofunction?)
-(assign-operation generic:* (lambda (x y) zero-manifold-function)
+(assign-operation '* (lambda (x y) zero-manifold-function)
   manifold-function-cofunction? zero-manifold-function?)
 
-(assign-operation generic:* (lambda (x y) y)
+(assign-operation '* (lambda (x y) y)
   one-manifold-function? manifold-function-cofunction?)
-(assign-operation generic:* (lambda (x y) x)
+(assign-operation '* (lambda (x y) x)
   manifold-function-cofunction? one-manifold-function?)
 
-(assign-operation generic:+ (lambda (x y) y)
+(assign-operation '+ (lambda (x y) y)
   zero-manifold-function? manifold-function-cofunction?)
-(assign-operation generic:+ (lambda (x y) x)
+(assign-operation '+ (lambda (x y) x)
   manifold-function-cofunction? zero-manifold-function?)
 

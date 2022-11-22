@@ -210,50 +210,50 @@
 
 
 
-(assign-operation generic:type                v:type            vector?)
-(assign-operation generic:type-predicate      v:type-predicate  vector?)
-(assign-operation generic:arity               v:arity           vector?)
-(assign-operation generic:inexact?            v:inexact?        vector?)
+(assign-operation 'type                v:type            vector?)
+(assign-operation 'type-predicate      v:type-predicate  vector?)
+(assign-operation 'arity               v:arity           vector?)
+(assign-operation 'inexact?            v:inexact?        vector?)
 
-(assign-operation generic:zero-like           v:zero-like       vector?)
+(assign-operation 'zero-like           v:zero-like       vector?)
 
-(assign-operation generic:zero?               v:zero?           vector?)
-(assign-operation generic:negate              v:negate          vector?)
-(assign-operation generic:magnitude           complex-norm    vector?)
-(assign-operation generic:abs                 euclidean-norm  vector?)
-(assign-operation generic:conjugate           v:conjugate       vector?)
+(assign-operation 'zero?               v:zero?           vector?)
+(assign-operation 'negate              v:negate          vector?)
+(assign-operation 'magnitude           complex-norm    vector?)
+(assign-operation 'abs                 euclidean-norm  vector?)
+(assign-operation 'conjugate           v:conjugate       vector?)
 
-(assign-operation generic:=           vector=vector       vector? vector?)
-(assign-operation generic:+           vector+vector       vector? vector?)
-(assign-operation generic:-           vector-vector       vector? vector?)
+(assign-operation '=           vector=vector       vector? vector?)
+(assign-operation '+           vector+vector       vector? vector?)
+(assign-operation '-           vector-vector       vector? vector?)
 
-(assign-operation generic:*           scalar*vector       scalar? vector?)
-(assign-operation generic:*           vector*scalar       vector? scalar?)
+(assign-operation '*           scalar*vector       scalar? vector?)
+(assign-operation '*           vector*scalar       vector? scalar?)
 
-(assign-operation generic:/           vector/scalar       vector? scalar?)
+(assign-operation '/           vector/scalar       vector? scalar?)
 
-(assign-operation generic:solve-linear-right    vector/scalar       vector? scalar?)
-(assign-operation generic:solve-linear-left    (lambda (x y) (vector/scalar y x))   scalar? vector?)
-(assign-operation generic:solve-linear         (lambda (x y) (vector/scalar y x))   scalar? vector?)
+(assign-operation 'solve-linear-right    vector/scalar       vector? scalar?)
+(assign-operation 'solve-linear-left    (lambda (x y) (vector/scalar y x))   scalar? vector?)
+(assign-operation 'solve-linear         (lambda (x y) (vector/scalar y x))   scalar? vector?)
 
 
 
 ;;; subsumed by s:dot-product
-;;; (assign-operation generic:dot-product v:dot-product   vector? vector?)
+;;; (assign-operation 'dot-product v:dot-product   vector? vector?)
 
-(assign-operation generic:cross-product v:cross-product   vector? vector?)
+(assign-operation 'cross-product v:cross-product   vector? vector?)
 
-(assign-operation generic:dimension v:dimension  vector?)
+(assign-operation 'dimension v:dimension  vector?)
 
 
 #| ;;; Should be subsumed by deriv:pd in deriv.scm.
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
 		  v:partial-derivative
 		  vector? any?)
 |#
 
 #| ;;; Should be subsumed by s:apply in structs.scm.
-(assign-operation generic:apply       v:apply           vector? any?)
+(assign-operation 'apply       v:apply           vector? any?)
 |#
 
 
@@ -280,52 +280,52 @@
 	(make-combination vector-type-tag
 			  operator (reverse operands)))))
 
-(assign-operation generic:type           v:type             abstract-vector?)
-(assign-operation generic:type-predicate v:type-predicate   abstract-vector?)
-(assign-operation generic:arity          av:arity           abstract-vector?)
+(assign-operation 'type           v:type             abstract-vector?)
+(assign-operation 'type-predicate v:type-predicate   abstract-vector?)
+(assign-operation 'arity          av:arity           abstract-vector?)
 
-(assign-operation generic:inexact? (has-property? 'inexact) abstract-vector?)
+(assign-operation 'inexact? (has-property? 'inexact) abstract-vector?)
 
-(assign-operation generic:zero-like      av:zero-like       abstract-vector?)
+(assign-operation 'zero-like      av:zero-like       abstract-vector?)
 
-(assign-operation generic:zero?    (has-property? 'zero)    abstract-vector?)
+(assign-operation 'zero?    (has-property? 'zero)    abstract-vector?)
 
-(assign-operation generic:negate     (make-vector-combination 'negate)     abstract-vector?)
-(assign-operation generic:magnitude  (make-vector-combination 'magnitude)  abstract-vector?)
-(assign-operation generic:abs        (make-vector-combination 'abs)        abstract-vector?)
-(assign-operation generic:conjugate  (make-vector-combination 'conjugate)  abstract-vector?)
+(assign-operation 'negate     (make-vector-combination 'negate)     abstract-vector?)
+(assign-operation 'magnitude  (make-vector-combination 'magnitude)  abstract-vector?)
+(assign-operation 'abs        (make-vector-combination 'abs)        abstract-vector?)
+(assign-operation 'conjugate  (make-vector-combination 'conjugate)  abstract-vector?)
 
 ;(assign-operation derivative (make-vector-combination 'derivative) abstract-vector?)
 
 
-;(assign-operation generic:= vector=vector abstract-vector? abstract-vector?)
-(assign-operation generic:+  (make-vector-combination '+) abstract-vector? abstract-vector?)
-(assign-operation generic:+  (make-vector-combination '+) vector?          abstract-vector?)
-(assign-operation generic:+  (make-vector-combination '+ 'r)       abstract-vector? vector?)
+;(assign-operation '= vector=vector abstract-vector? abstract-vector?)
+(assign-operation '+  (make-vector-combination '+) abstract-vector? abstract-vector?)
+(assign-operation '+  (make-vector-combination '+) vector?          abstract-vector?)
+(assign-operation '+  (make-vector-combination '+ 'r)       abstract-vector? vector?)
 
 
-(assign-operation generic:-  (make-vector-combination '-) abstract-vector? abstract-vector?)
-(assign-operation generic:-  (make-vector-combination '-) vector?          abstract-vector?)
-(assign-operation generic:-  (make-vector-combination '-) abstract-vector? vector?)
+(assign-operation '-  (make-vector-combination '-) abstract-vector? abstract-vector?)
+(assign-operation '-  (make-vector-combination '-) vector?          abstract-vector?)
+(assign-operation '-  (make-vector-combination '-) abstract-vector? vector?)
 		     
-(assign-operation generic:*  (make-numerical-combination '*)    abstract-vector? abstract-vector?)
-(assign-operation generic:*  (make-numerical-combination '*)    vector?          abstract-vector?)
-(assign-operation generic:*  (make-numerical-combination '* 'r) abstract-vector? vector?)
-(assign-operation generic:*  (make-vector-combination '*)       scalar?          abstract-vector?)
-(assign-operation generic:*  (make-vector-combination '* 'r)    abstract-vector? scalar?)
+(assign-operation '*  (make-numerical-combination '*)    abstract-vector? abstract-vector?)
+(assign-operation '*  (make-numerical-combination '*)    vector?          abstract-vector?)
+(assign-operation '*  (make-numerical-combination '* 'r) abstract-vector? vector?)
+(assign-operation '*  (make-vector-combination '*)       scalar?          abstract-vector?)
+(assign-operation '*  (make-vector-combination '* 'r)    abstract-vector? scalar?)
 		     
-(assign-operation generic:/  (make-vector-combination '/)       abstract-vector? scalar?)
+(assign-operation '/  (make-vector-combination '/)       abstract-vector? scalar?)
 
 
-(assign-operation generic:dot-product
+(assign-operation 'dot-product
                   (make-vector-combination 'dot-product)
    abstract-vector? abstract-vector?)
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
 		  (make-vector-combination 'partial-derivative)
 		  abstract-vector? any?)
 
 ;;; I don't know what to do here -- GJS.  This is part of the literal
 ;;; function problem.
 
-;(assign-operation generic:apply  v:apply              abstract-vector? any?)
+;(assign-operation 'apply  v:apply              abstract-vector? any?)

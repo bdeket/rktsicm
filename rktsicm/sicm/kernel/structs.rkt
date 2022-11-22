@@ -261,47 +261,47 @@
                (v:apply (s:->vector v) args)))
 
 
-(assign-operation generic:type                s:type            structure?)
-(assign-operation generic:type-predicate      sc:type-predicate up?)
-(assign-operation generic:type-predicate      sr:type-predicate down?)
-(assign-operation generic:arity               s:arity           structure?)
-(assign-operation generic:inexact?            s:inexact?        structure?)
+(assign-operation 'type                s:type            structure?)
+(assign-operation 'type-predicate      sc:type-predicate up?)
+(assign-operation 'type-predicate      sr:type-predicate down?)
+(assign-operation 'arity               s:arity           structure?)
+(assign-operation 'inexact?            s:inexact?        structure?)
 
-(assign-operation generic:zero?               s:zero?           structure?)
-(assign-operation generic:zero-like           s:zero-like       structure?)
-(assign-operation generic:negate              s:negate          structure?)
+(assign-operation 'zero?               s:zero?           structure?)
+(assign-operation 'zero-like           s:zero-like       structure?)
+(assign-operation 'negate              s:negate          structure?)
 
-(assign-operation generic:magnitude           s:magnitude       structure?)
-(assign-operation generic:abs                 s:abs             structure?)
-(assign-operation generic:conjugate           s:conjugate       structure?)
+(assign-operation 'magnitude           s:magnitude       structure?)
+(assign-operation 'abs                 s:abs             structure?)
+(assign-operation 'conjugate           s:conjugate       structure?)
 
 
-(assign-operation generic:=           structure=structure     structure? structure?)
-(assign-operation generic:+           structure+structure     structure? structure?)
-(assign-operation generic:-           structure-structure     structure? structure?)
+(assign-operation '=           structure=structure     structure? structure?)
+(assign-operation '+           structure+structure     structure? structure?)
+(assign-operation '-           structure-structure     structure? structure?)
 
-(assign-operation generic:*           s:multiply              structure?    structure?)
+(assign-operation '*           s:multiply              structure?    structure?)
 
-(assign-operation generic:square      s:square                structure?)
+(assign-operation 'square      s:square                structure?)
 
-(assign-operation generic:dot-product s:dot-product           structure?    structure?)
-(assign-operation generic:outer-product s:outer-product       structure?    structure?)
+(assign-operation 'dot-product s:dot-product           structure?    structure?)
+(assign-operation 'outer-product s:outer-product       structure?    structure?)
 
-(assign-operation generic:*           scalar*structure        scalar?    structure?)
-(assign-operation generic:*           structure*scalar        structure? scalar?)
+(assign-operation '*           scalar*structure        scalar?    structure?)
+(assign-operation '*           structure*scalar        structure? scalar?)
 
-(assign-operation generic:/           structure/scalar        structure? scalar?)
+(assign-operation '/           structure/scalar        structure? scalar?)
 
-(assign-operation generic:expt        structure:expt          structure? exact-integer?)
+(assign-operation 'expt        structure:expt          structure? exact-integer?)
 
 
 #| ;;; Should be subsumed by deriv:pd in deriv.scm.
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
 		  s:partial-derivative
 		  structure? any?)
 |#
-(assign-operation generic:apply       s:apply           structure? any?)
+(assign-operation 'apply       s:apply           structure? any?)
 
 
 ;;; Abstract structures generalize structural quantities.
@@ -345,65 +345,65 @@
                           operator (reverse operands)))))
 
 
-(assign-operation generic:type           s:type             abstract-structure?)
-(assign-operation generic:type-predicate sc:type-predicate  abstract-up?)
-(assign-operation generic:type-predicate sr:type-predicate  abstract-down?)
-(assign-operation generic:arity          as:arity           abstract-structure?)
-(assign-operation generic:inexact? (has-property? 'inexact) abstract-structure?)
+(assign-operation 'type           s:type             abstract-structure?)
+(assign-operation 'type-predicate sc:type-predicate  abstract-up?)
+(assign-operation 'type-predicate sr:type-predicate  abstract-down?)
+(assign-operation 'arity          as:arity           abstract-structure?)
+(assign-operation 'inexact? (has-property? 'inexact) abstract-structure?)
 
-(assign-operation generic:zero?    (has-property? 'zero)    abstract-structure?)
-(assign-operation generic:zero-like      ac:zero-like       abstract-up?)
-(assign-operation generic:zero-like      ar:zero-like       abstract-down?)
+(assign-operation 'zero?    (has-property? 'zero)    abstract-structure?)
+(assign-operation 'zero-like      ac:zero-like       abstract-up?)
+(assign-operation 'zero-like      ar:zero-like       abstract-down?)
 
-(assign-operation generic:negate (make-up-combination 'negate)     abstract-up?)
-(assign-operation generic:negate (make-down-combination 'negate)        abstract-down?)
+(assign-operation 'negate (make-up-combination 'negate)     abstract-up?)
+(assign-operation 'negate (make-down-combination 'negate)        abstract-down?)
 
-(assign-operation generic:magnitude (make-up-combination 'magnitude)  abstract-up?)
-(assign-operation generic:magnitude (make-down-combination 'magnitude)     abstract-down?)
+(assign-operation 'magnitude (make-up-combination 'magnitude)  abstract-up?)
+(assign-operation 'magnitude (make-down-combination 'magnitude)     abstract-down?)
 
-(assign-operation generic:abs (make-up-combination 'abs)        abstract-up?)
-(assign-operation generic:abs (make-down-combination 'abs)           abstract-down?)
+(assign-operation 'abs (make-up-combination 'abs)        abstract-up?)
+(assign-operation 'abs (make-down-combination 'abs)           abstract-down?)
 
-(assign-operation generic:conjugate  (make-up-combination 'conjugate)  abstract-up?)
-(assign-operation generic:conjugate  (make-down-combination 'conjugate)     abstract-down?)
+(assign-operation 'conjugate  (make-up-combination 'conjugate)  abstract-up?)
+(assign-operation 'conjugate  (make-down-combination 'conjugate)     abstract-down?)
 
 
-;(assign-operation generic:= structure=structure abstract-structure? abstract-structure?)
+;(assign-operation '= structure=structure abstract-structure? abstract-structure?)
 
-(assign-operation generic:+  (make-vector-combination '+) abstract-up? abstract-up?)
-(assign-operation generic:+  (make-up-combination '+) up?  abstract-up?)
-(assign-operation generic:+  (make-up-combination '+ 'r) abstract-up? up?)
+(assign-operation '+  (make-vector-combination '+) abstract-up? abstract-up?)
+(assign-operation '+  (make-up-combination '+) up?  abstract-up?)
+(assign-operation '+  (make-up-combination '+ 'r) abstract-up? up?)
 
-(assign-operation generic:+  (make-down-combination '+)    down?   abstract-down?)
-(assign-operation generic:+  (make-down-combination '+ 'r) abstract-down? down?)
+(assign-operation '+  (make-down-combination '+)    down?   abstract-down?)
+(assign-operation '+  (make-down-combination '+ 'r) abstract-down? down?)
 
-(assign-operation generic:-  (make-vector-combination '-) abstract-up? abstract-up?)
-(assign-operation generic:-  (make-up-combination '-) up?  abstract-up?)
-(assign-operation generic:-  (make-up-combination '-) abstract-up? up?)
+(assign-operation '-  (make-vector-combination '-) abstract-up? abstract-up?)
+(assign-operation '-  (make-up-combination '-) up?  abstract-up?)
+(assign-operation '-  (make-up-combination '-) abstract-up? up?)
 
-(assign-operation generic:-  (make-down-combination '-)    down?   abstract-down?)
-(assign-operation generic:-  (make-down-combination '-)    abstract-down? down?)
+(assign-operation '-  (make-down-combination '-)    down?   abstract-down?)
+(assign-operation '-  (make-down-combination '-)    abstract-down? down?)
 
-(assign-operation generic:*  (make-numerical-combination '*)    abstract-structure? abstract-structure?)
-(assign-operation generic:*  (make-numerical-combination '*)    structure?          abstract-structure?)
-(assign-operation generic:*  (make-numerical-combination '*)    abstract-structure? structure?)
+(assign-operation '*  (make-numerical-combination '*)    abstract-structure? abstract-structure?)
+(assign-operation '*  (make-numerical-combination '*)    structure?          abstract-structure?)
+(assign-operation '*  (make-numerical-combination '*)    abstract-structure? structure?)
 
-(assign-operation generic:*  (make-up-combination '*)    scalar? abstract-up?)
-(assign-operation generic:*  (make-up-combination '* 'r) abstract-up? scalar?)
+(assign-operation '*  (make-up-combination '*)    scalar? abstract-up?)
+(assign-operation '*  (make-up-combination '* 'r) abstract-up? scalar?)
 
-(assign-operation generic:*  (make-down-combination '*)       scalar?    abstract-down?)
-(assign-operation generic:*  (make-down-combination '* 'r)    abstract-down?    scalar?)
+(assign-operation '*  (make-down-combination '*)       scalar?    abstract-down?)
+(assign-operation '*  (make-down-combination '* 'r)    abstract-down?    scalar?)
 
 		     
-(assign-operation generic:/  (make-up-combination '/)    abstract-up? scalar?)
+(assign-operation '/  (make-up-combination '/)    abstract-up? scalar?)
 
-(assign-operation generic:/  (make-down-combination '/)       abstract-down?    scalar?)
+(assign-operation '/  (make-down-combination '/)       abstract-down?    scalar?)
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
                   (make-up-combination 'partial-derivative)
                   abstract-up? any?)
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
                   (make-down-combination 'partial-derivative)
                   abstract-down? any?)
 
@@ -850,27 +850,27 @@
 (0 (up (down 0 0 0) (down 0 0 0)))
 |#
 
-(assign-operation generic:transpose          s:transpose2               2-tensor?)
-(assign-operation generic:transpose          s:transpose-up->down       up?)
-(assign-operation generic:transpose          s:transpose-down->up       down?)
+(assign-operation 'transpose          s:transpose2               2-tensor?)
+(assign-operation 'transpose          s:transpose-up->down       up?)
+(assign-operation 'transpose          s:transpose-down->up       down?)
 |#
 
 
 
 
-(assign-operation generic:invert             s:invert                   2-tensor?)
+(assign-operation 'invert             s:invert                   2-tensor?)
 
-(assign-operation generic:/                   scalar/tensor                   scalar?     2-tensor?)
-(assign-operation generic:/                   s:divide-by-structure           structure?  structure?)
+(assign-operation '/                   scalar/tensor                   scalar?     2-tensor?)
+(assign-operation '/                   s:divide-by-structure           structure?  structure?)
 
-(assign-operation generic:solve-linear-right  scalar/tensor                   scalar?     2-tensor?)
-(assign-operation generic:solve-linear-right  s:solve-linear-right            structure?  structure?)
+(assign-operation 'solve-linear-right  scalar/tensor                   scalar?     2-tensor?)
+(assign-operation 'solve-linear-right  s:solve-linear-right            structure?  structure?)
 
-(assign-operation generic:solve-linear-left   (lambda (x y) (scalar/tensor y x))   2-tensor?     scalar?)
-(assign-operation generic:solve-linear-left   s:solve-linear-left             structure?  structure?)
+(assign-operation 'solve-linear-left   (lambda (x y) (scalar/tensor y x))   2-tensor?     scalar?)
+(assign-operation 'solve-linear-left   s:solve-linear-left             structure?  structure?)
 
-(assign-operation generic:solve-linear        (lambda (x y) (scalar/tensor y x))   2-tensor?     scalar?)
-(assign-operation generic:solve-linear        s:solve-linear-left             structure?  structure?)
+(assign-operation 'solve-linear        (lambda (x y) (scalar/tensor y x))   2-tensor?     scalar?)
+(assign-operation 'solve-linear        s:solve-linear-left             structure?  structure?)
 
 
 (define (s:determinant s)
@@ -879,8 +879,8 @@
 (define (s:trace s)
   (m:trace (structure->matrix s)))
 
-(assign-operation generic:determinant s:determinant 2-tensor?)
-(assign-operation generic:trace       s:trace       2-tensor?)
+(assign-operation 'determinant s:determinant 2-tensor?)
+(assign-operation 'trace       s:trace       2-tensor?)
 
 
 ;;; This just changes the up and downness of a structure
@@ -1094,7 +1094,7 @@
 ;Value: 8
 |#
 
-(assign-operation generic:dimension s:dimension  structure?)
+(assign-operation 'dimension s:dimension  structure?)
 
 
 

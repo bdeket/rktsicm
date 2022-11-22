@@ -261,39 +261,39 @@
 
 
 
-(assign-operation generic:type                o:type            operator?)
-(assign-operation generic:type-predicate      o:type-predicate  operator?)
-(assign-operation generic:arity               o:arity           operator?)
+(assign-operation 'type                o:type            operator?)
+(assign-operation 'type-predicate      o:type-predicate  operator?)
+(assign-operation 'arity               o:arity           operator?)
 
-(assign-operation generic:zero-like o:zero-like simple-operator?)
-(assign-operation generic:one-like o:one-like operator?)
-(assign-operation generic:identity-like o:one-like operator?)
+(assign-operation 'zero-like o:zero-like simple-operator?)
+(assign-operation 'one-like o:one-like operator?)
+(assign-operation 'identity-like o:one-like operator?)
 
-(assign-operation generic:+          o:+               operator? operator?) 
-(assign-operation generic:+          o:o+f             operator? not-operator?) 
-(assign-operation generic:+          o:f+o             not-operator? operator?) 
+(assign-operation '+          o:+               operator? operator?) 
+(assign-operation '+          o:o+f             operator? not-operator?) 
+(assign-operation '+          o:f+o             not-operator? operator?) 
 
-(assign-operation generic:-          o:-               operator? operator?)
-(assign-operation generic:-          o:o-f             operator? not-operator?) 
-(assign-operation generic:-          o:f-o             not-operator? operator?) 
+(assign-operation '-          o:-               operator? operator?)
+(assign-operation '-          o:o-f             operator? not-operator?) 
+(assign-operation '-          o:f-o             not-operator? operator?) 
 
-(assign-operation generic:*          o:*               operator? operator?)
-(assign-operation generic:*          o:o*f             operator? not-operator?) 
-(assign-operation generic:*          o:f*o             not-operator? operator?)
-(assign-operation generic:/          o:o/n             operator? numerical-quantity?)
+(assign-operation '*          o:*               operator? operator?)
+(assign-operation '*          o:o*f             operator? not-operator?) 
+(assign-operation '*          o:f*o             not-operator? operator?)
+(assign-operation '/          o:o/n             operator? numerical-quantity?)
 
 
-(assign-operation generic:solve-linear-right
+(assign-operation 'solve-linear-right
                   o:o/n  operator? numerical-quantity?)
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
                   (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
                   (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
 
-(assign-operation generic:negate     o:negate          operator?)
-(assign-operation generic:expt       o:expt            operator? exact-integer?)
+(assign-operation 'negate     o:negate          operator?)
+(assign-operation 'expt       o:expt            operator? exact-integer?)
 
-(assign-operation generic:exp                 o:exp             operator?)
-(assign-operation generic:sin                 o:sin             operator?)
-(assign-operation generic:cos                 o:cos             operator?)
+(assign-operation 'exp                 o:exp             operator?)
+(assign-operation 'sin                 o:sin             operator?)
+(assign-operation 'cos                 o:cos             operator?)
 

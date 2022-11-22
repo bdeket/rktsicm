@@ -151,7 +151,7 @@
 
 
 
-(assign-operation generic:negate          signal:negate         signal?)
+(assign-operation 'negate          signal:negate         signal?)
 
-(assign-operation generic:+               signal:+              signal?  signal?)
-(assign-operation generic:-               signal:-              signal?  signal?)
+(assign-operation '+               signal:+              signal?  signal?)
+(assign-operation '-               signal:-              signal?  signal?)

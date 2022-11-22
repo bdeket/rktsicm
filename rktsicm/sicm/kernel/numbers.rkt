@@ -146,81 +146,81 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 
 ;;; Here we assign the primitive numerical generic operators.
 
-(assign-operation generic:type             n:type             number?)
-(assign-operation generic:type-predicate   n:type-predicate   number?)
-(assign-operation generic:arity            n:arity            number?)
+(assign-operation 'type             n:type             number?)
+(assign-operation 'type-predicate   n:type-predicate   number?)
+(assign-operation 'arity            n:arity            number?)
 
-(assign-operation generic:inexact?         n:inexact?         number?)
+(assign-operation 'inexact?         n:inexact?         number?)
 
-(assign-operation generic:zero-like        n:zero-like        number?)
-(assign-operation generic:one-like         n:one-like         number?)
-(assign-operation generic:identity-like    n:one-like         number?)
+(assign-operation 'zero-like        n:zero-like        number?)
+(assign-operation 'one-like         n:one-like         number?)
+(assign-operation 'identity-like    n:one-like         number?)
 
-(assign-operation generic:zero?            n:zero?            number?)
-(assign-operation generic:one?             n:one?             number?)
-(assign-operation generic:identity?        n:one?             number?)
+(assign-operation 'zero?            n:zero?            number?)
+(assign-operation 'one?             n:one?             number?)
+(assign-operation 'identity?        n:one?             number?)
 
-(assign-operation generic:negate           n:negate           number?)
-(assign-operation generic:invert           n:invert           number?)
-(assign-operation generic:square           n:square           number?)
+(assign-operation 'negate           n:negate           number?)
+(assign-operation 'invert           n:invert           number?)
+(assign-operation 'square           n:square           number?)
 
-(assign-operation generic:sqrt             n:sqrt             number?)
+(assign-operation 'sqrt             n:sqrt             number?)
 
-(assign-operation generic:exp              n:exp              number?)
-(assign-operation generic:log              n:log              number?)
+(assign-operation 'exp              n:exp              number?)
+(assign-operation 'log              n:log              number?)
 
-(assign-operation generic:sin              n:sin              number?)
-(assign-operation generic:cos              n:cos              number?)
+(assign-operation 'sin              n:sin              number?)
+(assign-operation 'cos              n:cos              number?)
 
-(assign-operation generic:asin             n:asin             number?)
-(assign-operation generic:acos             n:acos             number?)
+(assign-operation 'asin             n:asin             number?)
+(assign-operation 'acos             n:acos             number?)
 
-(assign-operation generic:sinh             n:sinh             number?)
-(assign-operation generic:cosh             n:cosh             number?)
+(assign-operation 'sinh             n:sinh             number?)
+(assign-operation 'cosh             n:cosh             number?)
 
-(assign-operation generic:abs              n:abs              number?)
+(assign-operation 'abs              n:abs              number?)
 
-(assign-operation generic:determinant      identity           number?)
-(assign-operation generic:trace            identity           number?)
+(assign-operation 'determinant      identity           number?)
+(assign-operation 'trace            identity           number?)
 
 
-(assign-operation generic:=          n:=            number? number?)
-(assign-operation generic:<          n:<            number? number?)
-(assign-operation generic:<=         n:<=           number? number?)
-(assign-operation generic:>          n:>            number? number?)
-(assign-operation generic:>=         n:>=           number? number?)
+(assign-operation '=          n:=            number? number?)
+(assign-operation '<          n:<            number? number?)
+(assign-operation '<=         n:<=           number? number?)
+(assign-operation '>          n:>            number? number?)
+(assign-operation '>=         n:>=           number? number?)
 
-(assign-operation generic:+          n:+            number? number?)
-(assign-operation generic:-          n:-            number? number?)
-(assign-operation generic:*          n:*            number? number?)
-(assign-operation generic:/          n:/            number? number?)
+(assign-operation '+          n:+            number? number?)
+(assign-operation '-          n:-            number? number?)
+(assign-operation '*          n:*            number? number?)
+(assign-operation '/          n:/            number? number?)
 
-(assign-operation generic:solve-linear-right n:/    number? number?)
+(assign-operation 'solve-linear-right n:/    number? number?)
 
 (define (n:revdivide x y) (n:/ y x))
-(assign-operation generic:solve-linear-left n:revdivide number? number?)
-(assign-operation generic:solve-linear      n:revdivide number? number?)
+(assign-operation 'solve-linear-left n:revdivide number? number?)
+(assign-operation 'solve-linear      n:revdivide number? number?)
 
-(assign-operation generic:expt       n:expt         number? number?)
-(assign-operation generic:gcd        n:gcd          number? number?)
+(assign-operation 'expt       n:expt         number? number?)
+(assign-operation 'gcd        n:gcd          number? number?)
 
-(assign-operation generic:dot-product  n:*          number? number?)
+(assign-operation 'dot-product  n:*          number? number?)
 
-(assign-operation generic:make-rectangular    n:make-rectangular real? real?)
-(assign-operation generic:make-polar          n:make-polar       real? real?)
-(assign-operation generic:real-part           n:real-part        number?)
-(assign-operation generic:imag-part           n:imag-part        number?)
-(assign-operation generic:magnitude           n:magnitude        number?)
-(assign-operation generic:angle               n:angle            number?)
+(assign-operation 'make-rectangular    n:make-rectangular real? real?)
+(assign-operation 'make-polar          n:make-polar       real? real?)
+(assign-operation 'real-part           n:real-part        number?)
+(assign-operation 'imag-part           n:imag-part        number?)
+(assign-operation 'magnitude           n:magnitude        number?)
+(assign-operation 'angle               n:angle            number?)
 
-(assign-operation generic:conjugate           n:conjugate        number?)
+(assign-operation 'conjugate           n:conjugate        number?)
 
-(assign-operation generic:atan1               n:atan             number?)
-(assign-operation generic:atan2               n:atan     number? number?)
+(assign-operation 'atan1               n:atan             number?)
+(assign-operation 'atan2               n:atan     number? number?)
 
-;(assign-operation generic:partial-derivative  n:deriv      number? any?)
+;(assign-operation 'partial-derivative  n:deriv      number? any?)
 
-(assign-operation generic:apply               n:self        number? any?)
+(assign-operation 'apply               n:self        number? any?)
 
 
 ;;;; Abstract numbers generalize numerical quantities.
@@ -247,217 +247,217 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (define (an:zero-like n) :zero)
 (define (an:one-like n) :one)
 
-(assign-operation generic:type             n:type             abstract-number?)
-(assign-operation generic:type-predicate   n:type-predicate   abstract-number?)
-(assign-operation generic:arity            n:arity            abstract-number?)
+(assign-operation 'type             n:type             abstract-number?)
+(assign-operation 'type-predicate   n:type-predicate   abstract-number?)
+(assign-operation 'arity            n:arity            abstract-number?)
 
-(assign-operation generic:inexact?  (has-property? 'inexact)  abstract-number?)
+(assign-operation 'inexact?  (has-property? 'inexact)  abstract-number?)
 
-(assign-operation generic:zero-like        an:zero-like       abstract-number?)
-(assign-operation generic:one-like         an:one-like        abstract-number?)
-(assign-operation generic:identity-like    an:one-like        abstract-number?)
+(assign-operation 'zero-like        an:zero-like       abstract-number?)
+(assign-operation 'one-like         an:one-like        abstract-number?)
+(assign-operation 'identity-like    an:one-like        abstract-number?)
 
-(assign-operation generic:negate
+(assign-operation 'negate
 		  (make-numerical-combination 'negate)
 		  abstract-number?)
-(assign-operation generic:invert
+(assign-operation 'invert
 		  (make-numerical-combination 'invert)
 		  abstract-number?)
 
-(assign-operation generic:sqrt
+(assign-operation 'sqrt
 		  (make-numerical-combination 'sqrt)
 		  abstract-number?)
 
 
-(assign-operation generic:exp
+(assign-operation 'exp
 		  (make-numerical-combination 'exp)
 		  abstract-number?)
-(assign-operation generic:log
+(assign-operation 'log
 		  (make-numerical-combination 'log)
 		  abstract-number?)
 
-(assign-operation generic:sin
+(assign-operation 'sin
 		  (make-numerical-combination 'sin)
 		  abstract-number?)
-(assign-operation generic:cos
+(assign-operation 'cos
 		  (make-numerical-combination 'cos)
 		  abstract-number?)
 
-(assign-operation generic:asin
+(assign-operation 'asin
 		  (make-numerical-combination 'asin)
 		  abstract-number?)
-(assign-operation generic:acos
+(assign-operation 'acos
 		  (make-numerical-combination 'acos)
 		  abstract-number?)
 
-(assign-operation generic:sinh
+(assign-operation 'sinh
 		  (make-numerical-combination 'sinh)
 		  abstract-number?)
-(assign-operation generic:cosh
+(assign-operation 'cosh
 		  (make-numerical-combination 'cosh)
 		  abstract-number?)
 
-;(assign-operation generic:derivative n:deriv  abstract-number?)
+;(assign-operation 'derivative n:deriv  abstract-number?)
 
 
-(assign-operation generic:+
+(assign-operation '+
 		  (make-numerical-combination '+)
 		  abstract-number? abstract-number?)
-(assign-operation generic:+
+(assign-operation '+
 		  (make-numerical-combination '+)
 		  number?          abstract-number?)
-(assign-operation generic:+
+(assign-operation '+
 		  (make-numerical-combination '+ 'r)
 		  abstract-number? number?)
 
-(assign-operation generic:-
+(assign-operation '-
 		  (make-numerical-combination '-)
 		  abstract-number? abstract-number?)
-(assign-operation generic:-
+(assign-operation '-
 		  (make-numerical-combination '-)
 		  number?          abstract-number?)
-(assign-operation generic:-
+(assign-operation '-
 		  (make-numerical-combination '-)
 		  abstract-number? number?)
 
-(assign-operation generic:*
+(assign-operation '*
 		  (make-numerical-combination '*)
 		  abstract-number? abstract-number?)
-(assign-operation generic:*
+(assign-operation '*
 		  (make-numerical-combination '*)
 		  number?          abstract-number?)
-(assign-operation generic:*
+(assign-operation '*
 		  (make-numerical-combination '* 'r)
 		  abstract-number? number?)
 
-(assign-operation generic:dot-product
+(assign-operation 'dot-product
 		  (make-numerical-combination '*)
 		  abstract-number? abstract-number?)
-(assign-operation generic:dot-product
+(assign-operation 'dot-product
 		  (make-numerical-combination '*)
 		  number?          abstract-number?)
-(assign-operation generic:dot-product
+(assign-operation 'dot-product
 		  (make-numerical-combination '* 'r)
 		  abstract-number? number?)
 
 
-(assign-operation generic:/
+(assign-operation '/
 		  (make-numerical-combination '/)
 		  abstract-number? abstract-number?)
-(assign-operation generic:/
+(assign-operation '/
 		  (make-numerical-combination '/)
 		  number?          abstract-number?)
-(assign-operation generic:/
+(assign-operation '/
 		  (make-numerical-combination '/)
 		  abstract-number? number?)
 
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
 		  (make-numerical-combination '/ 'r)
 		  abstract-number? abstract-number?)
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
 		  (make-numerical-combination '/ 'r)
 		  number? abstract-number?)
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
 		  (make-numerical-combination '/ 'r)
 		  abstract-number? number?)
 
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
 		  (make-numerical-combination '/ 'r)
 		  abstract-number? abstract-number?)
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
 		  (make-numerical-combination '/ 'r)
 		  number? abstract-number?)
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
 		  (make-numerical-combination '/ 'r)
 		  abstract-number? number?)
 
-(assign-operation generic:solve-linear-right
+(assign-operation 'solve-linear-right
 		  (make-numerical-combination '/)
 		  abstract-number? abstract-number?)
-(assign-operation generic:solve-linear-right
+(assign-operation 'solve-linear-right
 		  (make-numerical-combination '/)
 		  number? abstract-number?)
-(assign-operation generic:solve-linear-right
+(assign-operation 'solve-linear-right
 		  (make-numerical-combination '/)
 		  abstract-number? number?)
 
-(assign-operation generic:determinant    identity    abstract-number?)
-(assign-operation generic:trace          identity    abstract-number?)
+(assign-operation 'determinant    identity    abstract-number?)
+(assign-operation 'trace          identity    abstract-number?)
 
 
-(assign-operation generic:expt
+(assign-operation 'expt
 		  (make-numerical-combination 'expt)
 		  abstract-number? abstract-number?)
-(assign-operation generic:expt
+(assign-operation 'expt
 		  (make-numerical-combination 'expt)
 		  number?          abstract-number?)
-(assign-operation generic:expt
+(assign-operation 'expt
 		  (make-numerical-combination 'expt)
 		  abstract-number? number?)
 
-(assign-operation generic:gcd
+(assign-operation 'gcd
 		  (make-numerical-combination 'gcd)
 		  abstract-number? abstract-number?)
-(assign-operation generic:gcd
+(assign-operation 'gcd
 		  (make-numerical-combination 'gcd)
 		  number?          abstract-number?)
-(assign-operation generic:gcd
+(assign-operation 'gcd
 		  (make-numerical-combination 'gcd 'r)
 		  abstract-number? number?)
 
-(assign-operation generic:make-rectangular
+(assign-operation 'make-rectangular
 		  (make-numerical-combination 'make-rectangular)
 		  abstract-number? abstract-number?)
-(assign-operation generic:make-rectangular
+(assign-operation 'make-rectangular
 		  (make-numerical-combination 'make-rectangular)
 		  number? abstract-number?)
-(assign-operation generic:make-rectangular
+(assign-operation 'make-rectangular
 		  (make-numerical-combination 'make-rectangular)
 		  abstract-number? number?)
 
-(assign-operation generic:make-polar
+(assign-operation 'make-polar
 		  (make-numerical-combination 'make-polar)
 		  abstract-number? abstract-number?)
-(assign-operation generic:make-polar
+(assign-operation 'make-polar
 		  (make-numerical-combination 'make-polar)
 		  number? abstract-number?)
-(assign-operation generic:make-polar
+(assign-operation 'make-polar
 		  (make-numerical-combination 'make-polar)
 		  abstract-number? number?)
 
 
-(assign-operation generic:real-part
+(assign-operation 'real-part
 		  (make-numerical-combination 'real-part)
 		  abstract-number?)
-(assign-operation generic:imag-part
+(assign-operation 'imag-part
 		  (make-numerical-combination 'imag-part)
 		  abstract-number?)
-(assign-operation generic:magnitude
+(assign-operation 'magnitude
 		  (make-numerical-combination 'magnitude)
 		  abstract-number?)
-(assign-operation generic:angle
+(assign-operation 'angle
 		  (make-numerical-combination 'angle)
 		  abstract-number?)
 
-(assign-operation generic:conjugate
+(assign-operation 'conjugate
 		  (make-numerical-combination 'conjugate)
 		  abstract-number?)
 
-(assign-operation generic:atan1
+(assign-operation 'atan1
 		  (make-numerical-combination 'atan)
 		  abstract-number?)
-(assign-operation generic:atan2
+(assign-operation 'atan2
 		  (make-numerical-combination 'atan)
 		  abstract-number? abstract-number?)
-(assign-operation generic:atan2
+(assign-operation 'atan2
 		  (make-numerical-combination 'atan)
 		  number? abstract-number?)
-(assign-operation generic:atan2
+(assign-operation 'atan2
 		  (make-numerical-combination 'atan)
 		  abstract-number? number?)
 
-;(assign-operation generic:partial-derivative  n:deriv  abstract-number? any?)
-(assign-operation generic:apply               n:self    abstract-number? any?)
+;(assign-operation 'partial-derivative  n:deriv  abstract-number? any?)
+(assign-operation 'apply               n:self    abstract-number? any?)
 
 
 ;;; Conservative tests...  These tests will return TRUE only if the
@@ -485,9 +485,9 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
   (exact-one? (g:simplify x)))
 
 ;;; Sigh.
-;;; (assign-operation generic:=   an:=  abstract-number? abstract-number?)
-;;; (assign-operation generic:zero?  an:zero?        abstract-number?)
-;;; (assign-operation generic:one?   an:one?         abstract-number?)
+;;; (assign-operation '=   an:=  abstract-number? abstract-number?)
+;;; (assign-operation 'zero?  an:zero?        abstract-number?)
+;;; (assign-operation 'one?   an:one?         abstract-number?)
 
 ;;; Quick and dirty...
 
@@ -503,9 +503,9 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
   (let ((xx (expression-of x)))
     (and (number? xx) (one? xx))))
 
-(assign-operation generic:=     abn:=      abstract-number? abstract-number?)
-(assign-operation generic:zero? abn:zero?  abstract-number?)
-(assign-operation generic:one?  abn:one?   abstract-number?)
+(assign-operation '=     abn:=      abstract-number? abstract-number?)
+(assign-operation 'zero? abn:zero?  abstract-number?)
+(assign-operation 'one?  abn:one?   abstract-number?)
 
 
 (define *known-reals* (make-parameter '()))

@@ -510,72 +510,72 @@
 (define (diff:zero-like n) :zero)
 (define (diff:one-like n) :one)
 
-(assign-operation generic:type            diff:type             differential?)
-(assign-operation generic:type-predicate  diff:type-predicate   differential?)
-(assign-operation generic:arity           diff:arity            differential?)
-(assign-operation generic:apply           diff:apply            differential? any?)
+(assign-operation 'type            diff:type             differential?)
+(assign-operation 'type-predicate  diff:type-predicate   differential?)
+(assign-operation 'arity           diff:arity            differential?)
+(assign-operation 'apply           diff:apply            differential? any?)
 
 
 ;;; arity?, inexact?
 
-(assign-operation generic:zero-like       diff:zero-like        differential?)
-(assign-operation generic:one-like        diff:one-like         differential?)
+(assign-operation 'zero-like       diff:zero-like        differential?)
+(assign-operation 'one-like        diff:one-like         differential?)
 
 ;;; zero?, one?
-(assign-operation generic:negate          diff:negate           differential?)
-(assign-operation generic:invert          diff:invert           differential?)
+(assign-operation 'negate          diff:negate           differential?)
+(assign-operation 'invert          diff:invert           differential?)
 
-(assign-operation generic:sqrt            diff:sqrt             differential?)
+(assign-operation 'sqrt            diff:sqrt             differential?)
 
-(assign-operation generic:exp             diff:exp              differential?)
-(assign-operation generic:log             diff:log              differential?)
+(assign-operation 'exp             diff:exp              differential?)
+(assign-operation 'log             diff:log              differential?)
 
-(assign-operation generic:sin             diff:sin              differential?)
-(assign-operation generic:cos             diff:cos              differential?)
-(assign-operation generic:asin            diff:asin             differential?)
-(assign-operation generic:acos            diff:acos             differential?)
-(assign-operation generic:atan1           diff:atan1            differential?)
-(assign-operation generic:sinh            diff:sinh             differential?)
-(assign-operation generic:cosh            diff:cosh             differential?)
+(assign-operation 'sin             diff:sin              differential?)
+(assign-operation 'cos             diff:cos              differential?)
+(assign-operation 'asin            diff:asin             differential?)
+(assign-operation 'acos            diff:acos             differential?)
+(assign-operation 'atan1           diff:atan1            differential?)
+(assign-operation 'sinh            diff:sinh             differential?)
+(assign-operation 'cosh            diff:cosh             differential?)
 
-(assign-operation generic:+               diff:+       differential? not-compound?)
-(assign-operation generic:+               diff:+       not-compound? differential?)
-(assign-operation generic:-               diff:-       differential? not-compound?)
-(assign-operation generic:-               diff:-       not-compound? differential?)
-(assign-operation generic:*               diff:*       differential? not-compound?)
-(assign-operation generic:*               diff:*       not-compound? differential?)
-(assign-operation generic:/               diff:/       differential? not-compound?)
-(assign-operation generic:/               diff:/       not-compound? differential?)
+(assign-operation '+               diff:+       differential? not-compound?)
+(assign-operation '+               diff:+       not-compound? differential?)
+(assign-operation '-               diff:-       differential? not-compound?)
+(assign-operation '-               diff:-       not-compound? differential?)
+(assign-operation '*               diff:*       differential? not-compound?)
+(assign-operation '*               diff:*       not-compound? differential?)
+(assign-operation '/               diff:/       differential? not-compound?)
+(assign-operation '/               diff:/       not-compound? differential?)
 
-(assign-operation generic:solve-linear-right     diff:/
+(assign-operation 'solve-linear-right     diff:/
                   differential? not-compound?)
-(assign-operation generic:solve-linear-right     diff:/
+(assign-operation 'solve-linear-right     diff:/
                   not-compound? differential?)
 
-(assign-operation generic:solve-linear-left      (lambda (x y) (diff:/ y x))
+(assign-operation 'solve-linear-left      (lambda (x y) (diff:/ y x))
                   not-compound? differential?)
-(assign-operation generic:solve-linear-left      (lambda (x y) (diff:/ y x))
+(assign-operation 'solve-linear-left      (lambda (x y) (diff:/ y x))
                   differential? not-compound?)
 
-(assign-operation generic:solve-linear           (lambda (x y) (diff:/ y x))
+(assign-operation 'solve-linear           (lambda (x y) (diff:/ y x))
                   not-compound? differential?)
-(assign-operation generic:solve-linear           (lambda (x y) (diff:/ y x))
+(assign-operation 'solve-linear           (lambda (x y) (diff:/ y x))
                   differential? not-compound?)
 
-(assign-operation generic:dot-product     diff:*
+(assign-operation 'dot-product     diff:*
                   differential? not-compound?)
 
-(assign-operation generic:expt     diff:power
+(assign-operation 'expt     diff:power
                   differential? (negation differential?))
-(assign-operation generic:expt
+(assign-operation 'expt
                   diff:expt   not-compound?  differential?)
 
-(assign-operation generic:atan2           diff:atan2
+(assign-operation 'atan2           diff:atan2
                   differential? not-compound?)
-(assign-operation generic:atan2           diff:atan2
+(assign-operation 'atan2           diff:atan2
                   not-compound? differential?)
 
-(assign-operation generic:abs             diff:abs
+(assign-operation 'abs             diff:abs
                   differential?)
 
 ;;; This stuff allows derivatives to work in code where there are
@@ -588,25 +588,25 @@
               (g:zero? c)))
           (differential-term-list x)))
 
-(assign-operation generic:zero? diff:zero? differential?)
+(assign-operation 'zero? diff:zero? differential?)
 
 (define (diff:one? x)
   (assert (differential? x))
   (and (g:one? (finite-part x))
        (diff:zero? (infinitesimal-part x))))
 
-(assign-operation generic:one? diff:one? differential?)
+(assign-operation 'one? diff:one? differential?)
 
 #|
 ;;; this does not slow down derivatives!
 (define (diff:zero? x) #f)
 
-(assign-operation generic:zero? diff:zero? differential?)
+(assign-operation 'zero? diff:zero? differential?)
 
 
 (define (diff:one? x) #f)
 
-(assign-operation generic:one? diff:one? differential?)
+(assign-operation 'one? diff:one? differential?)
 |#
 
 
@@ -618,20 +618,20 @@
   bp?)
 
 
-(assign-operation generic:= (diff:binary-comparator g:=) differential? not-compound?)
-(assign-operation generic:= (diff:binary-comparator g:=) not-compound? differential?)
+(assign-operation '= (diff:binary-comparator g:=) differential? not-compound?)
+(assign-operation '= (diff:binary-comparator g:=) not-compound? differential?)
 
-(assign-operation generic:< (diff:binary-comparator g:<) differential? not-compound?)
-(assign-operation generic:< (diff:binary-comparator g:<) not-compound? differential?)
+(assign-operation '< (diff:binary-comparator g:<) differential? not-compound?)
+(assign-operation '< (diff:binary-comparator g:<) not-compound? differential?)
 
-(assign-operation generic:<= (diff:binary-comparator g:<=) differential? not-compound?)
-(assign-operation generic:<= (diff:binary-comparator g:<=) not-compound? differential?)
+(assign-operation '<= (diff:binary-comparator g:<=) differential? not-compound?)
+(assign-operation '<= (diff:binary-comparator g:<=) not-compound? differential?)
 
-(assign-operation generic:> (diff:binary-comparator g:>) differential? not-compound?)
-(assign-operation generic:> (diff:binary-comparator g:>) not-compound? differential?)
+(assign-operation '> (diff:binary-comparator g:>) differential? not-compound?)
+(assign-operation '> (diff:binary-comparator g:>) not-compound? differential?)
 
-(assign-operation generic:>= (diff:binary-comparator g:>=) differential? not-compound?)
-(assign-operation generic:>= (diff:binary-comparator g:>=) not-compound? differential?)
+(assign-operation '>= (diff:binary-comparator g:>=) differential? not-compound?)
+(assign-operation '>= (diff:binary-comparator g:>=) not-compound? differential?)
 
 ;;; The derivative of a univariate function over R is a value
 ;;;  ((derivative (lambda (x) (expt x 5))) 'a)
@@ -678,7 +678,7 @@
 ;;; This is not quite right... It is only good for testing R-->R stuff.
 ;;; Now disabled, see DERIV.SCM.
 
-;(assign-operation generic:derivative      diff:derivative       function?)
+;(assign-operation 'derivative      diff:derivative       function?)
 
 #|
 ;;; BTW.

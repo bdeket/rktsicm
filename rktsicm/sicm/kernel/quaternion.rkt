@@ -539,64 +539,64 @@
 |#
 
 
-(assign-operation generic:type             q:type            quaternion?)
-(assign-operation generic:type-predicate   q:type-predicate  quaternion?)
+(assign-operation 'type             q:type            quaternion?)
+(assign-operation 'type-predicate   q:type-predicate  quaternion?)
 
-(assign-operation generic:arity            q:arity           quaternion?)
+(assign-operation 'arity            q:arity           quaternion?)
 
-(assign-operation generic:inexact?         q:inexact?        quaternion?)
+(assign-operation 'inexact?         q:inexact?        quaternion?)
 
-(assign-operation generic:zero-like        q:zero-like       quaternion?)
+(assign-operation 'zero-like        q:zero-like       quaternion?)
 
-(assign-operation generic:zero?            q:zero?           quaternion?)
+(assign-operation 'zero?            q:zero?           quaternion?)
 
-(assign-operation generic:negate           q:negate          quaternion?)
+(assign-operation 'negate           q:negate          quaternion?)
 
-(assign-operation generic:magnitude        q:magnitude       quaternion?)
-
-
-(assign-operation generic:conjugate        q:conjugate       quaternion?)
-(assign-operation generic:invert 	    q:invert 	      quaternion?)
-
-(assign-operation generic:real-part        q:real-part       quaternion?)
+(assign-operation 'magnitude        q:magnitude       quaternion?)
 
 
-(assign-operation generic:exp              q:exp             quaternion?)
-(assign-operation generic:log              q:log             quaternion?)
+(assign-operation 'conjugate        q:conjugate       quaternion?)
+(assign-operation 'invert 	    q:invert 	      quaternion?)
+
+(assign-operation 'real-part        q:real-part       quaternion?)
+
+
+(assign-operation 'exp              q:exp             quaternion?)
+(assign-operation 'log              q:log             quaternion?)
 
 
 
-(assign-operation generic:=     q:=                       quaternion? quaternion?)
+(assign-operation '=     q:=                       quaternion? quaternion?)
 
-(assign-operation generic:+     quaternion+quaternion     quaternion? quaternion?)
-(assign-operation generic:-     quaternion-quaternion     quaternion? quaternion?)
+(assign-operation '+     quaternion+quaternion     quaternion? quaternion?)
+(assign-operation '-     quaternion-quaternion     quaternion? quaternion?)
 
-(assign-operation generic:*     quaternion*quaternion     quaternion? quaternion?)
+(assign-operation '*     quaternion*quaternion     quaternion? quaternion?)
 
-(assign-operation generic:*     scalar*quaternion         scalar?     quaternion?)
-(assign-operation generic:*     quaternion*scalar         quaternion? scalar?)
+(assign-operation '*     scalar*quaternion         scalar?     quaternion?)
+(assign-operation '*     quaternion*scalar         quaternion? scalar?)
 
-(assign-operation generic:/     quaternion/scalar         quaternion? scalar?)
-(assign-operation generic:/     quaternion/quaternion     quaternion? quaternion?)
+(assign-operation '/     quaternion/scalar         quaternion? scalar?)
+(assign-operation '/     quaternion/quaternion     quaternion? quaternion?)
 
-(assign-operation generic:apply            q:apply        quaternion? any?)
+(assign-operation 'apply            q:apply        quaternion? any?)
 
-(assign-operation generic:partial-derivative q:partial-derivative quaternion? any?)
+(assign-operation 'partial-derivative q:partial-derivative quaternion? any?)
 
 
-(assign-operation generic:solve-linear-right     quaternion/scalar         quaternion? scalar?)
-(assign-operation generic:solve-linear-right     quaternion/quaternion     quaternion? quaternion?)
+(assign-operation 'solve-linear-right     quaternion/scalar         quaternion? scalar?)
+(assign-operation 'solve-linear-right     quaternion/quaternion     quaternion? quaternion?)
 
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
                   (lambda (x y) (quaternion/scalar y x))
                   scalar? quaternion?)
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
                   (lambda (x y) (quaternion/quaternion y x))
                   quaternion? quaternion?)
 
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
                   (lambda (x y) (quaternion/scalar y x))
                   scalar? quaternion?)
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
                   (lambda (x y) (quaternion/quaternion y x))
                   quaternion? quaternion?)

@@ -169,7 +169,7 @@
 			  (g:apply f (up-structure->list s))))
 		     (list->up-structure args)))))))))
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
 		  deriv:multivariate-derivative
 		  (disjunction function? structure?)
 		  any?)

@@ -227,108 +227,108 @@
   (not (and (pair? x) (eq? (car x) '*unit*))))
 
 
-(assign-operation generic:type             u:type             with-units?)
+(assign-operation 'type             u:type             with-units?)
 
-(assign-operation generic:arity            u:arity            with-units?)
+(assign-operation 'arity            u:arity            with-units?)
 
-(assign-operation generic:zero-like        u:zero-like        with-units?)
-(assign-operation generic:one-like         u:one-like         with-units?)
+(assign-operation 'zero-like        u:zero-like        with-units?)
+(assign-operation 'one-like         u:one-like         with-units?)
 
-(assign-operation generic:zero?            u:zero?            with-units?)
+(assign-operation 'zero?            u:zero?            with-units?)
 
 ;;; The following causes (/ (& 1 &ampere) (& 1 &volt)) to return
 ;Value 22: (*with-units* 1 #(0 0 0 1 0 0 0))
-;(assign-operation generic:one?             u:one?             with-units?)
+;(assign-operation 'one?             u:one?             with-units?)
 
-(assign-operation generic:negate           u:negate           with-units?)
-(assign-operation generic:invert           u:invert           with-units?)
+(assign-operation 'negate           u:negate           with-units?)
+(assign-operation 'invert           u:invert           with-units?)
 
-(assign-operation generic:sqrt             u:sqrt             with-units?)
+(assign-operation 'sqrt             u:sqrt             with-units?)
 
 #|
-(assign-operation generic:sin              u:sin              angular?)
-(assign-operation generic:cos              u:cos              angular?)
-(assign-operation generic:exp              u:cos              angular?)
+(assign-operation 'sin              u:sin              angular?)
+(assign-operation 'cos              u:cos              angular?)
+(assign-operation 'exp              u:cos              angular?)
 |#
 
-(assign-operation generic:=          u:=            with-units? with-units?)
-(assign-operation generic:<          u:<            with-units? with-units?)
-(assign-operation generic:<=         u:<=           with-units? with-units?)
-(assign-operation generic:>          u:>            with-units? with-units?)
-(assign-operation generic:>=         u:>=           with-units? with-units?)
+(assign-operation '=          u:=            with-units? with-units?)
+(assign-operation '<          u:<            with-units? with-units?)
+(assign-operation '<=         u:<=           with-units? with-units?)
+(assign-operation '>          u:>            with-units? with-units?)
+(assign-operation '>=         u:>=           with-units? with-units?)
 
-(assign-operation generic:+   u:+     with-units?             not-differential-or-compound?)
-(assign-operation generic:+   u:+     not-differential-or-compound?  with-units?)
+(assign-operation '+   u:+     with-units?             not-differential-or-compound?)
+(assign-operation '+   u:+     not-differential-or-compound?  with-units?)
 
-(assign-operation generic:-   u:-     with-units?             not-differential-or-compound?)
-(assign-operation generic:-   u:-     not-differential-or-compound?  with-units?)
+(assign-operation '-   u:-     with-units?             not-differential-or-compound?)
+(assign-operation '-   u:-     not-differential-or-compound?  with-units?)
 
-(assign-operation generic:*   u:*     with-units?             not-differential-or-compound?)
-(assign-operation generic:*   u:*     not-differential-or-compound?  with-units?)
+(assign-operation '*   u:*     with-units?             not-differential-or-compound?)
+(assign-operation '*   u:*     not-differential-or-compound?  with-units?)
 
-(assign-operation generic:*   u:*u    with-units?               units?)
-(assign-operation generic:*   u:u*    units?                    with-units?)
+(assign-operation '*   u:*u    with-units?               units?)
+(assign-operation '*   u:u*    units?                    with-units?)
 
-(assign-operation generic:*   u:t*u    not-d-c-u?               units?)
-(assign-operation generic:*   u:u*t    units?                   not-d-c-u?)
-
-
-(assign-operation generic:/   u:/     with-units?              not-differential-or-compound?)
-(assign-operation generic:/   u:/     not-differential-or-compound?  with-units?)
-
-(assign-operation generic:/   u:/u    with-units?               units?)
-(assign-operation generic:/   u:u/    units?                    with-units?)
-
-(assign-operation generic:/   u:t/u    not-d-c-u?                units?)
-(assign-operation generic:/   u:u/t    units?                    not-d-c-u?)
-
-;(assign-operation generic:dot-product  u:dot-product  with-units? with-units?)
-
-(assign-operation generic:expt       u:expt         with-units?  not-differential-or-compound?)
-
-;(assign-operation generic:gcd        u:gcd          with-units? with-units?)
-
-(assign-operation generic:make-rectangular    u:make-rectangular with-units? with-units?)
-(assign-operation generic:make-polar          u:make-polar       with-units? any?)
-(assign-operation generic:real-part           u:real-part        with-units?)
-(assign-operation generic:imag-part           u:imag-part        with-units?)
-(assign-operation generic:magnitude           u:magnitude        with-units?)
-(assign-operation generic:angle               u:angle            with-units?)
-
-(assign-operation generic:conjugate           u:conjugate        with-units?)
-
-;(assign-operation generic:atan1               u:atan            with-units?)
-(assign-operation generic:atan2               u:atan2            with-units? with-units?)
+(assign-operation '*   u:t*u    not-d-c-u?               units?)
+(assign-operation '*   u:u*t    units?                   not-d-c-u?)
 
 
-(assign-operation generic:solve-linear-right   u:/     with-units?              not-differential-or-compound?)
-(assign-operation generic:solve-linear-right   u:/     not-differential-or-compound?  with-units?)
+(assign-operation '/   u:/     with-units?              not-differential-or-compound?)
+(assign-operation '/   u:/     not-differential-or-compound?  with-units?)
 
-(assign-operation generic:solve-linear-right   u:/u    with-units?               units?)
-(assign-operation generic:solve-linear-right   u:u/    units?                    with-units?)
+(assign-operation '/   u:/u    with-units?               units?)
+(assign-operation '/   u:u/    units?                    with-units?)
 
-(assign-operation generic:solve-linear-right   u:t/u    not-d-c-u?                units?)
-(assign-operation generic:solve-linear-right   u:u/t    units?                    not-d-c-u?)
+(assign-operation '/   u:t/u    not-d-c-u?                units?)
+(assign-operation '/   u:u/t    units?                    not-d-c-u?)
+
+;(assign-operation 'dot-product  u:dot-product  with-units? with-units?)
+
+(assign-operation 'expt       u:expt         with-units?  not-differential-or-compound?)
+
+;(assign-operation 'gcd        u:gcd          with-units? with-units?)
+
+(assign-operation 'make-rectangular    u:make-rectangular with-units? with-units?)
+(assign-operation 'make-polar          u:make-polar       with-units? any?)
+(assign-operation 'real-part           u:real-part        with-units?)
+(assign-operation 'imag-part           u:imag-part        with-units?)
+(assign-operation 'magnitude           u:magnitude        with-units?)
+(assign-operation 'angle               u:angle            with-units?)
+
+(assign-operation 'conjugate           u:conjugate        with-units?)
+
+;(assign-operation 'atan1               u:atan            with-units?)
+(assign-operation 'atan2               u:atan2            with-units? with-units?)
 
 
-(assign-operation generic:solve-linear-left   (lambda (x y) (u:/ y x))     not-differential-or-compound?              with-units?)
-(assign-operation generic:solve-linear-left   (lambda (x y) (u:/ y x))     with-units?           not-differential-or-compound?)
+(assign-operation 'solve-linear-right   u:/     with-units?              not-differential-or-compound?)
+(assign-operation 'solve-linear-right   u:/     not-differential-or-compound?  with-units?)
 
-(assign-operation generic:solve-linear-left   (lambda (x y) (u:/u y x))    units?                 with-units?)
-(assign-operation generic:solve-linear-left   (lambda (x y) (u:u/ y x))    with-units?            units?)
+(assign-operation 'solve-linear-right   u:/u    with-units?               units?)
+(assign-operation 'solve-linear-right   u:u/    units?                    with-units?)
 
-(assign-operation generic:solve-linear-left   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
-(assign-operation generic:solve-linear-left   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
+(assign-operation 'solve-linear-right   u:t/u    not-d-c-u?                units?)
+(assign-operation 'solve-linear-right   u:u/t    units?                    not-d-c-u?)
 
 
-(assign-operation generic:solve-linear   (lambda (x y) (u:/ y x))     not-differential-or-compound?              with-units?)
-(assign-operation generic:solve-linear   (lambda (x y) (u:/ y x))     with-units?           not-differential-or-compound?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:/ y x))     not-differential-or-compound?              with-units?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:/ y x))     with-units?           not-differential-or-compound?)
 
-(assign-operation generic:solve-linear   (lambda (x y) (u:/u y x))    units?                 with-units?)
-(assign-operation generic:solve-linear   (lambda (x y) (u:u/ y x))    with-units?            units?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:/u y x))    units?                 with-units?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:u/ y x))    with-units?            units?)
 
-(assign-operation generic:solve-linear   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
-(assign-operation generic:solve-linear   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
+
+
+(assign-operation 'solve-linear   (lambda (x y) (u:/ y x))     not-differential-or-compound?              with-units?)
+(assign-operation 'solve-linear   (lambda (x y) (u:/ y x))     with-units?           not-differential-or-compound?)
+
+(assign-operation 'solve-linear   (lambda (x y) (u:/u y x))    units?                 with-units?)
+(assign-operation 'solve-linear   (lambda (x y) (u:u/ y x))    with-units?            units?)
+
+(assign-operation 'solve-linear   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
+(assign-operation 'solve-linear   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
 
 
 

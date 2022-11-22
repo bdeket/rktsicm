@@ -68,14 +68,14 @@
 	   (operator-arity op)
 	   (operator-optionals op)))
 
-(assign-operation generic:zero-like vf:zero-like vector-field?)
+(assign-operation 'zero-like vf:zero-like vector-field?)
 
 
 (define (vf:zero? vf)
   (assert (vector-field? vf) "vf:zero?")
   (eq? (operator-procedure vf) vf:zero))
 
-(assign-operation generic:zero? vf:zero? vector-field?)
+(assign-operation 'zero? vf:zero? vector-field?)
 
 
 ;;; It is often useful to construct a literal vector field

@@ -714,96 +714,96 @@
 		 (matrix->array m)))
 
 
-(assign-operation generic:type             m:type             matrix?)
-(assign-operation generic:type-predicate   m:type-predicate   matrix?)
-(assign-operation generic:arity            m:arity            matrix?)
-(assign-operation generic:inexact?         m:inexact?         matrix?)
+(assign-operation 'type             m:type             matrix?)
+(assign-operation 'type-predicate   m:type-predicate   matrix?)
+(assign-operation 'arity            m:arity            matrix?)
+(assign-operation 'inexact?         m:inexact?         matrix?)
 						     
-(assign-operation generic:zero-like        m:zero-like        matrix?)
-(assign-operation generic:one-like         m:one-like         matrix?)
-(assign-operation generic:identity-like    m:identity-like    matrix?)
+(assign-operation 'zero-like        m:zero-like        matrix?)
+(assign-operation 'one-like         m:one-like         matrix?)
+(assign-operation 'identity-like    m:identity-like    matrix?)
 						     
-(assign-operation generic:zero?            m:zero?            matrix?)
-(assign-operation generic:identity?        m:identity?        matrix?)
+(assign-operation 'zero?            m:zero?            matrix?)
+(assign-operation 'identity?        m:identity?        matrix?)
 						     
-(assign-operation generic:negate           m:negate           matrix?)
-(assign-operation generic:invert           m:invert    square-matrix?)
+(assign-operation 'negate           m:negate           matrix?)
+(assign-operation 'invert           m:invert    square-matrix?)
 						     
-(assign-operation generic:conjugate        m:conjugate        matrix?)
-(assign-operation generic:exp              m:exp       square-matrix?)
-(assign-operation generic:sin              m:sin       square-matrix?)
-(assign-operation generic:cos              m:cos       square-matrix?)
+(assign-operation 'conjugate        m:conjugate        matrix?)
+(assign-operation 'exp              m:exp       square-matrix?)
+(assign-operation 'sin              m:sin       square-matrix?)
+(assign-operation 'cos              m:cos       square-matrix?)
 
 
-(assign-operation generic:=   matrix=matrix           matrix? matrix?)
-(assign-operation generic:=   matrix=scalar    square-matrix? scalar?)
-(assign-operation generic:=   scalar=matrix    scalar? square-matrix?)
+(assign-operation '=   matrix=matrix           matrix? matrix?)
+(assign-operation '=   matrix=scalar    square-matrix? scalar?)
+(assign-operation '=   scalar=matrix    scalar? square-matrix?)
 		     
-(assign-operation generic:+   matrix+matrix           matrix? matrix?)
-(assign-operation generic:+   matrix+scalar    square-matrix? scalar?)
-(assign-operation generic:+   scalar+matrix    scalar? square-matrix?)
+(assign-operation '+   matrix+matrix           matrix? matrix?)
+(assign-operation '+   matrix+scalar    square-matrix? scalar?)
+(assign-operation '+   scalar+matrix    scalar? square-matrix?)
 		     
-(assign-operation generic:-   matrix-matrix           matrix? matrix?)
-(assign-operation generic:-   matrix-scalar    square-matrix? scalar?)
-(assign-operation generic:-   scalar-matrix    scalar? square-matrix?)
+(assign-operation '-   matrix-matrix           matrix? matrix?)
+(assign-operation '-   matrix-scalar    square-matrix? scalar?)
+(assign-operation '-   scalar-matrix    scalar? square-matrix?)
 		     
-(assign-operation generic:*   matrix*matrix           matrix? matrix?)
-(assign-operation generic:*   matrix*scalar           matrix? scalar?)
-(assign-operation generic:*   scalar*matrix           scalar? matrix?)
+(assign-operation '*   matrix*matrix           matrix? matrix?)
+(assign-operation '*   matrix*scalar           matrix? scalar?)
+(assign-operation '*   scalar*matrix           scalar? matrix?)
 
-(assign-operation generic:*   down*matrix           down? matrix?)
-(assign-operation generic:*   matrix*up           matrix? up?)
+(assign-operation '*   down*matrix           down? matrix?)
+(assign-operation '*   matrix*up           matrix? up?)
 		     
-(assign-operation generic:/   matrix/scalar    matrix? scalar?)
-(assign-operation generic:/   scalar/matrix    scalar? square-matrix?)
-(assign-operation generic:/   m:rsolve         column-matrix? square-matrix?)
-(assign-operation generic:/   m:rsolve         up? square-matrix?)
-(assign-operation generic:/   m:rsolve         down? square-matrix?)
-(assign-operation generic:/   m:rsolve         row-matrix? square-matrix?)
-(assign-operation generic:/   matrix/matrix    matrix? square-matrix?)
+(assign-operation '/   matrix/scalar    matrix? scalar?)
+(assign-operation '/   scalar/matrix    scalar? square-matrix?)
+(assign-operation '/   m:rsolve         column-matrix? square-matrix?)
+(assign-operation '/   m:rsolve         up? square-matrix?)
+(assign-operation '/   m:rsolve         down? square-matrix?)
+(assign-operation '/   m:rsolve         row-matrix? square-matrix?)
+(assign-operation '/   matrix/matrix    matrix? square-matrix?)
 
-(assign-operation generic:dot-product m:dot-product-row row-matrix? row-matrix?)
-(assign-operation generic:dot-product m:dot-product-column column-matrix? column-matrix?)
+(assign-operation 'dot-product m:dot-product-row row-matrix? row-matrix?)
+(assign-operation 'dot-product m:dot-product-column column-matrix? column-matrix?)
 
-(assign-operation generic:outer-product m:outer-product column-matrix? row-matrix?)
+(assign-operation 'outer-product m:outer-product column-matrix? row-matrix?)
 
 
-(assign-operation generic:cross-product m:cross-product-row row-matrix? row-matrix?)
-(assign-operation generic:cross-product m:cross-product-column column-matrix? column-matrix?)
+(assign-operation 'cross-product m:cross-product-row row-matrix? row-matrix?)
+(assign-operation 'cross-product m:cross-product-column column-matrix? column-matrix?)
 
 		       
-(assign-operation generic:expt  m:expt  square-matrix? exact-integer?)
+(assign-operation 'expt  m:expt  square-matrix? exact-integer?)
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
 		         m:partial-derivative
                                                   matrix? any?)
 
-(assign-operation generic:apply m:apply                  matrix? any?)
+(assign-operation 'apply m:apply                  matrix? any?)
 
-(assign-operation generic:determinant m:determinant square-matrix?)
-(assign-operation generic:determinant identity      scalar?)
+(assign-operation 'determinant m:determinant square-matrix?)
+(assign-operation 'determinant identity      scalar?)
 
-(assign-operation generic:trace       m:trace       square-matrix?)
-(assign-operation generic:trace       identity      scalar?)
+(assign-operation 'trace       m:trace       square-matrix?)
+(assign-operation 'trace       identity      scalar?)
 
-(assign-operation generic:transpose   m:transpose   matrix?)
-(assign-operation generic:transpose   identity      scalar?)
+(assign-operation 'transpose   m:transpose   matrix?)
+(assign-operation 'transpose   identity      scalar?)
 
-(assign-operation generic:dimension   m:dimension         square-matrix?)
-(assign-operation generic:dimension   m:num-rows          column-matrix?)
-(assign-operation generic:dimension   m:num-cols          row-matrix?)
-(assign-operation generic:dimension   (lambda (x) 1)      scalar?)
+(assign-operation 'dimension   m:dimension         square-matrix?)
+(assign-operation 'dimension   m:num-rows          column-matrix?)
+(assign-operation 'dimension   m:num-cols          row-matrix?)
+(assign-operation 'dimension   (lambda (x) 1)      scalar?)
 
-(assign-operation generic:solve-linear-right m:rsolve       row-matrix? square-matrix?)
-(assign-operation generic:solve-linear-right m:rsolve       down?       square-matrix?)
+(assign-operation 'solve-linear-right m:rsolve       row-matrix? square-matrix?)
+(assign-operation 'solve-linear-right m:rsolve       down?       square-matrix?)
 
-(assign-operation generic:solve-linear-left m:solve-linear  square-matrix? column-matrix?)
-(assign-operation generic:solve-linear-left m:solve-linear  square-matrix? up?)
+(assign-operation 'solve-linear-left m:solve-linear  square-matrix? column-matrix?)
+(assign-operation 'solve-linear-left m:solve-linear  square-matrix? up?)
 
-(assign-operation generic:solve-linear m:solve-linear       square-matrix? column-matrix?)
-(assign-operation generic:solve-linear m:solve-linear       square-matrix? up?)
-(assign-operation generic:solve-linear m:solve-linear       square-matrix? row-matrix?)
-(assign-operation generic:solve-linear m:solve-linear       square-matrix? down?)
+(assign-operation 'solve-linear m:solve-linear       square-matrix? column-matrix?)
+(assign-operation 'solve-linear m:solve-linear       square-matrix? up?)
+(assign-operation 'solve-linear m:solve-linear       square-matrix? row-matrix?)
+(assign-operation 'solve-linear m:solve-linear       square-matrix? down?)
 
 
 ;;; Abstract matrices generalize matrix quantities.
@@ -839,59 +839,59 @@
 	(make-combination abstract-matrix-type-tag
 			  operator operands))))
 
-(assign-operation generic:type            m:type             abstract-matrix?)
-(assign-operation generic:type-predicate  m:type-predicate   abstract-matrix?)
-(assign-operation generic:arity           am:arity           abstract-matrix?)
+(assign-operation 'type            m:type             abstract-matrix?)
+(assign-operation 'type-predicate  m:type-predicate   abstract-matrix?)
+(assign-operation 'arity           am:arity           abstract-matrix?)
 
-(assign-operation generic:inexact?  (has-property? 'inexact) abstract-matrix?)
+(assign-operation 'inexact?  (has-property? 'inexact) abstract-matrix?)
 
-(assign-operation generic:zero-like       am:zero-like       abstract-matrix?)
+(assign-operation 'zero-like       am:zero-like       abstract-matrix?)
 
-(assign-operation generic:zero?     (has-property? 'zero)    abstract-matrix?)
-(assign-operation generic:one?      (has-property? 'one)     abstract-matrix?)
-(assign-operation generic:identity? (has-property? 'one)     abstract-matrix?)
+(assign-operation 'zero?     (has-property? 'zero)    abstract-matrix?)
+(assign-operation 'one?      (has-property? 'one)     abstract-matrix?)
+(assign-operation 'identity? (has-property? 'one)     abstract-matrix?)
 
-(assign-operation generic:negate     (make-matrix-combination 'negate)     abstract-matrix?)
-(assign-operation generic:invert  (make-matrix-combination 'invert) square-abstract-matrix?)
+(assign-operation 'negate     (make-matrix-combination 'negate)     abstract-matrix?)
+(assign-operation 'invert  (make-matrix-combination 'invert) square-abstract-matrix?)
 
-(assign-operation generic:conjugate  (make-matrix-combination 'conjugate)  abstract-matrix?)
-(assign-operation generic:exp        (make-matrix-combination 'exp) square-abstract-matrix?)
-(assign-operation generic:sin        (make-matrix-combination 'sin) square-abstract-matrix?)
-(assign-operation generic:cos        (make-matrix-combination 'cos) square-abstract-matrix?)
+(assign-operation 'conjugate  (make-matrix-combination 'conjugate)  abstract-matrix?)
+(assign-operation 'exp        (make-matrix-combination 'exp) square-abstract-matrix?)
+(assign-operation 'sin        (make-matrix-combination 'sin) square-abstract-matrix?)
+(assign-operation 'cos        (make-matrix-combination 'cos) square-abstract-matrix?)
 
 
-;(assign-operation generic:=          matrix=matrix         abstract-matrix? abstract-matrix?)
+;(assign-operation '=          matrix=matrix         abstract-matrix? abstract-matrix?)
 
-(assign-operation generic:+ (make-matrix-combination '+)    abstract-matrix? abstract-matrix?)
-(assign-operation generic:+ (make-matrix-combination '+)    matrix?          abstract-matrix?)
-(assign-operation generic:+ (make-matrix-combination '+ 'r) abstract-matrix? matrix?)
-(assign-operation generic:+ (make-matrix-combination '+)    scalar?   square-abstract-matrix?)
-(assign-operation generic:+ (make-matrix-combination '+ 'r) square-abstract-matrix? scalar?)
+(assign-operation '+ (make-matrix-combination '+)    abstract-matrix? abstract-matrix?)
+(assign-operation '+ (make-matrix-combination '+)    matrix?          abstract-matrix?)
+(assign-operation '+ (make-matrix-combination '+ 'r) abstract-matrix? matrix?)
+(assign-operation '+ (make-matrix-combination '+)    scalar?   square-abstract-matrix?)
+(assign-operation '+ (make-matrix-combination '+ 'r) square-abstract-matrix? scalar?)
 
-(assign-operation generic:- (make-matrix-combination '-)    abstract-matrix? abstract-matrix?)
-(assign-operation generic:- (make-matrix-combination '-)    matrix?          abstract-matrix?)
-(assign-operation generic:- (make-matrix-combination '-)    abstract-matrix? matrix?)
-(assign-operation generic:- (make-matrix-combination '-)    scalar?   square-abstract-matrix?)
-(assign-operation generic:- (make-matrix-combination '-)    square-abstract-matrix? scalar?)
+(assign-operation '- (make-matrix-combination '-)    abstract-matrix? abstract-matrix?)
+(assign-operation '- (make-matrix-combination '-)    matrix?          abstract-matrix?)
+(assign-operation '- (make-matrix-combination '-)    abstract-matrix? matrix?)
+(assign-operation '- (make-matrix-combination '-)    scalar?   square-abstract-matrix?)
+(assign-operation '- (make-matrix-combination '-)    square-abstract-matrix? scalar?)
 
-(assign-operation generic:* (make-matrix-combination '*)    abstract-matrix? abstract-matrix?)
-(assign-operation generic:* (make-matrix-combination '*)    matrix?          abstract-matrix?)
-(assign-operation generic:* (make-matrix-combination '*)    abstract-matrix? matrix?)
-(assign-operation generic:* (make-matrix-combination '*)    scalar?          abstract-matrix?)
-(assign-operation generic:* (make-matrix-combination '* 'r) abstract-matrix? scalar?)
+(assign-operation '* (make-matrix-combination '*)    abstract-matrix? abstract-matrix?)
+(assign-operation '* (make-matrix-combination '*)    matrix?          abstract-matrix?)
+(assign-operation '* (make-matrix-combination '*)    abstract-matrix? matrix?)
+(assign-operation '* (make-matrix-combination '*)    scalar?          abstract-matrix?)
+(assign-operation '* (make-matrix-combination '* 'r) abstract-matrix? scalar?)
 
-(assign-operation generic:/ (make-matrix-combination '/) abstract-matrix? square-abstract-matrix?)
-(assign-operation generic:/ (make-matrix-combination '/) matrix?          square-abstract-matrix?)
-(assign-operation generic:/ (make-matrix-combination '/) abstract-matrix? square-matrix?)
-(assign-operation generic:/ (make-matrix-combination '/) scalar?          square-abstract-matrix?)
-(assign-operation generic:/ (make-matrix-combination '/) abstract-matrix? scalar?)
-(assign-operation generic:/ (make-matrix-combination '/) vector-quantity? square-abstract-matrix?)
+(assign-operation '/ (make-matrix-combination '/) abstract-matrix? square-abstract-matrix?)
+(assign-operation '/ (make-matrix-combination '/) matrix?          square-abstract-matrix?)
+(assign-operation '/ (make-matrix-combination '/) abstract-matrix? square-matrix?)
+(assign-operation '/ (make-matrix-combination '/) scalar?          square-abstract-matrix?)
+(assign-operation '/ (make-matrix-combination '/) abstract-matrix? scalar?)
+(assign-operation '/ (make-matrix-combination '/) vector-quantity? square-abstract-matrix?)
 
-(assign-operation generic:expt
+(assign-operation 'expt
                   (make-matrix-combination 'expt) square-abstract-matrix? exact-integer?)
 
-(assign-operation generic:partial-derivative
+(assign-operation 'partial-derivative
   (make-matrix-combination 'partial-derivative)
   abstract-matrix? any?)
 
-;(assign-operation generic:apply   m:apply                abstract-matrix? any?)
+;(assign-operation 'apply   m:apply                abstract-matrix? any?)

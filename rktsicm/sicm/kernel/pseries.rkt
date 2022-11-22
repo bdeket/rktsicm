@@ -281,61 +281,61 @@
 (define (series:one-like x)   series:one)
 
 
-(assign-operation generic:type             series:type             series?)
-(assign-operation generic:type-predicate   series:type-predicate   series?)
-(assign-operation generic:arity      series:arity                  series?)
+(assign-operation 'type             series:type             series?)
+(assign-operation 'type-predicate   series:type-predicate   series?)
+(assign-operation 'arity      series:arity                  series?)
 #|
-(assign-operation generic:one        series:one           series?)
-(assign-operation generic:zero       series:zero          series?)
-(assign-operation generic:identity   series:identity      series?)
+(assign-operation 'one        series:one           series?)
+(assign-operation 'zero       series:zero          series?)
+(assign-operation 'identity   series:identity      series?)
 |#
-(assign-operation generic:zero-like  series:zero-like     series?)
-(assign-operation generic:one-like   series:one-like      series?)
+(assign-operation 'zero-like  series:zero-like     series?)
+(assign-operation 'one-like   series:one-like      series?)
 
-(assign-operation generic:negate     series:negate        series?)
-(assign-operation generic:invert     series:invert        series?)
+(assign-operation 'negate     series:negate        series?)
+(assign-operation 'invert     series:invert        series?)
 
-(assign-operation generic:+          series:add           series?        series?)
-(assign-operation generic:+          coefficient+series   not-series?    series?)
-(assign-operation generic:+          series+coefficient   series?        not-series?)
+(assign-operation '+          series:add           series?        series?)
+(assign-operation '+          coefficient+series   not-series?    series?)
+(assign-operation '+          series+coefficient   series?        not-series?)
 
-(assign-operation generic:-          series:sub           series?        series?)
-(assign-operation generic:-          coefficient-series   not-series?    series?)
-(assign-operation generic:-          series-coefficient   series?        not-series?)
+(assign-operation '-          series:sub           series?        series?)
+(assign-operation '-          coefficient-series   not-series?    series?)
+(assign-operation '-          series-coefficient   series?        not-series?)
 
-(assign-operation generic:*          series:mul           series?        series?)
-(assign-operation generic:*          coefficient*series   not-series?    series?)
-(assign-operation generic:*          series*coefficient   series?        not-series?)
+(assign-operation '*          series:mul           series?        series?)
+(assign-operation '*          coefficient*series   not-series?    series?)
+(assign-operation '*          series*coefficient   series?        not-series?)
 
-(assign-operation generic:/          series:div           series?        series?)
-(assign-operation generic:/          coefficient/series   not-series?    series?)
-(assign-operation generic:/          series/coefficient   series?        not-series?)
+(assign-operation '/          series:div           series?        series?)
+(assign-operation '/          coefficient/series   not-series?    series?)
+(assign-operation '/          series/coefficient   series?        not-series?)
 
 
-(assign-operation generic:solve-linear-right       series:div           series?        series?)
-(assign-operation generic:solve-linear-right       coefficient/series   not-series?    series?)
-(assign-operation generic:solve-linear-right       series/coefficient   series?        not-series?)
+(assign-operation 'solve-linear-right       series:div           series?        series?)
+(assign-operation 'solve-linear-right       coefficient/series   not-series?    series?)
+(assign-operation 'solve-linear-right       series/coefficient   series?        not-series?)
 
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
                   (lambda (x y) (series:div y x))         series?  series?)
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
                   (lambda (x y) (series/coefficient y x)) series?  not-series?)
-(assign-operation generic:solve-linear-left
+(assign-operation 'solve-linear-left
                   (lambda (x y) (coefficient/series y x)) not-series?  series?)
 
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
                   (lambda (x y) (series:div y x))         series?     series?)
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
                   (lambda (x y) (series/coefficient y x)) series?     not-series?)
-(assign-operation generic:solve-linear
+(assign-operation 'solve-linear
                   (lambda (x y) (coefficient/series y x)) not-series? series?)
 
-(assign-operation generic:expt       series:expt          series?        exact-integer?)
+(assign-operation 'expt       series:expt          series?        exact-integer?)
 
-;(assign-operation generic:exp       exp-series           operator?)
+;(assign-operation 'exp       exp-series           operator?)
 
-(assign-operation generic:partial-derivative series:derivative    series? any?)
-(assign-operation generic:apply              series:value         series? any?)
+(assign-operation 'partial-derivative series:derivative    series? any?)
+(assign-operation 'apply              series:value         series? any?)
 
 
 

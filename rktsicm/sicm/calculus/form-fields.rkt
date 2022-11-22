@@ -45,14 +45,14 @@
 	   (operator-arity op)
 	   (operator-optionals op)))
 
-(assign-operation generic:zero-like ff:zero-like form-field?)
+(assign-operation 'zero-like ff:zero-like form-field?)
 
 
 (define (ff:zero? ff)
   (assert (form-field? ff) "ff:zero?")
   (eq? (operator-procedure ff) ff:zero))
 
-(assign-operation generic:zero? ff:zero? form-field?)
+(assign-operation 'zero? ff:zero? form-field?)
 
 
 ;;; A 1form is specified by a function that gives components, in a

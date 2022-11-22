@@ -1568,4 +1568,4 @@
   (coordinate-system-at 'gnomic 'north-pole S2))
 
 
-(assign-operation g:dimension (lambda (x) (coordinate-system-dimension x)))
+(assign-operation 'dimension (lambda (x) (coordinate-system-dimension x)))

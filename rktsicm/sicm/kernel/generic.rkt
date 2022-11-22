@@ -19,7 +19,7 @@
       (s:transpose1 thing shape)))
 
 ;moved to calculus/manifold
-#;(assign-operation g:dimension (lambda (x) (coordinate-system-dimension x)))
+#;(assign-operation 'dimension (lambda (x) (coordinate-system-dimension x)))
 
 ;;; Binary Operators
 

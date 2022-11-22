@@ -15,9 +15,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\Lie.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\SR-boost.rkt" test)
-f:\PortableApps\Racket\raco.bat : --------------------
+F:\PortableApps\Racket\raco.bat : --------------------
 At line:1 char:1
-+ f:\PortableApps\Racket\raco.bat test .\sicm\ 2>&1 > ..\testrun.txt
++ F:\PortableApps\Racket\raco.bat test .\sicm\ 2>&1 > ..\testrun.txt
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (--------------------:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8282 real time: 8270 gc time: 314
+cpu time: 10719 real time: 10738 gc time: 373
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 35343 real time: 35374 gc time: 138
-cpu time: 23907 real time: 23914 gc time: 156
-cpu time: 2937 real time: 2941 gc time: 15
+cpu time: 44859 real time: 44917 gc time: 283
+cpu time: 30125 real time: 30179 gc time: 220
+cpu time: 3672 real time: 3684 gc time: 32
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run

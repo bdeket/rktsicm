@@ -165,21 +165,21 @@
 
 
 
-(assign-operation generic:invert          mod:invert         modint?)
+(assign-operation 'invert          mod:invert         modint?)
 
 
-(assign-operation generic:+               mod:+              modint?  modint?)
-(assign-operation generic:-               mod:-              modint?  modint?)
-(assign-operation generic:*               mod:*              modint?  modint?)
-(assign-operation generic:/               mod:/              modint?  modint?)
+(assign-operation '+               mod:+              modint?  modint?)
+(assign-operation '-               mod:-              modint?  modint?)
+(assign-operation '*               mod:*              modint?  modint?)
+(assign-operation '/               mod:/              modint?  modint?)
 
-(assign-operation generic:solve-linear-right  mod:/                  modint?  modint?)
-(assign-operation generic:solve-linear-left   (lambda (x y) (mod:/ y x))  modint?  modint?)
-(assign-operation generic:solve-linear        (lambda (x y) (mod:/ y x))  modint?  modint?)
+(assign-operation 'solve-linear-right  mod:/                  modint?  modint?)
+(assign-operation 'solve-linear-left   (lambda (x y) (mod:/ y x))  modint?  modint?)
+(assign-operation 'solve-linear        (lambda (x y) (mod:/ y x))  modint?  modint?)
 
-(assign-operation generic:expt            mod:expt           modint?  modint?)
+(assign-operation 'expt            mod:expt           modint?  modint?)
 
-(assign-operation generic:=               mod:=              modint?  modint?)
+(assign-operation '=               mod:=              modint?  modint?)
 
 #|
 (define (test p)

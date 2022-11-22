@@ -17,12 +17,12 @@
 (define (g:identity x) x)
 ;< from mathutil.scm
 
-(assign-operation g:identity-like (lambda (x) g:identity))
+(assign-operation 'identity-like (lambda (x) g:identity))
 
 ;;; Generic tests are conservative.  
 ;;; They will return #f unless the answer is known true.
 
-(assign-operation g:square (lambda (x) (g:* x x)))
+(assign-operation 'square (lambda (x) (g:* x x)))
 
 (define g:derivative
   (make-operator

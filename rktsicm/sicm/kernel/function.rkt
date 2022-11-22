@@ -81,108 +81,108 @@
 
 (define (f:identity-like f) g:identity)
 
-(assign-operation generic:type            f:type            function?)
-(assign-operation generic:type-predicate  f:type-predicate  function?)
-(assign-operation generic:arity           f:arity           function?)
+(assign-operation 'type            f:type            function?)
+(assign-operation 'type-predicate  f:type-predicate  function?)
+(assign-operation 'arity           f:arity           function?)
 
-(assign-operation generic:inexact?        (f:unary g:inexact?)       function?)
+(assign-operation 'inexact?        (f:unary g:inexact?)       function?)
 
-(assign-operation generic:zero-like       f:zero-like                function?)
-(assign-operation generic:one-like        f:one-like                 function?)
-(assign-operation generic:identity-like   f:identity-like            function?)
+(assign-operation 'zero-like       f:zero-like                function?)
+(assign-operation 'one-like        f:one-like                 function?)
+(assign-operation 'identity-like   f:identity-like            function?)
 
 ;;; The following tests conflict with the conservative theory of
 ;;; generic predicates in that they return a new procedure with a
 ;;; deferred test rather than #f, because they cannot know the
 ;;; result.  Indeed, a user may write (compose zero? f) if necessary.
 
-;;;(assign-operation generic:zero?           (f:unary g:zero?)          function?)
-;;;(assign-operation generic:one?            (f:unary g:one?)           function?)
-;;;(assign-operation generic:identity?       (f:unary g:identity?)      function?)
+;;;(assign-operation 'zero?           (f:unary g:zero?)          function?)
+;;;(assign-operation 'one?            (f:unary g:one?)           function?)
+;;;(assign-operation 'identity?       (f:unary g:identity?)      function?)
 
-(assign-operation generic:negate          (f:unary g:negate)         function?)
-(assign-operation generic:invert          (f:unary g:invert)         function?)
+(assign-operation 'negate          (f:unary g:negate)         function?)
+(assign-operation 'invert          (f:unary g:invert)         function?)
 
-(assign-operation generic:sqrt            (f:unary g:sqrt)           function?)
-(assign-operation generic:square          (f:unary g:square)         function?)
+(assign-operation 'sqrt            (f:unary g:sqrt)           function?)
+(assign-operation 'square          (f:unary g:square)         function?)
 
-(assign-operation generic:exp             (f:unary g:exp)            function?)
-(assign-operation generic:log             (f:unary g:log)            function?)
+(assign-operation 'exp             (f:unary g:exp)            function?)
+(assign-operation 'log             (f:unary g:log)            function?)
 
-(assign-operation generic:sin             (f:unary g:sin)            function?)
-(assign-operation generic:cos             (f:unary g:cos)            function?)
+(assign-operation 'sin             (f:unary g:sin)            function?)
+(assign-operation 'cos             (f:unary g:cos)            function?)
 
-(assign-operation generic:asin            (f:unary g:asin)           function?)
-(assign-operation generic:acos            (f:unary g:acos)           function?)
+(assign-operation 'asin            (f:unary g:asin)           function?)
+(assign-operation 'acos            (f:unary g:acos)           function?)
 
-(assign-operation generic:sinh            (f:unary g:sinh)           function?)
-(assign-operation generic:cosh            (f:unary g:cosh)           function?)
+(assign-operation 'sinh            (f:unary g:sinh)           function?)
+(assign-operation 'cosh            (f:unary g:cosh)           function?)
 
-(assign-operation generic:abs             (f:unary g:abs)            function?)
+(assign-operation 'abs             (f:unary g:abs)            function?)
 
-(assign-operation generic:determinant     (f:unary g:determinant)    function?)
-(assign-operation generic:trace           (f:unary g:trace)          function?)
+(assign-operation 'determinant     (f:unary g:determinant)    function?)
+(assign-operation 'trace           (f:unary g:trace)          function?)
 
 ;;; Binary operations on functions are a bit weird.  A special predicate
 ;;; are needed to make the correct coercions possible:
 
 ;;; Tests must be conservative.
-;;;(assign-operation generic:=               (f:binary g:=)             function? function?)
+;;;(assign-operation '=               (f:binary g:=)             function? function?)
 
-(assign-operation generic:+                  (f:binary g:+)             function? cofunction?)
-(assign-operation generic:+                  (f:binary g:+)             cofunction? function?)
-(assign-operation generic:-                  (f:binary g:-)             function? cofunction?)
-(assign-operation generic:-                  (f:binary g:-)             cofunction? function?)
-(assign-operation generic:*                  (f:binary g:*)             function? cofunction?)
-(assign-operation generic:*                  (f:binary g:*)             cofunction? function?)
-(assign-operation generic:/                  (f:binary g:/)             function? cofunction?)
-(assign-operation generic:/                  (f:binary g:/)             cofunction? function?)
+(assign-operation '+                  (f:binary g:+)             function? cofunction?)
+(assign-operation '+                  (f:binary g:+)             cofunction? function?)
+(assign-operation '-                  (f:binary g:-)             function? cofunction?)
+(assign-operation '-                  (f:binary g:-)             cofunction? function?)
+(assign-operation '*                  (f:binary g:*)             function? cofunction?)
+(assign-operation '*                  (f:binary g:*)             cofunction? function?)
+(assign-operation '/                  (f:binary g:/)             function? cofunction?)
+(assign-operation '/                  (f:binary g:/)             cofunction? function?)
 
-(assign-operation generic:dot-product        (f:binary g:dot-product)   function? cofunction?)
-(assign-operation generic:dot-product        (f:binary g:dot-product)   cofunction? function?)
+(assign-operation 'dot-product        (f:binary g:dot-product)   function? cofunction?)
+(assign-operation 'dot-product        (f:binary g:dot-product)   cofunction? function?)
 
-(assign-operation generic:cross-product      (f:binary g:cross-product)   function? cofunction?)
-(assign-operation generic:cross-product      (f:binary g:cross-product)   cofunction? function?)
+(assign-operation 'cross-product      (f:binary g:cross-product)   function? cofunction?)
+(assign-operation 'cross-product      (f:binary g:cross-product)   cofunction? function?)
 
-(assign-operation generic:expt               (f:binary g:expt)          function? cofunction?)
-(assign-operation generic:expt               (f:binary g:expt)          cofunction? function?)
+(assign-operation 'expt               (f:binary g:expt)          function? cofunction?)
+(assign-operation 'expt               (f:binary g:expt)          cofunction? function?)
 
-(assign-operation generic:gcd                (f:binary g:gcd)           function? cofunction?)
-(assign-operation generic:gcd                (f:binary g:gcd)           cofunction? function?)
+(assign-operation 'gcd                (f:binary g:gcd)           function? cofunction?)
+(assign-operation 'gcd                (f:binary g:gcd)           cofunction? function?)
 
-(assign-operation generic:make-rectangular   (f:binary g:make-rectangular)
+(assign-operation 'make-rectangular   (f:binary g:make-rectangular)
 	                                                        function? cofunction?)
-(assign-operation generic:make-rectangular   (f:binary g:make-rectangular)
+(assign-operation 'make-rectangular   (f:binary g:make-rectangular)
 	                                                        cofunction? function?)
 
-(assign-operation generic:make-polar         (f:binary g:make-polar)    function? cofunction?)
-(assign-operation generic:make-polar         (f:binary g:make-polar)    cofunction? function?)
+(assign-operation 'make-polar         (f:binary g:make-polar)    function? cofunction?)
+(assign-operation 'make-polar         (f:binary g:make-polar)    cofunction? function?)
 
-(assign-operation generic:real-part          (f:unary g:real-part)      function?)
-(assign-operation generic:imag-part          (f:unary g:imag-part)      function?)
-(assign-operation generic:magnitude          (f:unary g:magnitude)      function?)
-(assign-operation generic:angle              (f:unary g:angle)          function?)
+(assign-operation 'real-part          (f:unary g:real-part)      function?)
+(assign-operation 'imag-part          (f:unary g:imag-part)      function?)
+(assign-operation 'magnitude          (f:unary g:magnitude)      function?)
+(assign-operation 'angle              (f:unary g:angle)          function?)
 
-;(assign-operation generic:conjugate         (f:unary g:conjugate)      function?)
+;(assign-operation 'conjugate         (f:unary g:conjugate)      function?)
 
-(assign-operation generic:atan1              (f:unary g:atan)           function?)
-(assign-operation generic:atan2              (f:binary g:atan)          function? cofunction?)
-(assign-operation generic:atan2              (f:binary g:atan)          cofunction? function?)
+(assign-operation 'atan1              (f:unary g:atan)           function?)
+(assign-operation 'atan2              (f:binary g:atan)          function? cofunction?)
+(assign-operation 'atan2              (f:binary g:atan)          cofunction? function?)
 
-(assign-operation generic:solve-linear-right (f:binary g:solve-linear-right)  function? cofunction?)
-(assign-operation generic:solve-linear-right (f:binary g:solve-linear-right)  cofunction? function?)
+(assign-operation 'solve-linear-right (f:binary g:solve-linear-right)  function? cofunction?)
+(assign-operation 'solve-linear-right (f:binary g:solve-linear-right)  cofunction? function?)
 
-(assign-operation generic:solve-linear-left  (f:binary g:solve-linear-left)  cofunction? function?)
-(assign-operation generic:solve-linear-left  (f:binary g:solve-linear-left)  function? cofunction?)
+(assign-operation 'solve-linear-left  (f:binary g:solve-linear-left)  cofunction? function?)
+(assign-operation 'solve-linear-left  (f:binary g:solve-linear-left)  function? cofunction?)
 
-(assign-operation generic:solve-linear      (f:binary g:solve-linear)  cofunction? function?)
-(assign-operation generic:solve-linear      (f:binary g:solve-linear)  function? cofunction?)
+(assign-operation 'solve-linear      (f:binary g:solve-linear)  cofunction? function?)
+(assign-operation 'solve-linear      (f:binary g:solve-linear)  function? cofunction?)
 
 ;;; This only makes sense for linear functions...
 (define (((f:transpose f) g) a)
   (g (f a)))
 
-(assign-operation generic:transpose          f:transpose                function?)
+(assign-operation 'transpose          f:transpose                function?)
 
 #|
 ;;; 

@@ -152,65 +152,65 @@
   
 
 
-(assign-operation generic:negate          sigfun:negate         sigfun?)
-(assign-operation generic:invert          sigfun:invert         sigfun?)
+(assign-operation 'negate          sigfun:negate         sigfun?)
+(assign-operation 'invert          sigfun:invert         sigfun?)
 
-(assign-operation generic:sqrt            sigfun:sqrt           sigfun?)
-(assign-operation generic:square          sigfun:square         sigfun?)
+(assign-operation 'sqrt            sigfun:sqrt           sigfun?)
+(assign-operation 'square          sigfun:square         sigfun?)
 
-(assign-operation generic:exp             sigfun:exp            sigfun?)
-(assign-operation generic:log             sigfun:log            sigfun?)
+(assign-operation 'exp             sigfun:exp            sigfun?)
+(assign-operation 'log             sigfun:log            sigfun?)
 
-(assign-operation generic:sin             sigfun:sin            sigfun?)
-(assign-operation generic:cos             sigfun:cos            sigfun?)
+(assign-operation 'sin             sigfun:sin            sigfun?)
+(assign-operation 'cos             sigfun:cos            sigfun?)
 
-(assign-operation generic:asin            sigfun:asin           sigfun?)
-(assign-operation generic:acos            sigfun:acos           sigfun?)
+(assign-operation 'asin            sigfun:asin           sigfun?)
+(assign-operation 'acos            sigfun:acos           sigfun?)
 
-(assign-operation generic:sinh            sigfun:sinh           sigfun?)
-(assign-operation generic:cosh            sigfun:cosh           sigfun?)
+(assign-operation 'sinh            sigfun:sinh           sigfun?)
+(assign-operation 'cosh            sigfun:cosh           sigfun?)
 
-(assign-operation generic:+               sigfun:+              sigfun?  sigfun?)
-(assign-operation generic:-               sigfun:-              sigfun?  sigfun?)
-(assign-operation generic:*               sigfun:*              sigfun?  sigfun?)
-(assign-operation generic:*               sigfun:scale          number?  sigfun?)
-(assign-operation generic:*               sigfun:scale2         sigfun?  number?)
+(assign-operation '+               sigfun:+              sigfun?  sigfun?)
+(assign-operation '-               sigfun:-              sigfun?  sigfun?)
+(assign-operation '*               sigfun:*              sigfun?  sigfun?)
+(assign-operation '*               sigfun:scale          number?  sigfun?)
+(assign-operation '*               sigfun:scale2         sigfun?  number?)
 
-(assign-operation generic:/               sigfun:/              sigfun?  sigfun?)
-(assign-operation generic:/               sigfun:scale3         number?  sigfun?)
-(assign-operation generic:/               sigfun:scale4         sigfun?  number?)
+(assign-operation '/               sigfun:/              sigfun?  sigfun?)
+(assign-operation '/               sigfun:scale3         number?  sigfun?)
+(assign-operation '/               sigfun:scale4         sigfun?  number?)
 
-(assign-operation generic:solve-linear-right    sigfun:/              sigfun?  sigfun?)
-(assign-operation generic:solve-linear-right    sigfun:scale3         number?  sigfun?)
-(assign-operation generic:solve-linear-right    sigfun:scale4         sigfun?  number?)
+(assign-operation 'solve-linear-right    sigfun:/              sigfun?  sigfun?)
+(assign-operation 'solve-linear-right    sigfun:scale3         number?  sigfun?)
+(assign-operation 'solve-linear-right    sigfun:scale4         sigfun?  number?)
 
-(assign-operation generic:solve-linear-left  (lambda (x y) (sigfun:/ y x))       sigfun?  sigfun?)
-(assign-operation generic:solve-linear-left  (lambda (x y) (sigfun:scale3 y x))  sigfun?  number?)
-(assign-operation generic:solve-linear-left  (lambda (x y) (sigfun:scale4 y x))  number?  sigfun?)
+(assign-operation 'solve-linear-left  (lambda (x y) (sigfun:/ y x))       sigfun?  sigfun?)
+(assign-operation 'solve-linear-left  (lambda (x y) (sigfun:scale3 y x))  sigfun?  number?)
+(assign-operation 'solve-linear-left  (lambda (x y) (sigfun:scale4 y x))  number?  sigfun?)
 
-(assign-operation generic:solve-linear  (lambda (x y) (sigfun:/ y x))       sigfun?  sigfun?)
-(assign-operation generic:solve-linear  (lambda (x y) (sigfun:scale3 y x))  sigfun?  number?)
-(assign-operation generic:solve-linear  (lambda (x y) (sigfun:scale4 y x))  number?  sigfun?)
+(assign-operation 'solve-linear  (lambda (x y) (sigfun:/ y x))       sigfun?  sigfun?)
+(assign-operation 'solve-linear  (lambda (x y) (sigfun:scale3 y x))  sigfun?  number?)
+(assign-operation 'solve-linear  (lambda (x y) (sigfun:scale4 y x))  number?  sigfun?)
 
-(assign-operation generic:expt            sigfun:expt           sigfun?  sigfun?)
-(assign-operation generic:expt            sigfun:expt2          number?  sigfun?)
-(assign-operation generic:expt            sigfun:expt3          sigfun?  number?)
+(assign-operation 'expt            sigfun:expt           sigfun?  sigfun?)
+(assign-operation 'expt            sigfun:expt2          number?  sigfun?)
+(assign-operation 'expt            sigfun:expt3          sigfun?  number?)
 
 
-(assign-operation generic:make-rectangular sigfun:make-rectangular  sigfun? sigfun?)
-(assign-operation generic:make-polar       sigfun:make-polar        sigfun? sigfun?)
+(assign-operation 'make-rectangular sigfun:make-rectangular  sigfun? sigfun?)
+(assign-operation 'make-polar       sigfun:make-polar        sigfun? sigfun?)
 
-(assign-operation generic:real-part        sigfun:real-part      sigfun?)
-(assign-operation generic:imag-part        sigfun:imag-part      sigfun?)
-(assign-operation generic:magnitude        sigfun:magnitude      sigfun?)
-(assign-operation generic:angle            sigfun:angle          sigfun?)
+(assign-operation 'real-part        sigfun:real-part      sigfun?)
+(assign-operation 'imag-part        sigfun:imag-part      sigfun?)
+(assign-operation 'magnitude        sigfun:magnitude      sigfun?)
+(assign-operation 'angle            sigfun:angle          sigfun?)
 
-(assign-operation generic:conjugate        sigfun:conjugate      sigfun?)
+(assign-operation 'conjugate        sigfun:conjugate      sigfun?)
 
-(assign-operation generic:atan1            sigfun:atan           sigfun?)
-(assign-operation generic:atan2            sigfun:atan2          sigfun? sigfun?)
+(assign-operation 'atan1            sigfun:atan           sigfun?)
+(assign-operation 'atan2            sigfun:atan2          sigfun? sigfun?)
 
-(assign-operation generic:apply            sigfun:apply          sigfun? any?)
+(assign-operation 'apply            sigfun:apply          sigfun? any?)
 
 
 #|
