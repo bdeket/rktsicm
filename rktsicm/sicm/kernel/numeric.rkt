@@ -2,7 +2,7 @@
 
 (provide (all-defined-out)
          conjugate
-         (all-from-out (submod "../general/permute.rkt" for-num))
+         (all-from-out "../general/permute.rkt")
          )
 
 (require "../rkt/fixnum.rkt"
@@ -11,7 +11,7 @@
          "../general/assert.rkt"
          "../general/memoize.rkt"
          (only-in racket/math conjugate)
-         (submod "../general/permute.rkt" for-num)
+         (only-in "../general/permute.rkt" exact-quotient binomial-coefficient factorial)
          )
 (define (exact-rational? x) (and (real? x) (exact? x)))
 (define-values (integer-divide integer-divide-quotient integer-divide-remainder)
@@ -71,6 +71,7 @@
 (define :2pi 2pi)
 (define :+2pi 2pi)
 (define :-2pi -2pi)
+
 
 ;;; *machine-epsilon* is the smallest number that when added to 1.0
 ;;;  gives a different number.
@@ -331,15 +332,35 @@
     (if (fix:> i high)
 	sum
 	(lp (fix:+ i 1) (+ sum (f i))))))
-|#
 
-(define (sigma f low high)
+
+(define (sigma-Kahan f low high)
   (let lp ((i low) (sum 0) (c 0))
     (if (fix:> i high)
 	sum
 	(let* ((y (- (f i) c)) (t (+ sum y)))
 	  (lp (fix:+ i 1) t (- (- t sum) y))))))
 
+#The following version is better.
+|#
+
+(define (sigma-KahanBabushkaNeumaier f low high)
+  (let lp ((i low) (sum 0) (c 0))
+    (if (fix:> i high)
+	(+ sum c)
+        (let ((fv (f i)))
+          (let ((t (+ sum fv)))
+            (lp (+ i 1)
+                t
+                (+ (if (>= (abs sum) (abs fv))
+                       (+ (- sum t) fv)
+                       (+ (- fv t) sum))
+                   c)))))))
+
+
+;;; I adopt skbn:
+
+(define sigma sigma-KahanBabushkaNeumaier)
 #|
 ;;; When adding up 1/n large-to-small we
 ;;; get a different answer than when adding 
@@ -411,7 +432,7 @@
 
 #|
 (define (geometric a r n)
-  (define (sigma-kahan f low high)
+  (define (sigma-KahanBabushkaNeumaier f low high)
     (let lp ((i low) (sum 0) (c 0))
       (if (fix:> i high)
 	  sum
@@ -432,8 +453,8 @@
 	(write-line `(reverse-order ,sum))
 	(lp< (- k 1) (+ sum (* a (expt r k))))))
   (write-line
-   `(kahan-method
-     ,(sigma-kahan
+   `(sigma-KahanBabushkaNeumaier
+     ,(sigma-KahanBabushkaNeumaier
        (lambda (k)
 	 (exact->inexact (* a (expt r k))))
        0 n)))  

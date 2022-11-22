@@ -1,7 +1,6 @@
 #lang racket/base
 
 (provide (all-defined-out))
-(module+ for-num (provide exact-quotient binomial-coefficient))
 
 (require "../rkt/fixnum.rkt"
          (only-in racket/list index-of)
