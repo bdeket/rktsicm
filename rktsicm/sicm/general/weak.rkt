@@ -3,24 +3,30 @@
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
+         "../rkt/if.rkt"
          (only-in "../rkt/todo.rkt" todo set-car! set-cdr!))
 
 (todo clean-expression-table "canonicalizer")
 
-;;;; Weak list utilities
+(define gc-reclaimed-object (gensym))
+(define (gc-reclaimed-object? v) (eq? gc-reclaimed-object v))
+
 (struct weak-pair (car cdr) #:transparent #:mutable)
 (define (weak-cons car cdr) (weak-pair (make-weak-box car) cdr))
-(define (weak-car W) (weak-box-value (weak-pair-car W)))
+(define (weak-car W) (weak-box-value (weak-pair-car W) gc-reclaimed-object))
 (define (weak-cdr W) (weak-pair-cdr W))
 (define (weak-set-cdr! W v) (set-weak-pair-cdr! W v))
 (define (weak-pair/car? W)
-  (define g (gensym 'gcd))
-  (not (eq? g (weak-box-value (weak-pair-car W) g))))
+  (not (gc-reclaimed-object? (weak-car W))))
 
 (define (list->weak-list lst)
   (if (pair? lst)
       (weak-cons (car lst) (list->weak-list (cdr lst)))
       lst))
+
+;;;; Weak list utilities
+
+;;; Looks for obj in a weak list.
 
 (define (get-weak-member obj weak-list)
   (if (null? weak-list)
@@ -30,18 +36,24 @@
 	    a
 	    (get-weak-member obj (weak-cdr weak-list))))))
 
+
+;;; Looks for obj as the key in a weak alist.
+;;;  The weak alist has a backbone that is a strong list
+;;;    with weak pair entries.
+
 (define (weak-find obj weak-alist)
   (if (null? weak-alist)
       #f
       (let ((pair (car weak-alist)))
-	(if pair
+	(if pair                        ;not dead pair
 	    (let ((a (weak-car pair)))
-	      (if a
+	      (if (gc-reclaimed-object? a)
+		  (begin (set-car! weak-alist #f)
+			 #f)            ;kill this pair
 		  (if (equal? obj a)
 		      a
-		      (weak-find obj (cdr weak-alist)))
-		  (begin (set-car! weak-alist #f)
-			 #f)))
+		      (weak-find obj
+                                 (cdr weak-alist)))))
 	    (weak-find obj (cdr weak-alist))))))
 
 (define (weak-length weak-list)
@@ -62,12 +74,13 @@
 	(let ((pair (car weak-alist)))
 	  (cond ((weak-pair? pair)
 		 (let ((a (weak-car pair)))
-		   (if a		; assumes no key is #f
-		       (if (same? obj a)
-			   (weak-cdr pair)
-			   (the-finder obj (cdr weak-alist)))
+		   (if (gc-reclaimed-object? a)
 		       (begin (set-car! weak-alist #f)
-			      #f))))
+			      #f)
+                       (if (same? obj a)
+			   (weak-cdr pair)
+			   (the-finder obj
+                                       (cdr weak-alist))))))
 		((pair? pair)
 		 (let ((a (car pair)))
 		   (if (same? obj a)
@@ -77,15 +90,9 @@
 		 (the-finder obj (cdr weak-alist)))))))
   the-finder)
 
-
 (define weak-find-equal? (weak-finder equal?))
-
-
 (define weak-find-eqv? (weak-finder eqv?))
-
-
 (define weak-find-eq? (weak-finder eq?))
-
 
 ;;; The following clips out dead linkages that have been clobbered by
 ;;; a weak finder (above).  It also limits the size of the alist to
@@ -106,31 +113,31 @@
   (let clean-head ((this weak-list))
     (if (weak-pair? this)
 	(let ((next (weak-cdr this)))
-	  (if (weak-pair/car? this)
+	  (if (gc-reclaimed-object? (weak-car this))
+	      (clean-head next)
 	      (begin
 		(let clean-tail ((this next) (prev this))
-		  (when (weak-pair? this)
+		  (if (weak-pair? this)
 		      (let ((next (weak-cdr this)))
-			(if (weak-pair/car? this)
-			    (clean-tail next this)
+			(if (gc-reclaimed-object? (weak-car this))
 			    (begin
 			      (weak-set-cdr! prev next)
-			      (clean-tail next prev))))))
-		this)
-	      (clean-head next)))
+			      (clean-tail next prev))
+			    (clean-tail next this)))))
+		this)))
 	this)))
 
 (define (clean-weak-alist weak-alist)
   (clean-alist weak-alist
 	       (lambda (p)
-		 (when (not (weak-pair? p))
+		 (if (not (weak-pair? p))
 		     (raise-argument-error 'clean-weak-alist "weak-alist" weak-alist))
-		 (weak-pair/car? p))))
+		 (not (gc-reclaimed-object? (weak-car p))))))
 
 (define (clean-subtable-alist alist)
   (clean-alist alist
                (lambda (p)
-                 (unless (pair? p)
+                 (if (not (pair? p))
                    (raise-argument-error 'clean-subtable-alist "weak-alist" alist))
                  (clean-expression-table (cdr p)))))
 
@@ -141,7 +148,7 @@
 	  (if (clean-association (car this))
 	      (begin
 		(let clean-tail ((this next) (prev this))
-		  (when (pair? this)
+		  (if (pair? this)
 		      (let ((next (cdr this)))
 			(if (clean-association (car this))
 			    (clean-tail next this)

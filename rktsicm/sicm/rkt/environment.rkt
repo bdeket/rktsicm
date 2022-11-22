@@ -98,3 +98,5 @@
                #:when (eq? object o))
     b))
 
+(define (nearest-repl/environment) (current-namespace))
+(define (environment? env) (namespace? env))
