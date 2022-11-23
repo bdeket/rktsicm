@@ -6,7 +6,7 @@
          "cstm/vectors.rkt"
          "../general/assert.rkt"
          "cstm/express.rkt"
-         "cstm/generic-apply.rkt"
+         "cstm/generic.rkt"
          "iterat.rkt"
          "numbers.rkt"
          "numeric.rkt"

@@ -32,11 +32,11 @@ params:
     (general-boost (R beta))
     (extended-rotation R))
    xi))
+1
 message:    "timeout = 3s => simplification/calculation too difficult?"
 location:   SR-boost.rkt:33:5
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-1
 raco test: (submod ".\\sicm\\tests\\calculus\\SR-frames.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 12390 real time: 12400 gc time: 362
+cpu time: 12063 real time: 12104 gc time: 407
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 56328 real time: 56767 gc time: 327
-cpu time: 35969 real time: 36222 gc time: 282
-cpu time: 4594 real time: 4599 gc time: 32
+cpu time: 49156 real time: 49164 gc time: 214
+cpu time: 32704 real time: 32709 gc time: 312
+cpu time: 4078 real time: 4083 gc time: 16
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -283,7 +283,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 391 real time: 381 gc time: 0
+cpu time: 344 real time: 346 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run

@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 (require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
-         "generic-extra.rkt"
+         "generic.rkt"
          "../numeric.rkt"
          "../types.rkt")
 

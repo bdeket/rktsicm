@@ -8,7 +8,7 @@
          "../general/list-utils.rkt"
          (only-in "../rkt/todo.rkt" bkpt)
          "cstm/express.rkt"
-         "cstm/generic-extra.rkt"
+         "cstm/generic.rkt"
          "iterat.rkt"
          "cstm/mathutil.rkt"
          "matrices.rkt"

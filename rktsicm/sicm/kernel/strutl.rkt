@@ -8,7 +8,7 @@
 (require racket/stream
          "../rkt/fixnum.rkt"
          (only-in racket/list make-list)
-         "cstm/generic-extra.rkt"
+         "cstm/generic.rkt"
          "numeric.rkt"
          "../rkt/int.rkt"
          (only-in "../rkt/todo.rkt" access ->environment))

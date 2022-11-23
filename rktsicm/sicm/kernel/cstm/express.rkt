@@ -2,6 +2,8 @@
 
 (provide (all-defined-out))
 
+(require "types.rkt")
+
 ;;; An abstract quantity may be have a type-tagged expression.
 
 (define (operator exp) (car exp))
@@ -52,7 +54,7 @@
 
 
 (define (make-numerical-literal expression)
-  (make-literal '*number* expression))
+  (make-literal number-type-tag expression))
 
 (define (make-real-literal expression)
   (let ((e (make-numerical-literal expression)))

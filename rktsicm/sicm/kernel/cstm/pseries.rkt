@@ -4,7 +4,7 @@
 
 (require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
-         "generic-extra.rkt"
+         "generic.rkt"
          "../strutl.rkt"
          "../types.rkt"
          "../utils.rkt")

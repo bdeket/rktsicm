@@ -1,11 +1,10 @@
 #lang racket/base
 
 (provide (all-defined-out)
-         (all-from-out "cstm/generic-apply.rkt")
-         make-assign-operations)
+         (all-from-out "cstm/generic.rkt"))
 
 ;;;; Primitive Generic Operation Declarations
-(require "cstm/generic-apply.rkt"
+(require "cstm/generic.rkt"
          "../rkt/default-object.rkt"
          "structs.rkt"
          "numbers.rkt"

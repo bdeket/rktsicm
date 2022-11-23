@@ -6,7 +6,6 @@
          racket/vector
          "s-operator.rkt"
          "../../general/list-utils.rkt"
-         "generic-extra.rkt"
          "matrices.rkt"
          "pseries.rkt"
          "structs.rkt"
@@ -14,14 +13,6 @@
          "../types.rkt"
          "../utils.rkt"
          )
-
-(define (g:sigma f low high)
-  (if (fix:> low high)
-      0
-      (let lp ((i (fix:+ low 1)) (sum (f low)))
-	(if (fix:> i high)
-	    sum
-	    (lp (fix:+ i 1) (g:+ sum (f i)))))))
 
 (define (ref-internal x selectors)
   (cond ((null? selectors) x)

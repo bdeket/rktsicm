@@ -5,7 +5,7 @@
 
 (require "../../rkt/fixnum.rkt"
          "pseries.rkt"
-         "generic-apply.rkt"
+         "generic.rkt"
          "../strutl.rkt"
          "../types.rkt"
          "../utils.rkt")

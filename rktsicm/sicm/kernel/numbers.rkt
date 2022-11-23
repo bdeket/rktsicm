@@ -11,7 +11,7 @@
          (only-in "../rkt/todo.rkt" symbolic-operators condition?)
          "cstm/diff.rkt"
          "express.rkt"
-         "cstm/generic-extra.rkt"
+         "cstm/generic.rkt"
          "iterat.rkt"
          "cstm/matrices.rkt"
          "numeric.rkt"

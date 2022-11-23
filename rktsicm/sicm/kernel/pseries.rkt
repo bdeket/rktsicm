@@ -6,7 +6,7 @@
 (require "../rkt/fixnum.rkt"
          "cstm/pseries+.rkt"
          "../general/assert.rkt"
-         "cstm/generic-apply.rkt"
+         "cstm/generic.rkt"
          "cstm/mathutil.rkt"
          "numeric.rkt"
          "strutl.rkt"

@@ -13,7 +13,7 @@
          "diff.rkt"
          "cstm/arity.rkt"
          "cstm/express.rkt"
-         "cstm/generic-apply.rkt"
+         "cstm/generic.rkt"
          "numsymb.rkt"
          "structs.rkt"
          "types.rkt"

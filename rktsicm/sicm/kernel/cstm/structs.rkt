@@ -6,7 +6,7 @@
          "../types.rkt"
          "../utils.rkt"
          "../iterat.rkt"
-         "generic-apply.rkt"
+         "generic.rkt"
          "vectors.rkt"
          "matrices.rkt"
          )

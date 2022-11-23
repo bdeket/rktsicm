@@ -4,7 +4,7 @@
 
 (require "../general/assert.rkt"
          "../rkt/int.rkt"
-         "cstm/generic-extra.rkt")
+         "cstm/generic.rkt")
 (define-values (assign-operation modarith:assign-operations)
   (make-assign-operations 'modarith))
 
