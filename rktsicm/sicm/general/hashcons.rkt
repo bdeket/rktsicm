@@ -2,6 +2,8 @@
 
 (provide (all-defined-out))
 
+(require "../rkt/hashtable.rkt")
+
 ;;;;         HashCONS
 ;;;  Apparently invented by Ershov 
 ;;;   (see CACM 1, 8, August 1958, pp. 3--6)
@@ -21,17 +23,20 @@
 
 ;;; HashCONS needs a fancy key-ephemeral hash table!
 
-#;(define (pair-eqv? u v)
+#;
+(define (pair-eqv? u v)
   (and (eqv? (car u) (car v))
        (eqv? (cdr u) (cdr v))))
 
-#;(define (pair-eqv-hash-mod key modulus)
+#;
+(define (pair-eqv-hash-mod key modulus)
   (fix:remainder
    (fix:xor (eqv-hash-mod (car key) modulus)
-          (eqv-hash-mod (cdr key) modulus))
+            (eqv-hash-mod (cdr key) modulus))
    modulus))
 
-#;(define the-cons-table
+#;
+(define the-cons-table
   ((hash-table-constructor
     (make-hash-table-type
      pair-eqv-hash-mod           ;hash-function
@@ -39,6 +44,28 @@
      #t                          ;rehash-after-gc?
      hash-table-entry-type:key-ephemeral ;entry-type
      ))))
+
+#;
+(define cons-unique
+    (let* ((cons                    ;the REAL cons
+          (access cons system-global-environment))
+         (the-test-pair (cons #f #f)))
+      (define (generator) the-test-pair)
+      (define (hashcons x y)
+        (set-car! the-test-pair x)
+        (set-cdr! the-test-pair y)
+        (let ((the-canonical-pair
+               (hash-table/intern! the-cons-table
+                                   the-test-pair
+                                   generator)))
+          (if (eq? the-canonical-pair the-test-pair)
+              ;; Test pair used; make a new one.
+              (set! the-test-pair (cons #f #f))
+              ;; Clear the test pair.
+              (begin (set-car! the-test-pair #f)
+                     (set-cdr! the-test-pair #f)))
+          the-canonical-pair))
+      hashcons))
 
 ;start new impl.
 (define (clean)
@@ -82,24 +109,6 @@
          (hash-set! the-cons-table x
                     (make-weak-hasheqv (list (cons y (make-weak-box the-cons)))))
          the-cons]))))
-#;(define cons-unique
-  (let* ((the-test-pair (cons #f #f)))
-    (define (generator) the-test-pair)
-    (define (hashcons x y)
-      (set-car! the-test-pair x)
-      (set-cdr! the-test-pair y)
-      (let ((the-canonical-pair
-             (hash-table/intern! the-cons-table
-                                 the-test-pair
-                                 generator)))
-        (if (eq? the-canonical-pair the-test-pair)
-            ;; Test pair used; make a new one.
-            (set! the-test-pair (cons #f #f))
-            ;; Clear the test pair.
-            (begin (set-car! the-test-pair #f)
-                   (set-cdr! the-test-pair #f)))
-        the-canonical-pair))
-    hashcons))
 
 (define hash-cons cons-unique)
 
@@ -111,9 +120,9 @@
     (cons-unique (canonical-copy (car x))
                  (canonical-copy (cdr x))))
   (if (pair? x)
-      (let ((v (hash-ref the-cons-table
-                         x
-                         #f)))
+      (let ((v (hash-table/get the-cons-table
+                               x
+                               #f)))
         (or v (recurse)))
       x))
 
@@ -140,29 +149,29 @@
 (define foo
   '(define (canonical-copy x)
      (if (pair? x)
-	 (let ((canonical-pair
-		(hash-table/get the-cons-table x #f)))
-	   (or canonical-pair
-	       (let ((new
-		      (cons (canonical-copy (car x))
-			    (canonical-copy (cdr x)))))
-		 (hash-table/put! the-cons-table new new)
-		 new)))
-	 x)))
+         (let ((canonical-pair
+                (hash-table/get the-cons-table x #f)))
+           (or canonical-pair
+               (let ((new
+                      (cons (canonical-copy (car x))
+                            (canonical-copy (cdr x)))))
+                 (hash-table/put! the-cons-table new new)
+                 new)))
+         x)))
 
 (define bar
   '(define cons-unique
      (let ((the-pair (cons #f #f)))  
        (define (hashcons x y)
-	 (set-car! the-pair x)
-	 (set-cdr! the-pair y)
-	 (let ((canonical-pair
-		(hash-table/get the-cons-table the-pair #f)))
-	   (or canonical-pair
-	       (let ((new the-pair))
-		 (hash-table/put! the-cons-table new new)
-		 (set! the-pair (cons #f #f))
-		 new))))
+         (set-car! the-pair x)
+         (set-cdr! the-pair y)
+         (let ((canonical-pair
+                (hash-table/get the-cons-table the-pair #f)))
+           (or canonical-pair
+               (let ((new the-pair))
+                 (hash-table/put! the-cons-table new new)
+                 (set! the-pair (cons #f #f))
+                 new))))
        hashcons)))
 
 (define cfoo
@@ -205,8 +214,8 @@ mum
 (let lp ((t1 (tree-copy cfoo)) (t2 (tree-copy cfoo)))
   (let ((c1 (canonical-copy t1)) (c2 (canonical-copy t2)))
     (if (not (and (equal? t1 c1) (equal? t2 c2) (eq? c1 c2)))
-	(error `(lose (,(hash c1) ,c1) (,(hash c2) ,c2)))
-	(lp (tree-copy c1) t1))))
+        (error `(lose (,(hash c1) ,c1) (,(hash c2) ,c2)))
+        (lp (tree-copy c1) t1))))
 ;GC #6 23:09:39: took:   0.10   (0%) CPU,   0.10   (0%) real; free: 307188457
 ;GC #7 23:10:26: took:   0.10   (0%) CPU,   0.10   (0%) real; free: 307188445
 ;GC #8 23:11:13: took:   0.10   (0%) CPU,   0.10   (0%) real; free: 307188385

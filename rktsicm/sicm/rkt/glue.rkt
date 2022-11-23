@@ -25,3 +25,4 @@
 (define true #t)
 (define false #f)
 (define delete remove)
+(define every andmap)
