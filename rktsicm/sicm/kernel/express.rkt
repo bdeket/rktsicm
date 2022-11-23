@@ -5,22 +5,21 @@
          object-name
          procedure-name)
 
-(require racket/port
-         "../rkt/fixnum.rkt"
-         "cstm/express.rkt"
-         "cstm/s-operator.rkt"
+(require (only-in "../rkt/glue.rkt" string:<? undefined-value undefined-value?
+                  fix:= fix:< fix:+)
+         (only-in "../rkt/environment.rkt" user-generic-environment generic-environment rule-environment numerical-environment scmutils-base-environment procedure-name object-name)
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
          "../general/table.rkt"
-         "../rkt/undefined.rkt"
-         (only-in "../rkt/environment.rkt" user-generic-environment generic-environment rule-environment numerical-environment scmutils-base-environment procedure-name object-name)
-         "cstm/diff.rkt"
+         "utils.rkt"
          "iterat.rkt"
+         "cstm/express.rkt"
+         "cstm/s-operator.rkt"
+         "cstm/diff.rkt"
          "matrices.rkt"
          "cstm/numsymb.rkt"
          "cstm/structs.rkt"
          "types.rkt"
-         "utils.rkt"
          (only-in "../rkt/todo.rkt" todos)
          )
 
@@ -31,18 +30,22 @@
 
 ;;;;  Utilities for manipulating symbolic expressions
 
+;;bdk;; operator/operands first...-operand moved to cstm
+
 (define (substitute new old expression)
   (define (sloop exp)
-    (cond
-      [(equal? old exp) new]
-      [(pair? exp)
-       (cons (sloop (car exp))
-             (sloop (cdr exp)))]
-      [(vector? exp)
-       ((vector-elementwise sloop) exp)]
-      [else exp]))
+    (cond ((equal? old exp) new)
+          ((pair? exp)
+           (cons (sloop (car exp))
+                 (sloop (cdr exp))))
+          ((vector? exp)
+           ((vector-elementwise sloop) exp))
+          (else exp)))
   (if (equal? new old) expression (sloop expression)))
 
+;;bdk;; has/get/add!-property moved to cstm
+
+;;bdk;; make-*-literal, make-combination expression-of moved to cstm
 
 ;;; In this system, expressions never contain vectors or matrices,
 ;;; they only contain constructions for them.  Thus we need to be able
@@ -156,16 +159,26 @@
 	  (else (error "Bad expression" expr))))
   (exprlp expr))
 
+(define up-constructor-name 'up)
+(define down-constructor-name 'down)
+
 ;;; Finds a name, if any, of the given object in the given
 ;;; environments.  If none, value is #f.
 
-#;
-(define (object-name object . environments)
-  (for*/first ([e (in-list environments)]
-               [b (in-list (namespace-mapped-symbols e))]
-               [o (in-value (namespace-variable-value b #t (λ () (gensym)) e))]
-               #:when (eq? object o))
-    b))
+#;#;(define (object-name object #:rest environments)
+  (let lp ((environments environments))
+    (cond ((null? environments)	#f)
+	  ((rlookup object (environment-bindings (car environments)))
+	   => car)
+	  (else (lp (cdr environments))))))
+
+(define (procedure-name f)
+  (let ((u2 (unsyntax (procedure-lambda f))))
+    (and (pair? u2)
+	 (cond ((eq? (car u2) 'named-lambda) (caadr u2))
+	       ((eq? (car u2) 'lambda) `(lambda ,(cadr u2) ???))
+	       (else
+		(error "Unknown procedure type" f))))))
 
 (define (procedure-expression f)
   (or (eq-get f 'function-name)
@@ -185,6 +198,33 @@
       (concatenate-names base-symbol
 			 (string->symbol (number->string i))))))
 
+#|
+(define (variables-in expr)
+  (cond ((pair? expr)
+	 (reduce list-union
+		 '()
+		 (map variables-in expr)))
+	((symbol? expr) (list expr))
+	(else '())))
+|#
+
+(define (variables-in expr)
+  (let lp ((expr expr)
+	   (vars '())
+	   (cont (lambda (vars) vars)))
+    (cond ((pair? expr)
+	   (lp (car expr)
+	       vars
+	       (lambda (vars)
+		 (lp (cdr expr)
+		     vars
+		     cont))))
+	  ((symbol? expr)
+	   (if (memq expr vars)
+	       (cont vars)
+	       (cont (cons expr vars))))
+	  (else (cont vars)))))		
+
 
 (define (pair-up vars vals table)
   (cond ((null? vars)
@@ -199,7 +239,7 @@
 	 (cons (list (car vars) (car vals))
 	       (pair-up (cdr vars) (cdr vals)
 			table)))))
-		
+
 
 ;;; An evaluator for simple expressions
 
@@ -234,7 +274,7 @@
 	((symbol? expr2) #f)
         ((string? expr1)
 	 (if (string expr2)
-	     (string<? expr1 expr2)
+	     (string:<? expr1 expr2)
 	     (or (pair? expr2) (vector? expr2))))
 	((string? expr2) #f)
 	((pair? expr1)
@@ -272,3 +312,6 @@
 	 (< (hash expr1) (hash expr2)))))
 
 (define expr:= equal?)
+
+
+

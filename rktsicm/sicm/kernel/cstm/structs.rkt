@@ -2,6 +2,7 @@
 
 (provide (all-defined-out))
 (require "../../rkt/fixnum.rkt"
+         "express.rkt"
          "../types.rkt"
          "../utils.rkt"
          "../iterat.rkt"

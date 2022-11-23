@@ -5,9 +5,8 @@
          (all-from-out "../general/permute.rkt")
          )
 
-(require "../rkt/fixnum.rkt"
-         "../rkt/default-object.rkt"
-         "../rkt/int.rkt"
+(require (only-in "../rkt/glue.rkt" default-object default-object?
+                  int:<= int:= int:- int:+ int:* fix:>)
          "../general/assert.rkt"
          "../general/memoize.rkt"
          (only-in racket/math conjugate)

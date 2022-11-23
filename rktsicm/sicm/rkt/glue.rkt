@@ -39,5 +39,7 @@
 (define list-head take)
 (define generate-uninterned-symbol gensym)
 (define find findf)
+(define make-initialized-vector build-vector)
+(define string:<? string<?)
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))

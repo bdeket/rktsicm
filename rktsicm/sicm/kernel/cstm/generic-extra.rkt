@@ -7,7 +7,7 @@
 ;;;; Primitive Generic Operation Declarations
 (require "../ghelper.rkt"
          "generic.rkt"
-         "numeric.rkt"
+         "../numeric.rkt"
          "s-operator.rkt"
          )
 

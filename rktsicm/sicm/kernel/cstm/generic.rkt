@@ -4,7 +4,7 @@
 (require (for-syntax racket/base
                      racket/syntax)
          "../ghelper.rkt"
-         "numeric.rkt")
+         "../numeric.rkt")
 
 (define-syntax (define-generic stx)
   (syntax-case stx ()

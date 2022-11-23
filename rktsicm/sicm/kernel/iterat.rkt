@@ -2,11 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         (only-in racket/list split-at)
-         (rename-in racket/base
-                    [build-list make-initialized-list]
-                    [build-vector make-initialized-vector]))
+(require (only-in "../rkt/glue.rkt" list-head make-initialized-list make-initialized-vector
+                  fix:= fix:- fix:+)
+         (only-in racket/list split-at))
 
 ;*r* copy/adapted from the scmutils library
 ;;;; Structure iterators
@@ -26,7 +24,10 @@
 
 (define (list-with-substituted-coord lst i x)
   (define-values (head tail) (split-at lst i))
-  `(,@head ,x ,@(cdr tail)))
+  `(,@head ,x ,@(cdr tail))
+  (append (list-head lst i)
+	  (list x)
+	  (cdr (list-tail lst i))))
 
 ;;;           Structural Vectors
 #|

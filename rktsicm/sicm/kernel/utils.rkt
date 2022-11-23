@@ -116,7 +116,6 @@
       (let ((r (reverse l)))
         (cons (car r) (reverse (cdr r))))))
 
-
 ;;; Functional operators
 
 ;;bdk;; arity moved to cstm/arity

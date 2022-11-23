@@ -4,7 +4,7 @@
 (require "../../rkt/fixnum.rkt"
          "../../general/assert.rkt"
          "generic-extra.rkt"
-         "numeric.rkt"
+         "../numeric.rkt"
          "../types.rkt")
 
 (define (v:type v) vector-type-tag)

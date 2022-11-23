@@ -9,4 +9,6 @@ compiled/
 *.bak
 *.scm
 *.sch
+*.xlsx
+*.bat
 TAGS

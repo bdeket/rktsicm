@@ -5,7 +5,7 @@
 (require "../../general/assert.rkt"
          "types.rkt"
          "generic.rkt"
-         "numeric.rkt")
+         "../numeric.rkt")
 
 ;;;                Data Structure
 ;;; A differential quantity is a typed list of differential terms,
