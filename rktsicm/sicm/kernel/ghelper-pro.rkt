@@ -1,7 +1,11 @@
 #lang racket/base
 
-(require "cstm/ghelper.rkt"
-         "cstm/arity.rkt")
+(require (only-in "../rkt/glue.rkt" if default-object default-object?)
+         (only-in "../rkt/environment.rkt" generic-environment)
+         "cstm/ghelper.rkt"
+         "cstm/arity.rkt"
+         "cstm/types.rkt"
+         "cstm/genenv.rkt")
 
 (provide make-generic-operator)
 
@@ -12,24 +16,13 @@
 ;;; Generic-operator dispatch is implemented here by a discrimination
 ;;; list, where the arguments passed to the operator are examined by
 ;;; predicates that are supplied at the point of attachment of a
-;;; handler (by ASSIGN-OPERATION alias DEFHANDLER).
+;;; handler (by ASSIGN-OPERATION).
 
-;;; To be the correct branch all arguments must be accepted by the
-;;; branch predicates, so this makes it necessary to backtrack to find
-;;; another branch where the first argument is accepted if the second
-;;; argument is rejected.  Here backtracking is implemented using #f
-;;; as a failure return, requiring further search.  A success is
-;;; consummated by calling the WIN procedure.
-
-;;; The discrimination list has the following structure: it is a
-;;; possibly improper alist whose "keys" are the predicates that are
-;;; applicable to the first argument.  If a predicate matches the
-;;; first argument, the cdr of that alist entry is a discrimination
-;;; list for handling the rest of the arguments.  If a discrimination
-;;; list is improper, then the cdr at the end of the backbone of the
-;;; alist is the default handler to apply (all remaining arguments are
-;;; implicitly accepted).
-
+;;; To be the correct branch all arguments must be accepted by
+;;; the branch predicates, so this makes it necessary to
+;;; backtrack to find another branch where the first argument
+;;; is accepted if the second argument is rejected.  Here
+;;; backtracking is implemented by OR.
 
 ;***************************************************************************************************
 ;*                                                                                                 *
@@ -49,15 +42,7 @@
     (cond
       [(eq? #f default-operation*)
        (define (no-handler . arguments)
-         (define s
-           (apply
-            string-append
-            (format "Generic operator inapplicable: ~a\n" operator)
-            (format " function: ~a\n" name)
-            (for/list ([a (in-list arguments)]
-                       [i (in-naturals 1)])
-              (format "argument ~a: ~a\n" i a))))
-         (error s))
+         (no-way-known operator name arguments))
        no-handler]
       [(arity-includes? (procedure-arity default-operation*) arity)
        default-operation*]
@@ -69,32 +54,78 @@
   (define record (make-operator-record name arity))
   (define TREE (operator-record-tree record))
 
-  (define (find-handler arguments)
-    (or
-     (let loop ([args arguments]
-                [tree TREE])
-       (cond
-         [(null? args) (tree-han tree)]
-         [else
-          (for/or ([p&b (in-list (tree-branch tree))])
-            (define pred? (car p&b))
-            (define branch (cdr p&b))
-            (or (and (tree-rst? branch) (andmap pred? args) (tree-han branch))
-                (and (pred? (car args)) (loop (cdr args) branch))))]))
-     (tree-han TREE)))
+  (define (find-branch tree arg win)
+    (let loop ([trlst (tree-branch tree)])
+      (cond
+        [(pair? trlst)
+         (or (and ((caar trlst) arg) (win (cdar trlst)))
+             (loop (cdr trlst)))]
+        [(tree-rst? tree) (tree-han tree)]
+        [else #f])))
+  (define (general-find-handler arguments)
+    (let loop ([tree TREE]
+               [args arguments])
+      (find-branch tree (car args)
+                   (if (pair? (cdr args))
+                       (λ (branch) (loop branch (cdr args)))
+                       tree-han))))
     
   (define operator
     (procedure-rename
+     (case arity
+       [(1)
+        (λ (arg) ((find-branch TREE arg tree-han) arg))]
+       [(2)
+        (λ (arg1 arg2)
+          ((find-branch TREE arg1 (λ (branch) (find-branch branch arg2 tree-han)))
+           arg1 arg2))]
+       [else
      (λ arguments
        (unless (arity-includes? arity (length arguments))
          (raise-arity-error operator arity arguments))
-       (apply (find-handler arguments) arguments))
+       (apply (general-find-handler arguments) arguments))])
      (string->symbol (format "_~a_" name))))
 
   (set-operator-record! operator record)
   (when name* (set-symbol-operator-record! name* record))
   (assign-operation operator default-operation #:rest #t)
   operator)
+
+
+
+;***************************************************************************************************
+;*                                                                                                 *
+;***************************************************************************************************
+;;; Failures make it to here.  Time to DWIM, with apologies to Warren
+;;; Teitelman.  Can we look at some argument as a default numerical
+;;; expression?  I want to get rid of this, since "when in doubt, dike 
+;;; it out." -- Greenblatt, but metacirc/prop seems to need this.  
+;;; It should be fixed.
+
+(define (no-way-known operator name arguments)
+  (let ((new-arguments (map dwim arguments)))
+    (if (equal? arguments new-arguments)
+        (let ((s (apply
+                  string-append
+                  (format "Generic operator inapplicable: ~a\n" operator)
+                  (format " function: ~a\n" name)
+                  (for/list ([a (in-list arguments)]
+                             [i (in-naturals 1)])
+                    (format "argument ~a: ~a\n" i a)))))
+          (error s)))
+    (apply operator new-arguments)))
+
+(define (dwim argument)
+  (if (pair? argument)
+      (cond
+        [(memq (car argument) type-tags)
+         argument]
+        [(memq (car argument) generic-numerical-operators)
+         (apply (eval (car argument) generic-environment)
+                (cdr argument))]
+        [else
+         argument])
+      argument))
 
 (module+ test
   (define (any? _) #t)
@@ -162,9 +193,10 @@
   (check-equal? (foo 'a 'c 'c) 2)
   (check-equal? (foo 'b 'c 'c) 3)
   (check-equal? (foo 'b 'b 'b) 5)
+  (check-equal? (foo 'b 'any 'any) 5)
+  ;; ^^ this is different from ghelper-class (in in line with scim)
+  ;; in practice it seems the #:rest is only ever used for the top tree (which doesn't have a pred?)
   (check-equal? (foo 'c 'c 'c) 'foo-default)
   (check-equal? (foo 'a 'a 'c) 'foo-default)
-
-  (define bar (make-generic-operator 1 'bar))
-  (assign-operation bar (λ (x) x))
+  
   )
