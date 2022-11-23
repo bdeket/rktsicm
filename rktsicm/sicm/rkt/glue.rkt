@@ -20,9 +20,15 @@
          "if.rkt"
          "int.rkt"
          "racket-help.rkt"
-         "undefined.rkt")
+         "undefined.rkt"
+         (submod racket/performance-hint begin-encourage-inline))
 
 (define true #t)
 (define false #f)
-(define delete remove)
-(define every andmap)
+(define delete remove*)
+(define delq remq*)
+(define every andmap) ;; not definedin mitscheme, nor scmutils...
+(define (there-exists? l p?) (ormap p? l))
+(define cons* list*)
+(define-syntax-rule (define-integrable head body ...)
+  (begin-encourage-inline (define head body ...)))

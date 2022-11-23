@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "list-utils.rkt")
+(require (only-in "../rkt/glue.rkt" true false define-integrable delq)
+         "list-utils.rkt")
 
 ;;;; Sets -- Implementation as ordered lists of symbols
 
@@ -17,7 +18,7 @@
   (define set-rest cdr)
 
   (define (set-singleton? s)
-    (if (null? s) #f (null? (cdr s))))
+    (if (null? s) false (null? (cdr s))))
 
   (define (set-singleton x)
     (list x))
@@ -35,9 +36,9 @@
 	  (else (cons (car set) (set-remove x (cdr set))))))
 
   (define (set-element? x set)
-    (cond ((null? set) #f)
-	  ((set-equal-elements? x (car set)) #t)
-	  ((set-less-elements? x (car set)) #f)
+    (cond ((null? set) false)
+	  ((set-equal-elements? x (car set)) true)
+	  ((set-less-elements? x (car set)) false)
 	  (else (set-element? x (cdr set)))))
 
   (define (set-intersection set1 set2)
@@ -58,7 +59,6 @@
 	   (cons (car set1) (set-union (cdr set1) set2)))
 	  (else (cons (car set2) (set-union set1 (cdr set2))))))
 
-
   (define (set-difference set1 set2)
     (cond ((null? set2) set1)
 	  ((null? set1) '())
@@ -69,11 +69,11 @@
 	  (else (cons (car set1) (set-difference (cdr set1) set2)))))
 
   (define (set-subset? s1 s2)
-    (cond ((null? s1) #t)
-	  ((null? s2) #f)
+    (cond ((null? s1) true)
+	  ((null? s2) false)
 	  ((set-equal-elements? (car s1) (car s2))
 	   (set-subset? (cdr s1) (cdr s2)))
-	  ((set-less-elements? (car s1) (car s2)) #f)
+	  ((set-less-elements? (car s1) (car s2)) false)
 	  (else (set-subset? s1 (cdr s2)))))
 
   (define (list->set lst)
@@ -117,8 +117,7 @@
 (define (list->set set-type) (vector-ref set-type 11))
 (define (set->list set-type) (vector-ref set-type 12))
 
-
-(define symbols (make-sets-package eq? symbol<?))
+(define symbols (make-sets-package eq? variable<?))
 (define real-numbers (make-sets-package = <))
 
 ;;; There is no nice way to compare complex numbers, 
@@ -149,7 +148,6 @@
   ((list->set symbols) '(d e f))))
 ;Value: (a c d e f)
 |#
-
 
 ;;;; Sets represented as unsorted lists of elements
 
@@ -183,8 +181,8 @@
 	       (list-difference (cdr l1) l2)))))
 
 (define (duplications? lst)
-  (cond ((null? lst) #f)
-	((member (car lst) (cdr lst)) #t)
+  (cond ((null? lst) false)
+	((member (car lst) (cdr lst)) true)
 	(else (duplications? (cdr lst)))))
 
 (define (remove-duplicates list)
@@ -197,7 +195,7 @@
 
 (define (subset? s1 s2)
   (if (null? s1)
-      #t
+      true
       (and (member (car s1) s2)
 	   (subset? (cdr s1) s2))))
 
@@ -205,19 +203,18 @@
   (and (subset? s1 s2)
        (subset? s2 s1)))
 
-
 ;;;; eq-set utilities from Jinx
 
-(define (eq-set/make-empty)
+(define-integrable (eq-set/make-empty)
   '())
 
-(define (eq-set/empty? set)
+(define-integrable (eq-set/empty? set)
   (null? set))
 
-(define (eq-set/member? element set)
+(define-integrable (eq-set/member? element set)
   (memq element set))
 
-(define (eq-set/adjoin element set)
+(define-integrable (eq-set/adjoin element set)
   (if (eq-set/member? element set)
       set
       (cons element set)))
@@ -225,7 +222,7 @@
 (define (eq-set/remove element set)
   (if (not (eq-set/member? element set))
       set
-      (remq element set)))
+      (delq element set)))
 
 ;; Important: This will return set2 itself (rather than a copy) if the
 ;; union is set2.  Thus eq? can be used on the return value to
@@ -280,31 +277,30 @@
       (and (eq-set/subset? set1 set2)
 	   (eq-set/subset? set2 set1))))
 
-
 ;;;; multi-set utilities from Jinx
 
-(define (multi-set/empty)
+(define-integrable (multi-set/empty)
   '())
 
-(define (multi-set/adjoin element set)
+(define-integrable (multi-set/adjoin element set)
   (cons element set))
 
-(define (multi-set/empty? set)
+(define-integrable (multi-set/empty? set)
   (null? set))
 
-(define (multi-set/first set)
+(define-integrable (multi-set/first set)
   (car set))
 
-(define (multi-set/rest set)
+(define-integrable (multi-set/rest set)
   (cdr set))
 
-(define (multi-set/remove element set)
-  (remq element set))
+(define-integrable (multi-set/remove element set)
+  (delq-once element set))
 
-(define (multi-set/element? element set)
+(define-integrable (multi-set/element? element set)
   (memq element set))
 
-(define (multi-set/union set1 set2)
+(define-integrable (multi-set/union set1 set2)
   (%reverse set1 set2))
 
 (define (multi-set/intersection set1 set2)

@@ -1,8 +1,9 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide make-table adjoin-to-list! put! table-of lookup)
 
-(require "sets.rkt")
+(require (only-in "../rkt/glue.rkt" false)
+         "sets.rkt")
 
 ;;;; Property Tables
 
@@ -15,22 +16,32 @@
 ;;; the subtable for that key.
 
 (define (make-table table-name assoc)
-  (let ([local-table (list *no-value*)])
+  (let ((local-table (list *no-value*)))
 
     (define (lookup keys)
       (define (loop keys table)
 	(if (null? keys) (car table)
-	    (let ([entry (assoc (car keys) (cdr table))])
+	    (let ((entry (assoc (car keys) (cdr table))))
 	      (if entry
 		  (loop (cdr keys) (cdr entry))
 		  *no-value*))))
       (loop keys local-table))
 
     (define (smash! keys value)
+      #;
+      (define (loop keys table)
+	(if (null? keys) (set-car! table value)
+	    (let ((entry (assoc (car keys) (cdr table))))
+	      (if entry
+		  (loop (cdr keys) (cdr entry))
+		  (set-cdr! table
+			    (cons (cons (car keys)
+					(make-subtable (cdr keys) value))
+				  (cdr table)))))))
       (define (loop keys table)
 	(if (null? keys)
             (cons value (cdr table))
-	    (let ([entry (assoc (car keys) (cdr table))])
+	    (let ((entry (assoc (car keys) (cdr table))))
 	      (if entry
 		  (for/list ([i (in-list table)])
                     (if (eq? i entry)
@@ -44,13 +55,27 @@
       local-table)
 
     (define (make-subtable keys value)
-      (if (null? keys)
-          (list value)
+      (if (null? keys) (list value)
 	  (list *no-value*
 		(cons (car keys)
 		      (make-subtable (cdr keys) value)))))
 
     (define (accumulator! increment-procedure initial-value keys value)
+      #;
+      (define (loop keys table)
+	(if (null? keys)
+	    (if (eq? (car table) *no-value*)
+		(set-car! table (increment-procedure value initial-value))
+		(set-car! table (increment-procedure value (car table))))
+	    (let ((entry (assoc (car keys) (cdr table))))
+	      (if entry
+		  (loop (cdr keys) (cdr entry))
+		  (set-cdr! table
+			    (cons (cons (car keys)
+					(make-subtable (cdr keys)
+						       (increment-procedure value
+									    initial-value)))
+				  (cdr table)))))))
       (define (loop keys table)
 	(if (null? keys)
             (cons (increment-procedure value
@@ -142,7 +167,6 @@
   ((vector-ref table 2) keys object)
   'done)
 
-
 ;;; Elementary table utilities implemented in ALISTs
 
 (define (lookup key table)
@@ -152,18 +176,18 @@
 	(error "key not in table -- LOOKUP" key))))
 
 (define (rlookup key table)
-  (cond ((null? table) #f)
+  (cond ((null? table) false)
 	((null? (cdar table)) (rlookup key (cdr table)))
 	((eq? key (cadar table)) (car table))
 	(else (rlookup key (cdr table)))))
 
 (define (rassq key table)
-  (cond ((null? table) #f)
+  (cond ((null? table) false)
 	((eq? key (cdar table)) (car table))
 	(else (rassq key (cdr table)))))
 
 (define (rassoc key table)
-  (cond ((null? table) #f)
+  (cond ((null? table) false)
 	((equal? key (cdar table)) (car table))
 	(else (rassoc key (cdr table)))))
 
