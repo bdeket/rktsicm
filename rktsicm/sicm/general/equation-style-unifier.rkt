@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "list-utils.rkt")
+(require (only-in "../rkt/glue.rkt" list-head any))
 
 ;;;; Unifier with segment variables -- GJS -- 1 May 2016
 
@@ -26,7 +26,7 @@
 	       ((unify:restriction var) targets))
 	   (let slp ((n (length targets)))
 	     (and (>= n 0)
-		  (or (let ((seg (take targets n)))
+		  (or (let ((seg (list-head targets n)))
 			(and (not (unify:occurs-in? var seg))
 			     (next (append seg (cdr sources))
 				   targets
@@ -83,7 +83,7 @@
     (let lp ((x expr))
       (cond ((unify:variable? x)
 	     (eqv? (unify:name x) name))
-	    ((list? x) (ormap lp x))
+	    ((list? x) (any lp x))
 	    (else #f)))))
 
 ;;; Dictionary

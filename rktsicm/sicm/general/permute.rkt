@@ -2,9 +2,10 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         (only-in racket/list index-of)
-         "../rkt/int.rkt"
+(require (only-in "../rkt/glue.rkt" fix:= fix:+
+                  int:>= int:< int:* int:-
+                  delete iota make-initialized-list)
+         (only-in "list-utils.rkt" list-index-of)
          "sets.rkt"
          "assert.rkt"
          )
@@ -17,7 +18,7 @@
       (apply append
 	     (map (lambda (item)
 		    (map (lambda (perm) (cons item perm))
-			 (permutations (remove item lst))))
+			 (permutations (delete item lst))))
 		  lst))))
 
 (define (combinations lst p)
@@ -106,15 +107,15 @@
   (let* ((n
 	  (length ulist))
 	 (lsource
-	  (map list ulist (build-list n values)))
+	  (map list ulist (iota n)))
 	 (ltarget
 	  (sort lsource
 		(lambda (x y) (<? (car x) (car y)))))
 	 (sorted (map car ltarget))
 	 (perm (map cadr ltarget))
 	 (iperm
-	  (build-list n
-	    (lambda (i) (index-of perm i)))))
+	  (make-initialized-list n
+	    (lambda (i) (list-index-of i perm)))))
     (cont ulist
 	  sorted
 	  (lambda (l) (permute perm l))
@@ -154,13 +155,9 @@
 
 
 (define (factorial n)
-  (define (f n)
-    (if (< n 2)
-	1
-	(* n (f (- n 1)))))
-  (unless (and (exact-integer? n) (not (negative? n)))
-    (raise-argument-error 'factorial "exact-nonnegative-integer" n))
-  (f n))
+  (if (int:< n 2)
+      1
+      (int:* n (factorial (int:- n 1)))))
 
 (define number-of-permutations factorial)
 
@@ -179,13 +176,13 @@ computation is slow. Also big inputs can exceed recursion depth:
 
 GJS: Done!  Binomial coefficient was defined in kernel/numeric.scm
 |#
-;;;; originally in kernel/numeric
+;;bdk;; originally in kernel/numeric
 (define (exact-quotient n d)
   (define-values (q r) (quotient/remainder n d))
   (assert (= 0 r))
   q)
 
-;;;; originally in kernel/numeric
+;;bdk;; originally in kernel/numeric
 (define (binomial-coefficient n m)
   (assert (and (exact-integer? n) (exact-integer? m) (<= 0 m n)))
   (let ((d (- n m)))
@@ -204,10 +201,9 @@ GJS: Done!  Binomial coefficient was defined in kernel/numeric.scm
 #|
 1 ]=> (number-of-combinations 1000000 12)
 ;Value: 2087489902989715894938746580371577443671966248767470771200000000
-;;;; wrong! should be: (calc is correct, comment not)
-;;;;    2087537916209397485013453738892186349699824088113864639583250000
+;;bdk;; wrong! should be: (calc is correct, comment not)
+;;bdk;; 2087537916209397485013453738892186349699824088113864639583250000
 |#
-
 
 (define (permutation-parity permuted-list original-list)
   (if (same-set? permuted-list original-list)

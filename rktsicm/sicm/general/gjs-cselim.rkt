@@ -2,14 +2,19 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" default-object default-object?
+                  every if generate-uninterned-symbol find
+                  fix:+ fix:=)
          "list-utils.rkt")
+
+(struct entry (expr name cntr) #:mutable)
 
 ;;;; Simple-minded common-subexpression eliminator.  
 ;;;    GJS: 9 December 2005, 23 December 2019
-(struct entry (expr name cntr) #:mutable)
 
-(define (gjs/cselim expression [not-worth-subdividing? (lambda (expr) #f)])
+(define (gjs/cselim expression [not-worth-subdividing? default-object])
+  (if (default-object? not-worth-subdividing?)
+      (set! not-worth-subdividing? (lambda (expr) #f)))
   (let ((initial-expression-recorder
          (make-expression-recorder #f '())))
     (define (walk expression expression-recorder)
@@ -109,7 +114,7 @@
       (let-values
           (((independent dependent)
             (partition (lambda (binding)
-                         (andmap (lambda (other-binding)
+                         (every (lambda (other-binding)
                                    (not (occurs-in? (car other-binding)
                                                     (cadr binding))))
                                  bindings))
@@ -121,73 +126,64 @@
                  ,inner))))))
  
 (define (make-expression-recorder parent-recorder bound-variables)
-  (define local-expressions-seen '())
-  (lambda (message)
-    (case message
-      ((record!)
-       (lambda (expression ignored-variables)
-         (cond ((or (not parent-recorder)
-                    (occurs-in? bound-variables expression))
-                (let (#;(vcell (assoc expression local-expressions-seen))
-                      [vcell (findf (λ (x) (equal? expression (entry-expr x))) local-expressions-seen)])
-                  (cond
-                    [vcell
-                     (set-entry-cntr! vcell (fix:+ (entry-cntr vcell) 1))
-                     (entry-name vcell)]
-                    #;(vcell
-                       ;; Increment reference count
-                       (set-car! (cddr vcell) (fix:+ (caddr vcell) 1))
-                       (cadr vcell))
-                    [else
-                     (define name (gensym))
-                     (set! local-expressions-seen
-                           (cons (entry expression name 1)
-                                 local-expressions-seen))
-                     (set! bound-variables
-                           (cons name bound-variables))
-                     name]
-                    #;(else
-                       (let ((name (gensym)))
-                         (set! local-expressions-seen
-                               (cons (list expression name 1)
-                                     local-expressions-seen))
-                         (set! bound-variables
-                               (cons name bound-variables))
-                         name)))))
-               (else
-                ((parent-recorder 'record!) expression ignored-variables)))))
-      ((seen)
-       (let lp ((entries (reverse local-expressions-seen)) (results '()))
-         (cond ((null? entries) (reverse results))
-               ((fix:= (entry-cntr (car entries)) 1)
-                (define vcell (car entries))
-                (for-each
-                 (lambda (entry)
-                   (set-entry-expr! entry
-                                    (subst (entry-expr vcell)
-                                           (entry-name vcell)
-                                           (entry-expr entry))))
-                 (cdr entries))
-                (lp (cdr entries) results))
-               (else
-                (define vcell (car entries))
-                (lp (cdr entries)
-                    (cons (list (entry-name vcell) (entry-expr vcell))
-                          results))))))
-      ((get-entry)
-       (lambda (variable)
-         (if (symbol? variable)
-             (let ((entry
-                    (findf (lambda (entry) (eq? (entry-name entry) variable))
-                           local-expressions-seen)))
-               (if entry
-                   entry
-                   (if parent-recorder
-                       ((parent-recorder 'get-entry) variable)
-                       (error "Variable not present"))))
-             (list variable))))
-      (else
-       (error "unknown message: expression-recorder" message)))))
+  (let ((local-expressions-seen '()))
+    (lambda (message)
+      (case message
+        ((record!)
+         (lambda (expression ignored-variables)
+           (cond ((or (not parent-recorder)
+                      (occurs-in? bound-variables expression))
+                  (let ((vcell #;(assoc expression local-expressions-seen)
+                               (find (λ (x) (equal? expression (entry-expr x))) local-expressions-seen)))
+                    (cond (vcell
+                           ;; Increment reference count
+                           (set-entry-cntr! vcell (fix:+ (entry-cntr vcell) 1))
+                           (entry-name vcell)
+                           #;#;
+                           (set-car! (cddr vcell) (fix:+ (caddr vcell) 1))
+                           (cadr vcell))
+                          (else
+                           (let ((name (generate-uninterned-symbol)))
+                             (set! local-expressions-seen
+                                   (cons (entry expression name 1)
+                                         local-expressions-seen))
+                             (set! bound-variables
+                                   (cons name bound-variables))
+                             name)))))
+                 (else
+                  ((parent-recorder 'record!) expression ignored-variables)))))
+        ((seen)
+         (let lp ((entries (reverse local-expressions-seen)) (results '()))
+           (cond ((null? entries) (reverse results))
+                 ((fix:= (entry-cntr (car entries)) 1)
+                  (define vcell (car entries))
+                  (for-each
+                   (lambda (entry)
+                     (set-entry-expr! entry
+                                      (subst (entry-expr vcell)
+                                             (entry-name vcell)
+                                             (entry-expr entry))))
+                   (cdr entries))
+                  (lp (cdr entries) results))
+                 (else
+                  (define vcell (car entries))
+                  (lp (cdr entries)
+                      (cons (list (entry-name vcell) (entry-expr vcell))
+                            results))))))
+        ((get-entry)
+         (lambda (variable)
+           (if (symbol? variable)
+               (let ((entry
+                      (find (lambda (entry) (eq? (entry-name entry) variable))
+                             local-expressions-seen)))
+                 (if entry
+                     entry
+                     (if parent-recorder
+                         ((parent-recorder 'get-entry) variable)
+                         (error "Variable not present"))))
+               (list variable))))
+        (else
+         (error "unknown message: expression-recorder" message))))))
 
 (define (record-expression! expression-recorder expression ignored-variables)
   ((expression-recorder 'record!) expression ignored-variables))

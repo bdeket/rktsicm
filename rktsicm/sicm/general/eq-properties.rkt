@@ -1,21 +1,9 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) assoc-del assq-del assoc-del* assq-del* assoc-set assq-set))
 
-(require "list-utils.rkt")
-
-
-;;;; Traditional LISP property lists
-;;; extended to work on any kind of eq? data structure.
-
-;;; Property lists are a way of creating data that looks like a record
-;;; structure without commiting to the fields that will be used until
-;;; run time.  The use of such flexible structures is frowned upon by
-;;; most computer scientists, because it is hard to statically
-;;; determine the bounds of the behavior of a program written using
-;;; this stuff.  But it makes it easy to write programs that confuse
-;;; such computer scientists.  I personally find it difficult to write
-;;; without such crutches.  -- GJS
+(require (only-in "../rkt/glue.rkt" hash-table/get hash-table/put! delq)
+         "list-utils.rkt")
 
 (define (assoc-del itm lst [is-equal? equal?])
   (let loop ([lst lst])
@@ -50,27 +38,57 @@
       (cons set lst)))
 (define (assq-set lst itm val) (assoc-set lst itm val eq?))
 
+;;;; Traditional LISP property lists
+;;; extended to work on any kind of eq? data structure.
+
+;;; Property lists are a way of creating data that looks
+;;; like a record structure without commiting to the fields
+;;; that will be used until run time.  The use of such
+;;; flexible structures is frowned upon by most computer
+;;; scientists, because it is hard to statically determine
+;;; the bounds of the behavior of a program written using
+;;; this stuff.  But it makes it easy to write programs that
+;;; confuse such computer scientists.  I personally find it
+;;; difficult to write without such crutches.  -- GJS
+
 (define eq-properties (make-weak-hasheq))
 
 (define (eq-put! node property value)
-  (define lst (assq-set (hash-ref eq-properties node '())
-                        property value))
-  (hash-set! eq-properties node lst)
+  (let ([plist (assq-set (hash-table/get eq-properties node '())
+                         property value)])
+    (hash-set! eq-properties node plist))
+  #;
+  (let ((plist (hash-table/get eq-properties node '())))
+    (let ((vcell (assq property plist)))
+      (if vcell
+	  (set-cdr! vcell value)
+	  (hash-table/put! eq-properties node
+			   (cons (cons property value)
+				 plist)))))
   node)
 
 (define (eq-get node property)
-  (let ((plist (hash-ref eq-properties node '())))
+  (let ((plist (hash-table/get eq-properties node '())))
     (let ((vcell (assq property plist)))
       (if vcell
 	  (cdr vcell)
 	  #f))))
 
 (define (eq-rem! node . properties)
-  (define lst (assq-del* properties
-                          (hash-ref eq-properties node '())))
-  (hash-set! eq-properties node lst)
+  (let ([plist (assq-del* properties
+                          (hash-ref eq-properties node '()))])
+    (hash-table/put! eq-properties node plist))
+  #;
+  (for-each
+   (lambda (property)
+     (let ((plist
+	    (hash-table/get eq-properties node '())))
+       (let ((vcell (assq property plist)))
+	 (if vcell
+	     (hash-table/put! eq-properties node
+			      (delq! vcell plist))))))
+   properties)
   node)
-
 
 (define (eq-adjoin! node property new)
   (eq-put! node property
@@ -81,16 +99,20 @@
 
 (define (eq-delete! node property obj)
   (eq-put! node property
-           (remq* (list obj) (or (eq-get node property) '()))))
+           (delq obj (or (eq-get node property) '()))))
 
 
 (define (eq-plist node)
-  (let ((plist (hash-ref eq-properties node #f)))
+  (let ((plist (hash-table/get eq-properties node #f)))
     (if plist (cons node plist) #f)))
 
 (define (eq-clone! source target)
-  (hash-set! eq-properties target
-    (hash-ref eq-properties source '()))
+  (hash-table/put! eq-properties target
+    (hash-table/get eq-properties source '()))
+  #;
+  (let ((plist (hash-table/get eq-properties source #f)))
+    (if plist
+        (hash-table/put! eq-properties target plist)))
   target)
 
 (define (eq-label! node . plist)
