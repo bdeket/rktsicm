@@ -15,7 +15,7 @@
          "generic.rkt"
          "mathutil.rkt"
          "function.rkt"
-         "cstm/pseries+.rkt"
+         "cstm/pseries.rkt"
          )
 (define-values (assign-operation operator:assign-operations)
   (make-assign-operations 'operator))

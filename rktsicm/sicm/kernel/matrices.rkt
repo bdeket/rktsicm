@@ -17,7 +17,7 @@
          "cstm/vectors.rkt"
          "cstm/structs.rkt"
          "cstm/matrices.rkt"
-         "cstm/pseries+.rkt"
+         "cstm/pseries.rkt"
          )
 (define-values (assign-operation matrices:assign-operations)
   (make-assign-operations 'matrices))

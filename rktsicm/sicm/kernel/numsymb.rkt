@@ -1,29 +1,21 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (all-defined-out)
          (all-from-out "cstm/numsymb.rkt"))
-;*r* copy/adapted from the scmutils library
-;;;;              NUMSYMB.SCM
 
-(require "../rkt/fixnum.rkt"
-         "cstm/numsymb.rkt"
-         "../rkt/default-object.rkt"
-         "../general/assert.rkt"
-         "../general/memoize.rkt"
-         "cstm/sym-rules.rkt"
-         "cstm/express.rkt"
-         "types.rkt"
-         "numbers.rkt"
+(require (only-in "../rkt/glue.rkt" any default-object default-object? true for-all?
+                  fix:+)
+         (only-in "../general/logic-utils.rkt" assume!)
          "numeric.rkt"
+         "cstm/express.rkt"
+         "cstm/numsymb.rkt"
+         "cstm/sym-rules.rkt"
+         "numbers.rkt"
          )
 
-;;; Algebraic constructors for symbolic experiments.
+;;;;              NUMSYMB.SCM
 
-;;; Enable simplification on construction -- wastes time?
-(define (enable-constructor-simplifications doit?)
-  (assert (boolean? doit?) "argument must be a boolean.")
-  (clear-memoizer-tables) 
-  (enable-constructor-simplifications? doit?))
+;;; Algebraic constructors for symbolic experiments.
 
 (define (make-rectangular? exp)
   (and (pair? exp) (eq? (car exp) 'make-rectangular)))
@@ -75,7 +67,7 @@
 		   (symb:mul -i
 			     (symb:- z (symb:conjugate z)))))))
 (addto-symbolic-operator-table 'imag-part symb:imag-part)
-
+
 (define (magnitude? exp)
   (and (pair? exp) (eq? (car exp) 'magnitude)))
 
@@ -133,13 +125,49 @@
     sinh cosh tanh sech csch
     + - * / expt up down))
 
+;;; Logical operators may be useful...
+
+(define (symb:and . args)
+  (if (any (lambda (a) (eq? a #f)) args)
+      '#f
+      `(and ,@args)))
+
+(addto-symbolic-operator-table 'and symb:and)
+
+(define (symb:or . args)
+  (if (any (lambda (a) (eq? a #t)) args)
+      '#t
+      `(or ,@args)))
+
+(addto-symbolic-operator-table 'or symb:or)
+
+(define (symb:not b)
+  (if (memq b '(#t #f))
+      (not b)
+      `(not ,b)))
+
+(addto-symbolic-operator-table 'not symb:not)
+
+
+;;; Program simplifications?
+
+(define (symb:if p c a)
+  `(if ,p ,c ,a))
+
+(addto-symbolic-operator-table 'if symb:if)
+
+
+
+
+
+;;; This & is for units!
+
 (define (symb:& numexp u1 [u2 default-object])
   (if (default-object? u2)
       `(& ,numexp ,u1)
       `(& ,numexp ,u1 ,u2)))
 
 (addto-symbolic-operator-table '& symb:&)
-
 
 (define (equality? x)
   (and (pair? x) (eq? (car x) '=)))
@@ -161,12 +189,15 @@
 	(else
 	 (let lp ((args (cddr args))
 		  (larg (cadr args))
-		  (ans (symb:=:bin (car args) (cadr args))))
+		  (ans
+                   (symb:=:bin (car args) (cadr args))))
 	   (if (null? args)
 	       ans
 	       (lp (cdr args)
 		   (car args)
-		   (and ans (symb:=:bin larg (car args)))))))))
+                   (symb:and ans
+                             (symb:=:bin larg
+                                         (car args)))))))))
 
 (addto-symbolic-operator-table '= symb:=)
 
@@ -486,7 +517,7 @@
       `(log ,x)))
 (addto-symbolic-operator-table 'log symb:log)
 
-(define heuristic-sin-cos-simplify #t)
+(define heuristic-sin-cos-simplify true)
 (define relative-integer-tolerance (* 100 *machine-epsilon*))
 (define absolute-integer-tolerance 1e-20)
 (define n:pi/4 (atan 1 1))
@@ -625,6 +656,7 @@
 (define (atan? exp)
   (and (pair? exp) (eq? (car exp) 'atan)))
 
+#|
 (define (symb:atan x . opts)
   (if (null? opts)
       (if (number? x)
@@ -650,6 +682,42 @@
 		    (atan y x)
 		    `(atan ,y ,x)))
 	    `(atan ,y ,x)))))
+|#
+
+;;; From Sam Ritchie.
+
+(define (symb:atan x . opts)
+  (if (null? opts)
+      (if (number? x)
+	  (if (inexact? x)
+	      (atan x)
+	      (if (zero? x)
+		  :zero
+		  `(atan ,x)))
+	  `(atan ,x))
+      (let ((y x) (x (car opts)))
+        (cond ((exact-zero? y)
+               (if (number? x)
+                   (if (negative? x) ':pi 0)
+                   (and (assume! `(positive? ,x) 'symb:atan)
+                        0)))
+
+              ((exact-zero? x)
+               (if (number? y)
+                   (if (negative? y)
+                       ':-pi/2
+                       ':pi/2)
+                   (and (assume! `(positive? ,y) 'symb:atan)
+                        0)))
+
+              ((and (number? x)
+                    (number? y)
+                    (or (inexact? x)
+                        (inexact? y)))
+               (atan y x))
+
+              (else `(atan ,y ,x))))))
+
 (addto-symbolic-operator-table 'atan symb:atan)
 
 
@@ -711,7 +779,7 @@
   (and (pair? exp) (eq? (car exp) 'max)))
 
 (define (symb:max . l)
-  (if (andmap number? l)
+  (if (for-all? l number?)
       (apply max l)
       `(max ,@l)))
 (addto-symbolic-operator-table 'max symb:max)
@@ -721,7 +789,7 @@
   (and (pair? exp) (eq? (car exp) 'min)))  
 
 (define (symb:min . l)
-  (if (andmap number? l)
+  (if (for-all? l number?)
       (apply min l)
       `(min ,@l)))
 (addto-symbolic-operator-table 'min symb:min)

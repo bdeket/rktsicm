@@ -7,3 +7,4 @@
 (define hash-table/put! hash-set!)
 (define hash-table-set! hash-set!)
 (define make-key-weak-eq-hash-table make-weak-hasheq)
+(define make-eq-hash-table make-hasheq)

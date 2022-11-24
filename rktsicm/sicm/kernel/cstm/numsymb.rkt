@@ -1,22 +1,31 @@
-#lang racket/base
+#lang s-exp "../extapply.rkt"
 
 (provide (all-defined-out)
          incremental-simplifier
          enable-constructor-simplifications?)
 
-(require "express.rkt"
+(require "../../rkt/hashtable.rkt"
+         "../../general/assert.rkt"
+         "../../general/memoize.rkt"
+         "express.rkt"
          "../types.rkt"
          "../../parameters.rkt")
 
-;;; currently disabled -- see heuristic.scm
-(define heuristic-number-canonicalizer #f)
-
 ;;; Disable intermediate simplification -- wastes time.
-(define symbolic-operator-table (make-hasheq))
+#; ;moved to paramters
+(define incremental-simplifier #f)
+
+;;; Enable simplification on construction -- wastes time?
+(define (enable-constructor-simplifications doit?)
+  (assert (boolean? doit?) "argument must be a boolean.")
+  (clear-memoizer-tables) 
+  (enable-constructor-simplifications? doit?))
+
+(define symbolic-operator-table (make-eq-hash-table))
 
 (define (make-numsymb-expression operator-symbol operands)
   (let ((operand-expressions (map numerical-expression operands)))
-    (let ((v (hash-ref symbolic-operator-table operator-symbol #f)))
+    (let ((v (hash-table/get symbolic-operator-table operator-symbol #f)))
       (if v
 	  (let ((newexp (apply v operand-expressions)))
 	    (make-literal number-type-tag
@@ -26,7 +35,17 @@
 	  (make-combination number-type-tag operator-symbol operands)))))
 
 (define (addto-symbolic-operator-table operator procedure)
-  (hash-set! symbolic-operator-table operator procedure))
+  (hash-table/put! symbolic-operator-table operator procedure))
+
+
+;;; currently disabled -- see heuristic.scm
+(define heuristic-number-canonicalizer #f)
+
+#|
+;;; From general/canonicalizer.scm
+(define numerical-expression-canonicalizer
+  (make-expression-canonicalizer))
+|#
 
 (define numerical-expression-canonicalizer #f)
 
