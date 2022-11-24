@@ -16,6 +16,7 @@
 (define (make-differential-quantity differential-term-list)
   (cons differential-type-tag differential-term-list))
 
+;;bdk;; comes from types
 (define (differential? obj)
   (and (pair? obj)
        (eq? (car obj) differential-type-tag)))
@@ -54,8 +55,6 @@
 
 (define (differential-coefficient dterm)
   (cadr dterm))
-
-;****
 
 (define (differential-of x)
   (let lp ((x x))

@@ -1,26 +1,25 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/diff.rkt")
          differential-of)
 
-(require "../rkt/fixnum.rkt"
-         "cstm/diff.rkt"
-         "cstm/s-operator.rkt"
-         "../general/assert.rkt"
+(require (only-in "../rkt/glue.rkt" if delv warn for-all?
+                  fix:< fix:=)
+         (only-in "../rkt/todo.rkt" diff-memoize-1arg diff-memoize-2arg)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
-         (only-in "../rkt/racket-help.rkt" delv)
-         (only-in "../rkt/todo.rkt" diff-memoize-1arg diff-memoize-2arg)
+         "types.rkt"
+         "utils.rkt"
+         (rename-in "cstm/s-operator.rkt" [make-operator make-op])
          "generic.rkt"
+         "cstm/diff.rkt"
          "matrices.rkt"
          "numeric.rkt"
          "cstm/pseries.rkt"
          "quaternion.rkt"
          "structs.rkt"
          "strutl.rkt"
-         "types.rkt"
-         "utils.rkt"
          )
 (define-values (assign-operation diff:assign-operations)
   (make-assign-operations 'diff))
@@ -63,11 +62,27 @@
 ;;; functions that returned functions.  This was done kludgerously,
 ;;; but it works.
 
+;;;                Data Structure
+;;; A differential quantity is a typed list of differential terms,
+;;; representing the power series alluded to earlier.  The terms are
+;;; kept in a sorted order, in ascending order. (Order is the number
+;;; of incrementals.  So dx*dy is higher order than dx or dy.)
+
+;;bdk;; moved to cstm/diff
+
+;;; Each differential term has a list of tags.  The tags represent the
+;;; incrementals.  Roughly, "dx" and "dy" are tags in the terms: 3*dx,
+;;; 4*dy, 2*dx*dy.  There is a tag created for each derivative that is
+;;; in progress.  Since the only use of a tag is to distinguish
+;;; unnamed incrementals we use positive integers for the tags.
+
+;;bdk;; moved to cstm/diff
 
 (define (terms->differential-collapse terms)
   (terms->differential
    (reduce dtl:+ '() (map list terms))))
 
+;;bdk;; moved to cstm/diff
 
 (define (diff:arity x)
   (let lp ((x x))
@@ -393,6 +408,9 @@
 		  (lambda (x y)
 		    (g:* -1 (g:/ x (g:square y))))))
 
+(define diff:identity
+  (diff:unary-op (lambda (x) x)
+		 (lambda (x) +1)))
 
 (define diff:negate
   (diff:unary-op (lambda (x)
@@ -491,15 +509,14 @@
 (define diff:cosh
   (diff:unary-op g:cosh g:sinh))
 
+;;; Improved by suggestion from Sam Ritchie on 4Jan2020.
 
 (define (diff:abs x)
   (let ((f (finite-part x)))
-    ((cond ((g:< f 0)
-	    (diff:unary-op (lambda (x) x) (lambda (x) -1)))
+    ((cond ((g:< f 0) diff:negate)
 	   ((g:= f 0)
 	    (error "Derivative of ABS undefined at zero"))
-	   ((g:> f 0)
-	    (diff:unary-op (lambda (x) x) (lambda (x) +1)))
+	   ((g:> f 0) diff:identity)
 	   (else
 	    (error "Derivative of ABS at" x)))
      x)))
@@ -578,15 +595,26 @@
 (assign-operation 'abs             diff:abs
                   differential?)
 
+#|
+;;; Suggested by Sam Ritchie on 26 March 2022
+(assign-operation 'square (lambda (x) (diff:power x 2))
+                  differential?)
+|#
+
+(define diff:square
+  (diff:unary-op g:square (lambda (x) (g:* 2 x))))
+
+(assign-operation 'square diff:square differential?)
+
 ;;; This stuff allows derivatives to work in code where there are
 ;;; conditionals if the finite parts are numerical.
 
 (define (diff:zero? x)
   (assert (differential? x))
-  (andmap (lambda (term)
-            (let ((c (differential-coefficient term)))
-              (g:zero? c)))
-          (differential-term-list x)))
+  (for-all? (differential-term-list x)
+   (lambda (term)
+     (let ((c (differential-coefficient term)))
+       (g:zero? c)))))
 
 (assign-operation 'zero? diff:zero? differential?)
 
@@ -661,7 +689,7 @@
 
 (define (simple-derivative-internal f x)
   (let ((dx (make-differential-tag)))
-    (extract-dx-part dx (g:apply f (list (make-x+dx x dx))))))
+    (extract-dx-part dx (f (make-x+dx x dx)))))
 
 (define (make-x+dx x dx)
   (d:+ x
@@ -679,6 +707,59 @@
 ;;; Now disabled, see DERIV.SCM.
 
 ;(assign-operation 'derivative      diff:derivative       function?)
+
+#|
+;;; See the long story below: Alexey's Amazing Bug!
+
+(define (extract-dx-part dx obj)
+  (define (extract obj)
+    (if (differential? obj)
+	(terms->differential-collapse
+	 (append-map
+	  (lambda (term)
+	    (let ((tags (differential-tags term)))
+	      (if (memv dx tags)
+		  (list (make-differential-term (delv dx tags)
+			  (differential-coefficient term)))
+		  '())))
+	  (differential-term-list obj)))
+	:zero))
+  (define (dist obj)
+    (cond ((structure? obj)
+	   (s:map/r dist obj))
+	  ((matrix? obj)
+	   ((m:elementwise dist) obj))
+	  ((function? obj)
+	   (compose dist obj))
+	  ((operator? obj)
+	   (g:* (make-operator dist 'extract (operator-subtype obj))
+		obj))
+	  ((series? obj)
+	   (make-series (g:arity obj)
+			(map-stream dist (series->stream obj))))
+	  (else (extract obj))))
+  (dist obj))
+|#
+
+#|
+;;; The following hairy code was introduced to fix the "Amazing Bug"
+;;; discovered by Alexey Radul from a suggestion by Barak Perlmutter
+;;; (June 2011)!  Here is the bug.
+
+(define (((f x) g) y)
+  (g (+ x y)))
+#| f |#
+
+(define f-hat ((D f) 3))
+#| f-hat |#
+
+((f-hat exp) 5)
+#| 2980.9579870417283 |#
+
+((f-hat (f-hat exp)) 5)
+#| 0 |#			;WRONG!
+#| 59874.14171519782 |# ;Now correct.
+|#
 
 #|
 ;;; BTW.
@@ -723,6 +804,24 @@
   (dist obj))
 
 (define (extract-dx-differential dx obj)
+  (if (tag-active? dx)
+      (warn "Entering Radul Territory" (*active-tags*)))
+  (cond ((differential? obj)
+         (terms->differential-collapse
+          (append-map
+           (lambda (term)
+             (let ((tags (differential-tags term)))
+               (if (memv dx tags)
+                   (list
+                    (make-differential-term (delv dx tags)
+                                            (differential-coefficient term)))
+                   '())))
+           (differential-term-list obj))))
+        (else :zero)))
+#|
+;;; Siskind/Perlmutter/Radul hack
+
+(define (extract-dx-differential dx obj)
   (if (differential? obj)
       (terms->differential-collapse
        (append-map
@@ -735,6 +834,32 @@
                 '())))
         (differential-term-list obj)))
       :zero))
+|#
+
+(define *active-tags* (make-parameter '()))
+
+(define (tag-active? tag)
+  (memq tag (*active-tags*)))
+
+(define (with-active-tag tag f args)
+  (parameterize ((*active-tags*
+                  (cons tag (*active-tags*))))
+    (apply f args)))
+
+(define (extract-dx-function dx procedure)
+  (lambda args
+    (if (tag-active? dx)
+        (let ((internal-tag (make-differential-tag)))
+          ((replace-differential-tag internal-tag dx)
+           (extract-dx-part dx
+             (with-active-tag dx procedure
+               (map (replace-differential-tag dx internal-tag)
+                    args)))))
+        (extract-dx-part dx
+                         (with-active-tag dx procedure args)))))
+
+#|
+;;; Siskind/Perlmutter/Radul hack
 
 (define (extract-dx-function dx procedure)
   (lambda args
@@ -744,23 +869,53 @@
          (apply procedure
                 (map (replace-differential-tag dx internal-tag)
                      args)))))))
+|#
+
+;;; Sam Ritchie replacement:
+;; (define (extract-dx-operator dx obj)
+;;   (extract-dx-function dx procedure))
 
 (define (extract-dx-operator dx obj)
-  (extract-dx-function dx (operator-procedure obj)))
+  (let ((f (operator-procedure obj)))
+    (make-op (extract-dx-function dx f)
+             (operator-name obj)
+             (operator-subtype obj)
+             (operator-arity obj)
+             (operator-optionals obj))))
 
+#|
+(define (extract-dx-operator dx obj)
+  (hide-tag-in-procedure dx
+                         (g:* (make-operator dist 'extract (operator-subtype obj))
+                              obj)))
+(define (hide-tag-in-procedure dx procedure)
+  (lambda args
+    (let ((internal-tag (make-differential-tag)))
+      ((replace-differential-tag internal-tag dx)
+       (let* ((rargs
+	       (map (replace-differential-tag dx internal-tag)
+		    args))
+	      (val (apply procedure rargs)))
+	 val)))))
+|#
 
 (define ((replace-differential-tag oldtag newtag) object)
   (cond ((differential? object)
-	 (terms->differential
-	  (map (lambda (term)
-		 (if (memv oldtag (differential-tags term))
-		     (make-differential-term
-		      (insert-differential-tag newtag
-                       (remove-differential-tag oldtag
-                        (differential-tags term)))
-		      (differential-coefficient term))
-		     term))
-	       (differential-term-list object))))
+         (terms->differential
+          (map (lambda (term)
+                 (let ((tags (differential-tags term)))
+                   (if (memv oldtag tags)
+                       (if (memv newtag tags) ;Sam Ritchie patch
+                           (make-differential-term
+                            (remove-differential-tag newtag
+                                                     (remove-differential-tag oldtag tags))
+                            :zero)
+                           (make-differential-term
+                            (insert-differential-tag newtag
+                                                     (remove-differential-tag oldtag tags))
+                            (differential-coefficient term)))
+                       term)))
+               (differential-term-list object))))
 	((structure? object)
 	 (s:map/r (replace-differential-tag oldtag newtag) object))
 	((matrix? object)
@@ -793,8 +948,16 @@
                (map (replace-differential-tag oldtag eps)
                     args)))))))
 
-(define (replace-dx-operator newtag oldtag)
-  (replace-dx-function newtag oldtag))
+;;; Sam Ritchie suggestion
+;; (define (replace-dx-operator newtag oldtag)
+;;   (replace-dx-function newtag oldtag))
+(define ((replace-dx-operator newtag oldtag) op)
+  (let ((swap-tags (replace-dx-function newtag oldtag)))
+    (make-op (swap-tags (operator-procedure op))
+                   (operator-name op)
+                   (operator-subtype op)
+                   (operator-arity op)
+                   (operator-optionals op))))
 
 (define (remove-differential-tag tag tags) (delv tag tags))
 
@@ -806,3 +969,161 @@
 	(else
 	 (cons (car tags)
 	       (insert-differential-tag tag (cdr tags))))))
+
+#|
+;;; Superseded on 18 May 2019.  A new bug report by Jeff Siskind
+;;; precipitated a rewrite.  The result is simpler and fixes the
+;;; very subtle bug he observed.
+
+(define (extract-dx-part dx obj)
+  (define (extract obj)
+    (if (differential? obj)
+	(terms->differential-collapse
+	 (append-map
+	  (lambda (term)
+	    (let ((tags (differential-tags term)))
+	      (if (memv dx tags)
+		  (list
+		   (make-differential-term (delv dx tags)
+					   (differential-coefficient term)))
+		  '())))
+	  (differential-term-list obj)))
+	:zero))
+  (define (dist obj)
+    (cond ((structure? obj)
+	   (s:map/r dist obj))
+	  ((matrix? obj)
+	   ((m:elementwise dist) obj))
+	  ((quaternion? obj)
+	   (quaternion
+	    (dist (quaternion-ref obj 0))
+	    (dist (quaternion-ref obj 1))
+	    (dist (quaternion-ref obj 2))
+	    (dist (quaternion-ref obj 3))))
+	  ((function? obj)
+	   (hide-tag-in-procedure dx (compose dist obj)))
+	  ((operator? obj)
+	   (hide-tag-in-procedure dx
+	      (g:* (make-operator dist 'extract (operator-subtype obj))
+		   obj)))
+	  ((series? obj)
+	   (make-series (g:arity obj)
+			(map-stream dist (series->stream obj))))
+	  (else (extract obj))))
+  (dist obj))
+
+(define (hide-tag-in-object tag object)
+  (cond ((procedure? object)
+	 (hide-tag-in-procedure tag object))
+	(else object)))
+
+(define ((hide-tag-in-procedure external-tag procedure) . args)
+  (let ((internal-tag (make-differential-tag)))
+    (hide-tag-in-object internal-tag
+                        (apply (wrap-procedure-differential-tags external-tag
+                                                                 internal-tag
+                                                                 procedure)
+                               args))))
+
+(define (wrap-procedure-differential-tags external-tag internal-tag procedure)
+  (let ((new
+	 (lambda args
+	   ((replace-differential-tag internal-tag external-tag)
+	    (apply procedure
+		   (map (replace-differential-tag external-tag internal-tag)
+			args))))))
+    (cond ((function? procedure)
+	   new)
+	  ((operator? procedure)
+	   (make-operator new 'composition (operator-subtype procedure)))
+	  (else
+	   (error "Unknown procedure type -- WRAP-PROCEDURE-DIFFERENTIAL-TAGS:"
+		  external-tag internal-tag procedure)))))
+
+(define ((replace-differential-tag oldtag newtag) object)
+  (cond ((differential? object)
+	 (terms->differential
+	  (map (lambda (term)
+		 (if (memv oldtag (differential-tags term))
+		     (make-differential-term
+		      (insert-differential-tag newtag
+                       (remove-differential-tag oldtag
+                        (differential-tags term)))
+		      (differential-coefficient term))
+		     term))
+	       (differential-term-list object))))
+	((procedure? object)
+	 (wrap-procedure-differential-tags oldtag newtag object))
+	((structure? object)
+	 (s:map/r (replace-differential-tag oldtag newtag) object))
+	((matrix? object)
+	 ((m:elementwise (replace-differential-tag oldtag newtag)) object))
+	((quaternion? object)
+	 (let ((r (replace-differential-tag oldtag newtag)))
+	   (quaternion
+	    (r (quaternion-ref object 0))
+	    (r (quaternion-ref object 1))
+	    (r (quaternion-ref object 2))
+	    (r (quaternion-ref object 3)))))
+	((series? object)
+	 (make-series (g:arity object)
+		      (map-stream (replace-differential-tag oldtag newtag)
+				  (series->stream object))))
+	(else object)))
+
+(define (remove-differential-tag tag tags) (delv tag tags))
+
+(define (insert-differential-tag tag tags)
+  (cond ((null? tags) (list tag))
+	((<dt tag (car tags)) (cons tag tags))
+	((=dt tag (car tags))
+	 (error "INSERT-DIFFERENTIAL-TAGS:" tag tags))
+	(else
+	 (cons (car tags)
+	       (insert-differential-tag tag (cdr tags))))))
+|#
+
+#|     
+;;; 2011 buggy version: did not handle derivative functions with multiple args
+;;; (define ((f x) y z) (* x y z))
+;;; (((D f) 2) 3 4) should return 12, but gets error.
+
+(define ((hide-tag-in-procedure external-tag procedure) x)
+  (let ((internal-tag (make-differential-tag)))
+    (hide-tag-in-object internal-tag
+      (((replace-differential-tag external-tag internal-tag) procedure) x))))
+
+(define ((replace-differential-tag oldtag newtag) object)
+  (cond ((differential? object)
+	 (terms->differential
+	  (map (lambda (term)
+		 (if (memv oldtag (differential-tags term))
+		     (make-differential-term
+		      (insert-differential-tag newtag
+                       (remove-differential-tag oldtag
+                        (differential-tags term)))
+		      (differential-coefficient term))
+		     term))
+	       (differential-term-list object))))
+	((procedure? object)
+	 (let ((new
+		(compose (replace-differential-tag newtag oldtag)
+			 object
+			 (replace-differential-tag oldtag newtag))))
+	   (cond ((function? object)
+		  new)
+		 ((operator? object)
+		  (make-operator new 'composition (operator-subtype object)))
+		 (else
+		  (error "Unknown procedure type --REPLACE-DIFFERENTIAL-TAGS:"
+			 oldtag newtag object)))))
+	((structure? object)
+	 (s:map/r (replace-differential-tag oldtag newtag) object))
+	((matrix? object)
+	 ((m:elementwise (replace-differential-tag oldtag newtag)) object))
+	((series? object)
+	 (make-series (g:arity object)
+		      (map-stream (replace-differential-tag oldtag newtag)
+				  (series->stream object))))
+	(else object)))
+|#
