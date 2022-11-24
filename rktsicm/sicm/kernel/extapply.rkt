@@ -7,29 +7,31 @@
          *enable-generic-apply*)
 
 (require (for-syntax racket/base)
-         (only-in "../rkt/todo.rkt" bind-condition-handler condition-type:unbound-variable access-condition use-value condition-type:floating-point-underflow condition-accessor condition-type:inapplicable-object bind-default-condition-handler)
-         "../rkt/environment.rkt"
+         (only-in "../rkt/todo.rkt" bind-condition-handler use-value condition-type:floating-point-underflow)
          "../parameters.rkt"
-         "types.rkt"
-         "generic.rkt")
+         "cstm/generic.rkt")
 
 ;;;; Scheme evaluator extensions for algebra.
 
 ;;; Extension of Scheme for application of non-procedures in operator position.
+
+#; ;parameter moved to paramters
+(define *enable-generic-apply* true)
 
 (define-syntax-rule (myapp f args ...)
   (if (and (not (procedure? f)) (*enable-generic-apply*))
       (#%app g:apply f (list args ...))
       (#%app f args ...)))
 
-#|(define inapplicable-object/operator
+#|
+(define inapplicable-object/operator
   (condition-accessor condition-type:inapplicable-object 'DATUM))
 
 (define (apply-extension-init)
   (bind-default-condition-handler
    (list condition-type:inapplicable-object)
    (lambda (condition)
-     (when *enable-generic-apply*
+     (if *enable-generic-apply*
        (use-value
         (lambda args
           (g:apply (inapplicable-object/operator condition) args)))))))
@@ -42,7 +44,7 @@
 	     'done)
       'already-done))
 
-;(once-only! apply-extension-init 'apply-extension-init)
+(once-only! apply-extension-init 'apply-extension-init)
 |#
 
 #|
@@ -81,10 +83,9 @@
        (syntax-parameterize ([#%top (syntax-rules () [(_ . id) 'id])])
          (thunk))]))
 
-#;(define (with-self-evaluating-unbound-variables thunk)
-  (with-handlers ([exn:fail? (λ (e) (println e))])
-    (thunk))
-  #;(bind-condition-handler
+#;
+(define (with-self-evaluating-unbound-variables thunk)
+  (bind-condition-handler
       (list condition-type:unbound-variable)
       (lambda (condition)
 	(let ((variable-name
@@ -103,6 +104,9 @@
 
 ;;; *enable-generic-apply* is tested in applicable-literal?, used in
 ;;; g:apply.  See generic.scm.
+
+#; ;moved to parameter
+(define *enable-literal-apply* #f)
 
 (define (with-literal-apply-enabled thunk)
   (parameterize ([*enable-literal-apply* #t])
@@ -129,7 +133,6 @@
 	     (+ (f 'a) 3)) ))))
 (+ 3 (f a))
 |#
-
 
 ;;; (define *numbers-are-constant-functions* #f) in numbers.scm.  If
 ;;; this is set to #t then numbers are applied as constant functions.
