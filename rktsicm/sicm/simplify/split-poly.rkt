@@ -2,11 +2,10 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-intr.rkt"
-         "../general/list-utils.rkt"
+(require (only-in "../rkt/glue.rkt" if iota
+                  fix:= fix:> fix:+ fix:-)
          "../general/logic-utils.rkt"
-         "sparse.rkt"
+         "../kernel-intr.rkt"
          "pcf.rkt"
          "pcf-fpf.rkt"
          "simplify.rkt"
@@ -76,7 +75,7 @@
 		(map (lambda (f n)
 		       (symb:expt f (fix:+ n 1)))
 		     (cdr factors)
-		     (build-list (fix:- (length factors) 1) values)))))
+		     (iota (fix:- (length factors) 1))))))
 
 (define (split-polynomial->expression P)
   (let ((factors (factor-polynomial-expression P)))
@@ -226,7 +225,7 @@
 	       (odds 1)
 	       (evens 1))
 	(cond ((null? factors)
-               (when (not (and (number? evens) (= evens 1)))
+               (if (not (and (number? evens) (= evens 1)))
                    (assume! `(non-negative? ,evens) 'root-out-squares))
 	       (symb:* (symb:sqrt odds) evens))
 	      ((expt? (car factors))

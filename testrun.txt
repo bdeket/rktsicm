@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8500 real time: 8507 gc time: 281
+cpu time: 8562 real time: 8569 gc time: 251
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 40188 real time: 40184 gc time: 62
-cpu time: 27047 real time: 27153 gc time: 188
-cpu time: 3375 real time: 3379 gc time: 16
+cpu time: 40860 real time: 40865 gc time: 95
+cpu time: 27719 real time: 27722 gc time: 236
+cpu time: 3468 real time: 3471 gc time: 31
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -283,7 +283,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 250 real time: 237 gc time: 0
+cpu time: 234 real time: 236 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -404,7 +404,10 @@ raco test: (submod ".\\sicm\\tests\\simplify\\pcf.rkt" test)
 raco test: (submod ".\\sicm\\tests\\simplify\\simplify.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\simplify\\split-poly.rkt" test)
+5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
+0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x254) (* -1 x255)) (eq:0) (x255 x254)) ((+ -7 (* 3 x254) x255) (eq:1) (x255 x254)))
-'(((+ -5 (* 3 x262) (* -1 x263)) (eq:0) (x263 x262)) ((+ k264 (* 3 x262) x263) (eq:1) (x263 x262 k264)))
-10/288 test failures
+'(((+ -5 (* 3 x294) (* -1 x295)) (eq:0) (x295 x294)) ((+ -7 (* 3 x294) x295) (eq:1) (x295 x294)))
+'(((+ -5 (* 3 x302) (* -1 x303)) (eq:0) (x303 x302)) ((+ k304 (* 3 x302) x303) (eq:1) (x303 x302 k304)))
+10/293 test failures

@@ -1,12 +1,14 @@
 #lang racket/base
 
-(require "../kernel-intr.rkt"
-         "../rkt/environment.rkt")
+(require "../rkt/hashtable.rkt"
+         "../rkt/environment.rkt"
+         "../kernel-intr.rkt"
+         )
 
 ;;;; Symbolic environment for simplification
 
 (define (symbolic-operator operator-symbol)
-  (let ((v (hash-ref symbolic-operator-table operator-symbol #f)))
+  (let ((v (hash-table/get symbolic-operator-table operator-symbol #f)))
     (if v
 	v
 	(error "Undefined symbolic operator" operator-symbol))))
