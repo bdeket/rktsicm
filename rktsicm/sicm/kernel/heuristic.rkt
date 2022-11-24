@@ -1,8 +1,10 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (all-defined-out))
 
-(require (only-in "../rkt/todo.rkt" rationalize->exact)
+(require (only-in "../rkt/glue.rkt" if)
+         "../rkt/define.rkt"
+         (only-in "../rkt/todo.rkt" rationalize->exact)
          "cstm/generic.rkt"
          "numeric.rkt"
          "numsymb.rkt")
@@ -38,13 +40,15 @@
 
 (define heuristic-symbolize? #t)
 
-(define (heuristic-canonicalize-real a
-                                     [symbolize? heuristic-symbolize?]
-                                     [zero-threshold heuristic-rounding-tiny])
+(define (heuristic-canonicalize-real a #:optional symbolize? zero-threshold)
+  (if (default-object? symbolize?) (set! symbolize? heuristic-symbolize?))
+  (if (default-object? zero-threshold) (set! zero-threshold heuristic-rounding-tiny))
   (h-c-r a symbolize? zero-threshold))
 
-(define (heuristic-round-real x [zero-threshold heuristic-rounding-tiny])
-  (h-c-r x #f zero-threshold))
+(define (heuristic-round-real x #:optional zero-threshold)
+  (if (default-object? zero-threshold)
+      (h-c-r x #f heuristic-rounding-tiny)
+      (h-c-r x #f zero-threshold)))
 
 (define (h-c-r a symbolize? zero-threshold)
   (if (and zero-threshold (< (abs a) zero-threshold))
@@ -75,13 +79,15 @@
     (,:phi :phi)
     ))
 
-(define (heuristic-canonicalize-complex z
-                                        [symbolize? heuristic-symbolize?]
-                                        [zero-threshold heuristic-rounding-tiny])
+(define (heuristic-canonicalize-complex z #:optional symbolize? zero-threshold)
+  (if (default-object? symbolize?) (set! symbolize? heuristic-symbolize?))
+  (if (default-object? zero-threshold) (set! zero-threshold heuristic-rounding-tiny))
   (h-c-c z symbolize? zero-threshold))
 
-(define (heuristic-round-complex z [zero-threshold heuristic-rounding-tiny])
-  (h-c-c z #f zero-threshold))
+(define (heuristic-round-complex z #:optional zero-threshold)
+  (if (default-object? zero-threshold)
+      (h-c-c z #f heuristic-rounding-tiny)
+      (h-c-c z #f zero-threshold)))
 
 (define (h-c-c z symbolize? zero-threshold)
   (if (real? z)

@@ -2,10 +2,10 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../general/logic-utils.rkt" disjunction)
-         (only-in "../rkt/undefined.rkt" undefined-value?)
+(require (only-in "../rkt/glue.rkt" if undefined-value?)
          (only-in "../rkt/environment.rkt" access ->environment scmutils-base-environment)
          (only-in "../rkt/todo.rkt" todo pp)
+         (only-in "../general/logic-utils.rkt" disjunction)
          (only-in "types.rkt" operator?)
          )
 
@@ -18,27 +18,10 @@
 (todo unsimplifiable?)
 (todo record?)
 (todo record-type-name)
-(todo record-type-description)
 (todo record-type-descriptor)
-(todo record-description)
+(todo pp-description)
 (todo port/operation)
 (todo internal-show-expression)
-
-#|
-;;; I don't trust this!
-
-(define saved-repl-eval
-  (access default/repl-eval
-	  (->environment '(runtime rep))))
-
-(define (scmutils/repl-eval s-expression environment repl)
-  ;; Reset the differential tag count each time we start a new eval.
-  ;; See kernel/deriv.scm.
-  (set! (access differential-tag-count scmutils-base-environment) 0)
-  (saved-repl-eval s-expression environment repl))
-
-(set! hook/repl-eval scmutils/repl-eval)
-|#
 
 (define saved-repl-eval
   (access default/repl-eval
@@ -55,18 +38,18 @@
   (access default/repl-write
 	  (->environment '(runtime rep))))
 
-(define (scmutils/repl-write object s-expression repl)
+(define (scmutils/repl-write objects s-expression repl)
   (let* ((port (cmdl/port repl))
 	 (edwin? (edwin-port? port)))
     (define (maybe-message val)
-      (when edwin? (edwin/transcript-write val #f)))
+      (if edwin? (edwin/transcript-write val #f)))
     (define (simplifiable object)
       (prepare-for-printing object simplify)
       (let ((val (*last-expression-printed*)))
 	(if ((disjunction symbol? number?) val)
 	    (print-unsimplifiable val)
 	    (begin (display "#|\n" port)
-		   (println val port)
+		   (pp val port)
 		   (display "|#\n" port)
 		   (maybe-message val)))))
     (define (print-unsimplifiable object)
@@ -74,23 +57,29 @@
       (write object port)
       (display " |#\n" port)
       (maybe-message object))
-    (cond ((unsimplifiable? object)
-	   (if (undefined-value? object)
-	       (begin (newline port)
-                      (display ";No return value." port)
-		      (maybe-message object))
-	       (print-unsimplifiable object)))
-	  ((or (symbol? object)
-	       (list? object)
-	       (vector? object)
-	       (procedure? object))
-	   (simplifiable object))
-	  ((record? object)
-	   (simplifiable
-	    `(*record*
-	      ,(record-type-name (record-type-descriptor object))
-	      ,@(record-description object))))
-	  (else (print-unsimplifiable object)))))
+    (define (doit object)
+      (cond ((unsimplifiable? object)
+             (if (undefined-value? object)
+                 (begin (newline port)
+                        (display ";No return value." port)
+                        (maybe-message object))
+                 (print-unsimplifiable object)))
+            ((or (symbol? object)
+                 (list? object)
+                 (vector? object)
+                 (procedure? object))
+             (simplifiable object))
+            ((record? object)
+             (simplifiable
+              `(*record*
+                ,(record-type-name (record-type-descriptor object))
+                ,@(pp-description object))))
+            (else (print-unsimplifiable object))))
+    (if (null? objects)
+        (begin ;; (newline port)
+               (display ";No return value." port)
+               (maybe-message ""))
+        (for-each doit objects))))
 
 (define (start-scmutils-print)
   (set! hook/repl-write scmutils/repl-write))
@@ -98,16 +87,29 @@
 (define (stop-scmutils-print)
   (set! hook/repl-write saved-repl-write))
 
-
+#|
 (define edwin/write-result
   (access operation/write-result (->environment '(edwin inferior-repl))))
 
-(define edwin/transcript-write
-  (access transcript-write (->environment '(edwin inferior-repl))))
 
 (define (edwin-port? port)
   (eq? (port/operation port 'write-result)
        edwin/write-result))
+
+(define (edwin-port? port)
+  #f)
+|#
+
+(define edwin/write-values
+  (access operation/write-values
+          (->environment '(edwin inferior-repl))))
+
+(define (edwin-port? port)
+  (eqv? edwin/write-values
+        (port/operation port 'write-values)))
+
+(define edwin/transcript-write
+  (access transcript-write (->environment '(edwin inferior-repl))))
 
 
 (define (display-expression)

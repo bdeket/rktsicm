@@ -78,7 +78,6 @@
 
 	(d 'derivative g:derivative)
 
-
 	;; Binary (and nary) operators from generic.scm
 
 	(d '= g:=)
@@ -138,8 +137,7 @@
 	)
     e))
 
-;*r* (define generic-environment
-;*r*  (generic-environment-maker))
+;;bdk;; slightly differen
 (void (generic-environment-maker generic-environment))
 
 
@@ -153,3 +151,13 @@
 		      '*environment*
 		      'numerical-environment))
 |#
+
+#;
+(let ((numerical-environment
+       (extend-top-level-environment scmutils-base-environment)))
+  (environment-define scmutils-base-environment
+		      'numerical-environment
+		      numerical-environment)
+  (environment-define numerical-environment
+		      '*environment*
+		      'numerical-environment))

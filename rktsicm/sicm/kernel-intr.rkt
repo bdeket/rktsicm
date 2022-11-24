@@ -1,7 +1,6 @@
 #lang racket/base
 
-(require (only-in "kernel/custom-repl.rkt")
-         "kernel/deriv.rkt"
+(require "kernel/deriv.rkt"
          "kernel/diff.rkt"
          "kernel/express.rkt"
          (only-in "kernel/extapply.rkt"
@@ -9,7 +8,6 @@
                   with-literal-reconstruction-enabled
                   with-self-evaluating-unbound-variables)
          "kernel/function.rkt"
-         (only-in "kernel/genenv.rkt")
          "kernel/generic.rkt"
          "kernel/heuristic.rkt"
          "kernel/iterat.rkt"
@@ -32,13 +30,11 @@
 
 (provide
  (except-out
-  (all-from-out "kernel/custom-repl.rkt"
-                "kernel/deriv.rkt"
+  (all-from-out "kernel/deriv.rkt"
                 "kernel/diff.rkt"
                 "kernel/express.rkt"
                 "kernel/extapply.rkt"
                 "kernel/function.rkt"
-                "kernel/genenv.rkt"
                 "kernel/generic.rkt"
                 "kernel/heuristic.rkt"
                 "kernel/iterat.rkt"
