@@ -4,7 +4,8 @@
          #%top
          (rename-out [myapp #%app])
          *enable-literal-apply*
-         *enable-generic-apply*)
+         *enable-generic-apply*
+         (except-out (all-from-out racket/base) #%app))
 
 (require (for-syntax racket/base)
          (only-in "../rkt/todo.rkt" bind-condition-handler use-value condition-type:floating-point-underflow)

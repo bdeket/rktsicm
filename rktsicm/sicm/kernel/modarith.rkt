@@ -1,9 +1,10 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../general/assert.rkt"
-         "../rkt/int.rkt"
+(require (only-in "../rkt/glue.rkt" for-all? int:= int:- int:* int:+)
+         "../general/assert.rkt"
+         "numeric.rkt"
          "cstm/generic.rkt")
 (define-values (assign-operation modarith:assign-operations)
   (make-assign-operations 'modarith))
@@ -50,11 +51,13 @@
   (define (euclid a p cont)
     (if (int:= a 1)
         (cont 1 0)
-	(let-values ([(q r) (quotient/remainder p a)])
-          (euclid r a
-                  (lambda (x y)
-                    (cont (int:- y (int:* q x))
-                          x))))))
+	(let ((qr (integer-divide p a)))
+	  (let ((q (integer-divide-quotient qr))
+		(r (integer-divide-remainder qr)))
+	    (euclid r a
+		    (lambda (x y)
+		      (cont (int:- y (int:* q x))
+			    x)))))))
   (euclid a p
 	  (lambda (x y)
 	    (mod:reduce x p))))
@@ -131,7 +134,7 @@
 ;;;   Finds x such that  m[i] = x mod p[i]
 
 (define (mod:chinese-remainder . modints)
-  (assert (andmap modint? modints))
+  (assert (for-all? modints modint?))
   (let ((moduli (map mod:modulus modints))
 	(residues (map mod:residue modints)))
     ((modint:chinese-remainder moduli) residues)))
