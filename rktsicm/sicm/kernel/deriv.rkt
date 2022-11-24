@@ -1,9 +1,9 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../general/logic-utils.rkt"
-         "../rkt/default-object.rkt"
+(require (only-in "../rkt/glue.rkt" default-object default-object? cons*)
+         "../general/logic-utils.rkt"
          "diff.rkt"
          "generic.rkt"
          "mathutil.rkt"
@@ -64,7 +64,7 @@
   (define (a-euclidean-derivative v)
     (cond ((structure? v)
 	   (sd (lambda (w)
-		 (g:apply f (list (s:subst-internal v w selectors))))
+		 (f (s:subst-internal v w selectors)))
 	       (ref-internal v selectors)))
 	  ((null? selectors)
 	   (simple-derivative-internal f v))
@@ -137,7 +137,7 @@
 	  ((equal? a *at-least-two*)
 	   (lambda (x y . z)
 	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (list* x y z)))))
+	      (list->up-structure (cons* x y z)))))
 	  ((equal? a *exactly-two*)
 	   (lambda (x y)
 	     ((d (lambda (s) (g:apply f (up-structure->list s))))
@@ -145,7 +145,7 @@
 	  ((equal? a *at-least-three*)
 	   (lambda (u x y . z)
 	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (list* u x y z)))))
+	      (list->up-structure (cons* u x y z)))))
 	  ((equal? a *exactly-three*)
 	   (lambda (x y z)
 	     ((d (lambda (s) (g:apply f (up-structure->list s))))

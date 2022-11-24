@@ -1,14 +1,20 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../rkt/default-object.rkt"
+(require (only-in "../rkt/glue.rkt" if default-object default-object?)
          "generic.rkt"
          "types.rkt"
          "utils.rkt"
          )
 (define-values (assign-operation function:assign-operations)
   (make-assign-operations 'function))
+
+(define (p-rename op fct)
+  (define a (regexp-replace #px"#<procedure:(.*)>" (format "~a" op) "\\1"))
+  (define b (regexp-replace #px"$g:" a ""))
+  (define c (regexp-replace #px"^_(.*)_$" b "\\1"))
+  (procedure-rename fct (string->symbol (format "f:~a" c))))
 
 
 ;;;;            Functions
@@ -17,11 +23,6 @@
 (define (f:type-predicate f) function-quantity?)
 
 ;;; Arity manipulation procedures are in UTILS.SCM
-(define (p-rename op fct)
-  (define a (regexp-replace #px"#<procedure:(.*)>" (format "~a" op) "\\1"))
-  (define b (regexp-replace #px"$g:" a ""))
-  (define c (regexp-replace #px"^_(.*)_$" b "\\1"))
-  (procedure-rename fct (string->symbol (format "f:~a" c))))
 
 (define ((f:unary operator) f)
   (p-rename operator (compose-bin operator f)))
@@ -30,7 +31,7 @@
   (let ((f1 (if (function? f1) f1 (coerce-to-function f1)))
 	(f2 (if (function? f2) f2 (coerce-to-function f2))))	
     (let ((a (joint-arity (g:arity f1) (g:arity f2))))
-      (unless a
+      (if (not a)
 	  (error "Functions have different arities" f1 f2))
       (p-rename operator
        (cond ((equal? a *at-least-zero*)

@@ -9,6 +9,10 @@
 (define (make-operator p [name #f] [subtype #f] [arity (procedure-arity p)] . opts)
   (make-apply-hook p `(,operator-type-tag ,subtype ,name ,arity ,@opts)))
 
+(define (make-op p name subtype arity opts)
+  (make-apply-hook p `(,operator-type-tag ,subtype ,name ,arity ,@opts)))
+
+;;bdk;; from ../types
 (define (operator? x)
   (and (apply-hook? x)
        (eq? (car (apply-hook-extra x))

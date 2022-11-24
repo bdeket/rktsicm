@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 11000 real time: 11002 gc time: 390
+cpu time: 10953 real time: 10946 gc time: 347
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 47766 real time: 47798 gc time: 155
-cpu time: 32219 real time: 32226 gc time: 300
-cpu time: 3968 real time: 3955 gc time: 0
+cpu time: 48671 real time: 48665 gc time: 187
+cpu time: 33297 real time: 33298 gc time: 235
+cpu time: 3938 real time: 3934 gc time: 16
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -239,7 +239,7 @@ Bad point: rectangular (*diff* (() #<procedure:...ector-fields.rkt:99:0>) ((37) 
 calculus/vector-calculus > R4-rect
 ERROR
 
-Bad point: rectangular (*diff* (() #<procedure:...nel/operator.rkt:170:17>) ((166) 1)) #<procedure:me>
+Bad point: rectangular (*diff* (() #<procedure:...nel/operator.rkt:170:11>) ((166) 1)) #<procedure:me>
 --------------------
 0 success(es) 0 failure(s) 2 error(s) 2 test(s) run
 2
@@ -283,7 +283,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 329 real time: 335 gc time: 0
+cpu time: 328 real time: 326 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run

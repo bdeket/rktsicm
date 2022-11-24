@@ -11,7 +11,7 @@
          "../general/logic-utils.rkt"
          "types.rkt"
          "utils.rkt"
-         (rename-in "cstm/s-operator.rkt" [make-operator make-op])
+         "cstm/s-operator.rkt"
          "generic.rkt"
          "cstm/diff.rkt"
          "matrices.rkt"

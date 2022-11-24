@@ -1,21 +1,21 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/s-operator.rkt"))
 
 (require (only-in racket/list take)
-         "cstm/s-operator.rkt"
          "../rkt/default-object.rkt"
          "../rkt/applyhook.rkt"
          "../general/assert.rkt"
          "../general/sets.rkt"
+         "cstm/s-operator.rkt"
          "express.rkt"
-         "function.rkt"
-         "generic.rkt"
-         "mathutil.rkt"
-         "cstm/pseries+.rkt"
          "types.rkt"
          "utils.rkt"
+         "generic.rkt"
+         "mathutil.rkt"
+         "function.rkt"
+         "cstm/pseries+.rkt"
          )
 (define-values (assign-operation operator:assign-operations)
   (make-assign-operations 'operator))
@@ -39,15 +39,17 @@
   (make-apply-hook p `(,operator-type-tag ,subtype ,name ,arity ,@opts)))
 |#
 
+;;bdk;; make-op etc moved to cstm/s-operator
+
 (define (simple-operator? op)
   (and (operator? op)
        (not (operator-subtype op))))
 
 (define (set-operator-optionals! op value)
   (assert (operator? op))
-  (set-apply-hook-extra! op (append (take (apply-hook-extra op) 4) value))
+  (set-apply-hook-extra! op (append (take (apply-hook-extra op) 4) value)) #;
+  (set-cdr! (cdddr (apply-hook-extra op)) value)
   op)
-
 
 (define (operator-merge-subtypes op1 op2)
   (let ((t1 (operator-subtype op1))
@@ -69,7 +71,7 @@
 
 (define (o:zero-like op)
   (assert (equal? (operator-arity op) *exactly-one*) "o:zero-like")
-  (make-operator (lambda (f) (g:zero-like f))
+  (make-op (lambda (f) (g:zero-like f))
 	   'zero
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -77,7 +79,7 @@
 
 (define (o:one-like op)
   (assert (equal? (operator-arity op) *exactly-one*) "o:one-like")
-  (make-operator g:identity
+  (make-op g:identity
 	   'identity
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -86,9 +88,8 @@
 (define o:identity
   (make-operator g:identity 'identity))
 
-
 (define (o:+ op1 op2)
-  (make-operator (lambda fs
+  (make-op (lambda fs
 	     (g:+ (apply op1 fs) (apply op2 fs)))
 	   `(+ ,(operator-name op1)
 	       ,(operator-name op2))
@@ -97,7 +98,7 @@
 	   (operator-merge-optionals op1 op2)))
 
 (define (o:- op1 op2)
-  (make-operator (lambda fs
+  (make-op (lambda fs
 	     (g:- (apply op1 fs) (apply op2 fs)))
 	   `(- ,(operator-name op1)
 	       ,(operator-name op2))
@@ -107,7 +108,7 @@
 
 (define (o:o+f op f)
   (let ((h (coerce-to-function f)))
-    (make-operator (lambda (g)
+    (make-op (lambda (g)
 	       (g:+ (op g)
 		    (g:compose h g)))
 	     `(+ ,(operator-name op) ,(procedure-expression h))
@@ -117,7 +118,7 @@
 
 (define (o:f+o f op)
   (let ((h (coerce-to-function f)))
-    (make-operator (lambda (g)
+    (make-op (lambda (g)
 	       (g:+ (g:compose h g)
 		    (op g)))
 	     `(+ ,(procedure-expression h) ,(operator-name op))
@@ -127,7 +128,7 @@
 
 (define (o:o-f op f)
   (let ((h (coerce-to-function f)))
-    (make-operator (lambda (g)
+    (make-op (lambda (g)
 	       (g:- (op g)
 		    (g:compose h g)))
 	     `(- ,(operator-name op) ,(procedure-expression h))
@@ -137,7 +138,7 @@
 
 (define (o:f-o f op)
   (let ((h (coerce-to-function f)))
-    (make-operator (lambda (g)
+    (make-op (lambda (g)
 	       (g:- (g:compose h g)
 		    (op g)))
 	     `(- ,(procedure-expression h) ,(operator-name op))
@@ -146,20 +147,19 @@
 	     (operator-optionals op))))
 
 (define (o:negate op)
-  (make-operator (lambda fs
+  (make-op (lambda fs
 	     (g:negate (apply op fs)))
 	   `(- ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
 	   (operator-optionals op)))
 
-
 (define (o:* op1 op2)
   (let ((subtype
 	 (operator-merge-subtypes op1 op2)))
     (if (procedure? subtype)
 	(subtype op1 op2)
-	(make-operator (compose op1 op2)
+	(make-op (compose op1 op2)
 		 `(* ,(operator-name op1)
 		     ,(operator-name op2))
 		 subtype
@@ -167,7 +167,7 @@
 		 (operator-merge-optionals op1 op2)))))
 
 (define (o:f*o f op)
-  (make-operator (lambda gs
+  (make-op (lambda gs
 	     (g:* f (apply op gs)))
 	   `(* ,(procedure-expression
 		 (coerce-to-function f))
@@ -177,7 +177,7 @@
 	   (operator-optionals op)))
 
 (define (o:o*f op f)
-  (make-operator (lambda gs
+  (make-op (lambda gs
 	     (apply op (map (lambda (g) (g:* f g)) gs)))
 	   `(* ,(operator-name op)
 	       ,(procedure-expression
@@ -187,7 +187,7 @@
 	   (operator-optionals op)))
 
 (define (o:o/n op n)
-  (make-operator (lambda gs
+  (make-op (lambda gs
 	     (g:* (/ 1 n) (apply op gs)))
 	   `(/ ,(operator-name op) ,n)
 	   (operator-subtype op)
@@ -196,18 +196,17 @@
 
 (define (o:expt op n)
   (assert (equal? (operator-arity op) *exactly-one*) "o:expt")
-  (make-operator (iterated op n o:identity)
+  (make-op (iterated op n o:identity)
 	   `(expt ,(operator-name op) ,n)
 	   (operator-subtype op)
 	   (operator-arity op)
 	   (operator-optionals op)))
 
-
 (define (o:exp op)
   (assert (equal? (operator-arity op) *exactly-one*) "o:exp")
-  (make-operator (lambda (g)
+  (make-op (lambda (g)
 	     (lambda x
-	       (g:apply (series:value (series:value exp-series (list op)) (list g)) x)))
+	       (g:apply ((series:value exp-series (list op)) g) x)))
 	   `(exp ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -215,9 +214,9 @@
 
 (define (o:cos op)
   (assert (equal? (operator-arity op) *exactly-one*) "o:cos")
-  (make-operator (lambda (g)
+  (make-op (lambda (g)
 	     (lambda x
-	       (g:apply (series:value (series:value cos-series (list op)) (list g)) x)))
+	       (g:apply ((series:value cos-series (list op)) g) x)))
 	   `(cos ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -225,9 +224,9 @@
 
 (define (o:sin op)
   (assert (equal? (operator-arity op) *exactly-one*) "o:sin")
-  (make-operator (lambda (g)
+  (make-op (lambda (g)
 	     (lambda x
-	       (g:apply (series:value (series:value sin-series (list op)) (list g)) x)))
+	       (g:apply ((series:value sin-series (list op)) g) x)))
 	   `(sin ,(operator-name op))
 	   (operator-subtype op)
 	   (operator-arity op)
@@ -247,7 +246,7 @@
   (assert (equal? (operator-arity op) *exactly-one*) "o:expn")
   (if (default-object? exponent)
       (o:exp op)
-      (make-operator
+      (make-op
        (lambda (g)
 	 (lambda x
 	   (g:apply ((series:inflate (series:value exp-series (list op))
@@ -258,7 +257,6 @@
        (operator-subtype op)
        (operator-arity op)
        (operator-optionals op))))
-
 
 
 (assign-operation 'type                o:type            operator?)
@@ -283,12 +281,9 @@
 (assign-operation '/          o:o/n             operator? numerical-quantity?)
 
 
-(assign-operation 'solve-linear-right
-                  o:o/n  operator? numerical-quantity?)
-(assign-operation 'solve-linear-left
-                  (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
-(assign-operation 'solve-linear
-                  (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
+(assign-operation 'solve-linear-right o:o/n  operator? numerical-quantity?)
+(assign-operation 'solve-linear-left (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
+(assign-operation 'solve-linear      (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
 
 (assign-operation 'negate     o:negate          operator?)
 (assign-operation 'expt       o:expt            operator? exact-integer?)
