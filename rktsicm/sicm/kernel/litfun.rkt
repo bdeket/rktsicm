@@ -1,23 +1,22 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (all-defined-out)
          *literal-reconstruction*
          f:expression)
 
 (require (only-in racket/list make-list)
-         "../rkt/fixnum.rkt"
-         (only-in "../rkt/racket-help.rkt" symbol)
+         (only-in "../rkt/glue.rkt" if default-object default-object? symbol
+                  fix:= fix:+ fix:-)
          "../rkt/applyhook.rkt"
          "../general/logic-utils.rkt"
          "../parameters.rkt"
-         "diff.rkt"
-         "cstm/arity.rkt"
+         "utils.rkt"
+         "types.rkt"
          "cstm/express.rkt"
          "cstm/generic.rkt"
+         "diff.rkt"
          "numsymb.rkt"
          "structs.rkt"
-         "types.rkt"
-         "utils.rkt"
          )
 
 ;;;; Literal function descriptor language.
@@ -77,6 +76,7 @@
      (((partial 1 1) H) (up t (up (x t) (y t)) (down (p_x t) (p_y t)))))))
 |#
 
+;;bdk;; intall applicable-literal? case in g:apply. Not possible to define it there...
 (install-g:apply-case applicable-literal?
                       (λ (f args)
                         (apply
@@ -140,10 +140,9 @@
 (define (-> domain range)
   `(-> ,domain ,range))
 
-
 (define Any 'Any)
 
-(define (default-function-type n [type Real])
+(define (default-function-type n [type default-object])
   (if (= n 1)
       '(-> Real Real)
       (-> (X* Real n) Real)))
@@ -154,16 +153,15 @@
 
 ;;; Some useful types
 
-(define (Lagrangian [n 1])	;n = #degrees-of-freedom
-  (if (= n 1)
-      (-> (UP* Real (UP* Real) (UP* Real)) Real)
+(define (Lagrangian [n default-object])	;n = #degrees-of-freedom
+  (if (default-object? n)
+      (-> (UP Real (UP* Real) (UP* Real)) Real)
       (-> (UP Real (UP* Real n) (UP* Real n)) Real)))
 
-(define (Hamiltonian [n 1])	;n = #degrees-of-freedom
-  (if (= n 1)
+(define (Hamiltonian [n default-object])	;n = #degrees-of-freedom
+  (if (default-object? n)
       (-> (UP Real (UP* Real) (DOWN* Real)) Real)
       (-> (UP Real (UP* Real n) (DOWN* Real n)) Real)))
-
 
 #| ;;; For example
 
@@ -211,7 +209,6 @@
      (((partial 2 1) H) (up t (up x y) (down p_x p_y)))))
 |#
 
-
 ;;;---------------------------------------------------------------------
 
 (define (type->domain type)
@@ -232,17 +229,19 @@
 
 (define (type->arity type)
   (assert (eq? (car type) '->))
-  (let ([domain (type->domain type)])
-    (cond
-      [(and (pair? domain) (eq? (car domain) 'X))
-       (length->exact-arity (length (cdr domain)))]
-      [(and (pair? domain) (eq? (car domain) 'X*))
-       (arity-at-least 0)]
-      [else
-       (length->exact-arity 1)])))
+  (let ((domain (type->domain type)))
+    (cond ((and (pair? domain) (eq? (car domain) 'X))
+           (length->exact-arity (length (cdr domain))))
+          ((and (pair? domain) (eq? (car domain) 'X*))
+           *at-least-zero*)
+          (else
+           (length->exact-arity 1)))))
 
 (define length->exact-arity exact-arity)
-
+#; ;defined in cstm/arity
+(define (length->exact-arity n)
+  (assert (exact-integer? n))
+  (cons n n))
 
 (define (type-expression->predicate type-expression)
   (cond ((pair? type-expression)
@@ -313,7 +312,6 @@
 	((eq? type-expression Any) any?)
 	(else (error "Unknown primitive type" type-expression))))
 
-
 (define (all-satisfied type-preds structure)
   (let ((n (length type-preds)))
     (and (fix:= n (s:length structure))
@@ -346,12 +344,12 @@
 ;;; For computing the type of the range of the derivative of a
 ;;;  function with a given type.
 
-(define (df-range-type f-domain-types f-range-type arg)
-  ;; There is some idea here that I should do something like
-  ;; (type-complement (type-expression arg) f-range-type)
-  ;; but the argument currently escapes me as to why I need this.
-  f-range-type)
-
+;;; This is not really used.  Observed by Sam Ritchie: 15 August 2021
+;; (define (df-range-type f-domain-types f-range-type arg)
+;;   ;; There is some idea here that I should do something like
+;;   ;; (type-complement (type-expression arg) f-range-type)
+;;   ;; but the argument currently escapes me as to why I need this.
+;;   f-range-type)
 
 ;;; Functions with types are defined as apply hooks...
 
@@ -365,6 +363,18 @@
       (caddr (apply-hook-extra f))
       #f))
 
+#; ;moved to parameters
+(define *literal-reconstruction* #f)
+
+#; ;moved to types
+(define (f:expression f)
+  (if (typed-or-abstract-function? f)
+      (if *literal-reconstruction*
+	  (cadddr (cdr (apply-hook-extra f)))
+	  (cadddr (apply-hook-extra f)))
+      #f))
+
+
 (define (typed-function function range-type domain-types)
   (let ((arity (g:arity function)))
     (assert (exactly-n? arity)
@@ -372,14 +382,21 @@
     (assert (fix:= (length domain-types) (car arity))
 	    "Inconsistent arity -- TYPED-FUNCTION")
     (make-apply-hook function
-                     (list '*function* domain-types range-type #f))))
-
+                     (list '*function* domain-types range-type #f))
+    #;
+    (let ((apply-hook (make-apply-hook #f #f)))
+      (set-apply-hook-procedure! apply-hook function)
+      (set-apply-hook-extra! apply-hook
+                             (list '*function* domain-types range-type #f))
+      apply-hook)))
 
 (define (literal-function? f)
   (and (apply-hook? f)
        (eq? (car (apply-hook-extra f)) '*function*)))
 
-(define (literal-function fexp [descriptor (default-function-type 1)])
+(define (literal-function fexp [descriptor default-object])
+  (if (default-object? descriptor)
+      (set! descriptor (default-function-type 1)))
   (let ((arity (type->arity descriptor))
 	(range-type (type->range-type descriptor)))
     (cond ((or (eq? Real range-type)
@@ -450,60 +467,112 @@
 		(add-property! ans 'type-expression rtype)
 		ans))))))
 
+;;; Sam Ritchie's improvement: 15 August 2021
 (define (litderiv apply-hook args)
-  (let ((v (list->up-structure args)))
-    (let ((maxtag (apply max-order-tag (s:fringe v))))
-      (let ((ev
-	     (up-structure->list
-	      (s:map/r (lambda (x) (without-tag x maxtag)) v)))
-	    (dv
-	     (s:map/r (lambda (x) (with-tag x maxtag)) v)))
-	(d:+ (apply apply-hook ev)
-	     (a-reduce d:+
-		       (map (lambda (partialx dx)
-			      (d:* (apply partialx ev) dx))
-			    (s:fringe (make-partials apply-hook v))  
-			    (s:fringe dv))))))))
+  (let* ((v        (list->up-structure args))
+         (maxtag   (apply max-order-tag (s:fringe v)))
+         (ev       (up-structure->list
+                    (s:map/r (lambda (x) (without-tag x maxtag)) v)))
+         (partials (s:fringe
+                    (s:map-chain
+                     (lambda (x path)
+                       (let ((dx (with-tag x maxtag)))
+                         ;; This is the same test applied inside
+                         ;; diff.scm.
+                         (if (and (number? dx) (zero? dx))
+                             0
+                             (let ((partialx
+                                    (literal-partial apply-hook path)))
+                               ;; we can use LITERAL-APPLY because we
+                               ;; know the type of PARTIALX, so no
+                               ;; need to use generics.
+                               (d:* (literal-apply partialx ev) dx)))))
+                     v))))
+    (d:+ (apply apply-hook ev)
+         (a-reduce d:+ partials))))
 
+(define (literal-partial apply-hook path)
+  (let ((fexp
+         (if (equal? (g:arity apply-hook) *exactly-one*) ;univariate
+             (if (fix:= (car path) 0)
+                 (if (fix:= (length path) 1)
+                     ;; Special-case the single argument case, or a
+                     ;; unary function that's provided with a
+                     ;; structure of a single entry.
+                     (symb:derivative (f:expression apply-hook))
+                     `((partial ,@(cdr path))
+                       ,(f:expression apply-hook)))
+                 (error "Wrong indices -- LITERAL-PARTIAL" path))
+             ;; If the function takes multiple arguments we DO need to
+             ;; index into that first layer. (else the first layer is
+             ;; added.)
+             `((partial ,@path)
+               ,(f:expression apply-hook))))
+        (range
+         (f:range-type apply-hook))
+        (domain
+         (f:domain-types apply-hook)))
+    (litfun fexp
+            (g:arity apply-hook)
+            range
+            domain
+            `(literal-function ',fexp
+                               (-> ,(apply X domain) ,range)))))
 
-(define (make-partials apply-hook v)
-  (define (fd indices vv)
-    (cond ((structure? vv)
-	   (s:generate (s:length vv) (s:same vv)
-		       (lambda (i)
-			 (fd (cons i indices)
-			     (s:ref vv i))))) 
-	  ((or (numerical-quantity? vv)
-	       (abstract-quantity? vv))
-	   (let ((fexp		  
-		  (let ((is (reverse indices)))
-		    (if (equal? (g:arity apply-hook) *exactly-one*) ;univariate
-			(if (fix:= (car is) 0)
-			    (if (fix:= (length indices) 1)
-				(symb:derivative (f:expression apply-hook))
-				`((partial ,@(cdr is))
-				  ,(f:expression apply-hook)))
-			    (error "Wrong indices -- MAKE-PARTIALS"
-				   indices vv))
-			`((partial ,@is)
-			  ,(f:expression apply-hook)))))
-		 (range
-		  (df-range-type (f:domain-types apply-hook)
-				 (f:range-type apply-hook)
-				 vv))
-		 (domain
-		  (f:domain-types apply-hook)))
-	     (litfun fexp
-		     (g:arity apply-hook)
-		     range
-		     domain
-		     `(literal-function ',fexp
-					(-> ,(apply X domain) ,range)))))
-	  (else
-	   (error "Bad structure -- MAKE-PARTIALS"
-		  indices vv))))
-  (fd '() v))
+;;; Previous version, before Sam Ritchie's improvement.
+;;
+;; (define (litderiv apply-hook args)
+;;   (let ((v (list->up-structure args)))
+;;     (let ((maxtag (apply max-order-tag (s:fringe v))))
+;;       (let ((ev
+;; 	     (up-structure->list
+;; 	      (s:map/r (lambda (x) (without-tag x maxtag)) v)))
+;; 	    (dv
+;; 	     (s:map/r (lambda (x) (with-tag x maxtag)) v)))
+;; 	(d:+ (apply apply-hook ev)
+;; 	     (a-reduce d:+
+;; 		       (map (lambda (partialx dx)
+;; 			      (d:* (apply partialx ev) dx))
+;; 			    (s:fringe (make-partials apply-hook v))  
+;; 			    (s:fringe dv))))))))
 
+;; (define (make-partials apply-hook v)
+;;   (define (fd indices vv)
+;;     (cond ((structure? vv)
+;; 	   (s:generate (s:length vv) (s:same vv)
+;; 		       (lambda (i)
+;; 			 (fd (cons i indices)
+;; 			     (s:ref vv i))))) 
+;; 	  ((or (numerical-quantity? vv)
+;; 	       (abstract-quantity? vv))
+;; 	   (let ((fexp		  
+;; 		  (let ((is (reverse indices)))
+;; 		    (if (equal? (g:arity apply-hook) *exactly-one*) ;univariate
+;; 			(if (fix:= (car is) 0)
+;; 			    (if (fix:= (length indices) 1)
+;; 				(symb:derivative (f:expression apply-hook))
+;; 				`((partial ,@(cdr is))
+;; 				  ,(f:expression apply-hook)))
+;; 			    (error "Wrong indices -- MAKE-PARTIALS"
+;; 				   indices vv))
+;; 			`((partial ,@is)
+;; 			  ,(f:expression apply-hook)))))
+;; 		 (range
+;; 		  (df-range-type (f:domain-types apply-hook)
+;; 				 (f:range-type apply-hook)
+;; 				 vv))
+;; 		 (domain
+;; 		  (f:domain-types apply-hook)))
+;; 	     (litfun fexp
+;; 		     (g:arity apply-hook)
+;; 		     range
+;; 		     domain
+;; 		     `(literal-function ',fexp
+;; 					(-> ,(apply X domain) ,range)))))
+;; 	  (else
+;; 	   (error "Bad structure -- MAKE-PARTIALS"
+;; 		  indices vv))))
+;;   (fd '() v))
 
 #|
 ;;; Not used anywhere.

@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8297 real time: 8301 gc time: 249
+cpu time: 8093 real time: 8087 gc time: 265
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 39985 real time: 39989 gc time: 234
-cpu time: 26625 real time: 26640 gc time: 218
-cpu time: 3328 real time: 3333 gc time: 30
+cpu time: 40765 real time: 40912 gc time: 127
+cpu time: 26563 real time: 26563 gc time: 187
+cpu time: 3297 real time: 3308 gc time: 30
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -248,7 +248,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\vector-fields.rkt" test)
 calculus/vector-fields > cylindrical >>> failing
 ERROR
 
-((f (#<procedure:...ernel/litfun.rkt:261:14> . #<manifold-point>))): Wrong type argument -- LITERAL-FUNCTION
+((f (#<procedure:...ernel/litfun.rkt:260:14> . #<manifold-point>))): Wrong type argument -- LITERAL-FUNCTION
 --------------------
 --------------------
 calculus/vector-fields > R2-rect >>> failing
@@ -283,7 +283,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 234 real time: 237 gc time: 0
+cpu time: 234 real time: 235 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
