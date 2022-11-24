@@ -1,23 +1,27 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/vectors.rkt"))
-(require "../rkt/fixnum.rkt"
-         "cstm/vectors.rkt"
+
+(require (only-in "../rkt/glue.rkt" if for-all? default-object default-object?
+                  fix:= fix:+)
          "../general/assert.rkt"
-         "cstm/express.rkt"
-         "cstm/generic.rkt"
-         "iterat.rkt"
-         "numbers.rkt"
          "numeric.rkt"
-         "types.rkt"
          "utils.rkt"
+         "iterat.rkt"
+         "types.rkt"
+         "cstm/generic.rkt"
+         "cstm/express.rkt"
+         "cstm/vectors.rkt"
+         "numbers.rkt"
          )
 (define-values (assign-operation vectors:assign-operations)
   (make-assign-operations 'vectors))
 
 ;;;;            Vectors
 
+
+;;bdk;; v:type -predicate moved to cstm/vectors
 
 ;;; This file makes the identification of the Scheme VECTOR data
 ;;; type with mathematical n-dimensional vectors.  These are 
@@ -29,13 +33,15 @@
 ;;; We also get the iterator MAKE-INITIALIZED-VECTOR, 
 ;;; and the predicate VECTOR?
 
+;;bdk;; v:generate moved to cstm/vectors
+
 (define ((v:elementwise f) . vectors)
   (assert (and (not (null? vectors))
-	       (andmap vector? vectors)))
+	       (for-all? vectors vector?)))
   (let ((n (v:dimension (car vectors))))
-    (assert (andmap (lambda (m)
-                      (fix:= (v:dimension m) n))
-                    (cdr vectors)))
+    (assert (for-all? (cdr vectors)
+                      (lambda (m)
+                        (fix:= (v:dimension m) n))))
     (v:generate
      (vector-length (car vectors))
      (lambda (i)
@@ -44,6 +50,7 @@
 		     vectors))))))
 
 (define vector:elementwise v:elementwise)
+
 
 (define (v:zero? v)
   (vector-forall g:zero? v))
@@ -63,7 +70,6 @@
 		 (string-append (symbol->string name)
 				"^"
 				(number->string i))))))
-
 
 (define (v:make-basis-unit n i)	; #(0 0 ... 1 ... 0) n long, 1 in ith position
   (v:generate n (lambda (j) (if (fix:= j i) :one :zero))))
@@ -120,7 +126,6 @@
     (lambda (i)
       (g:/ (vector-ref v i) s))))
 
-
 (define (v:inner-product v1 v2)
   (assert (and (vector? v1) (vector? v2))
 	  "Not vectors -- INNER-PRODUCT" (list v1 v2))
@@ -134,13 +139,14 @@
 	      (g:+ ans
 		   (g:* (g:conjugate (vector-ref v1 i))
 			(vector-ref v2 i))))))))
+
+;;bdk;; v:inner-product moved to cstm/vectors
     
 (define (v:square v)
   (v:dot-product v v))
 
 (define (v:cube v)
   (scalar*vector (v:dot-product v v) v))
-
 
 (define (euclidean-norm v)
   (g:sqrt (v:dot-product v v)))
@@ -163,10 +169,12 @@
 (define (v:conjugate v)
   ((v:elementwise g:conjugate) v))
 
+;;bdk;; v:cross-product moved to cstm/vectors
+
 (define (general-inner-product addition multiplication :zero)
   (define (ip v1 v2)
     (let ((n (vector-length v1)))
-      (when (not (fix:= n (vector-length v2)))
+      (if (not (fix:= n (vector-length v2)))
 	  (error "Unequal dimensions -- INNER-PRODUCT" v1 v2))
       (if (fix:= n 0)
 	  :zero
@@ -207,7 +215,6 @@
 
 (define (v:inexact? v)
   (vector-exists g:inexact? v))
-
 
 
 (assign-operation 'type                v:type            vector?)
@@ -256,7 +263,6 @@
 (assign-operation 'apply       v:apply           vector? any?)
 |#
 
-
 ;;; Abstract vectors generalize vector quantities.
 
 (define (abstract-vector symbol)
@@ -271,8 +277,8 @@
     (add-property! z 'zero #t)
     z))
 
-(define (make-vector-combination operator [reverse? #f])
-  (if reverse?
+(define (make-vector-combination operator [reverse? default-object])
+  (if (default-object? reverse?)
       (lambda operands 
 	(make-combination vector-type-tag
 			  operator operands))
@@ -290,35 +296,51 @@
 
 (assign-operation 'zero?    (has-property? 'zero)    abstract-vector?)
 
-(assign-operation 'negate     (make-vector-combination 'negate)     abstract-vector?)
-(assign-operation 'magnitude  (make-vector-combination 'magnitude)  abstract-vector?)
-(assign-operation 'abs        (make-vector-combination 'abs)        abstract-vector?)
-(assign-operation 'conjugate  (make-vector-combination 'conjugate)  abstract-vector?)
-
-;(assign-operation derivative (make-vector-combination 'derivative) abstract-vector?)
-
+(assign-operation
+ 'negate     (make-vector-combination 'negate)     abstract-vector?)
+(assign-operation
+ 'magnitude  (make-vector-combination 'magnitude)  abstract-vector?)
+(assign-operation
+ 'abs        (make-vector-combination 'abs)        abstract-vector?)
+(assign-operation
+ 'conjugate  (make-vector-combination 'conjugate)  abstract-vector?)
+#|
+(assign-operation
+ 'derivative (make-vector-combination 'derivative) abstract-vector?)
+|#
 
 ;(assign-operation '= vector=vector abstract-vector? abstract-vector?)
-(assign-operation '+  (make-vector-combination '+) abstract-vector? abstract-vector?)
-(assign-operation '+  (make-vector-combination '+) vector?          abstract-vector?)
-(assign-operation '+  (make-vector-combination '+ 'r)       abstract-vector? vector?)
+(assign-operation
+ '+  (make-vector-combination '+) abstract-vector? abstract-vector?)
+(assign-operation
+ '+  (make-vector-combination '+) vector?          abstract-vector?)
+(assign-operation
+ '+  (make-vector-combination '+ 'r)       abstract-vector? vector?)
 
-
-(assign-operation '-  (make-vector-combination '-) abstract-vector? abstract-vector?)
-(assign-operation '-  (make-vector-combination '-) vector?          abstract-vector?)
-(assign-operation '-  (make-vector-combination '-) abstract-vector? vector?)
+(assign-operation
+ '-  (make-vector-combination '-) abstract-vector? abstract-vector?)
+(assign-operation
+ '-  (make-vector-combination '-) vector?          abstract-vector?)
+(assign-operation
+ '-  (make-vector-combination '-) abstract-vector? vector?)
 		     
-(assign-operation '*  (make-numerical-combination '*)    abstract-vector? abstract-vector?)
-(assign-operation '*  (make-numerical-combination '*)    vector?          abstract-vector?)
-(assign-operation '*  (make-numerical-combination '* 'r) abstract-vector? vector?)
-(assign-operation '*  (make-vector-combination '*)       scalar?          abstract-vector?)
-(assign-operation '*  (make-vector-combination '* 'r)    abstract-vector? scalar?)
+(assign-operation
+ '*  (make-numerical-combination '*)    abstract-vector? abstract-vector?)
+(assign-operation
+ '*  (make-numerical-combination '*)    vector?          abstract-vector?)
+(assign-operation
+ '*  (make-numerical-combination '* 'r) abstract-vector? vector?)
+(assign-operation
+ '*  (make-vector-combination '*)       scalar?          abstract-vector?)
+(assign-operation
+ '*  (make-vector-combination '* 'r)    abstract-vector? scalar?)
 		     
-(assign-operation '/  (make-vector-combination '/)       abstract-vector? scalar?)
+(assign-operation
+ '/  (make-vector-combination '/)       abstract-vector? scalar?)
 
 
-(assign-operation 'dot-product
-                  (make-vector-combination 'dot-product)
+(assign-operation
+ 'dot-product (make-vector-combination 'dot-product)
    abstract-vector? abstract-vector?)
 
 (assign-operation 'partial-derivative

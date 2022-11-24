@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 10953 real time: 10946 gc time: 347
+cpu time: 10984 real time: 10980 gc time: 425
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 48671 real time: 48665 gc time: 187
-cpu time: 33297 real time: 33298 gc time: 235
-cpu time: 3938 real time: 3934 gc time: 16
+cpu time: 46875 real time: 46878 gc time: 170
+cpu time: 31437 real time: 31442 gc time: 249
+cpu time: 3954 real time: 3950 gc time: 16
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -283,7 +283,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 328 real time: 326 gc time: 0
+cpu time: 328 real time: 336 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -399,6 +399,6 @@ raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x262) (* -1 x263)) (eq:0) (x263 x262)) ((+ -7 (* 3 x262) x263) (eq:1) (x263 x262)))
-'(((+ -5 (* 3 x270) (* -1 x271)) (eq:0) (x271 x270)) ((+ k272 (* 3 x270) x271) (eq:1) (x271 x270 k272)))
+'(((+ -5 (* 3 x321) (* -1 x322)) (eq:0) (x322 x321)) ((+ -7 (* 3 x321) x322) (eq:1) (x322 x321)))
+'(((+ -5 (* 3 x329) (* -1 x330)) (eq:0) (x330 x329)) ((+ k331 (* 3 x329) x330) (eq:1) (x330 x329 k331)))
 10/285 test failures

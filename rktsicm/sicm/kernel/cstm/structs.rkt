@@ -1,7 +1,8 @@
-#lang racket/base
+#lang s-exp "../extapply.rkt"
 
 (provide (all-defined-out))
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" any
+                  fix:= fix:+)
          "express.rkt"
          "../types.rkt"
          "../utils.rkt"
@@ -10,6 +11,30 @@
          "vectors.rkt"
          "matrices.rkt"
          )
+
+;;; Structures are primitive tensor-like objects.  They are
+;;; represented as recursive combinations of down vectors and up
+;;; vectors, useful for dealing with derivatives of things with
+;;; structured inputs and outputs.
+
+
+#| in TYPES.SCM
+
+(define (up? x)
+  ;;(and (pair? x) (eq? (car x) up-type-tag))
+  (vector? x))
+
+(define (down? x)
+  (and (pair? x)
+       (eq? (car x) down-type-tag)))
+
+(define (structure? x)
+  (or (up? x) (down? x)))
+
+
+(define (abstract-structure? x)
+  (or (abstract-up? x) (abstract-down? x)))
+|#
 
 (define (s:type v)
   (cond ((up? v) up-type-tag)
@@ -30,7 +55,6 @@
 (define (vector->down v)
   (list down-type-tag v))
 
-
 (define (literal-up name size)
   (s:generate size 'up
 	      (lambda (i)
@@ -46,7 +70,6 @@
 		 (string-append (symbol->string name)
 				"_"
 				(number->string i))))))
-
 
 (define (s:structure up/down v)
   (case up/down
@@ -90,7 +113,6 @@
 	(else
 	 (error "Bad structure -- S:SAME" v))))
 
-
 (define (s:length v)
   (if (structure? v)
       (vector-length (s:->vector v))
@@ -103,9 +125,6 @@
       (if (fix:= i 0)
 	  v
 	  (error "Bad structure -- S:REF" v i))))
-
-(define (s:generate n up/down proc)
-  (s:structure up/down (v:generate n proc)))
 
 (define (s:with-substituted-coord v i xi)
   (if (structure? v)
@@ -131,6 +150,8 @@
                           (lp (cdr chain) (s:ref struct i))
                           (s:ref struct i)))))))
 
+(define (s:generate n up/down proc)
+  (s:structure up/down (v:generate n proc)))
 
 (define (s:forall p s)
   (let ((n (s:length s)))
@@ -140,6 +161,15 @@
             (else
              (lp (fix:+ i 1) (p (s:ref s i))))))))  
 
+(define (s:select . selectors)
+  (let lp ((selectors selectors)
+           (ans g:identity)) 
+    (if (null? selectors)
+        ans
+        (lp (cdr selectors)
+            (compose (lambda (s)
+                       (s:ref s (car selectors)))
+                     ans)))))
 
 
 (define (s:map-chain proc s)
@@ -153,54 +183,96 @@
         (proc s (reverse rev-chain))))
   (walk s '()))
 
-(define (s:select . selectors)
-  (let lp ((selectors selectors)
-           (ans g:identity)) 
-    (if (null? selectors)
-        ans
-        (lp (cdr selectors)
-            (compose (lambda (s)
-                       (s:ref s (car selectors)))
-                     ans)))))
 
-;;; Structures are primitive tensor-like objects.  They are
-;;; represented as recursive combinations of down vectors and up
-;;; vectors, useful for dealing with derivatives of things with
-;;; structured inputs and outputs.
+;;; S:FRINGE recursively traverses a structure, making up a list of
+;;; the terminal elements.
+
+(define (s:fringe s)
+  (define (walk s ans)
+    (if (structure? s)
+        (let ((n (s:length s)))
+          (let lp ((i 0) (ans ans))
+            (if (fix:= i n)
+                ans
+                (lp (fix:+ i 1)
+                    (walk (s:ref s i) ans)))))
+        (cons s ans)))
+  (walk s '()))
+
+(define (s:foreach proc s)
+  (define (walk s)
+    (if (structure? s)
+        (let ((n (s:length s)))
+          (let lp ((i 0))
+            (if (fix:= i n)
+                'done
+                (begin (walk (s:ref s i))
+                       (lp (fix:+ i 1))))))
+        (proc s)))
+  (walk s))
+
+;;; The following mappers only make sense if, when there is more than
+;;; one structure they are all isomorphic.
+
+(define (s:map/r proc . structures)
+  (s:map/r/l proc structures))
+
+(define (s:map/r/l proc structures)
+  (s:map/l (lambda elements
+             (if (structure? (car elements))
+                 (s:map/r/l proc elements)
+                 (apply proc elements)))
+           structures))
+
+(define (s:map proc . structures)
+  (s:map/l proc structures))
+
+(define (s:map/l proc structures)
+  (if (structure? (car structures))
+      (s:generate (s:length (car structures))
+                  (s:same (car structures))
+                  (lambda (i)
+                    (apply proc
+                           (map (lambda (s) (s:ref s i))
+                                structures))))
+      (apply proc structures)))
+(define ((s:elementwise proc) . structures)
+  (s:map/l proc structures))
+
+(define structure:elementwise s:elementwise)
+
+;;; Is there a part of thing that the predicate is true of?
 
 (define (rexists pred thing)
-  (let tlp ([thing thing])
-    (cond
-      [(pred thing) #t]
-      [(vector? thing)
-       (define n (vector-length thing))
-       (let lp ([i 0])
-         (cond
-           [(fix:= i n) #f]
-           [(tlp (vector-ref thing i))]
-           [else (lp (fix:+ i 1))]))]
-      [(structure? thing)
-       (define n (s:length thing))
-       (let lp ([i 0])
-         (cond
-           [(fix:= i n) #f]
-           [(tlp (s:ref thing i)) #t]
-           [else (lp (fix:+ i 1))]))]
-      [(matrix? thing)
-       (tlp (matrix->array thing))]
-      [(pair? thing)
-       (cond
-         [(memq (car thing) type-tags)
-          (let ((v (get-property thing 'expression)))
-            (if (not v)
-                #f
-                (tlp v)))]
-         [(list? thing)
-          (ormap tlp thing)]
-         [else
-          (or (tlp (car thing))
-              (tlp (cdr thing)))])]
-      [else #f])))
+  (let tlp ((thing thing))
+    (cond ((pred thing) #t)
+          ((vector? thing)
+           (let ((n (vector-length thing)))
+             (let lp ((i 0))
+               (cond ((fix:= i n) #f)
+                     ((tlp (vector-ref thing i)))
+                     (else (lp (fix:+ i 1)))))))
+          ((structure? thing)
+           (let ((n (s:length thing)))
+             (let lp ((i 0))
+               (cond ((fix:= i n) #f)
+                     ((tlp (s:ref thing i)) #t)
+                     (else (lp (fix:+ i 1)))))))
+          ((matrix? thing)
+           (tlp (matrix->array thing)))
+          ((pair? thing)
+           (cond ((memq (car thing) type-tags)
+                  (let ((v (get-property thing 'expression)))
+                    (if (not v)
+                        #f
+                        (tlp v))))
+                 ((list? thing)
+                  (any tlp thing))
+                 (else
+                  (or (tlp (car thing))
+                      (tlp (cdr thing))))))
+          (else #f))))
+
 
 (define (list->up-structure lst)
   (vector->up
@@ -217,40 +289,5 @@
                                      (matrix-ref mat i j))))))
         (else mat)))
 
-(define (s:fringe s)
-  (define (walk s ans)
-    (if (structure? s)
-        (let ((n (s:length s)))
-          (let lp ((i 0) (ans ans))
-            (if (fix:= i n)
-                ans
-                (lp (fix:+ i 1)
-                    (walk (s:ref s i) ans)))))
-        (cons s ans)))
-  (walk s '()))
-
 (define (up-structure->list s)
   (vector->list (up->vector s)))
-
-(define (s:map/r proc . structures)
-  (s:map/r/l proc structures))
-
-(define (s:map/r/l proc structures)
-  (s:map/l (lambda elements
-             (if (structure? (car elements))
-                 (s:map/r/l proc elements)
-                 (g:apply proc elements)))
-           structures))
-
-(define (s:map proc . structures)
-  (s:map/l proc structures))
-
-(define (s:map/l proc structures)
-  (if (structure? (car structures))
-      (s:generate (s:length (car structures))
-                  (s:same (car structures))
-                  (lambda (i)
-                    (g:apply proc
-                           (map (lambda (s) (s:ref s i))
-                                structures))))
-      (g:apply proc structures)))

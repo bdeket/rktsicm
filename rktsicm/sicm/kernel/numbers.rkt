@@ -1,28 +1,28 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
-;*r* copy/adapted from the scmutils library
-;;;; Generic Numerical Arithmetic
-(require "../rkt/fixnum.rkt"
-         "../general/sets.rkt"
-         "../rkt/default-object.rkt"
-         (only-in "../rkt/racket-help.rkt" ignore-errors)
+(require (only-in "../rkt/glue.rkt" default-object default-object? for-all? there-exists? ignore-errors
+                  fix:= fix:+)
          (only-in "../rkt/environment.rkt" symbolic-environment)
          (only-in "../rkt/todo.rkt" symbolic-operators condition?)
-         "cstm/diff.rkt"
-         "express.rkt"
-         "cstm/generic.rkt"
-         "iterat.rkt"
-         "cstm/matrices.rkt"
+         "../general/sets.rkt"
          "numeric.rkt"
+         "iterat.rkt"
+         "utils.rkt"
+         "types.rkt"
+         "express.rkt"
+         "cstm/diff.rkt"
+         "cstm/generic.rkt"
+         "cstm/matrices.rkt"
          "cstm/numsymb.rkt"
          "cstm/structs.rkt"
-         "types.rkt"
-         "utils.rkt"
          "todo/display-print.rkt"
          )
 (define-values (assign-operation numbers:assign-operations)
   (make-assign-operations 'numbers))
+
+;;;; Generic Numerical Arithmetic
+
 
 (define (n:type m) number-type-tag)
 (define (n:type-predicate m) numerical-quantity?)
@@ -66,7 +66,6 @@
 	 (sqrt (denominator x)))
       (sqrt x)))
 
-
 (define n:exp exp)
 (define n:log log)
 
@@ -98,7 +97,6 @@
 (define n:- -)
 (define n:* *)
 (define n:/ /)
-
 
 #|
 (define (n:expt b e)			; (n:expt -1 1/3) => -1
@@ -143,7 +141,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (define n:sigma sigma)
 
 
-
 ;;; Here we assign the primitive numerical generic operators.
 
 (assign-operation 'type             n:type             number?)
@@ -183,7 +180,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'determinant      identity           number?)
 (assign-operation 'trace            identity           number?)
 
-
 (assign-operation '=          n:=            number? number?)
 (assign-operation '<          n:<            number? number?)
 (assign-operation '<=         n:<=           number? number?)
@@ -221,7 +217,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 ;(assign-operation 'partial-derivative  n:deriv      number? any?)
 
 (assign-operation 'apply               n:self        number? any?)
-
 
 ;;;; Abstract numbers generalize numerical quantities.
 
@@ -268,7 +263,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 		  (make-numerical-combination 'sqrt)
 		  abstract-number?)
 
-
 (assign-operation 'exp
 		  (make-numerical-combination 'exp)
 		  abstract-number?)
@@ -298,7 +292,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 		  abstract-number?)
 
 ;(assign-operation 'derivative n:deriv  abstract-number?)
-
 
 (assign-operation '+
 		  (make-numerical-combination '+)
@@ -339,7 +332,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'dot-product
 		  (make-numerical-combination '* 'r)
 		  abstract-number? number?)
-
 
 (assign-operation '/
 		  (make-numerical-combination '/)
@@ -384,7 +376,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'determinant    identity    abstract-number?)
 (assign-operation 'trace          identity    abstract-number?)
 
-
 (assign-operation 'expt
 		  (make-numerical-combination 'expt)
 		  abstract-number? abstract-number?)
@@ -425,7 +416,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 		  (make-numerical-combination 'make-polar)
 		  abstract-number? number?)
 
-
 (assign-operation 'real-part
 		  (make-numerical-combination 'real-part)
 		  abstract-number?)
@@ -458,7 +448,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 
 ;(assign-operation 'partial-derivative  n:deriv  abstract-number? any?)
 (assign-operation 'apply               n:self    abstract-number? any?)
-
 
 ;;; Conservative tests...  These tests will return TRUE only if the
 ;;; default simplifier can prove that the answer is TRUE.  This is a
@@ -507,7 +496,6 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'zero? abn:zero?  abstract-number?)
 (assign-operation 'one?  abn:one?   abstract-number?)
 
-
 (define *known-reals* (make-parameter '()))
 
 (define (known-real? z)
@@ -527,19 +515,19 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 			   (collp (fix:+ j 1))
 			   #f)))))))
 	((differential? z)
-	 (andmap (lambda (term)
-	     (known-real? (differential-coefficient term)))
-                 (differential->terms z)))
+	 (for-all? (differential->terms z)
+                 (lambda (term)
+                   (known-real? (differential-coefficient term)))))
 	(else
-         (ormap (lambda (w)
-                  (or (equal? w z)
-                      (let ((diff
-                             (ignore-errors
-                              (lambda ()
-                                (simplify (g:- w z))))))
-                        (and (not (condition? diff))
-                             (exact-zero? diff)))))
-                (*known-reals*)))))
+         (there-exists? (*known-reals*)
+                        (lambda (w)
+                          (or (equal? w z)
+                              (let ((diff
+                                     (ignore-errors
+                                      (lambda ()
+                                        (simplify (g:- w z))))))
+                                (and (not (condition? diff))
+                                     (exact-zero? diff)))))))))
 
 ;;; Permanent declaration
 
@@ -553,6 +541,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 ;;; Temporary declaration
 
 (define (with-known-reals stuff thunk)
-  (parameterize ([*known-reals* (list-union stuff (*known-reals*))])
+  (parameterize ([*known-reals*
+                  (list-union stuff (*known-reals*))])
     (thunk)))
     

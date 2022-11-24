@@ -2,10 +2,11 @@
 
 (provide (all-defined-out)
          #%top
-         (rename-out [myapp #%app])
+         (rename-out [myapp #%app]
+                     [g:apply apply])
          *enable-literal-apply*
          *enable-generic-apply*
-         (except-out (all-from-out racket/base) #%app))
+         (except-out (all-from-out racket/base) #%app apply))
 
 (require (for-syntax racket/base)
          (only-in "../rkt/todo.rkt" bind-condition-handler use-value condition-type:floating-point-underflow)

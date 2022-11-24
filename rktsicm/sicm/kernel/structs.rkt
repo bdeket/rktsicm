@@ -1,29 +1,33 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/structs.rkt"))
-(require "../rkt/fixnum.rkt"
-         "cstm/structs.rkt"
+
+(require (only-in "../rkt/glue.rkt" if default-object default-object?
+                  there-exists? generate-uninterned-symbol every
+                  fix:= fix:> fix:< fix:+ fix:-)
+         (only-in "../rkt/todo.rkt" bkpt)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
-         (only-in "../rkt/todo.rkt" bkpt)
+         "numeric.rkt"
+         "iterat.rkt"
+         "utils.rkt"
+         "types.rkt"
          "cstm/express.rkt"
          "cstm/generic.rkt"
-         "iterat.rkt"
          "cstm/mathutil.rkt"
+         "cstm/structs.rkt"
          "matrices.rkt"
          "numbers.rkt"
-         "numeric.rkt"
-         "types.rkt"
-         "utils.rkt"
          "vectors.rkt"
          )
 (define-values (assign-operation structs:assign-operations)
   (make-assign-operations 'structs))
 
 
-;*r* copy/adapted from the scmutils library
 ;;;;                      Structures
+
+;;bdk;; s:type etc moved to cstm/structs
 
 #|
 (pe (s:map-chain (up 'a 'b 'c) cons))
@@ -32,36 +36,6 @@
 (pe (s:map-chain (up 'a (down 'b 'c) 'd) cons))
 (up (a 0) (down (b 1 0) (c 1 1)) (d 2))
 |#
-
-
-;;; S:FRINGE recursively traverses a structure, making up a list of
-;;; the terminal elements.
-
-(define (s:foreach proc s)
-  (define (walk s)
-    (if (structure? s)
-        (let ((n (s:length s)))
-          (let lp ((i 0))
-            (if (fix:= i n)
-                'done
-                (begin (walk (s:ref s i))
-                       (lp (fix:+ i 1))))))
-        (proc s)))
-  (walk s))
-
-
-;;; The following mappers only make sense if, when there is more than
-;;; one structure they are all isomorphic.
-
-(define ((s:elementwise proc) . structures)
-  (s:map/l proc structures))
-
-(define structure:elementwise s:elementwise)
-
-
-;;; Is there a part of thing that the predicate is true of?
-
-
 
 (define (s:arity v) (v:arity (s:->vector v)))
 
@@ -247,7 +221,7 @@
                     (g:+ sum (g:square (vector-ref vv i))))))))))
 
 (define (s:dot-product v1 v2)
-  (unless (and (eq? (s:same v1) (s:same v2)) (= (s:dimension v1) (s:dimension v2)))
+  (if (not (and (eq? (s:same v1) (s:same v2)) (= (s:dimension v1) (s:dimension v2))))
     (error "Incompatible structures -- S:DOT-PRODUCT" v1 v2))
   (apply g:+ (map g:* (s:fringe v1) (s:fringe v2))))
 
@@ -259,7 +233,6 @@
 (define (s:apply v args)
   (s:structure (s:same v)
                (v:apply (s:->vector v) args)))
-
 
 (assign-operation 'type                s:type            structure?)
 (assign-operation 'type-predicate      sc:type-predicate up?)
@@ -306,7 +279,6 @@
 |#
 (assign-operation 'apply       s:apply           structure? any?)
 
-
 ;;; Abstract structures generalize structural quantities.
 
 (define (abstract-up symbol)
@@ -329,8 +301,8 @@
     (add-property! z 'zero #t)
     z))
 
-(define (make-up-combination operator [reverse? #f])
-  (if reverse?
+(define (make-up-combination operator [reverse? default-object])
+  (if (default-object? reverse?)
       (lambda operands 
         (make-combination up-type-tag
                           operator operands))
@@ -338,15 +310,14 @@
         (make-combination up-type-tag
                           operator (reverse operands)))))
 
-(define (make-down-combination operator [reverse? #f])
-  (if reverse?
+(define (make-down-combination operator [reverse? default-object])
+  (if (default-object? reverse?)
       (lambda operands 
         (make-combination abstract-down-type-tag
                           operator operands))
       (lambda operands 
         (make-combination abstract-down-type-tag
                           operator (reverse operands)))))
-
 
 (assign-operation 'type           s:type             abstract-structure?)
 (assign-operation 'type-predicate sc:type-predicate  abstract-up?)
@@ -358,55 +329,86 @@
 (assign-operation 'zero-like      ac:zero-like       abstract-up?)
 (assign-operation 'zero-like      ar:zero-like       abstract-down?)
 
-(assign-operation 'negate (make-up-combination 'negate)     abstract-up?)
-(assign-operation 'negate (make-down-combination 'negate)        abstract-down?)
+(assign-operation
+ 'negate (make-up-combination 'negate)     abstract-up?)
+(assign-operation
+ 'negate (make-down-combination 'negate)        abstract-down?)
 
-(assign-operation 'magnitude (make-up-combination 'magnitude)  abstract-up?)
-(assign-operation 'magnitude (make-down-combination 'magnitude)     abstract-down?)
+(assign-operation
+ 'magnitude (make-up-combination 'magnitude)  abstract-up?)
+(assign-operation
+ 'magnitude (make-down-combination 'magnitude)     abstract-down?)
 
-(assign-operation 'abs (make-up-combination 'abs)        abstract-up?)
-(assign-operation 'abs (make-down-combination 'abs)           abstract-down?)
+(assign-operation
+ 'abs (make-up-combination 'abs)        abstract-up?)
+(assign-operation
+ 'abs (make-down-combination 'abs)           abstract-down?)
 
-(assign-operation 'conjugate  (make-up-combination 'conjugate)  abstract-up?)
-(assign-operation 'conjugate  (make-down-combination 'conjugate)     abstract-down?)
+(assign-operation
+ 'conjugate  (make-up-combination 'conjugate)  abstract-up?)
+(assign-operation
+ 'conjugate  (make-down-combination 'conjugate)     abstract-down?)
 
 
 ;(assign-operation '= structure=structure abstract-structure? abstract-structure?)
 
-(assign-operation '+  (make-vector-combination '+) abstract-up? abstract-up?)
-(assign-operation '+  (make-up-combination '+) up?  abstract-up?)
-(assign-operation '+  (make-up-combination '+ 'r) abstract-up? up?)
+(assign-operation
+ '+  (make-vector-combination '+) abstract-up? abstract-up?)
+(assign-operation
+ '+  (make-up-combination '+) up?  abstract-up?)
+(assign-operation
+ '+  (make-up-combination '+ 'r) abstract-up? up?)
 
-(assign-operation '+  (make-down-combination '+)    down?   abstract-down?)
-(assign-operation '+  (make-down-combination '+ 'r) abstract-down? down?)
+(assign-operation
+ '+  (make-down-combination '+)    down?   abstract-down?)
+(assign-operation
+ '+  (make-down-combination '+ 'r) abstract-down? down?)
 
-(assign-operation '-  (make-vector-combination '-) abstract-up? abstract-up?)
-(assign-operation '-  (make-up-combination '-) up?  abstract-up?)
-(assign-operation '-  (make-up-combination '-) abstract-up? up?)
+(assign-operation
+ '-  (make-vector-combination '-) abstract-up? abstract-up?)
+(assign-operation
+ '-  (make-up-combination '-) up?  abstract-up?)
+(assign-operation
+ '-  (make-up-combination '-) abstract-up? up?)
 
-(assign-operation '-  (make-down-combination '-)    down?   abstract-down?)
-(assign-operation '-  (make-down-combination '-)    abstract-down? down?)
+(assign-operation
+ '-  (make-down-combination '-)    down?   abstract-down?)
+(assign-operation
+ '-  (make-down-combination '-)    abstract-down? down?)
 
-(assign-operation '*  (make-numerical-combination '*)    abstract-structure? abstract-structure?)
-(assign-operation '*  (make-numerical-combination '*)    structure?          abstract-structure?)
-(assign-operation '*  (make-numerical-combination '*)    abstract-structure? structure?)
+(assign-operation
+ '*  (make-numerical-combination '*)    abstract-structure? abstract-structure?)
+(assign-operation
+ '*  (make-numerical-combination '*)    structure?          abstract-structure?)
+(assign-operation
+ '*  (make-numerical-combination '*)    abstract-structure? structure?)
 
-(assign-operation '*  (make-up-combination '*)    scalar? abstract-up?)
-(assign-operation '*  (make-up-combination '* 'r) abstract-up? scalar?)
+(assign-operation
+ '*  (make-up-combination '*)    scalar? abstract-up?)
+(assign-operation
+ '*  (make-up-combination '* 'r) abstract-up? scalar?)
 
-(assign-operation '*  (make-down-combination '*)       scalar?    abstract-down?)
-(assign-operation '*  (make-down-combination '* 'r)    abstract-down?    scalar?)
+(assign-operation
+ '*  (make-down-combination '*)       scalar?    abstract-down?)
+(assign-operation
+ '*  (make-down-combination '* 'r)    abstract-down?    scalar?)
 
-(assign-operation '*  (make-up-combination '*)    operator?    abstract-up?)
-(assign-operation '*  (make-up-combination '* 'r) abstract-up? operator?)
+(assign-operation
+ '*  (make-up-combination '*)    operator?    abstract-up?)
+(assign-operation
+ '*  (make-up-combination '* 'r) abstract-up? operator?)
 
-(assign-operation '*  (make-down-combination '*)       operator?         abstract-down?)
-(assign-operation '*  (make-down-combination '* 'r)    abstract-down?    operator?)
+(assign-operation
+ '*  (make-down-combination '*)       operator?         abstract-down?)
+(assign-operation
+ '*  (make-down-combination '* 'r)    abstract-down?    operator?)
 
 		     
-(assign-operation '/  (make-up-combination '/)    abstract-up? scalar?)
+(assign-operation
+ '/  (make-up-combination '/)    abstract-up? scalar?)
 
-(assign-operation '/  (make-down-combination '/)       abstract-down?    scalar?)
+(assign-operation
+ '/  (make-down-combination '/)       abstract-down?    scalar?)
 
 (assign-operation 'partial-derivative
                   (make-up-combination 'partial-derivative)
@@ -416,10 +418,11 @@
                   (make-down-combination 'partial-derivative)
                   abstract-down? any?)
 
-
 ;;; An argument list really wants to be represented as an (up) vector
 ;;; of arguments.  Also, any matrix in the argument list wants to be
 ;;; converted to a down of ups.
+
+;;bdk;; list->up-structure moved to cstm/structs
 
 (define (submatrix s lowdown hidown+1 lowcol hicol+1)
   (cond ((structure? s)
@@ -428,6 +431,7 @@
          (m:submatrix s lowdown hidown+1 lowcol hicol+1))
         (else (error "Wrong type submatrix" s))))
 
+;;bdk;; up-structure->list moved to cstm/structs
 
 ;;; In the following procedures there are extra arguments, ls and rs.
 ;;; If the input is multiplied by an object of the ls shape on the 
@@ -482,7 +486,6 @@
 #| (0 (up (down 0 0 0) (down 0 0 0))) |#
 |#
 
-
 (define (s:inverse ls ms rs)		;but see s:invert...
   (m->s (compatible-shape rs)
         (m:invert
@@ -528,7 +531,6 @@
 #| (up 0 0) |#
 |#
 
-
 ;;; Sometimes a 2-tensor must be viewed as a matrix for some purpose,
 ;;; for example to invert it.  The following are the required coercions 
 ;;; between tensor structures and matrices.  This can not work for 
@@ -572,7 +574,6 @@
 |#
 |#
 
-
 ;;; a col of n cols each m long -> m downs X n ups
 
 (define (A^mn->Mmn s)
@@ -607,7 +608,6 @@
 |#
 |#
 
-
 ;;; a down of n cols each m long -> m downs X n ups
 
 (define (A^m_n->Mmn s)
@@ -640,7 +640,6 @@
 (down (up a b) (up c d) (up e f))
 |#
 |#
-
 
 ;;; a col of n downs each m long -> n downs X m ups
 
@@ -675,7 +674,6 @@
 |#
 |#
 
-
 ;;; A few lonely tensor operations here -- this will expand later.
 
 (define (2-down? s)
@@ -695,11 +693,11 @@
 
 (define (single-layer-down? s)
   (and (down? s)
-       (not (ormap structure? (vector->list (s:->vector s))))))
+       (not (there-exists? (vector->list (s:->vector s)) structure?))))
 
 (define (single-layer-up? s)
   (and (up? s)
-       (not (ormap structure? (vector->list (s:->vector s))))))
+       (not (there-exists? (vector->list (s:->vector s)) structure?))))
 
 
 (define (structure->matrix s)
@@ -708,7 +706,6 @@
         ((up-of-downs? s) (A_m^n->Mnm s))
         ((down-of-ups? s) (A^m_n->Mmn s))
         (else (error "structure->matrix" s))))
-
 
 (define (s:invert s)
   (cond ((2-down? s)
@@ -752,7 +749,6 @@
     (- b (* (s:invert a) c))))
 #| (up 0 0) |#
 |#
-
 
 (define (scalar/tensor x s)
   (g:* x (s:invert s)))
@@ -803,7 +799,6 @@
 (up e f)
 |#
 |#
-
 
 #|
 (define (s:transpose2 s)
@@ -866,7 +861,6 @@
 
 
 
-
 (assign-operation 'invert             s:invert                   2-tensor?)
 
 (assign-operation '/                   scalar/tensor                   scalar?     2-tensor?)
@@ -890,7 +884,6 @@
 
 (assign-operation 'determinant s:determinant 2-tensor?)
 (assign-operation 'trace       s:trace       2-tensor?)
-
 
 ;;; This just changes the up and downness of a structure
 
@@ -925,14 +918,13 @@
       (s:generate (s:length s) (s:same s)
                   (lambda (i)
                     (typical-object (s:ref s i))))
-      (gensym 'x)))
+      (generate-uninterned-symbol 'x)))
 #|
 (typical-object (up 't (up 'u 'v) (down 'r 's) (up 'v1 'v2)))
 #|
 (up x328 (up x329 x330) (down x331 x332) (up x333 x334))
 |#
 |#
-
 
 (define (structure->access-chains struct)
   (let lp ((struct struct) (chain '()))
@@ -1045,7 +1037,7 @@
                (cons (cons (s:same s) (s:length s))
                      (lp (s:ref s 0)))
                '()))))
-    (assert (andmap (lambda (x)
+    (assert (every (lambda (x)
                       (or (eq? (car x) 'up) (eq? (car x) 'down)))
                     scripts))
     (assert (not (eq? (car (list-ref scripts index1))
@@ -1072,7 +1064,6 @@
                                     index2 i)))
                    0
                    (fix:- (s:length struct) 1))))))
-
 
 ;;; beginning of ultra-flatten
 
@@ -1151,7 +1142,7 @@
 (define *careful-conversion* #t)
 
 (define (s->m ls ms rs)
-  (when *careful-conversion*
+  (if *careful-conversion*
       (assert (numerical-quantity? (g:* ls (g:* ms rs)))
               "Innapropriate s->m" ls ms rs))
   (let ((ndowns (s:dimension ls))
@@ -1189,7 +1180,7 @@
                                     (cons (ultra-unflatten col-shape
                                                            (vector->list colj))
                                           (lp (fix:+ j 1)))))))))
-      (when *careful-conversion*
+      (if *careful-conversion*
           (assert (numerical-quantity? (g:* ls (g:* ms rs)))
                   "Innapropriate m->s" ls ms rs))
       ms)))
@@ -1199,7 +1190,6 @@
 (down (down (down (down m1 0) (down 0 0)) (down (down 0 m1) (down 0 0)))
       (down (down (down 0 0) (down m2 0)) (down (down 0 0) (down 0 m2))))
 |#
-
 
 ;;; Any one argument function of a structure can be seen
 ;;; as a matrix.  This is only useful if the function 
