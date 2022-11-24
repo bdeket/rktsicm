@@ -1,28 +1,30 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/matrices.rkt"))
 
-(require "../rkt/fixnum.rkt"
-         "cstm/matrices.rkt"
+(require (only-in "../rkt/glue.rkt" if default-object default-object? undefined-value
+                  make-initialized-vector for-all? iota
+                  fix:= fix:< fix:+ fix:- fix:quotient fix:zero?)
          "../general/list-utils.rkt"
          "../general/assert.rkt"
-         "../rkt/undefined.rkt"
+         "numeric.rkt"
+         "iterat.rkt"
+         "utils.rkt"
+         "types.rkt"
          "cstm/express.rkt"
          "cstm/generic.rkt"
-         "iterat.rkt"
-         "numeric.rkt"
-         "cstm/mathutil.rkt"
-         "cstm/pseries+.rkt"
-         "cstm/structs.rkt"
-         "types.rkt"
-         "utils.rkt"
          "cstm/vectors.rkt"
+         "cstm/structs.rkt"
+         "cstm/matrices.rkt"
+         "cstm/pseries+.rkt"
          )
 (define-values (assign-operation matrices:assign-operations)
   (make-assign-operations 'matrices))
 
 ;;;;               Matrices
+
+;;bdk;; m:type etc moved to cstm/matrices
 
 #|
   (*matrix* (nrows . ncols) 
@@ -30,8 +32,8 @@
 	       #( a21 a22 ...)
 	       ...))
 |#
-;(define (vector-forall pred? v) (for/and ([v (in-vector v)]) (pred? v)))
 
+;;bdk;; tag-matrix etc moved to cstm/matrices
 
 (define (array->matrix array)
   (assert (and (vector? array) (vector-forall vector? array))
@@ -43,6 +45,8 @@
      "Not all rows have same length -- ARRAY->MATRIX" array)
     (tag-matrix nrows ncols array)))
 
+;;bdk;; m:dimention etc moved to cstm/matrices
+
 ;;; Sometimes Scheme vectors need to be coerced to matrices
 
 (define (vector->row-matrix v)
@@ -52,9 +56,9 @@
 (define (vector->column-matrix v)
   (assert (vector? v))
   (define (vector->column-array v)
-    (build-vector (vector-length v)
-                  (lambda (i)
-                    (vector (vector-ref v i)))))
+    (make-initialized-vector (vector-length v)
+                             (lambda (i)
+                               (vector (vector-ref v i)))))
   (tag-matrix (vector-length v) 1 (vector->column-array v)))
 
 (define (row-matrix . args)
@@ -82,9 +86,8 @@
 
 (define (m:diagonal m)
   (let ((rows (m:dimension m)))
-    (build-vector rows
-      (lambda (i) (matrix-ref m i i)))))
-
+    (make-initialized-vector rows
+                             (lambda (i) (matrix-ref m i i)))))
 
 (define (literal-matrix name nrows ncols)
   (m:generate nrows ncols
@@ -120,7 +123,6 @@
 				"_"
 				(number->string j))))))
 
-
 ;;; We need to be able to enter matrices easily, in a variety of
 ;;; ways. 
 
@@ -148,9 +150,9 @@
   (assert (and (not (null? rows)) (list? (car rows))))
   (let ((nrows (length rows)))
     (let ((ncols (length (car rows))))
-      (assert (andmap (lambda (row)
-                        (and (list? row) (fix:= ncols (length row))))
-                      (cdr rows)))
+      (assert (for-all? (cdr rows)
+                        (lambda (row)
+                          (and (list? row) (fix:= ncols (length row))))))
       (m:generate nrows ncols
 		  (lambda (i j)
 		    (list-ref (list-ref rows i) j))))))
@@ -163,9 +165,9 @@
   (assert (and (not (null? cols)) (list (car cols))))
   (let ((ncols (length cols)))
     (let ((nrows (length (car cols))))
-      (assert (andmap (lambda (col)
-                        (and (list? col) (fix:= nrows (length col))))
-                      (cdr cols)))
+      (assert (for-all? (cdr cols)
+                        (lambda (col)
+                          (and (list? col) (fix:= nrows (length col))))))
       (m:generate nrows ncols
 		  (lambda (i j)
 		    (list-ref (list-ref cols j) i))))))
@@ -177,6 +179,8 @@
   (tag-matrix (m:num-rows A) (m:num-cols A) 
     (vector-with-substituted-coord (matrix->array A) i V)))
 
+;;bdk;; matrix-ref moved to cstm/matrices
+
 
 (define matrix:generate m:generate)
 
@@ -187,13 +191,13 @@
 
 (define ((m:elementwise f) . matrices)
   (assert (and (not (null? matrices))
-	       (andmap matrix? matrices)))
+	       (for-all? matrices matrix?)))
   (let ((nrows (m:num-rows (car matrices)))
 	(ncols (m:num-cols (car matrices))))
-    (assert (andmap (lambda (m)
-                      (and (fix:= (m:num-rows m) nrows)
-                           (fix:= (m:num-cols m) ncols)))
-                    (cdr matrices)))
+    (assert (for-all? (cdr matrices)
+                      (lambda (m)
+                        (and (fix:= (m:num-rows m) nrows)
+                             (fix:= (m:num-cols m) ncols)))))
     (m:generate nrows ncols
 		(lambda (i j)
 		  (g:apply f
@@ -202,6 +206,8 @@
 				matrices))))))
 
 (define matrix:elementwise m:elementwise)
+
+;;bdk;; m:submatrix moved to cstm/matrices
 
 ;;; A minor is a submatrix obtained from a given matrix
 ;;;   by dropping a given row and column.
@@ -218,7 +224,6 @@
 		      b
 		      (fix:+ b 1))))))
 
-
 (define (m:zero? matrix)
   (assert (matrix? matrix) "Not a matrix -- ZERO?" matrix)
   (let ((m (m:num-rows matrix))
@@ -234,8 +239,9 @@
 		    (collp (fix:+ j 1))
 		    #f)))))))
 
-(define (m:make-zero n [m n])
-  (m:generate n m (lambda (i j) :zero)))
+(define (m:make-zero n [m default-object])
+  (let ((m (if (default-object? m) n m)))
+    (m:generate n m (lambda (i j) :zero))))
 
 (define (m:zero-like m)
   (let ((z (g:zero-like (matrix-ref m 0 0))))
@@ -274,7 +280,6 @@
 (define (m:identity-like m)
   (m:make-identity (m:dimension m)))
 
-
 (define (m:make-diagonal diag)
   ;; From a scheme vector DIAG.
   (let ((n (vector-length diag)))
@@ -311,7 +316,6 @@
 	   (vector-forall g:= row1 row2))
 	 (matrix->array m1) (matrix->array m2))))
 
-
 (define (matrix-binary-componentwise binop matrix1 matrix2)
   (assert (and (matrix? matrix1) (matrix? matrix2))
 	  "Not a matrix -- addition" (list binop matrix1 matrix2))
@@ -324,11 +328,11 @@
 	    "Matrices of unequal size -- addition"
 	    (list binop matrix1 matrix2))
     (tag-matrix nrows ncols
-      (build-vector nrows
+      (make-initialized-vector nrows
         (lambda (i)
 	  (let ((m1row (vector-ref m1 i))
 	        (m2row (vector-ref m2 i)))
-	    (build-vector ncols
+	    (make-initialized-vector ncols
 	      (lambda (j)
 	        (binop (vector-ref m1row j)
 		       (vector-ref m2row j))))))))))
@@ -362,7 +366,6 @@
 		     0
 		     m1cm1)))))))
 
-
 (define (m:square a)
   (matrix*matrix a a))
 
@@ -372,7 +375,7 @@
 	 (error "Only integer powers allowed -- M:EXPT"))
 	((fix:< n 0) 
 	 (m:expt (m:invert M) (fix:- 0 n)))
-	((fix:= 0 n)
+	((fix:zero? n)
 	 (m:make-identity (m:num-rows M)))
 	(else
 	 (let loop ((count n))
@@ -412,7 +415,6 @@
 
 (define (matrix/matrix m1 m2)
   (matrix*matrix m1 (m:invert m2)))
-
 
 ;;; Cleaning up some useful hacks
 
@@ -478,7 +480,6 @@
 		      (m:make-identity (m:num-rows m)))
        m))
 
-
 (define (m:trace matrix)
   (assert (matrix? matrix) "Not a matrix -- TRACE")
   (let ((rows (m:num-rows matrix))
@@ -523,7 +524,6 @@
 
 (define (m:cos mat)
   (series:value cos-series (list mat)))
-
 
 ;;; Kleanthes Konaris determinant routine, slightly edited by GJS
 ;;; -------------------------------------------------------------
@@ -570,9 +570,8 @@
 				      (loop (fix:+ index 1)
 					    (cdr remaining-columns)
 					    (sub answer contrib))))))))))))
-	(c-det 0 (build-list (m:dimension m) values))))
+	(c-det 0 (iota (m:dimension m)))))
     det))
-
 
 ;;;; Linear equations solved by Cramer's rule.  
 ;;;   Solves an inhomogeneous system of linear equations, A*X=B,
@@ -591,7 +590,7 @@
 	      (d (det A))
 	      (At (m:transpose A)))
 	  (vector->column-matrix
-	   (build-vector (vector-length bv)
+	   (make-initialized-vector (vector-length bv)
 	     (lambda (i)
 	       (div (det (matrix-with-substituted-row At i bv))
 		    d)))))))
@@ -615,7 +614,6 @@
 		      (div (det (m:minor A i j)) d)
 		      (div (det (m:minor A i j)) -d))))))))
     matinv))
-
 
 (define (easy-zero? x)
   (cond ((number? x) (zero? x))
@@ -669,17 +667,16 @@
 (define (m:solve-linear A b)
   (m:rsolve b A))
 
-(define (set-numerical! [matinv #f] [solve #f] [determinant #f])
+(define (set-numerical! [matinv default-object] [solve default-object] [determinant default-object])
   (set! numerical? #t)
-  (when matinv (set! matinv-numerical matinv))
-  (when solve (set! solve-numerical solve))
-  (when determinant (set! determinant-numerical determinant))
+  (if (not (default-object? matinv)) (set! matinv-numerical matinv))
+  (if (not (default-object? solve)) (set! solve-numerical solve))
+  (if (not (default-object? determinant)) (set! determinant-numerical determinant))
   'thank-you)
 
 (define (set-symbolic!)
   (set! numerical? #f)
   'thank-you)
-
 
 (define (m:apply matrix args)
   (m:generate (m:num-rows matrix) (m:num-cols matrix)
@@ -712,7 +709,6 @@
   (vector-exists (lambda (v)
 		   (vector-exists g:inexact? v))
 		 (matrix->array m)))
-
 
 (assign-operation 'type             m:type             matrix?)
 (assign-operation 'type-predicate   m:type-predicate   matrix?)
@@ -805,7 +801,6 @@
 (assign-operation 'solve-linear m:solve-linear       square-matrix? row-matrix?)
 (assign-operation 'solve-linear m:solve-linear       square-matrix? down?)
 
-
 ;;; Abstract matrices generalize matrix quantities.
 
 (define (abstract-matrix symbol)
@@ -830,14 +825,14 @@
     (add-property! z 'one #t)
     z))
 
-(define (make-matrix-combination operator [reverse? #f])
-  (if reverse?
+(define (make-matrix-combination operator [reverse? default-object])
+  (if (default-object? reverse?)
       (lambda operands 
 	(make-combination abstract-matrix-type-tag
-			  operator (reverse operands)))
+			  operator operands))
       (lambda operands 
 	(make-combination abstract-matrix-type-tag
-			  operator operands))))
+			  operator (reverse operands)))))
 
 (assign-operation 'type            m:type             abstract-matrix?)
 (assign-operation 'type-predicate  m:type-predicate   abstract-matrix?)
@@ -851,46 +846,74 @@
 (assign-operation 'one?      (has-property? 'one)     abstract-matrix?)
 (assign-operation 'identity? (has-property? 'one)     abstract-matrix?)
 
-(assign-operation 'negate     (make-matrix-combination 'negate)     abstract-matrix?)
-(assign-operation 'invert  (make-matrix-combination 'invert) square-abstract-matrix?)
+(assign-operation
+ 'negate     (make-matrix-combination 'negate)     abstract-matrix?)
+(assign-operation
+ 'invert  (make-matrix-combination 'invert) square-abstract-matrix?)
 
-(assign-operation 'conjugate  (make-matrix-combination 'conjugate)  abstract-matrix?)
-(assign-operation 'exp        (make-matrix-combination 'exp) square-abstract-matrix?)
-(assign-operation 'sin        (make-matrix-combination 'sin) square-abstract-matrix?)
-(assign-operation 'cos        (make-matrix-combination 'cos) square-abstract-matrix?)
+(assign-operation
+ 'conjugate  (make-matrix-combination 'conjugate)  abstract-matrix?)
+(assign-operation
+ 'exp        (make-matrix-combination 'exp) square-abstract-matrix?)
+(assign-operation
+ 'sin        (make-matrix-combination 'sin) square-abstract-matrix?)
+(assign-operation
+ 'cos        (make-matrix-combination 'cos) square-abstract-matrix?)
 
+;(assign-operation
+;  '=          matrix=matrix         abstract-matrix? abstract-matrix?)
 
-;(assign-operation '=          matrix=matrix         abstract-matrix? abstract-matrix?)
+(assign-operation
+ '+ (make-matrix-combination '+)    abstract-matrix? abstract-matrix?)
+(assign-operation
+ '+ (make-matrix-combination '+)    matrix?          abstract-matrix?)
+(assign-operation
+ '+ (make-matrix-combination '+ 'r) abstract-matrix? matrix?)
+(assign-operation
+ '+ (make-matrix-combination '+)    scalar?   square-abstract-matrix?)
+(assign-operation
+ '+ (make-matrix-combination '+ 'r) square-abstract-matrix? scalar?)
 
-(assign-operation '+ (make-matrix-combination '+)    abstract-matrix? abstract-matrix?)
-(assign-operation '+ (make-matrix-combination '+)    matrix?          abstract-matrix?)
-(assign-operation '+ (make-matrix-combination '+ 'r) abstract-matrix? matrix?)
-(assign-operation '+ (make-matrix-combination '+)    scalar?   square-abstract-matrix?)
-(assign-operation '+ (make-matrix-combination '+ 'r) square-abstract-matrix? scalar?)
+(assign-operation
+ '- (make-matrix-combination '-)    abstract-matrix? abstract-matrix?)
+(assign-operation
+ '- (make-matrix-combination '-)    matrix?          abstract-matrix?)
+(assign-operation
+ '- (make-matrix-combination '-)    abstract-matrix? matrix?)
+(assign-operation
+ '- (make-matrix-combination '-)    scalar?   square-abstract-matrix?)
+(assign-operation
+ '- (make-matrix-combination '-)    square-abstract-matrix? scalar?)
 
-(assign-operation '- (make-matrix-combination '-)    abstract-matrix? abstract-matrix?)
-(assign-operation '- (make-matrix-combination '-)    matrix?          abstract-matrix?)
-(assign-operation '- (make-matrix-combination '-)    abstract-matrix? matrix?)
-(assign-operation '- (make-matrix-combination '-)    scalar?   square-abstract-matrix?)
-(assign-operation '- (make-matrix-combination '-)    square-abstract-matrix? scalar?)
+(assign-operation
+ '* (make-matrix-combination '*)    abstract-matrix? abstract-matrix?)
+(assign-operation
+ '* (make-matrix-combination '*)    matrix?          abstract-matrix?)
+(assign-operation
+ '* (make-matrix-combination '*)    abstract-matrix? matrix?)
+(assign-operation
+ '* (make-matrix-combination '*)    scalar?          abstract-matrix?)
+(assign-operation
+ '* (make-matrix-combination '* 'r) abstract-matrix? scalar?)
 
-(assign-operation '* (make-matrix-combination '*)    abstract-matrix? abstract-matrix?)
-(assign-operation '* (make-matrix-combination '*)    matrix?          abstract-matrix?)
-(assign-operation '* (make-matrix-combination '*)    abstract-matrix? matrix?)
-(assign-operation '* (make-matrix-combination '*)    scalar?          abstract-matrix?)
-(assign-operation '* (make-matrix-combination '* 'r) abstract-matrix? scalar?)
+(assign-operation
+ '/ (make-matrix-combination '/) abstract-matrix? square-abstract-matrix?)
+(assign-operation
+ '/ (make-matrix-combination '/) matrix?          square-abstract-matrix?)
+(assign-operation
+ '/ (make-matrix-combination '/) abstract-matrix? square-matrix?)
+(assign-operation
+ '/ (make-matrix-combination '/) scalar?          square-abstract-matrix?)
+(assign-operation
+ '/ (make-matrix-combination '/) abstract-matrix? scalar?)
+(assign-operation
+ '/ (make-matrix-combination '/) vector-quantity? square-abstract-matrix?)
 
-(assign-operation '/ (make-matrix-combination '/) abstract-matrix? square-abstract-matrix?)
-(assign-operation '/ (make-matrix-combination '/) matrix?          square-abstract-matrix?)
-(assign-operation '/ (make-matrix-combination '/) abstract-matrix? square-matrix?)
-(assign-operation '/ (make-matrix-combination '/) scalar?          square-abstract-matrix?)
-(assign-operation '/ (make-matrix-combination '/) abstract-matrix? scalar?)
-(assign-operation '/ (make-matrix-combination '/) vector-quantity? square-abstract-matrix?)
+(assign-operation
+ 'expt (make-matrix-combination 'expt) square-abstract-matrix? exact-integer?)
 
-(assign-operation 'expt
-                  (make-matrix-combination 'expt) square-abstract-matrix? exact-integer?)
-
-(assign-operation 'partial-derivative
+(assign-operation
+ 'partial-derivative
   (make-matrix-combination 'partial-derivative)
   abstract-matrix? any?)
 

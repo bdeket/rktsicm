@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (all-defined-out) fix:zero?)
 
 (require "../../rkt/fixnum.rkt"
          "../../kernel-intr.rkt"
@@ -26,7 +26,7 @@
 ;;; Other implementation of coefficient arithmetic may be constructed
 ;;; by modifying this map.
 
-(define fix:zero? int:zero?)
+;(define fix:zero? int:zero?)
 
 (define base? number?)
 

@@ -10,4 +10,6 @@
                     [fx-  fix:-]
                     [fx*  fix:*]
                     [fxquotient fix:quotient]))
-(provide (all-from-out racket/fixnum))
+(provide (all-from-out racket/fixnum) fix:zero?)
+
+(define (fix:zero? x) (fix:= 0 x))

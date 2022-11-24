@@ -1,16 +1,16 @@
-#lang racket/base
+#lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require racket/vector
-         "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" vector-tail make-initialized-vector
+                  default-object default-object? fix:=)
          "../general/logic-utils.rkt"
+         "utils.rkt"
          "generic.rkt"
+         "types.rkt"
+         "vectors.rkt"
          "matrices.rkt"
          "structs.rkt"
-         "types.rkt"
-         "utils.rkt"
-         "vectors.rkt"
          "todo/display-print.rkt")
 (define-values (assign-operation quaternion:assign-operations)
   (make-assign-operations 'quaternion))
@@ -56,7 +56,7 @@
 
 
 (define (quaternion->3vector q)
-  (vector-copy (quaternion->vector q) 1))
+  (vector-tail (quaternion->vector q) 1))
 
 (define q:3vector quaternion->3vector)
 
@@ -66,10 +66,9 @@
 
 (define q:real-part quaternion->real-part)
 
-
 (define (quaternion+quaternion q1 q2)
   (make-quaternion
-   (build-vector 4
+   (make-initialized-vector 4
      (lambda (i)
        (g:+ (quaternion-ref q1 i)
 	    (quaternion-ref q2 i))))))
@@ -79,7 +78,7 @@
 
 (define (quaternion-quaternion q1 q2)
   (make-quaternion
-   (build-vector 4
+   (make-initialized-vector 4
      (lambda (i)
        (g:- (quaternion-ref q1 i)
 	    (quaternion-ref q2 i))))))
@@ -114,26 +113,25 @@
 
 (define (q:negate q)
   (make-quaternion
-   (build-vector 4
+   (make-initialized-vector 4
      (lambda (i)
        (g:- (quaternion-ref q i))))))
 
-
 (define (scalar*quaternion s q)
   (make-quaternion
-   (build-vector 4
+   (make-initialized-vector 4
     (lambda (i)
       (g:* s (quaternion-ref q i))))))
 
 (define (quaternion*scalar q s)
   (make-quaternion
-   (build-vector 4
+   (make-initialized-vector 4
     (lambda (i)
       (g:* (quaternion-ref q i) s)))))
 
 (define (quaternion/scalar q s)
   (make-quaternion
-   (build-vector 4
+   (make-initialized-vector 4
     (lambda (i)
       (g:/ (quaternion-ref q i) s)))))
 
@@ -164,7 +162,6 @@
   (let ((v (q:->vector q)))
     (g:one? (v:dot-product v v))))
 
-
 (define (q:exp q)
   (let ((v (quaternion->3vector q))
 	(a (quaternion->real-part q)))
@@ -182,7 +179,6 @@
       (real&3vector->quaternion (g:log qq)
 				(g:* (g:acos (g:/ a qq))
 				     (g:/ v vv))))))
-
 
 (define (q:zero-like q)
   (make-quaternion
@@ -232,7 +228,6 @@
 	 (generic:partial-derivative f varspecs)))
       v))))
 
-
 ;;; Quaternions as 4x4 matrices
 
 (define q:1
@@ -272,7 +267,6 @@
 
 (define q:4x4-> 4x4->quaternion)
 
-
 ;;; Quaternions and 3D rotations
 
 ;;; Given a axis (a unit 3-vector) and an angle
@@ -291,13 +285,15 @@
 
 ;;; Problem: this is singular if the vector part is zero.
 
-(define (quaternion->angle-axis q [continue list])
+(define (quaternion->angle-axis q [continue default-object])
   (assert (quaternion? q))
-  (let* ((v (q:3vector q))
-         (theta (g:* 2 (g:atan (euclidean-norm v)
-                               (q:real-part q))))
-         (axis (vector/scalar v (euclidean-norm v))))
-    (continue theta axis)))
+  (let ((continue
+         (if (default-object? continue) list continue)))
+    (let* ((v (q:3vector q))
+           (theta (g:* 2 (g:atan (euclidean-norm v)
+                                 (q:real-part q))))
+           (axis (vector/scalar v (euclidean-norm v))))
+      (continue theta axis))))
 
 (define q:->angle-axis quaternion->angle-axis)
 
@@ -327,7 +323,6 @@
 	   (real&3vector->quaternion 0 3-vector)
 	   q*))))
     the-rotation))
-
 
 #|
 ;;; Relation to rotation matrices
@@ -374,7 +369,6 @@
 	      (q3 (g:/ q0q3 q0)))
 	  (quaternion q0 q1 q2 q3))))))
 |#
-
 
 ;;; Expanded Matt Mason method.
 
@@ -459,7 +453,6 @@
 |#
 |#
 
-
 (define (quaternion->rotation-matrix q)
   (assert (quaternion? q))
   ;;(assert (q:unit? q))
@@ -502,7 +495,6 @@
 
 (define q:->rotation-matrix quaternion->rotation-matrix)
 
-
 #|
 (let ((theta 'theta) (v (up 'x 'y 'z)))
   (let ((axis (v:make-unit v)))
@@ -537,7 +529,6 @@
         -1.6035674514745464))
 |#
 |#
-
 
 (assign-operation 'type             q:type            quaternion?)
 (assign-operation 'type-predicate   q:type-predicate  quaternion?)
@@ -587,16 +578,8 @@
 (assign-operation 'solve-linear-right     quaternion/scalar         quaternion? scalar?)
 (assign-operation 'solve-linear-right     quaternion/quaternion     quaternion? quaternion?)
 
-(assign-operation 'solve-linear-left
-                  (lambda (x y) (quaternion/scalar y x))
-                  scalar? quaternion?)
-(assign-operation 'solve-linear-left
-                  (lambda (x y) (quaternion/quaternion y x))
-                  quaternion? quaternion?)
+(assign-operation 'solve-linear-left (lambda (x y) (quaternion/scalar y x))     scalar?     quaternion?)
+(assign-operation 'solve-linear-left (lambda (x y) (quaternion/quaternion y x)) quaternion? quaternion?)
 
-(assign-operation 'solve-linear
-                  (lambda (x y) (quaternion/scalar y x))
-                  scalar? quaternion?)
-(assign-operation 'solve-linear
-                  (lambda (x y) (quaternion/quaternion y x))
-                  quaternion? quaternion?)
+(assign-operation 'solve-linear (lambda (x y) (quaternion/scalar y x))     scalar?     quaternion?)
+(assign-operation 'solve-linear (lambda (x y) (quaternion/quaternion y x)) quaternion? quaternion?)

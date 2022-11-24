@@ -42,6 +42,7 @@
 (define find findf)
 (define make-initialized-vector build-vector)
 (define subvector vector-copy)
+(define (vector-tail v t) (vector-copy v t))
 (define string:<? string<?)
 (define write-line writeln)
 (define-syntax-rule (define-integrable head body ...)

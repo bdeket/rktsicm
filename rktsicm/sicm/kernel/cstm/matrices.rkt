@@ -1,4 +1,4 @@
-#lang racket/base
+#lang s-exp "../extapply.rkt"
 
 (provide (all-defined-out))
 
@@ -7,6 +7,8 @@
          "../iterat.rkt"
          "../types.rkt"
          )
+
+;;;;               Matrices
 
 (define (m:type m) matrix-type-tag)
 (define (m:type-predicate m) matrix-quantity?)
@@ -39,7 +41,6 @@
   (assert (matrix? mat) "Not a matrix -- SIZE" mat)
   (fix:* (m:num-rows mat) (m:num-cols mat)))
 
-
 ;;; Single columns or rows are often important.
 
 (define (column-matrix? m)
@@ -55,10 +56,10 @@
 
 (define m:ref matrix-ref)
 
-;;; Submatrices are often used -- here we extract one
-
 (define (m:generate nrows ncols proc)
   (tag-matrix nrows ncols (generate-array nrows ncols proc)))
+
+;;; Submatrices are often used -- here we extract one
 
 (define (m:submatrix A lowrow hirow+1 lowcol hicol+1)
   (m:generate (fix:- hirow+1 lowrow) (fix:- hicol+1 lowcol)
