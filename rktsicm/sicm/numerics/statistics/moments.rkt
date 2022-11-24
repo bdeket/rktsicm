@@ -156,11 +156,11 @@
 ;;; Streams of data have running moments
 
 (define (running-mean decay stream)
-  (let loop ((sum (stream-first stream))
+  (let loop ((sum (stream-car stream))
 	     (count 1)
-	     (stream (stream-rest stream)))
-    (stream-cons (/ sum count)
-		 (loop (+ (stream-first stream) (* decay sum))
+	     (stream (stream-cdr stream)))
+    (cons-stream (/ sum count)
+		 (loop (+ (stream-car stream) (* decay sum))
 		       (+ 1 (* decay count))
-		       (stream-rest stream)))))
+		       (stream-cdr stream)))))
 

@@ -412,7 +412,7 @@
     (if (fix:= i k)
 	(begin (set! *interpolate-primes-stream* s)
 	       args)
-	(lp (fix:+ i 1) (stream-rest s) (cons (stream-first s) args)))))
+	(lp (fix:+ i 1) (stream-cdr s) (cons (stream-car s) args)))))
 
 #|
 ;;; This is trying to be a good boy, using the formula from Zippel for

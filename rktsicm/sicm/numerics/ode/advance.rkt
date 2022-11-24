@@ -114,9 +114,9 @@
   (lambda (state step-required h-suggested max-h)
     (advance state step-required h-suggested max-h
 	     (lambda (state step-achieved h cont)
-	       (stream-cons state (cont)))
+	       (cons-stream state (cont)))
 	     (lambda (state step-achieved h-suggested)
-	       (stream-cons state empty-stream)))))
+	       (cons-stream state the-empty-stream)))))
 
 
 ;;; Utilities for ODE integrators.

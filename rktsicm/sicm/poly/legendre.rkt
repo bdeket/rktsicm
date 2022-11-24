@@ -17,15 +17,15 @@
 ;;;      P[n](x) = ((2n-1)/n)*x*P[n-1](x) - ((n-1)/n)*P[n-2](x)
 
 (define legendre-polynomials
-  (stream-cons poly:one
-    (stream-cons poly:identity
+  (cons-stream poly:one
+    (cons-stream poly:identity
       (map-streams (lambda (p1 p2)
 		     (let* ((n (+ (poly:degree p1) 1))
 			    (a (/ (- (* 2 n) 1) n))
 			    (b (/ (- n 1) n)))
 		       (poly:- (poly:* (poly:scale poly:identity a) p1)
 			       (poly:scale p2 b))))
-		   (stream-rest legendre-polynomials)
+		   (stream-cdr legendre-polynomials)
 		   legendre-polynomials))))
 
 (define (legendre-polynomial n)

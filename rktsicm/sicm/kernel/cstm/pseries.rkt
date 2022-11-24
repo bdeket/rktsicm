@@ -44,7 +44,7 @@
 (define (series:generate p [arity *exactly-one*])
   (make-series arity
 	       (let lp ((i 0))
-		 (stream-cons (p i) (lp (+ i 1))))))
+		 (cons-stream (p i) (lp (+ i 1))))))
 
 (define (series:for-each proc series . optionals)
   (apply stream:for-each
@@ -87,22 +87,22 @@
 ;;;  part of the integrated series, i.e., {a0 a1/2 a2/3 a3/4 ...}.
 ;;;  Now, the mutual-recursion above can be made to work:
 ;;;    (define cos-series
-;;;      (make-series 1 (stream-cons 1
+;;;      (make-series 1 (cons-stream 1
 ;;;                      (series:negate (integral-series-tail sin-series)))))
 ;;;    (define sin-series
-;;;      (make-series 1 (stream-cons 0 (integral-series-tail cos-series))))
+;;;      (make-series 1 (cons-stream 0 (integral-series-tail cos-series))))
 ;;;
 ;;;  We have a special form, INTEGRATE-SERIES, to encapsulate this ugly mess.  Look
 ;;;   in the file fundamental-series.scm for examples.
 
 (define integrate-helper
   (lambda (s n)
-    (stream-cons (g:/ (stream-first s) n)
-		 (integrate-helper (stream-rest s) (fix:+ n 1)))))
+    (cons-stream (g:/ (head s) n)
+		 (integrate-helper (tail s) (fix:+ n 1)))))
 
 (define (*integrate-series series constant-term)
   (make-series (series:arity series)
-	       (stream-cons constant-term
+	       (cons-stream constant-term
 			    (integrate-helper (series->stream series)
 					      1))))
 
@@ -112,22 +112,22 @@
 
 (define cos-series
   (make-series *exactly-one*
-    (stream-cons 1
+    (cons-stream 1
 		 (negate-stream (integral-series-tail sin-series)))))
 
 (define sin-series
   (make-series *exactly-one*
-	       (stream-cons 0 (integral-series-tail cos-series))))
+	       (cons-stream 0 (integral-series-tail cos-series))))
 
 (define exp-series
   (make-series *exactly-one*
-	       (stream-cons 1 (integral-series-tail exp-series))))
+	       (cons-stream 1 (integral-series-tail exp-series))))
 
 (define cosh-series
   (make-series *exactly-one*
-	       (stream-cons 1 (integral-series-tail sinh-series))))
+	       (cons-stream 1 (integral-series-tail sinh-series))))
 
 (define sinh-series
   (make-series *exactly-one*
-	       (stream-cons 0 (integral-series-tail cosh-series))))
+	       (cons-stream 0 (integral-series-tail cosh-series))))
 

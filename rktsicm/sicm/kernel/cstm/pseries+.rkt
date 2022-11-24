@@ -18,14 +18,14 @@
 
 (define (series:value series arguments)
   (define (collect stream-of-procs)
-    (let ((first-result (g:apply (stream-first stream-of-procs) arguments)))
+    (let ((first-result (g:apply (head stream-of-procs) arguments)))
       (if (series? first-result)
 	  (let ((fr (series->stream first-result)))
-	    (stream-cons (stream-first fr)
-			 (stream:+ (stream-rest fr)
-				   (collect (stream-rest stream-of-procs)))))
-	  (stream-cons first-result
-		       (collect (stream-rest stream-of-procs))))))
+	    (cons-stream (head fr)
+			 (stream:+ (tail fr)
+				   (collect (tail stream-of-procs)))))
+	  (cons-stream first-result
+		       (collect (tail stream-of-procs))))))
   (cond ((equal? (series:arity series) *exactly-one*)
 	 (cond ((fix:= (length arguments) 1)
 		(make-series *exactly-zero*

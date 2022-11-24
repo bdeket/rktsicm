@@ -40,11 +40,11 @@
 (define chebyshev-polynomials
   (let ((x poly:identity)
 	(2x (poly:scale poly:identity 2)))
-    (stream-cons 1
-		 (stream-cons x
+    (cons-stream 1
+		 (cons-stream x
 			      (map-streams (lambda (p1 p2)
 					     (poly:- (poly:* 2x p1) p2))
-					   (stream-rest chebyshev-polynomials)
+					   (stream-cdr chebyshev-polynomials)
 					   chebyshev-polynomials)))))
 
 
@@ -72,19 +72,19 @@
       (add-lists t1 (add-lists t2 t3))))
 
 (define scaled-chebyshev-expansions
-  (stream-cons '(1)
-   (stream-cons '(0 1)
+  (cons-stream '(1)
+   (cons-stream '(0 1)
     (map-stream 2x
-		(stream-rest scaled-chebyshev-expansions)))))
+		(stream-cdr scaled-chebyshev-expansions)))))
 
 
 ;;; For convenience, we also provide the non-scaled Chebyshev expansions
 
 (define chebyshev-expansions
   (letrec (;; s = {1 1 2 4 8 16 ...}
-	   (s (stream-cons 1
-	       (stream-cons 1
-		(map-stream (lambda (x) (+ x x)) (stream-rest s)))))
+	   (s (cons-stream 1
+	       (cons-stream 1
+		(map-stream (lambda (x) (+ x x)) (stream-cdr s)))))
            (c scaled-chebyshev-expansions))
     (map-streams (lambda (factor expansion)
                    (scale-list (/ 1 factor) expansion))
@@ -110,8 +110,8 @@
 			   (when (not (equal? r poly:zero))
 			       (error "POLY->CHEB-EXP"))
 			   (lp q
-			       (stream-rest c)
-			       (add-lists (scale-list v (stream-first c)) s)))))))))
+			       (stream-cdr c)
+			       (add-lists (scale-list v (stream-car c)) s)))))))))
 
 
 ;;; Convert from Chebyshev expansion to polynomial form

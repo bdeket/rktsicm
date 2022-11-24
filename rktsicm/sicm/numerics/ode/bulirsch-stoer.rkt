@@ -136,12 +136,12 @@
 
 (define (bulirsch-stoer-setup max-depth max-width)
   (define (bsi n)
-    (stream-cons (expt 2 (+ n 1))
-		 (stream-cons (* 3 (expt 2 n))
+    (cons-stream (expt 2 (+ n 1))
+		 (cons-stream (* 3 (expt 2 n))
 			      (bsi (+ n 1)))))
   (set! *max-tableau-depth* max-depth)
   (set! *max-tableau-width* max-width)
-  (let ((bulirsch-stoer-integers (stream-cons 1 (bsi 0))))
+  (let ((bulirsch-stoer-integers (cons-stream 1 (bsi 0))))
     (set! bulirsch-stoer-steps
 	  (list->vector
 	   (map (lambda (x) (fix:* 2 x))

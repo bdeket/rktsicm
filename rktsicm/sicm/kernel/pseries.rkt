@@ -35,31 +35,31 @@
     (let lp ((a args))
       (if (null? a)
 	  (infinite-stream-of (g:zero-like (car args)))
-	  (stream-cons (car a) (lp (cdr a)))))))
+	  (cons-stream (car a) (lp (cdr a)))))))
 
 (define (power-series . args)
   (make-series *exactly-one*
     (let lp ((a args))
       (if (null? a)
 	  (infinite-stream-of (g:zero-like (car args)))
-	  (stream-cons (car a) (lp (cdr a)))))))
+	  (cons-stream (car a) (lp (cdr a)))))))
 
 (define series:zero 
   (make-series *exactly-one* zero-stream))
 
 (define series:one 
   (make-series *exactly-one*
-	       (stream-cons :one zero-stream)))
+	       (cons-stream :one zero-stream)))
 
 (define series:identity
   (make-series *exactly-one*
-	       (stream-cons :zero
-			    (stream-cons :one zero-stream))))
+	       (cons-stream :zero
+			    (cons-stream :one zero-stream))))
 
 
 (define (constant-series c [arity *exactly-one*])
   (make-series arity
-	       (stream-cons c zero-stream)))
+	       (cons-stream c zero-stream)))
     
 
 ;;; The following procedures provide a set of capabilities for
@@ -68,23 +68,23 @@
 (define (coefficient+series c series)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (stream-cons (g:+ c (stream-first s)) (stream-rest s)))))
+      (cons-stream (g:+ c (stream-car s)) (stream-cdr s)))))
 
 (define (series+coefficient series c)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (stream-cons (g:+ (stream-first s) c) (stream-rest s)))))
+      (cons-stream (g:+ (stream-car s) c) (stream-cdr s)))))
 
 (define (coefficient-series c series)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (stream-cons (g:- c (stream-first s))
-		   (negate-stream (stream-rest s))))))
+      (cons-stream (g:- c (stream-car s))
+		   (negate-stream (stream-cdr s))))))
 
 (define (series-coefficient series c)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (stream-cons (g:- (stream-first s) c) (stream-rest s)))))
+      (cons-stream (g:- (stream-car s) c) (stream-cdr s)))))
 
 
 ;;; c*(a0 + a1*x + a2*x^2 + a3*x^3 + ...)
@@ -138,9 +138,9 @@
   (map-stream (lambda (x) (g:/ x c)) s))
 
 (define (mul-series s1 s2)
-  (stream-cons (g:* (stream-first s1) (stream-first s2))
-	       (add-series (stream:c*s (stream-first s1) (stream-rest s2))
-		    (mul-series (stream-rest s1) s2))))
+  (cons-stream (g:* (stream-car s1) (stream-car s2))
+	       (add-series (stream:c*s (stream-car s1) (stream-cdr s2))
+		    (mul-series (stream-cdr s1) s2))))
 
 (define series:mul (series-wrapper mul-series))
 
@@ -149,10 +149,10 @@
   (accumulation series:mul series:one))
 
 (define (invert-series s)
-  (let ((s0 (g:/ :one (stream-first s))))
+  (let ((s0 (g:/ :one (stream-car s))))
     (define inverted
-      (stream-cons s0
-        (mul-series (stream:c*s (g:negate s0) (stream-rest s)) inverted)))
+      (cons-stream s0
+        (mul-series (stream:c*s (g:negate s0) (stream-cdr s)) inverted)))
     inverted))
 
 (define series:invert (series-wrapper invert-series))
@@ -170,10 +170,10 @@
 (define (series:expt s e)
   (letrec ((square (lambda (s) (mul-series s s)))
 	   (series:one
-	    (stream-cons :one zero-stream))
+	    (cons-stream :one zero-stream))
 	   (zuras
 	    (lambda (t e k)
-	      (stream-cons :one
+	      (cons-stream :one
 		(stream:c*s (div-coeff e k)
 			    (mul-series t
 					(zuras t
@@ -198,8 +198,8 @@
 	    (lambda (s e)
 	      (if (exact-integer? e)
 		  (iexpt s e)
-		  (stream:c*s (expt-coeff (stream-first s) e)
-		    (zuras (stream:s/c (stream-rest s) (stream-first s)) e 1))))))
+		  (stream:c*s (expt-coeff (stream-car s) e)
+		    (zuras (stream:s/c (stream-cdr s) (stream-car s)) e 1))))))
     (make-series (series:arity s)
 		 (expt (series->stream s) e))))
 
@@ -208,8 +208,8 @@
     (define (deriv-iter s n)
       (if (null? s)
 	  '()
-	  (stream-cons (g:* n (stream-first s))
-		       (deriv-iter (stream-rest s) (fix:+ n 1)))))
+	  (cons-stream (g:* n (stream-car s))
+		       (deriv-iter (stream-cdr s) (fix:+ n 1)))))
     (define (derivative s varnums)
       (cond ((equal? (series:arity s) *exactly-zero*)
 	     ((series:elementwise
@@ -221,7 +221,7 @@
 		 (error "Cannot yet take partial derivatives of a series"
 			s varnums))
 	     (make-series *exactly-one*
-			  (deriv-iter (stream-rest (series->stream s)) 1)))
+			  (deriv-iter (stream-cdr (series->stream s)) 1)))
 	    (else
 	     (error "Cannot take derivative of non arity=1 series"
 		    s varnums))))
@@ -236,12 +236,12 @@
   (when (not (equal? (series:arity series) *exactly-zero*))
       (error "Cannot sum non arity=0 series" series))
   (let ((stream (series->stream series)))
-    (partial-sums-stream (stream-first stream) (stream-rest stream))))
+    (partial-sums-stream (stream-car stream) (stream-cdr stream))))
 
 (define (partial-sums-stream value s)
-  (stream-cons value
-	       (partial-sums-stream (g:+ value (stream-first s))
-				    (stream-rest s))))
+  (cons-stream value
+	       (partial-sums-stream (g:+ value (stream-car s))
+				    (stream-cdr s))))
 
 (define (series:sum series order)
   (g:ref (partial-sums series) order))
@@ -268,7 +268,7 @@
   (let ((x0 (if (null? opt) :zero (car opt))))
     (make-series *exactly-one*
 		 (let lp ((i 1) (fn f) (factn 1))
-		   (stream-cons (g:/ (fn x0) factn)
+		   (cons-stream (g:/ (fn x0) factn)
 				(lp (fix:+ 1 i)
                                     ;TODO: was (derivative fn), not sure if this is right
 				    (g:derivative fn)
@@ -354,8 +354,8 @@
 (define (binomial-series a)
   (define (binomial-helper a n c)
     (if (g:= a 0)
-	(stream-cons c zero)
-	(stream-cons c
+	(cons-stream c zero)
+	(cons-stream c
 	  (binomial-helper (g:- a 1) (g:+ n 1) (g:/ (g:* c a) n)))))
   (make-series *exactly-one* (binomial-helper a 1 1)))
 
@@ -369,8 +369,8 @@
   (let ()
     (define (atan-helper n s)
       (if (even? n) 
-	  (stream-cons 0 (atan-helper (+ n 1) s))
-	  (stream-cons (* s (/ 1 n))
+	  (cons-stream 0 (atan-helper (+ n 1) s))
+	  (cons-stream (* s (/ 1 n))
 		       (atan-helper (+ n 1) (- s)))))
     (make-series *exactly-one*
 		 (atan-helper 0 1))))

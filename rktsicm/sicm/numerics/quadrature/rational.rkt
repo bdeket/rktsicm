@@ -99,10 +99,10 @@
 (define (trapezoid-stream f a b n0)
   (let ((steps (stream-of-iterates (lambda (x) (* 2 x)) n0))
 	(first-S ((rat-trapezoid f a b) n0)))
-    (let loop ((steps (stream-rest steps)) (Sn/2 first-S))
+    (let loop ((steps (stream-cdr steps)) (Sn/2 first-S))
       (let ((S
-             (trapezoid-using-previous-sum f a b Sn/2 (stream-first steps))))
-	(stream-cons S (loop (stream-rest steps) S))))))
+             (trapezoid-using-previous-sum f a b Sn/2 (stream-car steps))))
+	(cons-stream S (loop (stream-cdr steps) S))))))
 
 (define ((rat-trapezoid f a b) n)
   (let ((h (fl/ (fl- b a) (exact->inexact n))))
@@ -224,13 +224,13 @@
                          x-stream
                          y-stream
                          eps
-                         (stream-first y-stream)))
+                         (stream-car y-stream)))
 
 (define (build-tableau-streams dt dx-list x-stream y-stream eps estimate)
   (if (null? x-stream) 
       '()
-      (let ((dx-new (stream-first x-stream))
-	    (c (stream-first y-stream)))
+      (let ((dx-new (stream-car x-stream))
+	    (c (stream-car y-stream)))
 	(let ((new-dt
 	       (cons c (rational-interpolation dt c dx-list dx-new eps))))
 	  (let ((new-estimate (flo:sigma-list new-dt)))
@@ -238,8 +238,8 @@
 		     (> (length new-dt) 2))
 		new-estimate
 		(build-tableau-streams new-dt (cons dx-new dx-list) 
-				       (stream-rest x-stream)
-				       (stream-rest y-stream)
+				       (stream-cdr x-stream)
+				       (stream-cdr y-stream)
 				       eps
 				       new-estimate)))))))
 
