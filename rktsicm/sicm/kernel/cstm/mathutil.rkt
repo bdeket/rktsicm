@@ -2,17 +2,20 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         racket/vector
-         "s-operator.rkt"
+(require (only-in "../../rkt/glue.rkt" if subvector
+                  fix:< fix:+)
          "../../general/list-utils.rkt"
+         "../utils.rkt"
+         "s-operator.rkt"
          "matrices.rkt"
          "pseries.rkt"
          "structs.rkt"
-         "../strutl.rkt"
          "../types.rkt"
-         "../utils.rkt"
+         "../strutl.rkt"
          )
+
+(define (g:ref x . selectors)
+  (ref-internal x selectors))
 
 (define (ref-internal x selectors)
   (cond ((null? selectors) x)
@@ -69,7 +72,7 @@
 			  (list-ref x (adjust-index i (length x)))
 			  js))
 			((string? x)
-			 (when (not (null? js))
+			 (if (not (null? js))
 			     (error "String has no substructure -- REF" x i js))
 			 (string-ref x (adjust-index i (string-length x))))
 			(else
@@ -80,17 +83,17 @@
 		       (exact-integer? (cadr i)))
 		  (cond ((vector? x)
 			 (ref-internal
-                          (vector-copy x
-                                       (adjust-index (car i) (vector-length x))
-                                       (adjust-end (cadr i) (vector-length x)))
+                          (subvector x
+                                     (adjust-index (car i) (vector-length x))
+                                     (adjust-end (cadr i) (vector-length x)))
                           js))
                         ((structure? x)
                          (ref-internal
                           (s:structure
                            (s:type x)
-                           (vector-copy (s:->vector x)
-                                        (adjust-index (car i) (s:length x))
-                                        (adjust-end (cadr i) (s:length x))))
+                           (subvector (s:->vector x)
+                                      (adjust-index (car i) (s:length x))
+                                      (adjust-end (cadr i) (s:length x))))
 			  js))
 			((matrix? x)
 			 (if (null? js)
@@ -132,7 +135,7 @@
 				   (adjust-end (cadr i) (length x)))
 			  js))
 			((string? x)
-			 (when (not (null? js))
+			 (if (not (null? js))
 			     (error "String has no substructure -- REF" x i js))
 			 (substring x
 				    (adjust-index (car i) (string-length x))
@@ -145,11 +148,11 @@
 (define (adjust-index i n)
   (if (fix:< i 0)
       (let ((j (fix:+ n i)))
-	(when (fix:< j 0)
+	(if (fix:< j 0)
 	    (error "Bad index -- REF" i))
 	j)
       (begin
-	(when (not (fix:< i n))
+	(if (not (fix:< i n))
 	    (error "Bad index -- REF" i))
 	i)))
 
@@ -157,14 +160,10 @@
   (let ((n (fix:+ n 1)))
     (if (fix:< i 0)
 	(let ((j (fix:+ n i)))
-	  (when (fix:< j 0)
+	  (if (fix:< j 0)
 	      (error "Bad index -- REF" i))
 	  j)
 	(begin
-	  (when (not (fix:< i n))
+	  (if (not (fix:< i n))
 	      (error "Bad index -- REF" i))
 	  i))))
-
-(define (g:ref x . selectors)
-  (ref-internal x selectors))
-

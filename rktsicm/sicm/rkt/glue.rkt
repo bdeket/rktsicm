@@ -22,7 +22,8 @@
          "racket-help.rkt"
          "undefined.rkt"
          (submod racket/performance-hint begin-encourage-inline)
-         (only-in racket/list take))
+         (only-in racket/list take)
+         (only-in racket/vector vector-copy))
 
 (define true #t)
 (define false #f)
@@ -40,6 +41,8 @@
 (define generate-uninterned-symbol gensym)
 (define find findf)
 (define make-initialized-vector build-vector)
+(define subvector vector-copy)
 (define string:<? string<?)
+(define write-line writeln)
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))

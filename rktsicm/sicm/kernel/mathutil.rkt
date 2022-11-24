@@ -4,26 +4,26 @@
          (all-from-out "cstm/mathutil.rkt")
          g:identity)
 
-(require racket/vector
-         "cstm/mathutil.rkt"
-         "cstm/s-operator.rkt"
+(require "../rkt/default-object.rkt"
          "../general/list-utils.rkt"
-         "../rkt/default-object.rkt"
-         "generic.rkt"
-         "cstm/matrices.rkt"
          "numeric.rkt"
-         "cstm/pseries.rkt"
+         "utils.rkt"
+         "generic.rkt"
+         "cstm/mathutil.rkt"
+         "cstm/matrices.rkt"
          "structs.rkt"
          "strutl.rkt"
          "types.rkt"
-         "utils.rkt"
          )
 
 
 ;;;;    Derived Generic Operators
 
 (define ratnum? rational?);not sure ... should this be exact?
-;(define ratnum? rational (access ratnum? (->environment '(runtime number))))
+#;
+(define ratnum?
+  (access ratnum?
+          (->environment '(runtime number))))
 
 (define (g:cube x)
   (g:* x x x))
@@ -83,10 +83,18 @@
     (g:apply f (map g:* xs scales)))
   g)
 
-
-
+#; ;;bdk;; moved to cstm/generic
+(define (g:sigma f low high)
+  (if (fix:> low high)
+      0
+      (let lp ((i (fix:+ low 1)) (sum (f low)))
+	(if (fix:> i high)
+	    sum
+	    (lp (fix:+ i 1) (g:+ sum (f i)))))))
 
 ;;; The generalized selector:
+
+;;bdk;; g:ref & ref-internal moved to cstm/mathutil
 
 (define ((component . selectors) x)
   (ref-internal x selectors))
@@ -102,7 +110,6 @@
 	(else
 	 (error "Unknown compound -- G:size" x))))
 
-
 ;;; Generic composition duplicates composition in utils
 
 (define (g:compose . fs)
@@ -115,6 +122,8 @@
 	 (g:compose-bin (lp (butlast fs))
 			(car (last-pair fs))))))
 
+;;bdk;; g:identity moved to generics
+
 (define (g:compose-2 f g)
   (cond ((pair? g)
 	 (lambda x
@@ -125,7 +134,6 @@
 	(else
 	 (lambda x
 	   (f (g:apply g x))))))
-
 
 (define (g:compose-bin f g)
   (cond ((and (pair? g) (not (structure? g)))
