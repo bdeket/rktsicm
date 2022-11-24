@@ -8,3 +8,4 @@
 (define hash-table-set! hash-set!)
 (define make-key-weak-eq-hash-table make-weak-hasheq)
 (define make-eq-hash-table make-hasheq)
+(define hash-table->alist hash->list)

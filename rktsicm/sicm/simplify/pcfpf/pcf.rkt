@@ -1,15 +1,17 @@
 #lang racket/base
 
-(provide (all-defined-out) fix:zero?)
+(provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         "../../kernel-intr.rkt"
-         "../../rkt/default-object.rkt"
-         "../../rkt/int.rkt"
+(require (only-in "../../rkt/glue.rkt" if define-integrable false list-head
+                  make-initialized-vector make-initialized-list
+                  fix:< fix:= fix:> fix:+ fix:- fix:zero? fix:>= fix:fixnum?
+                  int:zero? int:quotient int:-)
+         (only-in "../../rkt/todo.rkt" pp)
          "../../general/assert.rkt"
          "../../general/list-utils.rkt"
          "../../general/resource-limit.rkt"
          "../../general/sets.rkt"
+         "../../kernel-intr.rkt"
          )
 
 ;;;;         Multivariate Polynomial Functions -- GJS
@@ -26,47 +28,45 @@
 ;;; Other implementation of coefficient arithmetic may be constructed
 ;;; by modifying this map.
 
-;(define fix:zero? int:zero?)
+(define-integrable base? number?)
 
-(define base? number?)
+(define-integrable base/zero :zero)
+(define-integrable base/one :one)
 
-(define base/zero :zero)
-(define base/one :one)
+(define-integrable base/zero? zero?)
+(define-integrable base/one? one?)
+(define-integrable base/negative? negative?)
 
-(define base/zero? zero?)
-(define base/one? one?)
-(define base/negative? negative?)
+(define-integrable base/negate -)
+(define-integrable base/abs magnitude)
 
-(define base/negate -)
-(define base/abs magnitude)
+(define-integrable base/equal? =)
 
-(define base/equal? =)
+(define-integrable base/add +)
+(define-integrable base/mul *)
+(define-integrable base/sub -)
 
-(define base/add +)
-(define base/mul *)
-(define base/sub -)
+(define-integrable base/div scheme-number-divide)
 
-(define base/div scheme-number-divide)
+(define-integrable base/gcd scheme-number-gcd)
 
-(define base/gcd scheme-number-gcd)
+(define-integrable base/expt expt)
 
-(define base/expt expt)
+(define-integrable poly/zero base/zero)
 
-(define poly/zero base/zero)
+(define-integrable poly/one base/one)
 
-(define poly/one base/one)
-
-(define (poly/zero? p)
+(define-integrable (poly/zero? p)
   (and (base? p) (base/zero? p)))
 
-(define (poly/one? p)
+(define-integrable (poly/one? p)
   (and (base? p) (base/one? p)))
 
 (define (poly/make-identity arity)
   (poly/make-from-dense arity (list base/one base/zero)))
 
 (define (poly/make-constant arity c)
-  (when (not (fix:< (poly/arity c) arity))
+  (if (not (fix:< (poly/arity c) arity))
       (error "Bad constant -- POLY/MAKE-CONSTANT" arity c))
   (poly/make-from-dense arity (list c)))
 
@@ -277,7 +277,7 @@
 	 (error "No inverse (POLY/EXPT):" base exponent))
 	((poly/one? base) base)
 	((poly/zero? base)
-	 (when (int:zero? exponent)
+	 (if (int:zero? exponent)
 	     (error "0^0 -- POLY/EXPT"))
 	 base)
 	((int:zero? exponent) poly/one)
@@ -299,7 +299,7 @@
 (define (poly/div u v cont)
   ;; cont = (lambda (q r)
   ;;          (assert (poly/equal? u (poly/add (poly/mul q v) r))))
-  (when (poly/zero? v)
+  (if (poly/zero? v)
       (error "Divide by zero (POLY/DIV):" u v))
   (cond ((and (base? u) (base? v)) (base/div u v cont))
 	((or (poly/zero? u) (poly/one? v))
@@ -376,7 +376,7 @@
 
 (define (poly/pseudo-remainder u v cont)
   ;; cont = (lambda (r d) #| l(v)^d*u = v*q + r|# )
-  (when (poly/zero? v)
+  (if (poly/zero? v)
       (error "Divide by zero (POLY/PSEUDO-REMAINDER):" u v))
   (let* ((arity (poly/check-same-arity u v))
 	 (cvn (poly/make-constant arity
@@ -454,7 +454,7 @@
 		  (car coeffs)
 		  (let ((n/2 (quotient n 2)))
 		    (let ((ps (poly/random-linear-combination
-			       (take coeffs n/2)))
+			       (list-head coeffs n/2)))
 			  (qs (poly/random-linear-combination
 			       (list-tail coeffs n/2))))
 		      (let ((g (poly/gcd ps qs)))
@@ -470,7 +470,7 @@
 (define poly/random-linear-combination
   (let* ((number-of-primes 100)
 	 (prime-table
-	  (build-vector number-of-primes
+	  (make-initialized-vector number-of-primes
 	    (lambda (i) (stream-ref prime-numbers-stream i)))))
     (lambda (polys)
       (fold-left poly/add (car polys)
@@ -492,7 +492,7 @@
 	(poly/primitive-part
 	 (poly/primitive-part-maker poly/gcd/euclid))) 
     (define (pgcd ppu ppv win lose)
-      (when euclid-wallp? (println (list ppu ppv)))
+      (if (euclid-wallp?) (pp (list ppu ppv)))
       (cond ((poly/zero? ppv) (win ppu))
 	    ((fix:zero? (poly/degree ppv)) (win poly/one))
 	    ((allocated-time-expired?) (lose))
@@ -545,7 +545,7 @@
 		   lose))
 	       lose))))))
 
-(define euclid-wallp? #f)
+(define euclid-wallp? (make-parameter false))
 
 (define (poly/gcd-euclid u v)
   (poly/gcd/euclid u v (lambda (g) g) (lambda () #f)))
@@ -555,6 +555,7 @@
 ;;;  Thus, I have not updated it to use the 
 ;;;  success and failure continuations needed.
 
+#; ;incomplete implementation (poly/content needs 3 arguments!
 (define (poly/gcd-collins u v)
   (let ((poly/content
 	 (poly/content-maker poly/gcd-collins))
@@ -562,7 +563,7 @@
 	 (poly/primitive-part-maker poly/gcd-collins)))
 
     (define (pgcd u v oc)
-      (when collins-wallp? (println (list u v)))
+      (if collins-wallp? (pp (list u v)))
       (cond ((poly/zero? v) u)
 	    ((fix:zero? (poly/degree v)) poly/one)
 	    (else
@@ -612,7 +613,7 @@
 				    c)))))))
 	       (poly/abs ans)))))))
 
-(define collins-wallp? #f)
+(define collins-wallp? false)
 
 #|
 ;;; Test examples
@@ -697,7 +698,8 @@
 ;;; GCD memoizer.  A hairy attempt to speed up the gcd.  Ultimately
 ;;; this failed and we went to a sparse interpolation gcd.
 
-#;(define (gcd-memoizer poly/gcd)
+#; ;;bdk;; since it's not working don't bother...
+(define (gcd-memoizer poly/gcd)
   (let ((table
 	 ((weak-hash-table/constructor unordered-poly-hash
 				       unordered-pair-equal?))))
@@ -739,15 +741,15 @@
 (define skip-initial-primes 100)
 
 (define prime-numbers-vector
-  (build-vector n-random-primes
+  (make-initialized-vector n-random-primes
 			   (lambda (i)
 			     (stream-ref prime-numbers-stream
 					 (fix:+ i skip-initial-primes)))))
 
 (define hash-args-vector
-  (build-vector n-random-primes
+  (make-initialized-vector n-random-primes
     (lambda (i)
-      (build-list i
+      (make-initialized-list i
 	(lambda (j)
 	  (vector-ref prime-numbers-vector
 		      (random (min (* 2 i) n-random-primes))))))))
@@ -773,7 +775,7 @@
 	((fix:= varnum 1) (poly/derivative-principal p))
 	(else
 	 (let ((arity (poly/arity p)))
-	   (when (fix:> varnum arity)
+	   (if (fix:> varnum arity)
 	       (error "Bad varnum -- POLY/DERIVATIVE-PARTIAL"
 		      p varnum))
 	   (let lp ((p p))
@@ -823,7 +825,7 @@
   (if (base? p)
       p
       (let ((arity (poly/arity p)))
-	(when (not (fix:= arity (length args)))
+	(if (not (fix:= arity (length args)))
 	    (error "Wrong number of args -- POLY/HORNER" p args))
 	(let lp ((p p) (args args))
 	  (if (base? p)
@@ -875,7 +877,7 @@
 (define (poly/arg-scale p factors)
   (poly/horner p
 	       (map poly/mul
-		    (take factors (poly/arity p))
+		    (list-head factors (poly/arity p))
 		    (poly/make-vars (poly/arity p)))))
 
 
@@ -887,7 +889,7 @@
 (define (poly/arg-shift p shifts)
   (poly/horner p
 	       (map poly/add
-		    (take shifts (poly/arity p))
+		    (list-head shifts (poly/arity p))
 		    (poly/make-vars (poly/arity p)))))
 
 
@@ -928,10 +930,10 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 (define (poly/horner-with-error a z cont)
   ;; cont = (lambda (p q r e) ...)
   (if (base? a)
-      a
+      (cont a 0 0 0)
       (let ((arity (poly/arity a))
 	    (az (magnitude z)))
-	(when (not (fix:= arity 1))
+	(if (not (fix:= arity 1))
 	    (error "Wrong arity poly -- POLY/HORNER-WITH-ERROR" a z))
 	(let lp ((degree (poly/degree a))
 		 (p (poly/leading-coefficient a))
@@ -1204,7 +1206,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (map cdr p))
 
 (define (poly/sparse/coefficient p d)
-  (when (not (and (fixnum? d) (fix:>= d 0)))
+  (if (not (and (fix:fixnum? d) (fix:>= d 0)))
       (raise-argument-error 'POLY/SPARSE/COEFFICIENT "nonnegative fixnum" d))
   (let lp ((terms p))
     (cond ((null? terms) base/zero)
@@ -1273,7 +1275,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	  (else (cons (car p) (loop (cdr p)))))))
 
 (define (poly/dense/coefficient p d)
-  (when (not (and (fixnum? d) (fix:>= d 0)))
+  (if (not (and (fix:fixnum? d) (fix:>= d 0)))
       (raise-argument-error 'POLY/DENSE/COEFFICIENT "nonnegative fixnum" d))
   (list-ref p (fix:- (fix:- (length p) 1) d)))
 
@@ -1413,7 +1415,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (if (base? p)
       p
       (let ((arity (poly/arity p)))
-	(when (not (fix:= arity (length vars)))
+	(if (not (fix:= arity (length vars)))
 	    (error "Poly arity not = vars supplied -- PCF:->EXPRESSION"
 		   p vars))
 	(let ((hh (poly/horner-helper symb:+ symb:* symb:expt)))

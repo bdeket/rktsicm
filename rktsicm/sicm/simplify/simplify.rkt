@@ -2,9 +2,12 @@
 
 (provide (all-defined-out))
 
-(require "../kernel-intr.rkt"
-         "../rkt/undefined.rkt"
+(require (only-in "../rkt/glue.rkt" undefined-value generate-uninterned-symbol true false
+                  hash-table->alist hash-table/get hash-table/put!)
          "../general/list-utils.rkt"
+         (only-in "../general/memoize.rkt" hash-memoize-1arg)
+         (only-in "../general/hashcons.rkt" canonical-copy)
+         "../kernel-intr.rkt"
          "../parameters.rkt"
          "fpf.rkt"
          "pcf.rkt"
@@ -85,7 +88,7 @@
     (define (get-auxiliary-variable-defs)
       (map (lambda (entry)
 	     (list (cdr entry) (car entry)))
-	   (hash->list auxiliary-variable-table)))
+	   (hash-table->alist auxiliary-variable-table)))
 
     ;; Implementation -----------------------
 
@@ -114,7 +117,7 @@
 
     (define (new-kernels expr)
       (let ((sexpr (map base-simplify expr)))
-	(let ((v (hash-ref symbolic-operator-table
+	(let ((v (hash-table/get symbolic-operator-table
 				 (operator sexpr)
 				 #f)))
 	  (if v
@@ -134,7 +137,7 @@
 	(lambda (expr)
 	  (cond ((pair? expr) (map lp expr))
 		((symbol? expr)
-		 (let ((v (hash-ref reverse-table expr #f)))
+		 (let ((v (hash-table/get reverse-table expr #f)))
 		   (if v (lp v) expr)))
 		(else expr))))
       (lp expr))
@@ -149,23 +152,23 @@
 	    (if as-seen
 		as-seen
 		(let ((newvar
-		       (gensym "kernel")))
-		  (hash-set! auxiliary-variable-table expr newvar)
-		  (hash-set! reverse-table newvar expr)
+		       (generate-uninterned-symbol "kernel")))
+		  (hash-table/put! auxiliary-variable-table expr newvar)
+		  (hash-table/put! reverse-table newvar expr)
 		  newvar)))
 	  expr))
 
     (define (expression-seen expr)
-      (hash-ref auxiliary-variable-table expr #f))
+      (hash-table/get auxiliary-variable-table expr #f))
 
 
     (define (vless? var1 var2)
       (let ((in (memq var1 uorder)))
 	(cond (in
-	       (cond ((memq var2 in) #t)
-		     ((memq var2 uorder) #f)
-		     (else #t)))
-	      ((memq var2 uorder) #f)
+	       (cond ((memq var2 in) true)
+		     ((memq var2 uorder) false)
+		     (else true)))
+	      ((memq var2 uorder) false)
 	      (else
 	       (variable<? var1 var2)))))
 
@@ -195,58 +198,33 @@
   (make-analyzer fpf:->expression fpf:expression-> fpf:operators-known))
 
 ;;(define fpf:simplify (default-simplifier fpf:analyzer))
-(define fpf:simplify (expression-simplifier fpf:analyzer))
-#|
-(define fpf:simplify
-  (compose canonical-copy
-           (expression-simplifier fpf:analyzer)))
-(define fpf:simplify
-  (compose canonical-copy
-           (expression-simplifier fpf:analyzer)
-           canonical-copy))
+;;(define fpf:simplify (expression-simplifier fpf:analyzer))
 (define fpf:simplify
   (hash-memoize-1arg
    (compose canonical-copy
 	    (expression-simplifier fpf:analyzer))))
-|#
+
 
 (define pcf:analyzer
   (make-analyzer pcf:->expression pcf:expression-> pcf:operators-known))
 
 ;;(define pcf:simplify (default-simplifier pcf:analyzer))
-(define pcf:simplify (expression-simplifier pcf:analyzer))
-#|
-(define pcf:simplify
-  (compose canonical-copy
-           (expression-simplifier pcf:analyzer)))
-(define pcf:simplify
-  (compose canonical-copy
-           (expression-simplifier pcf:analyzer)
-           canonical-copy))
+;;(define pcf:simplify (expression-simplifier pcf:analyzer))
+
 (define pcf:simplify
   (hash-memoize-1arg
    (compose canonical-copy
 	    (expression-simplifier pcf:analyzer))))
-|#
 
 (define rcf:analyzer
   (make-analyzer rcf:->expression rcf:expression-> rcf:operators-known))
 
 ;;(define rcf:simplify (default-simplifier rcf:analyzer))
-(define rcf:simplify (expression-simplifier rcf:analyzer))
-#|
-(define rcf:simplify
-  (compose canonical-copy
-           (expression-simplifier rcf:analyzer)))
-(define rcf:simplify
-  (compose canonical-copy
-           (expression-simplifier rcf:analyzer)
-           canonical-copy))
+;;(define rcf:simplify (expression-simplifier rcf:analyzer))
 (define rcf:simplify
   (hash-memoize-1arg
    (compose canonical-copy
 	    (expression-simplifier rcf:analyzer))))
-|#
 
 #|
 ((initializer rcf:analyzer))

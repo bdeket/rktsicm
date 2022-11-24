@@ -2,13 +2,13 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-intr.rkt"
-         "../rkt/default-object.rkt"
-         "../rkt/int.rkt"
+(require (only-in "../rkt/glue.rkt" if default-object default-object? make-initialized-list
+                  fix:= fix:> fix:< fix:+
+                  int:zero? int:quotient int:-)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          "../general/sets.rkt"
+         "../kernel-intr.rkt"
          )
 
 ;;;;      Flat Polynomial Form, for Commutative Rings
@@ -91,10 +91,10 @@
   (fpf:make (list (fpf:make-term (list 1) :one))))
 
 (define (fpf:new-variables n)
-  (build-list n
+  (make-initialized-list n
     (lambda (i)
       (fpf:make (list (fpf:make-term
-		       (build-list n
+		       (make-initialized-list n
 			 (lambda (j) (if (fix:= i j) 1 0)))
 		       :one))))))
 
@@ -284,7 +284,7 @@
 	      (else (error "Bad arguments -- FPF:DIVIDE" x y))))))
 
 (define (fpf:divide-terms termlist1 termlist2 [continue default-object])
-  (when (default-object? continue) (set! continue list))
+  (if (default-object? continue) (set! continue list))
   (fpf:divide-terms-general termlist1 termlist2
     fpf:coeff-add fpf:coeff-mul fpf:coeff-div fpf:coeff-negate continue))
 

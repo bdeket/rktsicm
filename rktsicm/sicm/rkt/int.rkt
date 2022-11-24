@@ -15,4 +15,5 @@
 (define-syntax int:quotient (make-rename-transformer #'quotient))
 
 (define (int:zero? x) (eq? 0 x))
+(define (int:negate x) (- x))
 

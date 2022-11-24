@@ -2,8 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../rkt/default-object.rkt"
+(require (only-in "../rkt/glue.rkt" default-object default-object? int:negate
+                  fix:= fix:> fix:< fix:+ fix:- fix:-1+ fix:zero? fix:quotient fix:negative?)
          "../general/list-utils.rkt"
          "../general/sets.rkt"
          "../kernel-intr.rkt"
@@ -280,24 +280,24 @@
 	answer
 	(if (even? count)
 	    (expt-iter (rcf:square x) (fix:quotient count 2) answer)
-	    (expt-iter x (fix:- count 1) (rcf:* x answer)))))
+	    (expt-iter x (fix:-1+ count) (rcf:* x answer)))))
   (cond ((not (exact-integer? exponent))
 	 (error "Can only raise a RCF to an exact integer power" base exponent))
-	((fix:< exponent 0)
-	 (rcf:invert (expt-iter base (- exponent) rcf:one)))
+	((fix:negative? exponent)
+	 (rcf:invert (expt-iter base (int:negate exponent) rcf:one)))
 	(else (expt-iter base exponent rcf:one))))
 
 (define (rcf:arg-scale r points)
   (if (ratform? r)
-      (rcf:/ (apply poly:arg-scale (ratform-numerator r) points)
-	     (apply poly:arg-scale (ratform-denominator r) points))
-      (apply poly:arg-scale r points)))
+      (rcf:/ (poly:arg-scale (ratform-numerator r) points)
+	     (poly:arg-scale (ratform-denominator r) points))
+      (poly:arg-scale r points)))
 
 (define (rcf:arg-shift r points)
   (if (ratform? r)
-      (rcf:/ (apply poly:arg-shift (ratform-numerator r) points)
-	     (apply poly:arg-shift (ratform-denominator r) points))
-      (apply poly:arg-shift r points)))
+      (rcf:/ (poly:arg-shift (ratform-numerator r) points)
+	     (poly:arg-shift (ratform-denominator r) points))
+      (poly:arg-shift r points)))
 
 (define (rcf:value r points)
   (if (ratform? r)
