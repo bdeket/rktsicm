@@ -28,6 +28,7 @@
   (and (pair? x)
        (eq? (car x) with-units-type-tag)))
 |#
+(add-to-numerical-quantity? (λ (x) (and (with-units? x) (numerical-quantity? (u:value x)))))
 
 (define (without-units? x)
   (not (with-units? x)))

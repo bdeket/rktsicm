@@ -3,17 +3,17 @@
 (provide (all-defined-out)
          (all-from-out "cstm/types.rkt")
          operator? differential?)
-;*r* copy/adapted from the scmutils library
-;;;; This is needed to load particular types
 
 (require "../rkt/fixnum.rkt"
+         "../rkt/applyhook.rkt"
          "../parameters.rkt"
          "cstm/express.rkt"
          "cstm/types.rkt"
          "cstm/s-operator.rkt"
          "cstm/diff.rkt"
-         "../rkt/applyhook.rkt"
          "cstm/generic.rkt")
+
+;;;; This is needed to load particular types
 
 (define (make-type type-tag abstract-type-tag
 		   quantity-predicate concrete-predicate abstract-predicate)
@@ -35,7 +35,7 @@
 (define (abstract-predicate type)
   (car (cddddr type)))
 
-;*r* part moved to types-def.rkt
+;;bdk;; part moved to cstm/types
 
 (define (abstract-quantity? x)
   (memq (g:type x) abstract-type-tags))
@@ -55,14 +55,18 @@
   (and (literal-number? x)
        ((has-property? 'real) x)))
 
-(define (numerical-quantity? x)
-  (or (number? x)
-      (abstract-number? x)
-      (and (differential? x)
-	   (numerical-quantity? (differential-of x)))
-      ;TODO
-      #;(and (with-units? x)
-	   (numerical-quantity? (u:value x)))))
+(define-values (numerical-quantity? add-to-numerical-quantity?)
+  (let ([tests (list number?
+                     abstract-number?
+                     (λ (x)
+                       (and (differential? x)
+                            (numerical-quantity? (differential-of x))))
+                     #; ;;bdk;; move to units
+                     (and (with-units? x)
+                          (numerical-quantity? (u:value x))))])
+    (values
+     (λ (x) (for/or ([pred? (in-list tests)]) (pred? x)))
+     (λ (test) (set! tests (append tests (list test)))))))
 
 (define (with-units? x)
   (and (pair? x)
@@ -91,7 +95,8 @@
   (not (or (vector? x)
 	   (and (pair? x)
 		(compound-type-tag? (car x)))
-	   (function? x))))
+	   (function? x)
+           (operator? x))))
 
 ;;; Scheme vectors are used to represent concrete vectors.
 ;;; VECTOR? is defined by Scheme system
@@ -168,7 +173,6 @@
 (define (abstract-structure? x)
   (or (abstract-up? x) (abstract-down? x)))
 
-
 (define (matrix? m)		
   (and (pair? m)
        (eq? (car m) matrix-type-tag)))
@@ -197,9 +201,14 @@
        (eq? (car matrix) abstract-matrix-type-tag)
        ((has-property? 'square) matrix)))
 
+#; ;;bdk;; moved to cstm/s-operator
+(define (operator? x)
+  (and (apply-hook? x)
+       (eq? (car (apply-hook-extra x))
+	    operator-type-tag)))
+
 (define (not-operator? x)
   (not (operator? x)))
-
 
 (define (function-quantity? f)
   (procedure? f))			;apply hooks are procedures.
@@ -224,20 +233,23 @@
        (eq? (car (apply-hook-extra f))
 	    function-type-tag)))
 
-;> from litfun.scm
+;> originally in litfun.scm
 (define (f:expression f)
   (if (typed-or-abstract-function? f)
       (if (*literal-reconstruction*)
 	  (cadddr (cdr (apply-hook-extra f)))
 	  (cadddr (apply-hook-extra f)))
       #f))
-;< from litfun.scm
 
 (define *function*
   (make-type function-type-tag
 	     abstract-function-type-tag
 	     function-quantity? function? abstract-function?))
 
+#; ;;bdk;; moved to cstm/diff
+(define (differential? obj)
+  (and (pair? obj)
+       (eq? (car obj) differential-type-tag)))
 
 (define (not-differential? obj)
   (not (differential? obj)))

@@ -2,44 +2,46 @@
 
 (provide (all-defined-out))
 
-(define number-type-tag '*number*)
+(require (only-in "../../rkt/glue.rkt" define-integrable))
 
-(define with-units-type-tag '*with-units*)
+(define-integrable number-type-tag '*number*)
 
-(define unit-type-tag '*unit*)
+(define-integrable with-units-type-tag '*with-units*)
 
-(define vector-type-tag '*vector*)
+(define-integrable unit-type-tag '*unit*)
 
-(define abstract-vector-type-tag '*vector*)
+(define-integrable vector-type-tag '*vector*)
+
+(define-integrable abstract-vector-type-tag '*vector*)
 
 (define quaternion-type-tag '*quaternion*)
 
 
 ;;; Up vectors are implemented as scheme vectors
 
-(define up-type-tag '*vector*)
+(define-integrable up-type-tag '*vector*)
 
-(define abstract-up-type-tag '*vector*)
+(define-integrable abstract-up-type-tag '*vector*)
 
-(define down-type-tag '*down*)
+(define-integrable down-type-tag '*down*)
 
-(define abstract-down-type-tag '*abstract-down*)
-
-
-(define matrix-type-tag '*matrix*)
-
-(define abstract-matrix-type-tag '*abstract-matrix*)
+(define-integrable abstract-down-type-tag '*abstract-down*)
 
 
-(define function-type-tag '*function*)
+(define-integrable matrix-type-tag '*matrix*)
 
-(define abstract-function-type-tag '*function*)
+(define-integrable abstract-matrix-type-tag '*abstract-matrix*)
 
-(define differential-type-tag '*diff*)
+
+(define-integrable function-type-tag '*function*)
+
+(define-integrable abstract-function-type-tag '*function*)
+
+(define-integrable differential-type-tag '*diff*)
 
 (define operator-type-tag '*operator*)
 
-(define series-type-tag '*series*)
+(define-integrable series-type-tag '*series*)
 
 
 (define type-tags

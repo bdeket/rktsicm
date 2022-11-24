@@ -290,6 +290,9 @@
 (assign-operation '*           scalar*structure        scalar?    structure?)
 (assign-operation '*           structure*scalar        structure? scalar?)
 
+(assign-operation '*           scalar*structure        operator?  structure?)
+(assign-operation '*           structure*scalar        structure? operator?)
+
 (assign-operation '/           structure/scalar        structure? scalar?)
 
 (assign-operation 'expt        structure:expt          structure? exact-integer?)
@@ -393,6 +396,12 @@
 
 (assign-operation '*  (make-down-combination '*)       scalar?    abstract-down?)
 (assign-operation '*  (make-down-combination '* 'r)    abstract-down?    scalar?)
+
+(assign-operation '*  (make-up-combination '*)    operator?    abstract-up?)
+(assign-operation '*  (make-up-combination '* 'r) abstract-up? operator?)
+
+(assign-operation '*  (make-down-combination '*)       operator?         abstract-down?)
+(assign-operation '*  (make-down-combination '* 'r)    abstract-down?    operator?)
 
 		     
 (assign-operation '/  (make-up-combination '/)    abstract-up? scalar?)
