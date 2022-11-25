@@ -1,20 +1,19 @@
-#lang racket/base
+#lang s-exp "../kernel.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" if there-exists?
+                  fix:= fix:> fix:<= fix:+ fix:-)
+         (only-in "../rkt/todo.rkt" pp)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "../general/permute.rkt"
          "../general/resource-limit.rkt"
-         "../kernel/utils.rkt"
-         "../kernel/matrices.rkt"
-         "../kernel/strutl.rkt"
          "pcfpf/pcf.rkt"
          "fpf.rkt"
          "pcfpf/pcf-fpf.rkt"
          "sparse.rkt"
-         "sparse-interpolate.ss"
+         "sparse-interpolate.rkt"
          "../numerics/linear/lu.rkt"
          )
 
@@ -39,16 +38,16 @@
 
 (define (poly/gcd/sparse su sv win lose)
   (let ((n (length (sparse-exponents (car su)))))
-    (when (not (fix:= n (length (sparse-exponents (car sv)))))
+    (if (not (fix:= n (length (sparse-exponents (car sv)))))
 	(error "Unequal arities--poly/gcd/sparse" su sv))		    
-    (if (or (ormap (lambda (term)
+    (if (or (there-exists? su
+                           (lambda (term)
                      (let ((c (sparse-coefficient term)))
-                       (or (not (number? c)) (inexact? c))))
-                   su)
-            (ormap (lambda (term)
+                       (or (not (number? c)) (inexact? c)))))
+            (there-exists? sv
+                           (lambda (term)
                      (let ((c (sparse-coefficient term)))
-                       (or (not (number? c)) (inexact? c))))
-                   sv))
+                       (or (not (number? c)) (inexact? c))))))
 	(win (sparse-one n))
 	(sparse-gcd su sv win lose))))
 
@@ -154,7 +153,7 @@
 ;;; See end of file for experiments that show this is valuable.
 
 (define (sparse-heuristic-gcd p1 p2 n ds win lose)
-  (let lp ((trials 0) (args (build-list n interpolate-random)))
+  (let lp ((trials 0) (args (generate-list n interpolate-random)))
     (if (fix:= trials *heuristic-sparse-gcd-trials*)
 	(begin (set! *heuristic-sparse-gcd-win*
 		     (+ *heuristic-sparse-gcd-win* 1))
@@ -163,7 +162,7 @@
 	      (v2 (sparse-evaluate p2 args)))
 	  (cond ((= (base/gcd v1 v2) 1)
 		 (lp (fix:+ trials 1)
-		     (build-list n interpolate-random)))
+		     (generate-list n interpolate-random)))
 		(else
 		 (set! *heuristic-sparse-gcd-lose*
 		       (+ *heuristic-sparse-gcd-lose* 1))
@@ -228,7 +227,7 @@
   ;; P, Q of arity n (They have n indeterminates.)  
   ;; ds is the n-long list of maximum degrees for each of the indeterminates.
   ;; The continuations win = (lambda (g) ...); lose = (lambda () ...)
-  (when *sgcd-wallp* (println `(sparse-gcd: (P ,P) (Q ,Q) (n ,n) (ds ,ds))))
+  (if *sgcd-wallp* (pp `(sparse-gcd: (P ,P) (Q ,Q) (n ,n) (ds ,ds))))
   ;; The following is a piece of shit and a bad idea...
   (reset-interpolation-args! ds
 			     (apply max
@@ -238,7 +237,7 @@
 
   ;; Now for the real stuff
   (let restart ((restart-count 0))
-    (when *sgcd-wallp* (println `(restart ,restart-count)))
+    (if *sgcd-wallp* (pp `(restart ,restart-count)))
     (if (or (fix:> restart-count *sgcd-restart-limit*)
 	    (allocated-time-expired?))
 	(lose) 				;failed!
@@ -253,16 +252,16 @@
 	  ;; determine g_k, the GCD of Pk and Qk, where the arguments [0,k] are
 	  ;; indeterminates.  When k=n-1 Pk and Qk are P and Q.  The g resulting
 	  ;; from that will then be the GCD of P&Q.
-	  (when *sgcd-wallp*
-	      (println `(restarted (rargs0 ,rargs0) (P0 ,P0) (Q0 ,Q0) (g0 ,g0))))
+	  (if *sgcd-wallp*
+	      (pp `(restarted (rargs0 ,rargs0) (P0 ,P0) (Q0 ,Q0) (g0 ,g0))))
 
 	  (let stagelp ((k 1) (g g0) (rargs rargs0) (stage-fail-count 0))	
 	    (cond ((sparse-zero? g)	;if P/=0 and Q/=0 then g/=0
-		   (when *sgcd-wallp* (println `(g=zero! ,k ,rargs)))
+		   (if *sgcd-wallp* (pp `(g=zero! ,k ,rargs)))
 		   (restart (fix:+ restart-count 1)))
 		  ((fix:= k n)
-		   (when *sgcd-tuning*
-		       (println
+		   (if *sgcd-tuning*
+		       (pp
 			`(restarts= ,restart-count P= ,P Q= ,Q G= ,g n= ,n ds= ,ds)))
 		   (win g))
 		  ((fix:> stage-fail-count *sgcd-stage-limit*)
@@ -292,7 +291,7 @@
 			  (skeleton (map sparse-exponents g))
 			  (nterms (length skeleton))
 			  (trial-arglists
-			   (build-list nterms
+			   (generate-list nterms
 			     (lambda (i)
 			       (make-interpolation-args k))))
 			  ;; But the undetermined coefficients of the nterms of
@@ -318,8 +317,8 @@
 					Gks))
 			  (nGkTerms (length (car GkSkels)))
 			  (maxGkTerms (fix:+ (list-ref ds k) 1)))
-		     (when *sgcd-wallp*
-			 (println `(stage (k ,k) (g ,g) (rargs ,rargs)
+		     (if *sgcd-wallp*
+			 (pp `(stage (k ,k) (g ,g) (rargs ,rargs)
 			       (skeleton ,skeleton)
 			       (Pk ,Pk) (Qk ,Qk)
 			       (trial-arglists ,trial-arglists)
@@ -340,10 +339,10 @@
 		     ;; it works, we go to the next stage.
 
 		     (cond ((not (all-equal? GkSkels))
-			    (when *sgcd-wallp* (println '(GkSkels not all the same)))
+			    (if *sgcd-wallp* (pp '(GkSkels not all the same)))
 			    (stagelp k g rargs (fix:+ stage-fail-count 1)))
 			   ((not (fix:<= nGkTerms maxGkTerms))
-			    (when *sgcd-wallp* (println '(Too many GkTerms)))
+			    (if *sgcd-wallp* (pp '(Too many GkTerms)))
 			    (restart (fix:+ restart-count 1)))
 			   (else
 			    (lu-decompose
@@ -368,18 +367,18 @@
 						 (lu-backsubstitute matrix permutation
 							    (list->vector values)))))
 					    xk+1s)))
-				 (when *sgcd-wallp*
-				     (println `(after-lu (xk+1s ,xk+1s) (coeffs ,coeffs))))
+				 (if *sgcd-wallp*
+				     (pp `(after-lu (xk+1s ,xk+1s) (coeffs ,coeffs))))
 				 (let clp ((css (list-transpose coeffs)) (cps '()))
-				   (when *sgcd-wallp* (println `(clp (css ,css) (cps ,cps))))
+				   (if *sgcd-wallp* (pp `(clp (css ,css) (cps ,cps))))
 				   (if (null? css)
 				       (let ((gk (expand-poly g (reverse cps))));WAS REVERSE!
-					 (when *sgcd-wallp* (println `(gk ,gk)))
+					 (if *sgcd-wallp* (pp `(gk ,gk)))
 					 (if (and (sparse-divisible? Pk gk)
 						  (sparse-divisible? Qk gk))
-					     (begin (when *sgcd-wallp* (println '(divide won)))
+					     (begin (if *sgcd-wallp* (pp '(divide won)))
 						    (stagelp (fix:+ k 1) gk (cdr rargs) 0))
-					     (begin (when *sgcd-wallp* (println '(divide lost)))
+					     (begin (if *sgcd-wallp* (pp '(divide lost)))
 						    (stagelp k g rargs
 							     (fix:+ stage-fail-count 1))
 						    ;;(restart (fix:+ restart-count 1))
@@ -387,12 +386,12 @@
 				       (univariate-interpolate-values xk+1s (car css)
 				         (lambda (cp) (clp (cdr css) (cons cp cps)))
 					 (lambda ()
-					   (when *sgcd-wallp* (println '(interpolation failed)))
+					   (if *sgcd-wallp* (pp '(interpolation failed)))
 					   (stagelp k g rargs (fix:+ stage-fail-count 1))
 					   ;;(restart (fix:+ restart-count 1))
 					   ))))))
 			     (lambda (x)
-			       (when *sgcd-wallp* (println `(singular)))
+			       (if *sgcd-wallp* (pp `(singular)))
 			       (stagelp k g rargs (fix:+ stage-fail-count 1))
 			       ;;(restart (fix:+ restart-count 1))
 			       ))))))))))))
@@ -412,7 +411,7 @@
     (if (fix:= i k)
 	(begin (set! *interpolate-primes-stream* s)
 	       args)
-	(lp (fix:+ i 1) (stream-cdr s) (cons (stream-car s) args)))))
+	(lp (fix:+ i 1) (tail s) (cons (head s) args)))))
 
 #|
 ;;; This is trying to be a good boy, using the formula from Zippel for
@@ -442,12 +441,12 @@
 (define *number-of-primes* 5000)
 
 (define *prime-table*
-  (build-vector *number-of-primes*
+  (make-initialized-vector *number-of-primes*
 			   (lambda (i)
 			     (stream-ref prime-numbers-stream i))))
 
 (define (make-interpolation-args k)
-  (build-list k interpolate-prime))
+  (generate-list k interpolate-prime))
 
 (define (interpolate-prime i)
   (vector-ref *prime-table* (random *number-of-primes*)))
@@ -496,7 +495,7 @@
 
 (define (sparse-univariate-gcd u v)		;Euclid's Algorithm is OK here.
   (define (pgcd ppu ppv)
-    (when *ugcd-wallp* (println `((ppu: ,ppu) (ppv: ,ppv))))
+    (if *ugcd-wallp* (pp `((ppu: ,ppu) (ppv: ,ppv))))
     (cond ((null? ppv) ppu)		;v=0      => u
 	  ((sparse-constant? ppv)	;deg(v)=0 => 1
 	   sparse-univariate-one)
@@ -534,7 +533,7 @@
 				 c)))))))
 
 	     (let ((ans (sparse-abs ans)))
-	       (when *ugcd-testing*
+	       (if *ugcd-testing*
 		   (assert (and (sparse-divisible? u ans)
 				(sparse-divisible? v ans))))
 	       ans))))))
@@ -615,7 +614,7 @@
   (define (random-sign)
     (if (= (random 2) 0) 1 -1))
   (define (random-monomial)
-    (sparse-term (build-list arity
+    (sparse-term (generate-list arity
 				(lambda (_)
 				  (random (+ max-order 1))))
 		 (* (random-sign)
@@ -623,7 +622,7 @@
   (define (random-polynomial)
     (reduce sparse-add '()
 	    (map list 
-		 (build-list max-terms
+		 (generate-list max-terms
 				(lambda (_) (random-monomial))))))
   (parameterize ((*heuristic-sparse-gcd-enabled* #f))
     (let loop ((i 0))
@@ -640,37 +639,35 @@
 		       (gABAC (sparse-gcd AB AC)))
 		  (cond ((or (not (sparse-divisible? B gBC))
 			     (not (sparse-divisible? C gBC)))
-			 (println `(gcd-failed1 ,i ,B ,C ,gBC))
+			 (pp `(gcd-failed1 ,i ,B ,C ,gBC))
 			 (error "bad")
 			 #f)
 			((or (not (sparse-divisible? AB gABAC))
 			     (not (sparse-divisible? AC gABAC)))
-			 (println `(gcd-failed2 ,i ,AB ,AC ,gABAC))
+			 (pp `(gcd-failed2 ,i ,AB ,AC ,gABAC))
 			 (error "bad")
 			 #f)
 			((not (equal? AgBC gABAC))
-			 (println (list 'not-gcd i A B C AB AC gBC AgBC gABAC))
+			 (pp (list 'not-gcd i A B C AB AC gBC AgBC gABAC))
 			 #f)
 			(else (loop (fix:+ i 1))))))))))))
 
 
 #|
+;;; Test repaired by gjs on 16 Aug 2021.
+
 (define (gcd-test d f g)
   (let ((pd (fpf:expression-> d (lambda (p v) p)))
 	(pf (fpf:expression-> f (lambda (p v) p)))
 	(pg (fpf:expression-> g (lambda (p v) p))))
     (let ((pdf (fpf:* pd pf)) (pdg (fpf:* pd pg)))
-      (let ((gcd?
-	     (sparse-gcd
-	      (fpf:->sparse pdf)
-	      (fpf:->sparse pdg)))
-	    (ans
-	     (fpf:->sparse pd)))
-	(if (equal? gcd? ans)
-	    #t
-	    (println (list (list 'gcd? gcd?)
-		      (list 'ans ans))))))))
-
+      (sparse-gcd (fpf:->sparse pdf) (fpf:->sparse pdg)
+                  (lambda (g)
+                    (if (equal? (sort g sparse-term->)
+                                (fpf:->sparse pd))
+                        #t
+                        (pp (list g (fpf:->sparse pd)))))
+                  (lambda () #f)))))
 
 (define d1
   '(+ (expt x1 2) x1 3))
@@ -923,7 +920,7 @@ process time: 2540 (2540 RUN + 0 GC); real time: 2534
 (define *heuristic-sparse-gcd-false-negative* 0)
 
 (define (reset-heuristic-sparse-gcd-test)
-  (println (list *heuristic-sparse-gcd-win*
+  (pp (list *heuristic-sparse-gcd-win*
 	    *heuristic-sparse-gcd-lose*
 	    *heuristic-sparse-gcd-false-positive*
 	    *heuristic-sparse-gcd-false-negative*))
@@ -938,7 +935,7 @@ process time: 2540 (2540 RUN + 0 GC); real time: 2534
     (if *heuristic-sparse-gcd-enabled*
 	(let ((n (length (sparse-exponents (car p1)))))
 	  (assert (fix:= n (length (sparse-exponents (car p2)))))
-	  (let ((args (build-list n interpolate-random)))
+	  (let ((args (generate-list n interpolate-random)))
 	    (let ((v1 (sparse-evaluate p1 args)) (v2 (sparse-evaluate p2 args)))
 	      (cond ((= (base/gcd v1 v2) 1)
 		     (set! *heuristic-sparse-gcd-win*

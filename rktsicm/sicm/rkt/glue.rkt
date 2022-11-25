@@ -37,6 +37,7 @@
 (define (there-exists? l p?) (ormap p? l))
 (define cons* list*)
 (define make-initialized-list build-list)
+(define generate-list build-list)
 (define list-head take)
 (define generate-uninterned-symbol gensym)
 (define find findf)

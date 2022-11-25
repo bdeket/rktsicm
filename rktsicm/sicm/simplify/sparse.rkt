@@ -1,8 +1,9 @@
-#lang racket/base
+#lang s-exp "../kernel.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" for-all? list-head
+                  fix:= fix:> fix:< fix:+)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          "fpf.rkt"
@@ -25,7 +26,7 @@
   (cons exponents coefficient))
 
 (define (sparse-constant-term? term)
-  (andmap zero? (sparse-exponents term)))
+  (for-all? (sparse-exponents term) zero?))
 
 (define (sparse-univariate? p)
   (and (pair? p)
@@ -59,7 +60,7 @@
 
 
 (define (sparse-identity-term arity-n varnum)
-  (sparse-term (build-list arity-n
+  (sparse-term (generate-list arity-n
 			      (lambda (i)
 				(if (fix:= i varnum) 1 0)))
 	       1))
@@ -215,8 +216,8 @@
 (define (sparse-divisible? n d)
   (if *heuristic-sparse-divisible-enabled*
       (let ((m (length (sparse-exponents (car n)))))
-	(let ((na (sparse-evaluate n (build-list m interpolate-random)))
-	      (da (sparse-evaluate d (build-list m interpolate-random))))
+	(let ((na (sparse-evaluate n (generate-list m interpolate-random)))
+	      (da (sparse-evaluate d (generate-list m interpolate-random))))
 	  (if (and (integer? na) (integer? da) (zero? (remainder na da)))
 	      (let ((val (null? (sparse-divide n d (lambda (q r) r)))))
 		(set! *heuristic-sparse-divisible-lose*
@@ -289,7 +290,7 @@
 	     (narity (- arity n)))
 	(sparse-combine-like-terms
 	 (map (lambda (term)
-		(sparse-term (take (sparse-exponents term) narity)
+		(sparse-term (list-head (sparse-exponents term) narity)
 			     (* (sparse-coefficient term)
 				(apply *
 				       (map expt
@@ -317,7 +318,7 @@
 		     (apply *
 			    (map expt
 				 x
-				 (take (sparse-exponents term)
+				 (list-head (sparse-exponents term)
 					    n))))))
 	      p)))))
 

@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if
+                  fix:= fix:-)
          "../../general/list-utils.rkt"
          "../../kernel/utils.rkt"
          "../fpf.rkt"
@@ -30,14 +31,15 @@
 		(pcf->fpf
 		 (poly/gcd-euclid (fpf->pcf u)
 				  (fpf->pcf v))))
-	       (else (error "What do I do here?"))))))
+	       (else (error "What do I do here?"))))
+        (else (error "What do I do here?"))))
 
 
 (define *euclid-breakpoint-arity* 3)
 
 (define (gcd-check-same-arity u v)
   (let ((au (poly:arity u)))
-    (when (not (fix:= au (poly:arity v)))
+    (if (not (fix:= au (poly:arity v)))
 	(error "Unequal arities -- poly:gcd" u v))
     au))
     
@@ -57,7 +59,7 @@
   (cond ((eq? type '*pcf*)
 	 (sparse->pcf s))
 	((eq? type '*fpf*)
-	 (fpf:make s))
+	 (fpf:make (sort s sparse-term->)))
 	(else
 	 (error "Unknown type: sparse->poly" s type))))  
 

@@ -1,9 +1,9 @@
-#lang racket/base
+#lang s-exp "../kernel.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-intr.rkt"
+(require (only-in "../rkt/glue.rkt" iota
+                  fix:= fix:+ fix:-)
          "../general/list-utils.rkt"
          "sparse.rkt"
          "../numerics/linear/vandermonde.rkt"
@@ -26,7 +26,7 @@
 ;;; find a representation for the terms of the polynomial.
 
 (define (sparse-interpolate f n d)
-  (let* ((rargs0 (build-list (fix:- n 1) interpolate-random))
+  (let* ((rargs0 (generate-list (fix:- n 1) interpolate-random))
 	 (f1 (lambda (x) (apply f x rargs0)))
 	 (p1 (univariate-interpolate f1 d)))
     (let stagelp			;p has k vars interpolated
@@ -38,7 +38,7 @@
 		    (lambda x1-xk
 		      (apply f (append x1-xk (list xk+1) (cdr rargs))))))
 		 (xk+1s
-		  (build-list (fix:+ d 1) interpolate-random))
+		  (generate-list (fix:+ d 1) interpolate-random))
 		 (ps
 		  (map (lambda (xk+1)
 			 (interpolate-skeleton (fk xk+1) p))
@@ -71,7 +71,7 @@
   (let ((skeleton (map sparse-exponents skeleton-polynomial))
 	(arity (length (sparse-exponents (car skeleton-polynomial)))))
     (if *interpolate-skeleton-using-vandermonde*
-        (let try-again ((args (build-list arity interpolate-random)))
+        (let try-again ((args (generate-list arity interpolate-random)))
 	  (let* ((ones (make-list arity 1))
 		 (ks
 		  (map (lambda (exponent-list)
@@ -93,12 +93,12 @@
 			     skeleton
 			     coefficients)))
 	      (lambda ()
-		(try-again (build-list arity interpolate-random))))))
+		(try-again (generate-list arity interpolate-random))))))
 	(let ((new-args
 	       (lambda ()
-		 (build-list (length skeleton-polynomial)
+		 (generate-list (length skeleton-polynomial)
 				(lambda (i)
-				  (build-list arity interpolate-random))))))
+				  (generate-list arity interpolate-random))))))
 	  (let try-again ((trial-arglists (new-args)))
 	    (let ((matrix
 		   (matrix-by-row-list
@@ -156,7 +156,7 @@
 ;;; (usually d is the degree of the polynomial)
 
 (define (univariate-interpolate f d)
-  (let* ((xs (build-list (+ d 1) interpolate-random))
+  (let* ((xs (generate-list (+ d 1) interpolate-random))
 	 (fs (map f xs)))
     (univariate-interpolate-values
      xs
@@ -173,7 +173,7 @@
 			(map (lambda (exponent coefficient)
 			       (sparse-term (list exponent)
 					    coefficient))
-			     (build-list (length xs) values)
+			     (iota (length xs))
 			     coefficients)))))
     fail))
 
@@ -216,8 +216,8 @@
 
 ;;; Check that the new algorithm is equivalent to the old one, and faster
 (define (check m)
-  (let ((xs (build-list m interpolate-random))
-	(fs (build-list m interpolate-random)))
+  (let ((xs (generate-list m interpolate-random))
+	(fs (generate-list m interpolate-random)))
     (let ((t0 (runtime)))
       (univariate-interpolate-values xs fs
         (lambda (new-result)
