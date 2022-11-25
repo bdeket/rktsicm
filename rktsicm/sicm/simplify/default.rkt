@@ -37,7 +37,9 @@
 	       (g:simplify (cdr expr))))
 	(else expr)))
 
-;(define g:simplify (make-generic-operator 1 'simplify default-simplify))
+#; ;;bdk;; the generic name is created in kernel/generic. because g:simplify is used in kernel.
+(define g:simplify
+  (make-generic-operator 1 'simplify default-simplify))
 (assign-operation 'simplify default-simplify)
 
 #|

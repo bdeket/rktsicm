@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "../kernel/cstm/sym-rules.rkt"))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" true false fix:> fix:-)
          "../kernel/cstm/sym-rules.rkt"
          "../kernel-gnrc.rkt"
          "../general/memoize.rkt"
@@ -23,65 +23,63 @@
 
 ;;; allows (log (exp x)) => x 
 ;;;  can confuse x=(x0+n*2pi)i with x0
-(define log-exp-simplify? #t)
+(define log-exp-simplify? true)
 
 ;;; Allows (x^a)^b => x^(a*b)
 ;;;   This is dangerous, because can lose or gain a root, e.g.
 ;;;   x = (x^(1/2))^2 \= ((x^2)^1/2)=+-x
-(define exponent-product-simplify? #t)
+(define exponent-product-simplify? true)
 
 ;;; Traditionally sqrt(x) is the positive square root
 ;;;   but x^(1/2) is both positive and negative roots.
 ;;;   This confuses these, potentiall losing a root.
-(define ^1/2->sqrt? #t)
+(define ^1/2->sqrt? true)
 
 ;;; If x is real then (sqrt (square x)) = (abs x)
 ;;;   This is hard to work with, but we usually want to 
 ;;;   allow (sqrt (square x)) => x, but this is
 ;;;   not necessarily good if x is negative.
-;>moved to kernel/cstm/sym-rules
-(define sqrt-expt-simplify? #t)
-;<end to kernel/cstm/sym-rules
-
+#; ;;bdk;; moved to /kernel/cstm/sym-rules
+(define sqrt-expt-simplify? true)
 
 ;;; If x, y are real non-negative then
 ;;; (* (sqrt x) (sqrt y)) = (sqrt (* x y))
 ;;; but this is not true for negative factors.
-(define sqrt-factor-simplify? #t)
+(define sqrt-factor-simplify? true)
 
 ;;; allows (atan y x) => (atan (/ y d) (/ x d)) where d=(gcd x y)
 ;;; OK if d is a number (gcd is always positive) but may
 ;;; lose quadrant if gcd can be negative for some values of
 ;;; its variables.
-(define aggressive-atan-simplify? #t)
+(define aggressive-atan-simplify? true)
 
 ;;; allows (asin (sin x)) => x, etc
 ;;;  loses multivalue info, as in log-exp
-(define inverse-simplify? #t)
+(define inverse-simplify? true)
 
 ;;; Allows reduction of sin, cos of rational multiples of :pi
-(define sin-cos-simplify? #t)
+(define sin-cos-simplify? true)
 
 ;;; Allow half-angle reductions.  Sign of result is hairy!
-(define half-angle-simplify? #t)
+(define half-angle-simplify? true)
 
 ;;; wierd case: ((d magnitude) (square x)) => 1
-(define ignore-zero? #t)
+(define ignore-zero? true)
 
 ;;; allows commutation of partial derivatives.
 ;;;  only ok if components selected by partials are unstructured 
 ;;;  (e.g. real)
-(define commute-partials? #t)
+(define commute-partials? true)
 
 ;;; allows division through by numbers
 ;;; e.g. (/ (+ (* 4 x) 5) 3) => (+ (* 4/3 x) 5/3)
-(define divide-numbers-through-simplify? #t)
+(define divide-numbers-through-simplify? true)
 
 ;;; Transforms products of trig functions into functions of sums 
 ;;;  of angles
 ;;; e.g. (* (sin x) (cos y)) 
 ;;;        ==> (+ (* 1/2 (sin (+ x y))) (* 1/2 (sin (+ x (* -1 y)))) )
-(define trig-product-to-sum-simplify? #f)
+(define trig-product-to-sum-simplify? false)
 
 ;;; however, we have control over the defaults
 
@@ -100,13 +98,11 @@
   (clear-memoizer-tables)
   (set! ^1/2->sqrt? doit?))
 
-;>moved to kernel/cstm/sym-rules
+#; ;;bdk;; moved to /kernel/cstm/sym-rules
 (define (sqrt-expt-simplify doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
   (clear-memoizer-tables)
   (set! sqrt-expt-simplify? doit?))
-;<end to kernel/cstm/sym-rules
-
 
 (define (sqrt-factor-simplify doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
@@ -1056,7 +1052,9 @@
      none
      (+ 1 (:: a1) (:: a2) (:: a3)) )
 
-   
+   #| 
+   ;; This rule, although algebraically correct, 
+   ;; causes infinite loops... not clear why.
    ( (+ (?? a1)
 	(* (?? f1) (expt (sin (? x)) 2) (?? f2))
 	(?? a2)
@@ -1064,43 +1062,6 @@
 	(?? a3))
      (let ((s1 (rcf:simplify `(* ,@f1 ,@f2)))
 	   (s2 (rcf:simplify `(* ,@f3 ,@f4))))
-       (if (exact-zero? (rcf:simplify `(- ,s1 ,s2)))
-	   s1
-	   #f))
-     (+ (:: a1) (:: a2) (:: a3) (: predicate-value)) )
-
-#|;; Sines are before cosines (see note above)
-   ( (+ (?? a1)
-	(expt (cos (? x)) 2)
-	(?? a2)
-	(expt (sin (? x)) 2)
-	(?? a3))
-     none
-     (+ (:: a1) (:: a2) (:: a3) 1) )
-|#
-
-#|   
-   ( (+ (?? a1)
-	(* (expt (sin (? x)) 2) (?? f1))
-	(?? a2)
-	(* (expt (cos (? x)) 2) (?? f2))
-	(?? a3))
-     (let ((s1 (rcf:simplify `(* ,@f1)))
-	   (s2 (rcf:simplify `(* ,@f2))))
-       (if (exact-zero? (rcf:simplify `(- ,s1 ,s2)))
-	   s1
-	   #f))
-     (+ (:: a1) (:: a2) (:: a3) (: predicate-value)) )
-|#
-
-#|;; Sines are before cosines (see note above)
-   ( (+ (?? a1)
-	(* (expt (cos (? x)) 2) (?? f1))
-	(?? a2)
-	(* (expt (sin (? x)) 2) (?? f2))
-	(?? a3))
-     (let ((s1 (rcf:simplify `(* ,@f1)))
-	   (s2 (rcf:simplify `(* ,@f2))))
        (if (exact-zero? (rcf:simplify `(- ,s1 ,s2)))
 	   s1
 	   #f))

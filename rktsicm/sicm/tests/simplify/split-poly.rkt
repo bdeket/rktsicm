@@ -102,49 +102,6 @@
                                      (expt R 4)))
                                  (expt (cos theta) 2)))
                            (* R (sin theta))))))
-                  '(/
-                    (+
-                     (*
-                      -1
-                      R
-                      (sin theta)
-                      (cos phi)
-                      (expt (cos theta) 3)
-                      (((partial 0) f)
-                       (up
-                        (* R (sin theta) (cos phi))
-                        (* R (sin theta) (sin phi))
-                        (* R (cos theta)))))
-                     (*
-                      -1
-                      R
-                      (sin theta)
-                      (sin phi)
-                      (expt (cos theta) 3)
-                      (((partial 1) f)
-                       (up
-                        (* R (sin theta) (cos phi))
-                        (* R (sin theta) (sin phi))
-                        (* R (cos theta)))))
-                     (*
-                      R
-                      (expt (cos theta) 4)
-                      (((partial 2) f)
-                       (up
-                        (* R (sin theta) (cos phi))
-                        (* R (sin theta) (sin phi))
-                        (* R (cos theta)))))
-                     (*
-                      -1
-                      R
-                      (expt (cos theta) 2)
-                      (((partial 2) f)
-                       (up
-                        (* R (sin theta) (cos phi))
-                        (* R (sin theta) (sin phi))
-                        (* R (cos theta))))))
-                    (sin theta))
-                  #; ;too difficult? the sqrt is at least gone...
                   (default-simplify
                     '(+ (* -1
                            R

@@ -18,6 +18,7 @@
 (define (variable<? x y)
   (symbol<? x y))
 
+#; ;;bdk;; this changes order, I don't thrust this: (* A B C) <> (* C (* B A)) for matrices...
 (define (reduce fct in lst)
   (cond
     [(null? lst) in]
@@ -25,8 +26,18 @@
      (let loop ([a (car lst)][lst (cdr lst)])
        (cond
          [(null? lst) a]
+         [else (loop (fct (car lst) a) (cdr lst))]))]))
+;(reduce list '() '(1 2 3 4)) => '(4 (3 (2 1)))
+(define (reduce-left fct in lst)
+  (cond
+    [(null? lst) in]
+    [else
+     (let loop ([a (car lst)][lst (cdr lst)])
+       (cond
+         [(null? lst) a]
          [else (loop (fct a (car lst)) (cdr lst))]))]))
-(define reduce-left reduce)
+(define reduce reduce-left)
+;(reduce-left list '() '(1 2 3 4)) => '(((1 2) 3) 4)
 
 (define (reduce-right fct in lst)
   (cond
@@ -37,6 +48,7 @@
          [(null? lst) a]
          [else
           (fct a (loop (car lst)(cdr lst)))]))]))
+;(reduce-right list '() '(1 2 3 4)) => (1 (2 (3 4)))
 
 (define (sublist lst start end) (take (drop lst start) (- end start)))
 

@@ -6,6 +6,7 @@
          (only-in "../rkt/racket-help.rkt" warn)
          )
 
+;;bdk;; rule-memoize is set to values in load
 (define (rule-memoize x) (warn (format "rule-memoize: not memoizing - ~a" x)) x)
 
 ;;;;         Match and Substitution Language Interpreter

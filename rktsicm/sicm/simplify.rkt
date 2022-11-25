@@ -16,8 +16,7 @@
          "simplify/sparse-interpolate.rkt"
          "simplify/split-poly.rkt"
          "simplify/symbenv.rkt"
-         (except-in "simplify/syntax.rkt" reduce)
-         "simplify/unifier-rule-simplifier.rkt"
+         "simplify/syntax.rkt"
          )
 
 (provide
@@ -39,7 +38,6 @@
                 "simplify/split-poly.rkt"
                 "simplify/symbenv.rkt"
                 "simplify/syntax.rkt"
-                "simplify/unifier-rule-simplifier.rkt"
                 )
   simplify:assign-operations))
 (void 'INSTALL-GENERICS

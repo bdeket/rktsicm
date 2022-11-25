@@ -1,14 +1,13 @@
 #lang racket/base
 
 (provide (all-defined-out)
-         rule:make
-         reduce)
+         rule:make)
 
 (require (for-syntax racket/base
                      (only-in "rule-syntax.rkt" rule:compile))
-         "../general/list-utils.rkt"
          "rule-syntax.rkt"
-         "unifier-rule-simplifier.rkt"; or "rule-simplifier.rkt"?
+         ;"unifier-rule-simplifier.rkt";marked experiment
+         "rule-simplifier.rkt"
          )
 
 ;next two need to come from one of the rule-simplifiers

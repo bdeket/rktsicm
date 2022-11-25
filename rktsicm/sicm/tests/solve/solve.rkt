@@ -379,6 +379,8 @@ Some things are not right, see solve/solve
  (solve-incremental
   (list (make-equation '(- 2 (acos (sqrt (+ x 1))))  (list 'A)))
   '(x))
+ '(() () (((= x (* -1 (expt (sin 2) 2))) (A))) ())
+ #; ;equivalent
  '(() () (((= x (+ -1 (expt (cos 2) 2))) (A))) ()))
 
 ;;; A real use. Note how dependencies keep track of contributions to solution
@@ -983,10 +985,7 @@ Some things are not right, see solve/solve
  (solve-equations
   (list (make-equation '(- 2 (acos (sqrt (+ x 1))))  (list 'A)))
   '(x))
- ;`(full-solutions (() () (((= x (* -1 (expt (sin 2) 2))) (A))) ()))
- ;                                            ^ that can't be right
- '(full-solutions (() () (((= x (+ -1 (expt (cos 2) 2))) (A))) ()))
- )
+ `(full-solutions (() () (((= x (* -1 (expt (sin 2) 2))) (A))) ())))
 
 (check-within
  (solve-equations

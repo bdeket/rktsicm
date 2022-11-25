@@ -2,7 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "syntax.rkt"
+(require (only-in "../rkt/glue.rkt" cons*)
+         (only-in "../general/list-utils.rkt" reduce)
+         "syntax.rkt"
          "rule-syntax.rkt")
 
 #|
@@ -30,11 +32,11 @@
    ( (+ (? a) (? b) (? c) (?? d))
      (reduce (lambda (x y) `(+ ,x ,y))
              0
-             (list* a b c d)) )
+             (cons* a b c d)) )
   ( (* (? a) (? b) (? c) (?? d))
     (reduce (lambda (x y) `(* ,x ,y))
             0
-            (list* a b c d)) )
+            (cons* a b c d)) )
    ( (- (? a) (? b) (? c) (?? d))
      none
      (- (: a) (+ (: b) (: c) (:: d))) )

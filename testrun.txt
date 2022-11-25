@@ -44,7 +44,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8562 real time: 8569 gc time: 251
+cpu time: 8219 real time: 8209 gc time: 252
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +168,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 40860 real time: 40865 gc time: 95
-cpu time: 27719 real time: 27722 gc time: 236
-cpu time: 3468 real time: 3471 gc time: 31
+cpu time: 39468 real time: 39459 gc time: 79
+cpu time: 26157 real time: 26166 gc time: 155
+cpu time: 3281 real time: 3288 gc time: 31
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -189,21 +189,13 @@ name:       check-simplified?
 actual:
   '(up
   (atan
-   (sqrt
-    (+
-     (* -1 (expt (cos theta) 2) (expt (cos phi) 2))
-     (expt (cos theta) 2)
-     (expt (cos phi) 2)))
+   (sqrt (+ (* (expt (sin theta) 2) (expt (cos phi) 2)) (expt (cos theta) 2)))
    (* (sin phi) (sin theta)))
   (atan (* -1 (cos theta)) (* (sin theta) (cos phi))))
 expected:
   '(up
   (atan
-   (sqrt
-    (+
-     1
-     (* (expt (cos theta) 2) (expt (cos phi) 2))
-     (* -1 (expt (cos phi) 2))))
+   (sqrt (+ (* (expt (cos theta) 2) (expt (cos phi) 2)) (expt (sin phi) 2)))
    (* -1 (sin theta) (cos phi)))
   (atan (* (sin phi) (sin theta)) (cos theta)))
 location:   manifold.rkt:107:4
@@ -283,7 +275,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 234 real time: 236 gc time: 0
+cpu time: 218 real time: 227 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -331,61 +323,8 @@ location:   numeric.rkt:38:4
 5 success(es) 1 failure(s) 0 error(s) 6 test(s) run
 1
 raco test: (submod ".\\sicm\\tests\\kernel\\quaternion.rkt" test)
---------------------
-kernel/quaternion > ORIG:rotation-matrix->quaternion
-FAILURE
-name:       check-equal?
-location:   quaternion.rkt:24:14
-actual:
-  '(up
-  (+
-   (* -1 theta)
-   (*
-    2
-    (atan
-     (/ (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))) (cos (* 1/2 theta)))
-     1)))
-  (up
-   (/
-    (+
-     (* x (sin (* 1/2 theta)) (sqrt (+ (expt x 2) (expt y 2) (expt z 2))))
-     (*
-      -1
-      x
-      (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
-      (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2))))))
-    (+
-     (* (expt x 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))
-     (* (expt y 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))
-     (* (expt z 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))))
-   (/
-    (+
-     (* y (sin (* 1/2 theta)) (sqrt (+ (expt x 2) (expt y 2) (expt z 2))))
-     (*
-      -1
-      y
-      (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
-      (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2))))))
-    (+
-     (* (expt x 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))
-     (* (expt y 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))
-     (* (expt z 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))))
-   (/
-    (+
-     (* z (sin (* 1/2 theta)) (sqrt (+ (expt x 2) (expt y 2) (expt z 2))))
-     (*
-      -1
-      z
-      (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
-      (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2))))))
-    (+
-     (* (expt x 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))
-     (* (expt y 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))
-     (* (expt z 2) (sqrt (+ 1 (* -1 (expt (cos (* 1/2 theta)) 2)))))))))
-expected:   '(up 0 (up 0 0 0))
---------------------
-2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-1
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\kernel\\structs.rkt" test)
 28 success(es) 0 failure(s) 0 error(s) 28 test(s) run
 0
@@ -398,6 +337,12 @@ raco test: (submod ".\\sicm\\tests\\numerics\\functions\\bessel.rkt" test)
 raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
+2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
+8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\simplify\\pcf.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
@@ -408,6 +353,6 @@ raco test: (submod ".\\sicm\\tests\\simplify\\split-poly.rkt" test)
 5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x294) (* -1 x295)) (eq:0) (x295 x294)) ((+ -7 (* 3 x294) x295) (eq:1) (x295 x294)))
-'(((+ -5 (* 3 x302) (* -1 x303)) (eq:0) (x303 x302)) ((+ k304 (* 3 x302) x303) (eq:1) (x303 x302 k304)))
-10/293 test failures
+'(((+ -5 (* 3 x257) (* -1 x258)) (eq:0) (x258 x257)) ((+ -7 (* 3 x257) x258) (eq:1) (x258 x257)))
+'(((+ -5 (* 3 x265) (* -1 x266)) (eq:0) (x266 x265)) ((+ k267 (* 3 x265) x266) (eq:1) (x266 x265 k267)))
+9/303 test failures
