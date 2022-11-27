@@ -1,4 +1,4 @@
-#lang s-exp "../../kernel.rkt"
+#lang s-exp "../../generic.rkt"
 
 (require rackunit
          "../../rkt/glue.rkt"
@@ -40,7 +40,7 @@
     (set! G (λ (nu)
               (* (+ (square 'x) (sigma (lambda (i) (symbol 'y i)) 1 nu) 1)
                  (+ (* -3 'y1 (square 'x)) (square 'y1) 1))))
-    (time (void (try 4) (try 5) (try 6) (check-true #t))))
+    (rkt:time (void (try 4) (try 5) (try 6) (check-true #t))))
    
    (test-case
     "Case 2: Linearly dense quartic inputs with quadratic gcd"
@@ -52,7 +52,7 @@
     (set! G (λ (nu)
               (* (H nu)
                  (square (+ 'x (sigma (lambda (i) (symbol 'y i)) 1 nu) 2)))))
-    (time (void (try 5) (try 6) (try 7) (check-true #t))))
+    (rkt:time (void (try 5) (try 6) (try 7) (check-true #t))))
    
    (test-case
     "Case 3: Sparse GCD and inputs where degrees are proportional to the number of variables"
@@ -76,7 +76,7 @@
                              (expt (symbol 'y i) (+ nu 1)))
                            1 nu)
                     2))))
-    (time (void (try 8) (try 9) (try 10) (check-true #t))))
+    (rkt:time (void (try 8) (try 9) (try 10) (check-true #t))))
    
    (test-case
     "Case 3': Alternatively"
@@ -100,7 +100,7 @@
                              (expt (symbol 'y i) nu))
                            1 nu)
                     2))))
-    (time (void (try 3) (try 4) (try 5) (try 6) (check-true #t))))
+    (rkt:time (void (try 3) (try 4) (try 5) (try 6) (check-true #t))))
 
    (test-case
     "Case 4: Quadratic non-monic GCD.  F and G have other quadratic factors."
@@ -122,7 +122,7 @@
                             (sigma (lambda (i) (symbol 'y i))
                                    1 nu)
                             2)))))
-    (time (void (try 5) (try 6) (try 7) (check-true #t))))
+    (rkt:time (void (try 5) (try 6) (try 7) (check-true #t))))
    (test-case
     "Case 5: Completely dense non-monic quadratic inputs with dense non-monic linear GCD."
     (define (Pi f lo hi)
@@ -146,7 +146,7 @@
                        (Pi (lambda (i) (+ (symbol 'y i) 2))
                            1 nu))
                     3))))
-    (time (void (try 4) (try 5) (try 6) (check-true #t))))
+    (rkt:time (void (try 4) (try 5) (try 6) (check-true #t))))
    (test-case
     "Case 5': Sparse non-monic quadratic inputs with linear GCDs."
     (define (Pi f lo hi)
@@ -172,7 +172,7 @@
                              (symbol 'y i))
                            1 nu))
                     3))))
-    (time (void (try 5) #;(try 100) (try 10) (check-true #t))))
+    (rkt:time (void (try 5) #;(try 100) (try 10) (check-true #t))))
    (test-case
     "Case 6: Trivariate inputs with increasing degrees."
     (define (H j)
@@ -190,7 +190,7 @@
                     (* (expt 'y j)
                        (expt 'z (+ j 1)))
                     -7))))
-    (time (void (try 10) (try 30) (check-true #t))))
+    (rkt:time (void (try 10) (try 30) (check-true #t))))
    (test-case
     "Case 7: Trivariate polynomials whose GCD has common factors with it cofactors"
     (define P (+ 'x (* -1 'y 'z) 1))
@@ -198,7 +198,7 @@
     (define (H j) (* (expt P j) (expt Q j)))
     (set! F (λ (j k) (* (expt P j) (expt Q k))))
     (set! G (λ (j k) (* (expt P k) (expt Q j))))
-    (time (void (try 1 4) (try 2 4) (try 3 4) (try 4 5) (check-true #t))))
+    (rkt:time (void (try 1 4) (try 2 4) (try 3 4) (try 4 5) (check-true #t))))
    ))
 
 (module+ test

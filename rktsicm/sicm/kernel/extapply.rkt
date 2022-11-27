@@ -20,6 +20,18 @@
 #; ;parameter moved to paramters
 (define *enable-generic-apply* true)
 
+; closer to the original, but contracts (like on map) make this fail => the applicable structure is
+;    never called as function. so no real gain over impl. below
+#; ; Worse: this is at least 10x slower than the other option.
+(define-syntax-rule (myapp f args ...)
+  (with-handlers ([exn:fail:contract:arity? raise]
+                  [(λ (e)
+                     (and exn:fail:contract?)
+                     (regexp-match #px"^application: not a procedure;\n expected a procedure that can be applied to arguments\n" (exn-message e)))
+                   (λ (e)
+                     (#%app g:apply f (list args ...)))])
+    (#%app f args ...)))
+
 (define-syntax-rule (myapp f args ...)
   (if (and (not (procedure? f)) (*enable-generic-apply*))
       (#%app g:apply f (list args ...))

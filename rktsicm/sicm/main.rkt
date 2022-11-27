@@ -1,7 +1,7 @@
-#lang s-exp "kernel.rkt"
+#lang racket/base
 
 (require "calculus.rkt"
-         (except-in "kernel.rkt" raise time)
+         "generic.rkt"
          (except-in "mechanics.rkt" Lie-derivative)
          "numerics.rkt"
          "parameters.rkt"
@@ -12,7 +12,7 @@
          )
 
 (provide (all-from-out "calculus.rkt"
-                       "kernel.rkt"
+                       "generic.rkt"
                        "mechanics.rkt"
                        "numerics.rkt"
                        "parameters.rkt"

@@ -1,10 +1,9 @@
-#lang s-exp "../kernel.rkt"
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
          racket/vector
-         "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "Lagrangian.rkt"
          "universal.rkt"

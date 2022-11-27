@@ -1,4 +1,4 @@
-#lang s-exp "../../kernel.rkt"
+#lang s-exp "../../generic.rkt"
 
 (require rackunit)
 

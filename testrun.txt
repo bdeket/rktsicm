@@ -10,6 +10,7 @@ F:\Documents\prog\rac-dis\rktsicm\rktsicm>SET PLTUSERHOME=F:\PortableApps\Racket
 F:\Documents\prog\rac-dis\rktsicm\rktsicm>IF NOT [] == [] (F:\PortableApps\Racket\Data\Setup\..\..\App\Racket\racket.exe F:\PortableApps\Racket\Data\Setup\setpath.rkt F:\PortableApps\Racket\Data\Setup\..\  ) 
 
 F:\Documents\prog\rac-dis\rktsicm\rktsicm>F:\PortableApps\Racket\App\Racket\raco.exe test .\sicm\ 
+raco test: ".\\sicm\\generic.rkt"
 raco test: ".\\sicm\\main.rkt"
 raco test: (submod ".\\sicm\\tests\\calculus\\Lie.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
@@ -44,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 9063 real time: 9062 gc time: 204
+cpu time: 8360 real time: 8365 gc time: 203
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -168,9 +169,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 42172 real time: 42149 gc time: 155
-cpu time: 28000 real time: 28003 gc time: 140
-cpu time: 3469 real time: 3470 gc time: 0
+cpu time: 38703 real time: 38693 gc time: 156
+cpu time: 25672 real time: 25677 gc time: 189
+cpu time: 3187 real time: 3192 gc time: 0
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -275,7 +276,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 235 real time: 236 gc time: 0
+cpu time: 250 real time: 238 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -341,15 +342,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2500 real time: 2508 gc time: 139
-cpu time: 16235 real time: 16221 gc time: 544
-cpu time: 2656 real time: 2664 gc time: 124
-cpu time: 219 real time: 211 gc time: 16
-cpu time: 46 real time: 49 gc time: 0
-cpu time: 10407 real time: 10402 gc time: 311
-cpu time: 0 real time: 3 gc time: 0
-cpu time: 31 real time: 27 gc time: 15
-cpu time: 99094 real time: 99286 gc time: 2046
+cpu time: 2453 real time: 2453 gc time: 267
+cpu time: 15562 real time: 15562 gc time: 514
+cpu time: 2547 real time: 2542 gc time: 63
+cpu time: 203 real time: 207 gc time: 31
+cpu time: 47 real time: 49 gc time: 16
+cpu time: 9860 real time: 9874 gc time: 218
+cpu time: 15 real time: 3 gc time: 0
+cpu time: 16 real time: 26 gc time: 0
+cpu time: 93687 real time: 93770 gc time: 1747
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)

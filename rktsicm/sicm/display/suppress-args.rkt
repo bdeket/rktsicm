@@ -7,18 +7,15 @@
          )
 
 (define *suppressed-argument-list* (make-parameter '()))
-(define *suppressed-argument-list-counter* (make-parameter 0))
-(define *rename-list* (make-parameter #hash()))
 
-(define (clear-arguments)
-  (*suppressed-argument-list* '())
-  (*suppressed-argument-list-counter* 0)
-  (*rename-list* #hash())
-  0)
+(define *suppressed-argument-list-counter* (make-parameter 0))
+
+(define *rename-list* (make-parameter #hash()))
 
 (define (suppress-arguments arguments)
   (let ((n (+ (length (*suppressed-argument-list*)) 1)))
-    (*suppressed-argument-list-counter* (+ (*suppressed-argument-list-counter*) 1))
+    (*suppressed-argument-list-counter*
+     (+ (*suppressed-argument-list-counter*) 1))
     (*suppressed-argument-list*
      (cons (cons arguments
                  (format-symbol "args.~a"
@@ -26,12 +23,16 @@
            (*suppressed-argument-list*)))
     n))
 
-(define (rename-part arg rep) (*rename-list* (hash-set (*rename-list*) arg rep)))
-
 (define (show-suppressed-arguments)
   (map (lambda (al)
              `(,(cdr al) = ,@(car al)))
            (*suppressed-argument-list*)))
+
+(define (clear-arguments)
+  (*suppressed-argument-list* '())
+  (*suppressed-argument-list-counter* 0)
+  (*rename-list* #hash())
+  0)
 
 (define (arg-suppressor expression)
   (if (pair? expression)
@@ -41,6 +42,7 @@
             (cons (arg-suppressor (car expression))
                   (arg-suppressor (cdr expression)))))
       expression))
+
 (define (arg-suppressor+ expression)
   (if (pair? expression)
       (let ((v (assoc (cdr expression) (*suppressed-argument-list*))))
@@ -49,6 +51,8 @@
             (cons (arg-suppressor+ (car expression))
                   (arg-suppressor+ (cdr expression)))))
       expression))
+
+(define (rename-part arg rep) (*rename-list* (hash-set (*rename-list*) arg rep)))
 
 (define rename-expression
   (let ([g (gensym)])
