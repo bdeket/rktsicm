@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" generate-uninterned-symbol fix:= fix:1+)
          "../kernel-intr.rkt")
 
 ;;;;                    COMCON.SCM
@@ -41,8 +41,8 @@
   (let do-loop ((i 0) (names '()))
     (if (fix:= i n)
         names
-        (do-loop (fix:+ 1 i)
-                 (cons (gensym 'x) names)))))
+        (do-loop (fix:1+ i)
+                 (cons (generate-uninterned-symbol 'x) names)))))
 
 
 
@@ -51,7 +51,7 @@
 (define (letify vals body-generator)
   (if (null? vals)
       (body-generator '())
-      (let ((names (map (lambda (x) (gensym 'y)) vals)))
+      (let ((names (map (lambda (x) (generate-uninterned-symbol 'y)) vals)))
         `(let ,(map list names vals) ,(body-generator names)))))
 
 (define (definify name definition-expression)

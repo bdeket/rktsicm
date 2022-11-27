@@ -23,7 +23,7 @@
          "undefined.rkt"
          (submod racket/performance-hint begin-encourage-inline)
          (only-in racket/list take)
-         (only-in racket/vector vector-copy))
+         (only-in racket/vector vector-copy vector-map))
 
 (define true #t)
 (define false #f)
@@ -47,5 +47,7 @@
 (define string:<? string<?)
 (define write-line writeln)
 (define pathname? path?)
+(define (for-each-vector-element v f) (vector-map f v))
+(define 1+ add1)
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))
