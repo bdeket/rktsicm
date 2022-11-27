@@ -2,13 +2,16 @@
 
 (provide (all-defined-out))
 
-(require "../kernel-intr.rkt"
-         "../kernel/todo/display-print.rkt"
-         "../rkt/undefined.rkt"
+(require (only-in "../rkt/glue.rkt" if undefined-value? hash-table? pathname? any)
+         (only-in "../rkt/todo.rkt" pp)
          "../rkt/environment.rkt"
          "../general/assert.rkt"
          "../general/memoize.rkt"
-         "../simplify.rkt"
+         "../kernel-intr.rkt"
+         "../kernel/ghelper.rkt"
+         "../kernel/todo/display-print.rkt"
+         (only-in "../simplify/rules.rkt" clean-differentials)
+         (only-in "../simplify/split-poly.rkt" poly:factor)
          "exdisplay.rkt"
          "suppress-args.rkt"
          (only-in "../rkt/todo.rkt" todos)
@@ -26,6 +29,13 @@
 
 (define *heuristic-numbers* #f)
 
+(define canonicalize-numbers (make-generic-operator 1 'canonicalize-numbers values))
+(assign-operation canonicalize-numbers (λ (expr) (and (number? expr) *heuristic-numbers*)) heuristic-canonicalize-complex)
+(assign-operation canonicalize-numbers list? (λ (expr) (cons (canonicalize-numbers (operator expr))
+                                                             (map canonicalize-numbers (operands expr)))))
+#; ;;bdk;; do in units
+(assign-operation canonicalize-numbers with-units? with-si-units->expression)
+#;
 (define (canonicalize-numbers expr)
   (cond ((with-units? expr)
 	 (with-si-units->expression expr))
@@ -130,8 +140,8 @@
   (or (memq expr '(#t #f))
       (null? expr)
       (number? expr)
-      (path? expr)
-      (hash? expr)
+      (pathname? expr)
+      (hash-table? expr)
       (undefined-value? expr)
       (and (procedure? expr)
 	   (object-name expr system-global-environment))
@@ -142,12 +152,12 @@
        (not (eq? (car expr) '*matrix*))
        (or (memq (car expr) '(*operator* *solution*)) ;What is this?
 	   (not (list? expr))
-	   (ormap improper-expression? expr))))
+	   (any improper-expression? expr))))
 
 (define (show-expression expr [simplifier simplify])
   (prepare-for-printing expr simplifier)
   ;; (display "#;\n")
-  (println (*last-expression-printed*))
+  (pp (*last-expression-printed*))
   (cond ((not *only-printing*)
 	 (internal-show-expression
 	  (*last-expression-printed*)))))
@@ -155,17 +165,24 @@
 (define (print-expression expr [simplifier simplify])
   (prepare-for-printing expr simplifier)
   ;; (display "#;\n")
-  (println (*last-expression-printed*)))
+  (pp (*last-expression-printed*)))
 
 (define pe print-expression)
 (define se show-expression)
+
+#;#; ;;bdk;; not interested
+(define (print-expression-prefix expr [simplifier simplify])
+  (prepare-for-printing expr simplifier)
+  ((pp-line-prefix "; ") (*last-expression-printed*)))
+
+(define pep print-expression-prefix)
 
 (define (print-expression-comment expr [simplifier simplify])
   (prepare-for-printing expr simplifier)
   (newline)
   (display "#| Result:")
   (newline)
-  (println (*last-expression-printed*))
+  (pp (*last-expression-printed*))
   (display "|#"))
 
 (define pec print-expression-comment)

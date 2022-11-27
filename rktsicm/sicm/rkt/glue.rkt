@@ -46,5 +46,6 @@
 (define (vector-tail v t) (vector-copy v t))
 (define string:<? string<?)
 (define write-line writeln)
+(define pathname? path?)
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))
