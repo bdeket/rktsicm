@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if false true
+                  fix:= fix:< fix:+ fix:-)
          racket/vector
          "../../kernel-intr.rkt"
          "singular.rkt"
@@ -61,14 +62,14 @@
 ;;; Transliterated from Press, Fortran version, p.28., with prejudice.
 ;;;  Replaces A by A^-1, and b by solution.
 
-(define (destructive-gauss-jordan-solve-linear-system A b succeed fail)
-  (let* ((n (num-rows A))
-	 (ipiv (make-vector n #f))	;not a legitimate index
+(define (destructive-gauss-jordan-solve-linear-system a b succeed fail)
+  (let* ((n (num-rows a))
+	 (ipiv (make-vector n false))	;not a legitimate index
 	 (indxr (make-vector n 0))
 	 (indxc (make-vector n 0)))
-    (when (not (fix:= n (num-cols A)))
+    (if (not (fix:= n (num-cols a)))
 	(error "Non-square matrix -- gj-solve-linear-system" n))
-    (when (not (fix:= n (vector-length b)))
+    (if (not (fix:= n (vector-length b)))
 	(error "Incompatible sizes --  gj-solve-linear-system" n))
 
     (let iloop ((i 0))			;runs over columns
@@ -85,37 +86,37 @@
 	      (if (fix:= j n)
 		  'done
 		  (begin
-		    (when (not (vector-ref ipiv j))	;row is free
+		    (if (not (vector-ref ipiv j))	;row is free
 			(let kloop ((k 0))              ;runs over columns 
 			  (if (fix:= k n)
 			      'done
 			      (begin
-				(when (not (vector-ref ipiv k))
-				    (let ((ajk (magnitude (array-ref A j k))))
-				      (when (> ajk big)
+				(if (not (vector-ref ipiv k))
+				    (let ((ajk (magnitude (array-ref a j k))))
+				      (if (> ajk big)
 					  (begin (set! big ajk)
 						 (set! irow j)
 						 (set! icol k)))))
 				(kloop (fix:+ k 1))))))
 		    (jloop (fix:+ j 1)))))
 	    ;(bkpt "gug")
-	    (when (= *minimum-allowable-gj-pivot* big) (fail (singular-matrix-error)))
-	    (vector-set! ipiv icol #t)
+	    (if (= *minimum-allowable-gj-pivot* big) (fail (singular-matrix-error)))
+	    (vector-set! ipiv icol true)
 	    ;; Output of jloop (above) is summarized in IROW, ICOL, IPIV
 	    ;;(bkpt "pivot found")
 
 	    ;; Pivot element must be on diagonal.
 	    ;; The following swaps two rows unless they are already 
 	    ;;   the same row.  It will work if the = test is removed.
-	    (when (not (fix:= irow icol))
+	    (if (not (fix:= irow icol))
 		(begin
 		  (let lloop ((l 0))
 		      (if (fix:= l n)
 			  'done
-			  (let ((dum (array-ref A irow l)))
-			    (array-set! A irow l
-					(array-ref A icol l))
-			    (array-set! A icol l dum)
+			  (let ((dum (array-ref a irow l)))
+			    (array-set! a irow l
+					(array-ref a icol l))
+			    (array-set! a icol l dum)
 			    (lloop (fix:+ l 1)))))
 		  ;;more generally, b can be a matrix
 		  ;;if so,replace this loop by one similar to the
@@ -130,14 +131,14 @@
 
 	    ;;(bkpt "after swap")
 	    ;; Scale the icol row by 1/pivot, and set the diag element to 1/pivot.
-	    (let ((aii (array-ref A icol icol)))
+	    (let ((aii (array-ref a icol icol)))
 	      (set! pivinv (invert aii))
-	      (array-set! A icol icol 1))
+	      (array-set! a icol icol 1))
 	    (let lloop ((l 0))
 	      (if (fix:= l n)
 		  'done
-		  (begin (array-set! A icol l
-				     (* (array-ref A icol l) pivinv))
+		  (begin (array-set! a icol l
+				     (* (array-ref a icol l) pivinv))
 			 (lloop (fix:+ l 1)))))
 	    ;;more generally, as above....
 	    (vector-set! b icol (* (vector-ref b icol) pivinv))
@@ -145,19 +146,19 @@
 	    ;;for each row, except the pivot row, do row reduction by
 	    ;;subtracting the appropriate multiple of the pivot row.
 	    (let llloop ((ll 0))
-	      (when (fix:= ll n)
+	      (if (fix:= ll n)
 		  'done
 		  (begin
-		    (when (not (fix:= ll icol))
-			(let ((dum (array-ref A ll icol)))
-			  (array-set! A ll icol 0)
+		    (if (not (fix:= ll icol))
+			(let ((dum (array-ref a ll icol)))
+			  (array-set! a ll icol 0)
 			  (let lloop ((l 0))
 			    (if (fix:= l n)
 				'done
 				(begin
-				  (array-set! A ll l
-					      (- (array-ref A ll l)
-						 (* (array-ref A icol l)
+				  (array-set! a ll l
+					      (- (array-ref a ll l)
+						 (* (array-ref a icol l)
 						    dum)))
 				  (lloop (fix:+ l 1)))))
 			  (vector-set! b ll
@@ -175,14 +176,14 @@
 	  'done
 	  (let ((kswap (vector-ref indxr l))
 		(cswap (vector-ref indxc l)))
-	    (when (not (fix:= kswap cswap))
+	    (if (not (fix:= kswap cswap))
 		(let kloop ((k 0))
 		  (if (fix:= k n)
 		      'done
-		      (let ((dum (array-ref A k kswap)))
-			(array-set! A k kswap
-				    (array-ref A k cswap))
-			(array-set! A k cswap dum)
+		      (let ((dum (array-ref a k kswap)))
+			(array-set! a k kswap
+				    (array-ref a k cswap))
+			(array-set! a k cswap dum)
 			(kloop (fix:+ k 1))))))
 	    (lloop (fix:- l 1))))))
-  (succeed b A))
+  (succeed b a))

@@ -2,7 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if generate-uninterned-symbol
+                  fix:= fix:+)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt"
          "../../simplify.rkt"
          "../../poly/polyroot.rkt"
@@ -13,8 +15,10 @@
 ;;;; Simple code to find eigenvalues and eigenvectors of small systems.
 
 
-(define (matrix->eigenvalues matrix [expand-multiplicities? #t])
-  (let ((x (gensym 'x)))
+(define (matrix->eigenvalues matrix #:optional expand-multiplicities?)
+  (if (default-object? expand-multiplicities?)
+      (set! expand-multiplicities? #t))
+  (let ((x (generate-uninterned-symbol 'x)))
     (let ((poly
 	   (m:determinant
 	    (g:- matrix (g:* x (m:make-identity (m:dimension matrix)))))))
@@ -23,7 +27,9 @@
 			  (poly->roots pcf expand-multiplicities?))))))
 
 
-(define (real-matrix->eigenvalues-eigenvectors matrix [cutoff (* 1000 *machine-epsilon*)])
+(define (real-matrix->eigenvalues-eigenvectors matrix #:optional cutoff)
+  (if (default-object? cutoff)
+      (set! cutoff (* 1000 *machine-epsilon*)))
   (let ((eigenvalues (matrix->eigenvalues matrix #f)))
     (map (lambda (root)
 	   (let ((m (car root))		; multiplicity

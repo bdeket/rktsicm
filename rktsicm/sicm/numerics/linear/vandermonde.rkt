@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" fold-left
+                  fix:= fix:+)
          "../../general/assert.rkt"
          "../../general/list-utils.rkt"
          "../../simplify/sparse.rkt"
@@ -25,7 +26,7 @@
               ks)))
     (assert (fix:= n (length ks)))
     (let ((Q
-           (foldl sparse-multiply (sparse-one 1)
+           (fold-left sparse-multiply (sparse-one 1)
                   linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
@@ -68,7 +69,7 @@
               ks)))
     (assert (fix:= n (length ks)))
     (let ((Q
-           (foldl sparse-multiply (sparse-one 1)
+           (fold-left sparse-multiply (sparse-one 1)
                   linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
@@ -111,7 +112,7 @@
               ks)))
     (assert (fix:= n (length ks)))
     (let ((Q
-           (foldl sparse-multiply (sparse-one 1)
+           (fold-left sparse-multiply (sparse-one 1)
                   linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
@@ -139,7 +140,7 @@
                                        (lp (fix:+ i 1)))))))))))))
 
 (define (roots->poly-value ks z)
-  (foldl *
+  (fold-left *
          1
          (map (lambda (k)
                 (- z k))

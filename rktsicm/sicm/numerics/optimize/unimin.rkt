@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../kernel-intr.rkt"
+(require (only-in "../../rkt/glue.rkt" if 1+)
+         "../../kernel-intr.rkt"
          )
 
 ;;; 6/1/89 (mh) added EXTREMAL-ARG and EXTREMAL-VALUE
@@ -41,11 +42,11 @@
         (if (good-enuf? x0 x1 x2 f0 f1 f2 count)
             (append (best-of x0 x1 x2 f0 f1 f2) (list count))
             (let ((nx1 (new-left x0 x2)))
-              (lp x0 nx1 x1 x2 f0 (f nx1) f1 f2 (+ 1 count))))
+              (lp x0 nx1 x1 x2 f0 (f nx1) f1 f2 (1+ count))))
         (if (good-enuf? x1 x2 x3 f1 f2 f3 count)
             (append (best-of x1 x2 x3 f1 f2 f3) (list count))
             (let ((nx2 (new-right x1 x3)))
-              (lp x1 x2 nx2 x3 f1 f2 (f nx2) f3 (+ 1 count))))))
+              (lp x1 x2 nx2 x3 f1 f2 (f nx2) f3 (1+ count))))))
   (let ((x1 (new-left a b)) (x2 (new-right a b)))
     (let ((fa (f a)) (fx1 (f x1)) (fx2 (f x2)) (fb (f b)))
       (lp a x1 x2 b fa fx1 fx2 fb 0))))
@@ -123,7 +124,7 @@
               (if (< (max (- x a) (- b x)) 2tol)
                   (list x fx count)
                   (begin
-                    (when (> (abs e) tol)
+                    (if (> (abs e) tol)
                       (let* ((t1 (* (- x w) (- fx fv)))
                              (t2 (* (- x v) (- fx fw)))
                              (t3 (- (* (- x v) t2) (* (- x w) t1)))
@@ -138,7 +139,7 @@
                         ;; parabolic step
                         (begin (set! d (/ p q))
                                (set! u (+ x d))
-                               (when (< (min (- u a) (- b u)) 2tol)
+                               (if (< (min (- u a) (- b u)) 2tol)
                                  (set! d (if (< x m) tol (- tol)))))
                         ;;else, golden section step
                         (begin (set! e (if (< x m) (- b x) (- a x)))
@@ -156,7 +157,7 @@
                                (if (or (<= fu fw) (= w x))
                                    (begin (set! v w) (set! fv fw)
                                           (set! w u) (set! fw fu))
-                                   (when (or (<= fu fv) (= v x) (= v w))
+                                   (if (or (<= fu fv) (= v x) (= v w))
                                      (begin (set! v u) (set! fv fu))))))
                     (loop (+ count 1))))))))))
 

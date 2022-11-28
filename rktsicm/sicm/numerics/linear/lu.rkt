@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if make-initialized-vector for-all?
+                  fix:= fix:< fix:> fix:+ fix:-)
          "../../kernel-intr.rkt"
          "singular.rkt"
          )
@@ -72,11 +73,11 @@
                            (succeed (lu-backsubstitute-internal lumatrix lupermutations b)))
                          fail))
 
-(define (lu-invert-internal A)
-  (let ((n (num-rows A)))
-    (lu-decompose-internal A
+(define (lu-invert-internal a)
+  (let ((n (num-rows a)))
+    (lu-decompose-internal a
                            (lambda (lumat luperm sign)
-                             (let ((m (build-vector n
+                             (let ((m (make-initialized-vector n
                                                     (lambda (i)
                                                       (let ((e (v:make-basis-unit n i)))
                                                         (lu-backsubstitute-internal lumat luperm e))))))
@@ -102,7 +103,7 @@
 
 (define (lu-decompose-internal m succeed singular-matrix)
   (let* ((n (num-rows m))
-         (perms (build-vector n (lambda (i) i))) ;row permutations
+         (perms (make-initialized-vector n (lambda (i) i))) ;row permutations
          (sign 1)			;1 for even permutations, -1 for odd
          ;; We must copy the matrix, since Crout's algorithm clobbers it.
          (m (array-copy m)))
@@ -110,11 +111,11 @@
       (if (fix:< j n)
           (begin
             (let iloop ((i 0))		;compute elements above diagonal
-              (when (not (fix:> i j))
+              (if (not (fix:> i j))
                 (begin (array-set! m i j (lu-upper-eqn i j m))
                        (iloop (fix:+ i 1)))))
             (let iloop ((i (fix:+ j 1))) ;compute elements below diagonal
-              (when (fix:< i n)
+              (if (fix:< i n)
                 (begin (array-set! m i j (lu-lower-eqn i j m))
                        (iloop (fix:+ i 1)))))
             (let* ((pivot-info (lu-find-best-pivot m j n))
@@ -124,7 +125,7 @@
                   (singular-matrix (lambda () (jloop (fix:+ j 1))))
                   (let ((inverted-pivot (invert pivot)))
                     (lu-row-swap m j pivot-index perms)
-                    (when (not (fix:= j pivot-index))
+                    (if (not (fix:= j pivot-index))
                       (set! sign (fix:- 0 sign)))
                     (let iloop ((i (fix:+ j 1))) ;divide through by pivot
                       (if (fix:= i n)
@@ -152,7 +153,7 @@
 ;;; this now. -- HAL
 
 (define (lu-find-best-pivot m j n)
-  (let ((column (build-vector n (lambda (i) (array-ref m i j)))))
+  (let ((column (make-initialized-vector n (lambda (i) (array-ref m i j)))))
     (let iloop ((i (fix:+ j 1))
                 (bestindex j)
                 (bestpivot (vector-ref column j)))
@@ -188,7 +189,7 @@
     (let ((temp (vector-ref vector i)))
       (vector-set! vector i (vector-ref vector j))
       (vector-set! vector j temp)))
-  (when (not (fix:= i1 i2))
+  (if (not (fix:= i1 i2))
     (begin (swap-elements perms i1 i2)
            ;;uses fact that matrix is a vector of rows
            (swap-elements m i1 i2))))
@@ -201,7 +202,7 @@
          (y (make-vector n '()))
          (x (make-vector n '())))
     (let fdloop ((i 0))
-      (when (fix:< i n)
+      (if (fix:< i n)
         (begin
           (vector-set! y i
                        (- (vector-ref b (vector-ref perm i))
@@ -214,7 +215,7 @@
                                              (array-ref m i j))))))))
           (fdloop (fix:+ i 1)))))
     (let bkloop ((i top))
-      (when (not (fix:< i 0))
+      (if (not (fix:< i 0))
         (begin
           (vector-set! x i
                        (/ (- (vector-ref y i)
@@ -272,7 +273,7 @@
          (top (fix:- n 1))
          (x (make-vector n '())))
     (let bkloop ((i top) (acount 0))
-      (when (not (fix:< i 0))
+      (if (not (fix:< i 0))
         (let ((p (array-ref m i i)))
           (if (heuristically-zero? p maxel)
               (begin
@@ -293,13 +294,13 @@
 
 (define heuristic-zero-test-bugger-factor
   ;; The following default number was assigned by HAL. -- GJS & MH.
-  (* 1000 *machine-epsilon*))
+  (make-parameter (* 1000 *machine-epsilon*)))
 
 (define (heuristically-zero? z m)
-  (< (magnitude z) (* heuristic-zero-test-bugger-factor (+ m 1))))
+  (< (magnitude z) (* (heuristic-zero-test-bugger-factor) (+ m 1))))
 
 (define (heuristic-zero-vector? v m)
-  (andmap (lambda (x) (heuristically-zero? x m)) (vector->list v)))
+  (for-all? (vector->list v) (lambda (x) (heuristically-zero? x m))))
 
 ;;; This is stuff to test the LU-decomposition
 

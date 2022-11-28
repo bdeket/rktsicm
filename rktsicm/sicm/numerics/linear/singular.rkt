@@ -10,13 +10,14 @@
 (define (allow-zero-pivot dismiss)
   (dismiss))
 
+;;; Rebind this to catch errors
+(define singular-matrix-error (make-parameter (λ () error)))
+
 ;;; default value
 (define (default-singular-matrix-error)
   (error "Singular matrix - zero pivot"))
 
-;;; Rebind this to catch errors
-(define singular-matrix-error (make-parameter default-singular-matrix-error))
-
+(singular-matrix-error default-singular-matrix-error)
 
 (define (with-singular-matrix-handler handler thunk)
   (parameterize ([singular-matrix-error handler])

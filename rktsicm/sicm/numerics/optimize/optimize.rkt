@@ -2,8 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         racket/list
+(require (only-in "../../rkt/glue.rkt" for-all?
+                  fix:= fix:+)
+         "../../general/list-utils.rkt"
          "../../kernel-intr.rkt"
          "unimin.rkt"
          "multimin.ss"
@@ -57,16 +58,16 @@
     (cond ((number? x) (list x))
 	  ((structure? x)
 	   (let ((lst (vector->list (s:->vector x))))
-	     (if (andmap number? lst)
+	     (if (for-all? lst number?)
 		 lst
 		 (append-map flatten lst))))
 	  ((list? x)
-	   (if (andmap number? x)
+	   (if (for-all? x number?)
 	       x
 	       (append-map flatten x)))
 	  (else
 	   (error "Non-numerical data in optimizer" p x))))
-  (if (and (list? p) (andmap number? p))
+  (if (and (list? p) (for-all? p number?))
       (list->vector p)
       (list->vector (flatten p))))
 

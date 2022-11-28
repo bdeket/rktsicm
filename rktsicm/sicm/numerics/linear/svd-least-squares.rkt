@@ -2,8 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../../kernel-intr.rkt"
-         "../../rkt/default-object.rkt"
+(require (only-in "../../rkt/glue.rkt" if make-initialized-vector)
+         (only-in "../../rkt/define.rkt" define default-object?)
+         "../../kernel-intr.rkt"
          "svd.rkt"
          )
 
@@ -26,7 +27,8 @@
 ;;;  solved-for unknowns, the overall error, and the standard error
 ;;;  for each unknown.
 
-(define (svd-least-squares A b [eps 1e-15] [db default-object])
+(define (svd-least-squares A b #:optional eps db)
+  (if (default-object? eps) (set! eps 1e-15))
   (let ((bp (if (default-object? db)
 		b
 		((vector-elementwise /) b db)))
@@ -41,7 +43,7 @@
        (let* ((n (vector-length w))
               (inverted-w
                (if (and (number? eps) (integer? eps) (>= eps 1))
-                   (build-vector n
+                   (make-initialized-vector n
                      (lambda (i) 
                        (let ((wi (vector-ref w i)))
                          (if (< i eps) (/ 1 wi) 0))))
@@ -54,7 +56,7 @@
 				    (apply max (vector->list w))))
                                 (else
                                  (error "Bad cutoff -- SVD" eps)))))
-                     (build-vector n
+                     (make-initialized-vector n
                        (lambda (i) 
                          (let ((wi (vector-ref w i)))
                            (if (< wi wmin) 0 (/ 1 wi)))))))))

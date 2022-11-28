@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 12406 real time: 12542 gc time: 440
+cpu time: 11047 real time: 11038 gc time: 406
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -169,9 +169,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 51063 real time: 51101 gc time: 156
-cpu time: 35828 real time: 35984 gc time: 235
-cpu time: 4156 real time: 4166 gc time: 16
+cpu time: 51531 real time: 51579 gc time: 220
+cpu time: 32391 real time: 32421 gc time: 236
+cpu time: 4000 real time: 3999 gc time: 32
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -276,7 +276,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 344 real time: 340 gc time: 0
+cpu time: 328 real time: 326 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -341,6 +341,21 @@ raco test: (submod ".\\sicm\\tests\\numerics\\functions\\bessel.rkt" test)
 raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\numerics\\linear\\eigen.rkt" test)
+9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\numerics\\linear\\svd-least-squares.rkt" test)
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\numerics\\linear\\svd.rkt" test)
+4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\numerics\\linear\\vandermonde.rkt" test)
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\numerics\\optimize\\optimize.rkt" test)
+2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\numerics\\quadrature\\defint.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
@@ -354,15 +369,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 3704 real time: 3735 gc time: 313
-cpu time: 37046 real time: 37072 gc time: 907
-cpu time: 5704 real time: 5709 gc time: 140
-cpu time: 328 real time: 324 gc time: 0
-cpu time: 62 real time: 72 gc time: 0
-cpu time: 14688 real time: 14684 gc time: 437
-cpu time: 15 real time: 7 gc time: 0
-cpu time: 47 real time: 58 gc time: 0
-cpu time: 235719 real time: 235976 gc time: 3342
+cpu time: 3625 real time: 3650 gc time: 313
+cpu time: 36391 real time: 36545 gc time: 828
+cpu time: 5453 real time: 5457 gc time: 109
+cpu time: 297 real time: 294 gc time: 32
+cpu time: 62 real time: 67 gc time: 0
+cpu time: 14547 real time: 14544 gc time: 425
+cpu time: 0 real time: 4 gc time: 0
+cpu time: 47 real time: 43 gc time: 0
+cpu time: 232813 real time: 233008 gc time: 2938
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -392,4 +407,4 @@ raco test: (submod ".\\sicm\\tests\\simplify\\split-poly.rkt" test)
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 '(((+ -5 (* 3 x257) (* -1 x258)) (eq:0) (x258 x257)) ((+ -7 (* 3 x257) x258) (eq:1) (x258 x257)))
 '(((+ -5 (* 3 x265) (* -1 x266)) (eq:0) (x266 x265)) ((+ k267 (* 3 x265) x266) (eq:1) (x266 x265 k267)))
-9/367 test failures
+9/386 test failures

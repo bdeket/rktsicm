@@ -2,9 +2,10 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if make-initialized-vector false true 1+ let*
+                  fix:= fix:< fix:> fix:+ fix:-)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt"
-         "../../rkt/undefined.rkt"
          )
 
 ;;;; Linear System Solver -- SVD -- Singular-Value Decomposition
@@ -43,7 +44,8 @@
 		(array->matrix v)
 		w))))
 
-(define (svd-invert a [eps 1e-15])
+(define (svd-invert a #:optional eps)
+  (if (default-object? eps) (set! eps 1e-15))
   (svd a
        (lambda (u sigma v w)
 	 (let ((inverted-w
@@ -54,7 +56,7 @@
 			      (* (eps w) (apply max (vector->list w))))
 			     (else
 			      (error "Bad cutoff -- SVD" eps)))))
-		  (build-vector (vector-length w)
+		  (make-initialized-vector (vector-length w)
 		    (lambda (i) 
 		      (let ((wi (vector-ref w i)))
 			(if (< wi wmin) 0 (/ 1 wi))))))))
@@ -76,7 +78,7 @@
 			      (* (eps w) (apply max (vector->list w))))
 			     (else
 			      (error "Bad cutoff -- SVD" eps)))))
-		  (build-vector (vector-length w)
+		  (make-initialized-vector (vector-length w)
 		    (lambda (i) 
 		      (let ((wi (vector-ref w i)))
 			(if (< wi wmin) 0 (/ 1 wi))))))))
@@ -103,17 +105,19 @@
 ;;; left singular vectors, *SVD.W* will contain singular values, and
 ;;; *SVD.V* will contain right singular vectors.
 
-(define (svd-internal a continue [matu #t] [matv #t])
+(define (svd-internal a continue #:optional matu matv)
+  (if (default-object? matu) (set! matu true))
+  (if (default-object? matv) (set! matv true))
   ;; continue = (lambda (u sigma v w) ...)
   (let* ((m (num-rows a)) (n (num-cols a))
 	 ;;(nm (max n m))
 	 (ierr 0)
-	 (g undefined-value) (scale undefined-value) (anorm undefined-value)
-	 (l undefined-value) (f undefined-value) (h undefined-value) (s undefined-value)
-	 (its undefined-value) (flag1 undefined-value) (flag2 undefined-value) (l1 undefined-value) (c undefined-value) (flag3 undefined-value) (k1 undefined-value)
-	 (convergence undefined-value)
-	 (x undefined-value) (y undefined-value) (z undefined-value)
-	 (i undefined-value)
+	 (g) (scale) (anorm)
+	 (l) (f) (h) (s)
+	 (its) (flag1) (flag2) (l1) (c) (flag3) (k1)
+	 (convergence)
+	 (x) (y) (z)
+	 (i)
 
 	 (*svd.a* (array-copy a))
 	 (*svd.u* (array-copy a))
@@ -124,6 +128,7 @@
 	(set! g 0.0)
 	(set! scale 0.0)
         (set! anorm 0.0)
+    
     ;; Perform Householder bidiagonalization
 
     (do-up 0 n			;DO 300 I=1,N
@@ -135,43 +140,45 @@
 	(set! g 0.0)
 	(set! s 0.0)
 	(set! scale 0.0)
-        (when (not (fix:> i (fix:- m 1)))
-          (do-up i m
-                 (lambda (k)
-                   (set! scale
-                         (+ scale
-                            (magnitude (array-ref *svd.u* k i))))))
-          (when (not (zero? scale))
+        (if (not (fix:> i (fix:- m 1)))
+          (begin
             (do-up i m
                    (lambda (k)
-                     (array-set! *svd.u* k i
-                                 (/ (array-ref *svd.u* k i)
-                                    scale))
-                     (set! s (+ s (square (array-ref *svd.u* k i))))))
-            (set! f (array-ref *svd.u* i i))  
-            (set! g (if (negative? f) (sqrt s) (- (sqrt s))))
-            (set! h (- (* f g) s))
-            (array-set! *svd.u* i i (- f g))
-            (when (not (fix:= i (fix:- n 1)))
-              (do-up l n
-                     (lambda (j)
-                       (set! s 0.0)
-                       (do-up i m
-                              (lambda (k)
-                                (set! s
-                                      (+ s
-                                         (* (array-ref *svd.u* k i)
-                                            (array-ref *svd.u* k j))))))
-                       (set! f (/ s h))
-                       (do-up i m
-                              (lambda (k)
-                                (array-set! *svd.u* k j
-                                            (+ (array-ref *svd.u* k j)
-                                               (* f (array-ref *svd.u* k i)))))))))
-            (do-up i m
-                   (lambda (k)
-                     (array-set! *svd.u* k i (* scale (array-ref *svd.u* k i)))))))
-	(vector-set! *svd.w* i (* scale g))
+                     (set! scale
+                           (+ scale
+                              (magnitude (array-ref *svd.u* k i))))))
+            (if (not (zero? scale))
+                (begin
+                  (do-up i m
+                         (lambda (k)
+                           (array-set! *svd.u* k i
+                                       (/ (array-ref *svd.u* k i)
+                                          scale))
+                           (set! s (+ s (square (array-ref *svd.u* k i))))))
+                  (set! f (array-ref *svd.u* i i))  
+                  (set! g (if (negative? f) (sqrt s) (- (sqrt s))))
+                  (set! h (- (* f g) s))
+                  (array-set! *svd.u* i i (- f g))
+                  (if (not (fix:= i (fix:- n 1)))
+                      (do-up l n
+                             (lambda (j)
+                               (set! s 0.0)
+                               (do-up i m
+                                      (lambda (k)
+                                        (set! s
+                                              (+ s
+                                                 (* (array-ref *svd.u* k i)
+                                                    (array-ref *svd.u* k j))))))
+                               (set! f (/ s h))
+                               (do-up i m
+                                      (lambda (k)
+                                        (array-set! *svd.u* k j
+                                                    (+ (array-ref *svd.u* k j)
+                                                       (* f (array-ref *svd.u* k i)))))))))
+                  (do-up i m
+                         (lambda (k)
+                           (array-set! *svd.u* k i (* scale (array-ref *svd.u* k i)))))))))
+        (vector-set! *svd.w* i (* scale g))
 
 	;; Perform row Householder
 	;; (write-line "row Householder")
@@ -180,45 +187,46 @@
 	(set! s 0.0)
 	(set! scale 0.0)
 
-        (when (not (or (fix:> i (fix:- m 1)) (fix:= i (fix:- n 1))))
-          (do-up l n
-                 (lambda (k)
-                   (set! scale (+ scale (magnitude (array-ref *svd.u* i k))))))
+        (if (not (or (fix:> i (fix:- m 1)) (fix:= i (fix:- n 1))))
+          (begin
+            (do-up l n
+                   (lambda (k)
+                     (set! scale (+ scale (magnitude (array-ref *svd.u* i k))))))
 
-          (when (not (zero? scale))
-              (begin
-                (do-up l n
-                       (lambda (k)
-                         (array-set! *svd.u* i k
-                                     (/ (array-ref *svd.u* i k)
-                                        scale))
-                         (set! s (+ s (square (array-ref *svd.u* i k))))))
-                (set! f (array-ref *svd.u* i l)) 
-                (set! g (if (negative? f) (sqrt s) (- (sqrt s))))
-                (set! h (- (* f g) s)) 
-                (array-set! *svd.u* i l (- f g))
-                (do-up l n
-                       (lambda (k)
-                         (vector-set! *svd.rv1* k (/ (array-ref *svd.u* i k) h))))
+            (if (not (zero? scale))
+                (begin
+                  (do-up l n
+                         (lambda (k)
+                           (array-set! *svd.u* i k
+                                       (/ (array-ref *svd.u* i k)
+                                          scale))
+                           (set! s (+ s (square (array-ref *svd.u* i k))))))
+                  (set! f (array-ref *svd.u* i l)) 
+                  (set! g (if (negative? f) (sqrt s) (- (sqrt s))))
+                  (set! h (- (* f g) s)) 
+                  (array-set! *svd.u* i l (- f g))
+                  (do-up l n
+                         (lambda (k)
+                           (vector-set! *svd.rv1* k (/ (array-ref *svd.u* i k) h))))
 
-                (when (not (fix:= i (fix:- m 1)))
-                    (do-up l m
-                           (lambda (j)
-                             (set! s 0.0)
-                             (do-up l n
-                                    (lambda (k)
-                                      (set! s
-                                            (+ s
-                                               (* (array-ref *svd.u* j k)
-                                                  (array-ref *svd.u* i k))))))
-                             (do-up l n
-                                    (lambda (k)
-                                      (array-set! *svd.u* j k
-                                                  (+ (array-ref *svd.u* j k)
-                                                     (* s (vector-ref *svd.rv1* k)))))))))
-                (do-up l n
-                       (lambda (k)
-                         (array-set! *svd.u* i k (* scale (array-ref *svd.u* i k))))))))
+                  (if (not (fix:= i (fix:- m 1)))
+                      (do-up l m
+                             (lambda (j)
+                               (set! s 0.0)
+                               (do-up l n
+                                      (lambda (k)
+                                        (set! s
+                                              (+ s
+                                                 (* (array-ref *svd.u* j k)
+                                                    (array-ref *svd.u* i k))))))
+                               (do-up l n
+                                      (lambda (k)
+                                        (array-set! *svd.u* j k
+                                                    (+ (array-ref *svd.u* j k)
+                                                       (* s (vector-ref *svd.rv1* k)))))))))
+                  (do-up l n
+                         (lambda (k)
+                           (array-set! *svd.u* i k (* scale (array-ref *svd.u* i k)))))))))
 
 	(set! anorm
 	      (max anorm
@@ -228,12 +236,12 @@
 
     ;; Accumulation of right-hand transformations
 
-    (when matv
+    (if matv
 	(do-down (fix:- n 1) -1
 	  (lambda (i)
-	    (when (not (fix:= i (fix:- n 1)))
+	    (if (not (fix:= i (fix:- n 1)))
 		(begin
-		 (when (not (= g 0.0))
+		 (if (not (= g 0.0))
 		     (begin
 		      (do-up l n
 			(lambda (j)
@@ -263,18 +271,18 @@
 
     ;; Accumulation of left-hand transformations
 
-    (when matu
+    (if matu
       (do-down (fix:- (if (fix:< m n) m n) 1) -1
 	(lambda (i)
 	  (set! l (fix:+ i 1))
 	  (set! g (vector-ref *svd.w* i))
-	  (when (not (fix:= i (fix:- n 1)))
+	  (if (not (fix:= i (fix:- n 1)))
 	      (do-up l n
 		(lambda (j)
 		  (array-set! *svd.u* i j 0.0))))
-	  (when (not (zero? g))
+	  (if (not (zero? g))
 	      (begin
-	       (when (not (fix:= i (fix:- (if (fix:< m n) m n) 1)))
+	       (if (not (fix:= i (fix:- (if (fix:< m n) m n) 1)))
 		   (do-up l n
 		     (lambda (j)
 		       (set! s 0.0)
@@ -308,46 +316,46 @@
       (lambda (k)
 	(set! k1 (fix:- k 1))
 	(set! its 0)
-	(set! flag1 #f)
-	(set! flag2 #f)
+	(set! flag1 false)
+	(set! flag2 false)
       
-	(set! convergence #f)
+	(set! convergence false)
 	(let lp ()
-	  (when (not convergence)
+	  (if (not convergence)
 	      (begin
-	       (set! flag1 #f)
-	       (set! flag2 #f)
+	       (set! flag1 false)
+	       (set! flag2 false)
 	       (let ll-lp ((ll k))
-		 (when (not (or (fix:< l 0) flag1 flag2))
+		 (if (not (or (fix:< l 0) flag1 flag2))
 		     (begin
 		      (set! l ll)
 		      (set! l1 (fix:- l 1))
 		      (set! flag1 (= (+ (magnitude (vector-ref *svd.rv1* l)) anorm) anorm))
-		      (when (not flag1)
+		      (if (not flag1)
 			  (set! flag2
 				(= (+ (magnitude (vector-ref *svd.w* l1))
 				      anorm)
 				   anorm)))
 		      (ll-lp (fix:- ll 1)))))
-	       (when (not flag1)
+	       (if (not flag1)
 		   (begin
 		    (set! c 0.0)
 		    (set! s 1.0)
-		    (set! flag3 #f)
+		    (set! flag3 false)
 		    (let i-lp ((i l))
-			 (when (not (or (fix:> i k) flag3))
+			 (if (not (or (fix:> i k) flag3))
 			     (begin 
 			      (set! f (* s (vector-ref *svd.rv1* i)))
 			      (vector-set! *svd.rv1* i (* c (vector-ref *svd.rv1* i)))
 			      (set! flag3 (= (+ (magnitude f) anorm) anorm))
-			      (when (not flag3)
+			      (if (not flag3)
 				  (begin
 				   (set! g (vector-ref *svd.w* i))
 				   (set! h (sqrt (+ (* f f) (* g g))))
 				   (vector-set! *svd.w* i h)
 				   (set! c (/ g h))
 				   (set! s (/ (- f) h))
-				   (when matu
+				   (if matu
 				       (do ((j 0 (fix:+ j 1)))
 					   ((fix:= j m))
 					   (set! y (array-ref *svd.u* j l1))
@@ -360,11 +368,11 @@
 
 	       (set! z (vector-ref *svd.w* k))
 	       (cond ((fix:= l k)
-		      (set! convergence #t))
+		      (set! convergence true))
 		     (else
-		      (when (fix:= its 30)
+		      (if (fix:= its 30)
 			  (error "SVD: No convergence after 30 iterations."))
-		      (set! its (fix:+ its 1))
+		      (set! its (1+ its))
 		      (set! x (vector-ref *svd.w* l))
 		      (set! y (vector-ref *svd.w* k1))
 		      (set! g (vector-ref *svd.rv1* k1))
@@ -395,7 +403,7 @@
 			  (set! g (+ (* (- x) s) (* g c)))
 			  (set! h (* y s))
 			  (set! y (* y c))
-			  (when matv
+			  (if matv
 			      (do-up 0 n
 				(lambda (j)
 				  (set! x (array-ref *svd.v* j i1))
@@ -404,12 +412,12 @@
 				  (array-set! *svd.v* j i (+ (* (- x) s) (* z c))))))
 			  (set! z (sqrt (+ (square f) (square h))))
 			  (vector-set! *svd.w* i1 z)
-			  (when (not (zero? z))
+			  (if (not (zero? z))
 			      (begin (set! c (/ f z))
 				     (set! s (/ h z))))
 			  (set! f (+ (* c g) (* s y)))
 			  (set! x (+ (* (- s) g) (* c y)))
-			  (when matu
+			  (if matu
 			      (do-up 0 m
 				(lambda (j)
 				  (set! y (array-ref *svd.u* j i1))
@@ -420,13 +428,13 @@
 		      (vector-set! *svd.rv1* l 0.0)
 		      (vector-set! *svd.rv1* k f)
 		      (vector-set! *svd.w* k x)
-		      (set! convergence #f)))
+		      (set! convergence false)))
 	       (lp))))
 
 	;; convergence
-	(when (< z 0.0)
+	(if (< z 0.0)
 	    (begin (vector-set! *svd.w* k (- z))
-		   (when matv
+		   (if matv
 		       (do-up 0 n
 			      (lambda (j)
 				(array-set! *svd.v* j k (- (array-ref *svd.v* j k))))))))))
@@ -537,9 +545,8 @@
 
 
 
-#|
-;|#
-;;; Testing
+#|  ;;; Testing
+
 (define (matnorm a)
   (apply max
 	 (map abs
@@ -547,10 +554,11 @@
 		     (map vector->list 
 			  (vector->list (matrix->array a)))))))
 
-(define (test n [m 100])
-  (local-require "lu.rkt")
+(define (test n #!optional m)
+  (if (default-object? m)
+      (set! m 100))
   (let ((h (hilbert n)))
-    (writeln `(lu ,(matnorm
+    (write-line `(lu ,(matnorm
 		       (matrix-matrix (matrix*matrix h (lu-invert h))
 				      (m:make-identity n)))))
     (svd h
@@ -560,7 +568,7 @@
 		 'done
 		 (let ((inverted-w
 			(let ((wmin (* eps (apply max (vector->list w)))))
-			  (build-vector (vector-length w)
+			  (make-initialized-vector (vector-length w)
 			    (lambda (i) 
 			      (let ((wi (vector-ref w i)))
 				(if (< wi wmin) 0 (/ 1 wi))))))))
@@ -569,7 +577,7 @@
 					 (matrix*matrix (m:make-diagonal inverted-w)
 							(m:transpose u)))))
 		   
-		     (writeln `(svd ,eps
+		     (write-line `(svd ,eps
 				       ,(matnorm
 					 (matrix-matrix (matrix*matrix h inv)
 							(m:make-identity n))))))
@@ -579,7 +587,6 @@
 
 ;;; Before 13 LU is better than SVD, but SVD eventually wins.
 
-#|
 (test 13)
 (lu .90625)
 (svd .0000000001 .6675129055220168)
@@ -703,5 +710,5 @@
   4.899374346302087e-18  3.7838677932677645e-18 3.1519489253291782e-18
   2.852971370421691e-18  1.9386313723000905e-18 9.527265084040377e-19)
 
-;|#
+|#
 

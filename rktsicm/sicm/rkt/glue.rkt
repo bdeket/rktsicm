@@ -11,9 +11,12 @@
           "int.rkt"
           "racket-help.rkt"
           "undefined.rkt")
-         (all-defined-out))
+         (all-defined-out)
+         vector-copy
+         (rename-out [mylet let][mylet* let*]))
 
-(require "applyhook.rkt"
+(require (for-syntax racket/base)
+         "applyhook.rkt"
          "hashtable.rkt"
           "1d-table.rkt"
          "default-object.rkt"
@@ -43,6 +46,7 @@
 (define list-head take)
 (define generate-uninterned-symbol gensym)
 (define find findf)
+(define fold-left foldl)
 (define make-initialized-vector build-vector)
 (define subvector vector-copy)
 (define (vector-tail v t) (vector-copy v t))
@@ -54,3 +58,48 @@
 (define unspecific void)
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))
+
+(define-syntax (mylet stx)
+  (syntax-case stx ()
+    [(_ (v ...) body ...)
+     (with-syntax ([(v* ...) (map (λ (x)
+                                    (define d (syntax->list x))
+                                    (if (null? (cdr d))
+                                        (quasisyntax/loc x (#,(car d) (gensym 'undefined)))
+                                        x))
+                                  (syntax->list #'(v ...)))])
+       (syntax/loc stx
+         (let (v* ...)
+           body ...)))]
+    [(_ n (v ...) body ...)
+     (with-syntax ([(v* ...) (map (λ (x)
+                                    (define d (syntax->list x))
+                                    (if (null? (cdr d))
+                                        (quasisyntax/loc x (#,(car d) (gensym 'undefined)))
+                                        x))
+                                  (syntax->list #'(v ...)))])
+       (syntax/loc stx
+         (let n (v* ...)
+           body ...)))]))
+(define-syntax (mylet* stx)
+  (syntax-case stx ()
+    [(_ (v ...) body ...)
+     (with-syntax ([(v* ...) (map (λ (x)
+                                    (define d (syntax->list x))
+                                    (if (null? (cdr d))
+                                        (quasisyntax/loc x (#,(car d) (gensym 'undefined)))
+                                        x))
+                                  (syntax->list #'(v ...)))])
+       (syntax/loc stx
+         (let* (v* ...)
+           body ...)))]
+    [(_ n (v ...) body ...)
+     (with-syntax ([(v* ...) (map (λ (x)
+                                    (define d (syntax->list x))
+                                    (if (null? (cdr d))
+                                        (quasisyntax/loc x (#,(car d) (gensym 'undefined)))
+                                        x))
+                                  (syntax->list #'(v ...)))])
+       (syntax/loc stx
+         (let* n (v* ...)
+           body ...)))]))

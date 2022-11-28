@@ -2,17 +2,13 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         "../../kernel-intr.rkt"
+(require (only-in "../../rkt/glue.rkt" if false write-line
+                  fix:= fix:+)
          "../../general/list-utils.rkt"
+         "../../kernel-intr.rkt"
          "unimin.rkt"
-         (only-in "../../rkt/todo.rkt" todos)
+         "../extrapolate/re.rkt"
          )
-
-(todos todo
-       [#:from "???"
-        richardson-limit])
-(require 'todo)
 
 ;;;; MULTIMIN.SCM -- n-dimensional minimization routines
 ;;; 9/22/89 (gjs) reduce->a-reduce
@@ -84,7 +80,7 @@
                (simplex-value (simplex-lowest simplex))
                epsilon))
 
-(define nelder-wallp? #f)
+(define nelder-wallp? false)
 
 (define (nelder-mead f start-pt start-step epsilon maxiter)
   (define shrink-coef 0.5)
@@ -128,7 +124,7 @@
                     (simplex-adjoin vc fc s-h)
                     (simplex-shrink s simplex))))))))
   (define (limit simplex count)
-    (when nelder-wallp? (println (simplex-lowest simplex)))
+    (if nelder-wallp? (write-line (simplex-lowest simplex)))
     (if (stationary? simplex epsilon)
         (list 'ok (simplex-lowest simplex) count)
         (if (fix:= count maxiter)
@@ -245,22 +241,22 @@
 ;;;  criterion: the search is stopped when the relative change in f falls 
 ;;;  below ftol.
 
-(define fletcher-powell-wallp? #f)
+(define fletcher-powell-wallp? false)
 
 (define (fletcher-powell line-search f g x est ftol maxiter)
   (let ((n (vector-length x)))
-    (when (null? g) (set! g (generate-gradient-procedure 
+    (if (null? g) (set! g (generate-gradient-procedure 
                             f n (* 1000 *machine-epsilon*))))
     (let loop ((H (m:make-identity n))
                (x x)
                (fx (f x))
                (gx (g x))
                (count 0))
-      (when fletcher-powell-wallp? (println (list x fx gx)))
+      (if fletcher-powell-wallp? (print (list x fx gx)))
       (let ((v (matrix*vector H (scalar*vector -1 gx))))
         (if (positive? (v:dot-product v gx))
           (begin 
-            (when fletcher-powell-wallp? 
+            (if fletcher-powell-wallp? 
                (display (list "H reset to Identity at iteration" count)))
             (loop (m:make-identity n) x fx gx count))
           (let ((r (line-search f g x v est)))
@@ -305,22 +301,22 @@
 ;;; line-search. Consequently, it is offered with Davidon's line search
 ;;; wired in.
 
-(define bfgs-wallp? #f)
+(define bfgs-wallp? false)
 
 (define (bfgs f g x est ftol maxiter)
   (let ((n (vector-length x)))
-    (when (null? g) (set! g (generate-gradient-procedure 
+    (if (null? g) (set! g (generate-gradient-procedure 
                             f n (* 1000 *machine-epsilon*))))
     (let loop ((H (m:make-identity n))
                (x x)
                (fx (f x))
                (gx (g x))
                (count 0))
-      (when bfgs-wallp? (print (list x fx gx)))
+      (if bfgs-wallp? (print (list x fx gx)))
       (let ((v (matrix*vector H (scalar*vector -1 gx))))
         (if (positive? (v:dot-product v gx))
           (begin 
-            (when bfgs-wallp? 
+            (if bfgs-wallp? 
                (display (list "H reset to Identity at iteration" count)))
             (loop (m:make-identity n) x fx gx count))
           (let ((r (line-min-davidon f g x v est)))

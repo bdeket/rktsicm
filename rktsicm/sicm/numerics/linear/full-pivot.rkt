@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" make-initialized-vector
+                  fix:= fix:< fix:> fix:+ fix:-)
          "../../kernel-intr.rkt"
          "singular.rkt"
          )
@@ -42,13 +43,13 @@
 		      (let ((nm1 (fix:- n 1))
 			    (pivot-row (nth-row A ip)))
 			(let ((scaled-pivot-row
-			       (build-vector nm1
+			       (make-initialized-vector nm1
 				 (lambda (k)
 				   (if (fix:< k jp)
 				       (/ (vector-ref pivot-row k) p)
 				       (/ (vector-ref pivot-row (fix:+ k 1)) p)))))
 			      (pivot-column
-			       (build-vector nm1
+			       (make-initialized-vector nm1
 				 (lambda (k)
 				   (if (fix:< k ip)
 				       (array-ref A k jp)
@@ -66,7 +67,7 @@
 				     (if (fix:< j jp)
 					 (- (array-ref A (fix:+ i 1) j) c)
 					 (- (array-ref A (fix:+ i 1) (fix:+ j 1)) c))))))
-			   (build-vector nm1
+			   (make-initialized-vector nm1
 			     (lambda (i)
 			       (let ((c (* bp (vector-ref pivot-column i))))
 				 (if (fix:< i ip)
@@ -83,7 +84,7 @@
 						 (* (vector-ref x k)
 						    (vector-ref scaled-pivot-row k))))))))
 			       (succeed
-				(build-vector n
+				(make-initialized-vector n
 				  (lambda (i)
 				    (cond ((fix:< i jp) (vector-ref x i))
 					  ((fix:= i jp) xip)
