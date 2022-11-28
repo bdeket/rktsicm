@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/flonum
+(require "../../rkt/flonum.rkt"
          "../../kernel-intr.rkt"
          )
 
@@ -14,19 +14,19 @@
 ;;;   It takes 6 floating operations and no comparisions.
 
 (define (+B u v k)			;k=(lambda (sum error) ...)
-  (let ((s (fl+ u v)))
-    (let ((up (fl- s v)))
-      (let ((vpp (fl- s up)))
-	(k s (fl+ (fl- u up) (fl- v vpp)))))))
+  (let ((s (flo:+ u v)))
+    (let ((up (flo:- s v)))
+      (let ((vpp (flo:- s up)))
+	(k s (flo:+ (flo:- u up) (flo:- v vpp)))))))
 
 
 (define (-B u v k)			;k=(lambda (sum error) ...)
-  (let ((s (fl- u v)))
-    (let ((up (fl+ s v)))
-      (let ((vpp (fl- s up)))
+  (let ((s (flo:- u v)))
+    (let ((up (flo:+ s v)))
+      (let ((vpp (flo:- s up)))
 	(k s
-	   (fl- (fl- u up)
-		  (fl+ v vpp)))))))
+	   (flo:- (flo:- u up)
+		  (flo:+ v vpp)))))))
 
 
 ;;; Multiplication of two floating operations, transcribed from 
@@ -39,32 +39,32 @@
   (exact->inexact (+ (expt 2 tremaine-j) 1)))
 
 (define (*T u v k)			;k=(lambda (prod error) ...)
-  (let* ((up (fl* u tremaine-c))
-	 (u1 (fl- u up))
-	 (u1 (fl+ u1 up))
-	 (u2 (fl- u u1))
-	 (vp (fl* v tremaine-c))
-	 (v1 (fl- v vp))
-	 (v1 (fl+ v1 vp))
-	 (v2 (fl- v v1))
-	 (prod (fl* u v))
-	 (e1 (fl* u1 v1))
-	 (e2 (fl* u2 v2))
-	 (e12 (fl* u1 v2))
-	 (e21 (fl* u2 v1))
-	 (err (fl- e1 prod))
-	 (err (fl+ err e12))
-	 (err (fl+ err e21))
-	 (perr (fl+ err e2)))
+  (let* ((up (flo:* u tremaine-c))
+	 (u1 (flo:- u up))
+	 (u1 (flo:+ u1 up))
+	 (u2 (flo:- u u1))
+	 (vp (flo:* v tremaine-c))
+	 (v1 (flo:- v vp))
+	 (v1 (flo:+ v1 vp))
+	 (v2 (flo:- v v1))
+	 (prod (flo:* u v))
+	 (e1 (flo:* u1 v1))
+	 (e2 (flo:* u2 v2))
+	 (e12 (flo:* u1 v2))
+	 (e21 (flo:* u2 v1))
+	 (err (flo:- e1 prod))
+	 (err (flo:+ err e12))
+	 (err (flo:+ err e21))
+	 (perr (flo:+ err e2)))
     (k prod perr)))
 
 
 (define (/T u v k)			;k=(lambda (prod error) ...)
-  (let ((quot (fl/ u v)))
+  (let ((quot (flo:/ u v)))
     (*T quot v
 	(lambda (rat err)
-	  (let* ((qerr (fl- u rat))
-		 (qerr (fl/ (fl- qerr err) v)))
+	  (let* ((qerr (flo:- u rat))
+		 (qerr (flo:/ (flo:- qerr err) v)))
 	    (k quot qerr))))))
 
 ;;;  Quad arithmetic -- a quad is a cons of the high and low part.
@@ -76,7 +76,7 @@
 	(q2l (cdr q2)))
     (+B q1h q2h
 	(lambda (s e)
-	  (+B s (fl+ (fl+ q1l q2l) e)
+	  (+B s (flo:+ (flo:+ q1l q2l) e)
 	      cons)))))
 
 (define (quad:- q1 q2)
@@ -86,7 +86,7 @@
 	(q2l (cdr q2)))
     (-B q1h q2h
 	(lambda (s e)
-	  (+B s (fl+ (fl- q1l q2l) e)
+	  (+B s (flo:+ (flo:- q1l q2l) e)
 	      cons)))))
 
 (define (quad:* q1 q2)
@@ -97,7 +97,7 @@
     (*T q1h q2h
 	(lambda (p e)
 	  (+B p
-	      (fl+ (fl+ (fl* q1l q2h) (fl* q1h q2l)) e)
+	      (flo:+ (flo:+ (flo:* q1l q2h) (flo:* q1h q2l)) e)
 	      cons)))))
 
 (define (quad:/ q1 q2)
@@ -108,8 +108,8 @@
     (/T q1h q2h
 	(lambda (q e)
 	  (+B q
-	      (fl+ (fl+ (fl/ q1l q2h)
-			    (fl* -1.0 (fl* q (/ q2l q2h))))
+	      (flo:+ (flo:+ (flo:/ q1l q2h)
+			    (flo:* -1.0 (flo:* q (/ q2l q2h))))
 		     e)
 	      cons)))))
 
@@ -124,7 +124,7 @@
 
 
 (define *quad-epsilon*
-  (fl* *machine-epsilon*
+  (flo:* *machine-epsilon*
 	 *machine-epsilon*))
 
 (define (quad:square x)
@@ -145,7 +145,7 @@
 
 (define (quad:sin x)
   (let ((xh (quad:high x)))
-    (if (< (flabs xh) quad:sin-bugger-factor)
+    (if (< (flo:abs xh) quad:sin-bugger-factor)
 	x
 	(let ((y (quad:sin (quad:/ x quad:3))))
 	  (quad:- (quad:* quad:3 y)

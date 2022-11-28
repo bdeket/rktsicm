@@ -6,6 +6,7 @@
           "1d-table.rkt"
           "default-object.rkt"
           "fixnum.rkt"
+          "flonum.rkt"
           "if.rkt"
           "int.rkt"
           "racket-help.rkt"
@@ -17,7 +18,8 @@
           "1d-table.rkt"
          "default-object.rkt"
          "fixnum.rkt"
-         "if.rkt"
+         "flonum.rkt"
+          "if.rkt"
          "int.rkt"
          "racket-help.rkt"
          "undefined.rkt"
@@ -49,5 +51,6 @@
 (define pathname? path?)
 (define (for-each-vector-element v f) (vector-map f v))
 (define 1+ add1)
+(define unspecific void)
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))

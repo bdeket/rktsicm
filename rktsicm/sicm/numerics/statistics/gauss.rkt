@@ -7,7 +7,7 @@
 
 ;;; UNIFORM-RANDOM produces an inexact number x,    0 <= x < 1
 
-(define (uniform-random) (random 1.))
+(define (uniform-random) (random #;1.))
 
 (define (nonzero-uniform-random)
   (let ((x (uniform-random)))

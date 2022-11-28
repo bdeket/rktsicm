@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide make-table adjoin-to-list! put! table-of lookup)
+(provide make-table adjoin-to-list! put! table-of lookup default-lookup)
 
 (require (only-in "../rkt/glue.rkt" false)
          "sets.rkt")

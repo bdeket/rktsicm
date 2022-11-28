@@ -149,7 +149,7 @@
     (set! bulirsch-stoer-magic-vectors
 	  (build-vector *max-tableau-depth*
 	    (lambda (m)
-	      (flo:build-vector (min m *max-tableau-width*)
+	      (flo:make-initialized-vector (min m *max-tableau-width*)
 		(lambda (k)
 		  (exact->inexact
 		   (square (/ (stream-ref bulirsch-stoer-integers m)
@@ -180,7 +180,7 @@
 	 (flo:vector-set! v2 i (flo:vector-ref v1 i)))))
 
 (define (flo:vector-copy source)
-  (flo:build-vector (flo:vector-length source)
+  (flo:make-initialized-vector (flo:vector-length source)
 			       (lambda (i)
 				 ;(declare (integrate i))
 				 (flo:vector-ref source i))))

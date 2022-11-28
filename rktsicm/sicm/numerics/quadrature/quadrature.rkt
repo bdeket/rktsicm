@@ -1,20 +1,18 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (all-defined-out)
+         (all-from-out "infinities.rkt"))
 
-(require "../../general/symbol.rkt"
+(require (only-in "../../rkt/glue.rkt" if)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "rational.rkt"
          "infinities.rkt"
          "../ode/advance.rkt"
          "../ode/bulirsch-stoer.rkt"
-         (only-in "../../rkt/todo.rkt" todos)
+         "../extrapolate/re.rkt"
          )
 
-(todos todo
-       [#:from "???"
-        romberg-quadrature]
-       )
-(require 'todo)
+(define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
 
 ;;;; Interface system for QUADRATURE 
 
@@ -107,60 +105,68 @@
 |#
 
 (define (make-definite-integrator
-	 [integrand #f]
-         [lower-limit #f]
-         [upper-limit #f]
-         [allowable-error 1.0e-10]
-         [method 'OPEN])
-  (define (the-integrator-control message . rest-of-arguments)
+         #:optional integrand lower-limit upper-limit allowable-error method)
+  (let* ((integrand
+          (if (default-object? integrand) #f integrand))
+         (lower-limit
+          (if (default-object? lower-limit) #f lower-limit))
+         (upper-limit
+          (if (default-object? upper-limit) #f upper-limit))
+         (allowable-error
+          (if (default-object? allowable-error) 1.0e-10 allowable-error))
+         (method
+          (if (default-object? method) 'open method)))
 
-    (case message
+    
+    (define (the-integrator-control message . rest-of-arguments)
+
+      (case (symbol-upcase message)
 	
-      ((INTEGRAL)
-       (evaluate-definite-integral
-        method
-        integrand
-        lower-limit
-        upper-limit
-        allowable-error))	  
+        ((INTEGRAL)
+         (evaluate-definite-integral
+          method
+          integrand
+          lower-limit
+          upper-limit
+          allowable-error))	  
 	
-      ((INTEGRAND) integrand)
-      ((SET-INTEGRAND!)
-       (let ((x (car rest-of-arguments)))
-         (set! integrand x)))
+        ((INTEGRAND) integrand)
+        ((SET-INTEGRAND!)
+         (let ((x (car rest-of-arguments)))
+           (set! integrand x)))
 
-      ((LOWER-LIMIT) lower-limit)
-      ((SET-LOWER-LIMIT!)
-       (let ((x (car rest-of-arguments)))
-         (set! lower-limit x)))
+        ((LOWER-LIMIT) lower-limit)
+        ((SET-LOWER-LIMIT!)
+         (let ((x (car rest-of-arguments)))
+           (set! lower-limit x)))
 
-      ((UPPER-LIMIT) upper-limit)
-      ((SET-UPPER-LIMIT!)
-       (let ((x (car rest-of-arguments)))
-         (set! upper-limit x)))
+        ((UPPER-LIMIT) upper-limit)
+        ((SET-UPPER-LIMIT!)
+         (let ((x (car rest-of-arguments)))
+           (set! upper-limit x)))
 
-      ((ERROR) allowable-error)
-      ((SET-ERROR!)
-       (let ((x (car rest-of-arguments)))
-         (set! allowable-error x)))
+        ((ERROR) allowable-error)
+        ((SET-ERROR!)
+         (let ((x (car rest-of-arguments)))
+           (set! allowable-error x)))
 	
-      ((METHOD) method)
-      ((SET-METHOD!)
-       (let ((x (car rest-of-arguments)))
-         (set! method x)))
+        ((METHOD) method)
+        ((SET-METHOD!)
+         (let ((x (car rest-of-arguments)))
+           (set! method x)))
 
-      (else
-       (error "Unknown message -- ODE-INTEGRATOR" message))
-      ))
+        (else
+         (error "Unknown message -- ODE-INTEGRATOR" message))
+        ))
 
-  the-integrator-control)
+  the-integrator-control))
 
 (define (evaluate-definite-integral method
 				    integrand
 				    lower-limit
 				    upper-limit
 				    allowable-error)
-  (when (not (and integrand lower-limit upper-limit))
+  (if (not (and integrand lower-limit upper-limit))
       (error "Missing parameter for definite integral"
 	     `(integrand ,integrand
 	       lower-limit ,lower-limit
@@ -182,7 +188,7 @@
 				    upper-limit
 				    allowable-error)
 	  
-	(case method
+	(case (symbol-upcase method)
 
 	  ((OPEN)
 	   (integrate-open integrand

@@ -2,17 +2,18 @@
 
 (provide (all-defined-out))
 
-(require "../../kernel-intr.rkt"
+(require (only-in "../../rkt/glue.rkt" if generate-uninterned-symbol)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../rkt/environment.rkt"
          "../../general/assert.rkt"
-         "../../units.rkt"
-         "rational.rkt"
-         "infinities.rkt"
-         "../quadrature/quadrature.rkt"
-         "../../enclose/alt-magic.rkt"
          ;there are two options
          (rename-in "../../general/gjs-cselim.rkt" [gjs/cselim cselim])
          ;(rename-in "../../enclose/jinx-cselim.rkt" [text/cselim cselim])
+         "../../kernel-intr.rkt"
+         "../../enclose/alt-magic.rkt"
+         "../../units.rkt"
+         "rational.rkt"
+         "quadrature.rkt"
          "../ode/interface.rkt"
          )
 
@@ -60,7 +61,7 @@
 
 (define (definite-integral-with-tolerance f x1 x2 tolerance)
   ((make-definite-integrator f x1 x2 tolerance)
-   'INTEGRAL))
+   'integral))
 
 
 ;;; Assumes f is purely numerical, and no units on t1, t2
@@ -73,12 +74,14 @@
 	 (definite-integral-with-tolerance (compile-procedure f)
 	   t1 t2 tolerance))))
 
-(define (definite-integral f t1 t2
-          [tolerance *definite-integral-allowable-error*]
-          [compile? *compile-integrand?])
+(define (definite-integral f t1 t2 #:optional tolerance compile?)
+  (if (default-object? tolerance)
+      (set! tolerance *definite-integral-allowable-error*))
+  (if (default-object? compile?)
+      (set! compile? *compile-integrand?))
   (let ((fx (f (choose-interior-point t1 t2))))
     (if (with-units? fx)		;Must extract numerical procedure
-	(let* ((input-value (gensym))
+	(let* ((input-value (generate-uninterned-symbol))
 	       (input-units (u:units t1))
 	       (input (with-units input-value input-units))
 	       (output (f input))
