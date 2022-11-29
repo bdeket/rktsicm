@@ -54,9 +54,6 @@
 
 (==> pp println)
 
-(define rationalize->exact inexact->exact)
-
-
 (==> fluid-let let) ;should be done with parameterize
 
 (==> define-integrable define);realy is define-inline

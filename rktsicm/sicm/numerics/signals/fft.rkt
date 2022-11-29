@@ -2,11 +2,13 @@
 
 (provide (except-out (all-defined-out) ->flonum))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if make-initialized-list iota
+                  fix:= fix:+ fix:1+)
+         (only-in "../../rkt/define.rkt" define default-object?)
          racket/vector
          "../../kernel-intr.rkt"
          "cph-dsp/fft.rkt"
-         "cph-dsp/flovec.rkt"
+         "cph-dsp/flovec.rkt" (only-in (submod "cph-dsp/flovec.rkt" flo:vector) flo:vector-cons)
          )
 
 (define ->flonum exact->inexact)
@@ -16,7 +18,7 @@
 ;;; Simple FFT for records whose length is a power of 2.
 ;;;   Data records are represented as lists of (complex) numbers.
 ;;;   All arithmetic is assumed to be complex generic, 
-;;;   unless explicitly noted by "fx" for indices.
+;;;   unless explicitly noted by "fix" for indices.
 
 #|
 (define (make-transform-pair period)
@@ -74,21 +76,21 @@
 	  (let ((fk (exact->inexact k)))
 	    (cons (make-rectangular (cos (* 2pi/n fk))
 				    (sin (* 2pi/n fk)))
-		  (loop (fix:+ 1 k))))))))
+		  (loop (fix:1+ k))))))))
 
 
 ;;; Useful for testing FFT programs
 
 (define (m-cycles-cos-in-n-samples m n)
   (let ((w (/ (* 2pi m) n)))
-    (build-list
+    (make-initialized-list
      n
      (lambda (i)
        (cos (* w i))))))
 
 (define (m-cycles-sin-in-n-samples m n)
   (let ((w (/ (* 2pi m) n)))
-    (build-list
+    (make-initialized-list
      n
      (lambda (i)
        (sin (* w i))))))
@@ -101,8 +103,8 @@
   (/ t (* n (/ (log n) (log 2)))))
 
 
-(define (make-transform-pair period [version #t])
-  (if version
+(define (make-transform-pair period #:optional version)
+  (if (default-object? version)
       (make-transform-pair-CPH period)
       (make-transform-pair-GJS period)))
 
@@ -153,8 +155,8 @@
       (let* ((fperiod (exact->inexact period)))
 	(define (ftkernel data direction scale)
           (fft-check-data-length data period)
-          (let ((reals (flo:make-vector period 0.0))
-                (imags (flo:make-vector period 0.0)))
+          (let ((reals (flo:vector-cons period))
+                (imags (flo:vector-cons period)))
 	    (define (complex-result)
 	      (vector-map (lambda (z) (* scale z))
 			  (fft-results->complex
@@ -174,7 +176,7 @@
       (error "Period is not a power of 2 -- MAKE-TRANSFORM-PAIR")))
 
 (define (fft-check-data-length data period)
-  (when (not
+  (if (not
        (fix:= period 
               ((cond ((vector? data) vector-length)
                      ((list? data) length)
@@ -195,7 +197,7 @@
                                (->flonum (real-part z)))
               (flo:vector-set! imags i
                                (->flonum (imag-part z))))
-            data (build-list (flo:vector-length reals) values)))
+            data (iota (flo:vector-length reals))))
 
 #|
 ;;; For example, we may:
@@ -278,7 +280,7 @@
 #|
 (define (fft-test period)
   (let ((data
-	 (build-list period
+	 (make-initialized-list period
 				(lambda (i)
 				  (- (random 2.0) 1.0))))
 	(gjs (make-transform-pair-GJS period))

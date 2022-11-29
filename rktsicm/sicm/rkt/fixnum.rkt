@@ -19,3 +19,4 @@
 (define (fix:-1+ x) (fix:- x 1))
 (define fix:fixnum? fixnum?)
 (define (fix:negative? x) (fix:< x 0))
+(define fix:lsh arithmetic-shift)

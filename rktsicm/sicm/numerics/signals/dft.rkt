@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../kernel-intr.rkt"
+(require (only-in "../../rkt/glue.rkt" make-initialized-list list-head iota)
+         "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          "../../general/list-utils.rkt"
          "fft.rkt"
@@ -30,7 +31,7 @@
 
 (define (m-cycles-cos-in-n-samples m n)
   (let ((w (/ (* 2pi m) n)))
-    (build-list
+    (make-initialized-list
      n
      (lambda (i)
        (cos (* w i))))))
@@ -51,7 +52,7 @@
 
 (define (m-cycles-sin-in-n-samples m n)
   (let ((w (/ (* 2pi m) n)))
-    (build-list
+    (make-initialized-list
      n
      (lambda (i)
        (sin (* w i))))))
@@ -76,7 +77,7 @@
 ;;; centered so that 0 is in the middle of the sample sequence.
 
 (define (rotate-list l n2)
-  (append (list-tail l n2) (take l n2)))
+  (append (list-tail l n2) (list-head l n2)))
 
 (define (dft x)
   (let ((n (length x)))
@@ -96,7 +97,7 @@
 
 (define (samples n f a)
   (assert (power-of-2? n))
-  (map f (build-list n (λ (i)(+ (- a) (* i (/ (* 2 a) n)))))))
+  (map f (iota n (- a) (/ (* 2 a) n))))
 
 #|
 (dft (samples 8 (lambda (x) (cos (* 0 x))) pi))

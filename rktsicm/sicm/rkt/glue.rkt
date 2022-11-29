@@ -36,9 +36,9 @@
 (define (delq itm lst) (remq* (list itm) lst))
 (define every andmap) ;; not definedin mitscheme, nor scmutils...
 (define any ormap)
-(define iota (case-lambda [(e) (for/list ([i (in-range e)]) i)]
-                          [(e s)(for/list ([i (in-range s e 1)]) i)]
-                          [(e s t)(for/list ([i (in-range s e t)]) i)]))
+(define iota (case-lambda [(n) (for/list ([i (in-range n)]) i)]
+                          [(n s)(for/list ([i (in-range s (+ s n) 1)]) i)]
+                          [(n s t)(for/list ([i (in-range s (+ s (* n t)) t)]) i)]))
 (define (there-exists? l p?) (ormap p? l))
 (define cons* list*)
 (define make-initialized-list build-list)
@@ -50,6 +50,7 @@
 (define make-initialized-vector build-vector)
 (define subvector vector-copy)
 (define (subvector-move-left! V vs ve T ts) (vector-copy! T ts V vs ve))
+(define (subvector-fill! V s e v) (for ([i (in-range s e)]) (vector-set! V i v)))
 (define (vector-tail v t) (vector-copy v t))
 (define string:<? string<?)
 (define write-line writeln)
@@ -57,6 +58,7 @@
 (define (for-each-vector-element v f) (vector-map f v))
 (define 1+ add1)
 (define unspecific void)
+(define rationalize->exact rationalize)
 
 (define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
 (define (symbol-downcase sym) (string->symbol (string-downcase (symbol->string sym))))

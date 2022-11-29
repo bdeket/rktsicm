@@ -2,9 +2,8 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../rkt/glue.rkt" if)
+(require (only-in "../rkt/glue.rkt" if rationalize->exact)
          "../rkt/define.rkt"
-         (only-in "../rkt/todo.rkt" rationalize->exact)
          "cstm/generic.rkt"
          "numeric.rkt"
          "numsymb.rkt")

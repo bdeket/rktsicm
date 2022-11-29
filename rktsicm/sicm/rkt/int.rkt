@@ -17,3 +17,5 @@
 (define (int:zero? x) (eq? 0 x))
 (define (int:negate x) (- x))
 
+(define int:->flonum exact->inexact)
+
