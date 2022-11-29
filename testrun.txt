@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 11047 real time: 11038 gc time: 406
+cpu time: 11828 real time: 11829 gc time: 393
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -169,9 +169,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 51531 real time: 51579 gc time: 220
-cpu time: 32391 real time: 32421 gc time: 236
-cpu time: 4000 real time: 3999 gc time: 32
+cpu time: 52687 real time: 52734 gc time: 190
+cpu time: 35485 real time: 35499 gc time: 218
+cpu time: 4453 real time: 4452 gc time: 47
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -276,7 +276,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 328 real time: 326 gc time: 0
+cpu time: 359 real time: 357 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -353,6 +353,28 @@ raco test: (submod ".\\sicm\\tests\\numerics\\linear\\svd.rkt" test)
 raco test: (submod ".\\sicm\\tests\\numerics\\linear\\vandermonde.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\numerics\\ode\\bulirsch-stoer.rkt" test)
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\numerics\\ode\\interface.rkt" test)
+--------------------
+numerics/ode/ode-advancer > 3*
+ERROR
+name:       check-within
+location:   interface.rkt:61:4
+
+matrix-by-rows: undefined;
+ cannot reference an identifier before its definition
+  in module: top-level
+--------------------
+4 success(es) 0 failure(s) 1 error(s) 5 test(s) run
+1
+raco test: (submod ".\\sicm\\tests\\numerics\\ode\\ode-advancer.rkt" test)
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\numerics\\ode\\qc.rkt" test)
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\numerics\\optimize\\optimize.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
@@ -369,15 +391,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 3625 real time: 3650 gc time: 313
-cpu time: 36391 real time: 36545 gc time: 828
-cpu time: 5453 real time: 5457 gc time: 109
-cpu time: 297 real time: 294 gc time: 32
-cpu time: 62 real time: 67 gc time: 0
-cpu time: 14547 real time: 14544 gc time: 425
-cpu time: 0 real time: 4 gc time: 0
-cpu time: 47 real time: 43 gc time: 0
-cpu time: 232813 real time: 233008 gc time: 2938
+cpu time: 3609 real time: 3604 gc time: 280
+cpu time: 38516 real time: 38563 gc time: 891
+cpu time: 6047 real time: 6049 gc time: 141
+cpu time: 297 real time: 293 gc time: 16
+cpu time: 78 real time: 71 gc time: 0
+cpu time: 14594 real time: 14618 gc time: 471
+cpu time: 15 real time: 5 gc time: 0
+cpu time: 47 real time: 47 gc time: 0
+cpu time: 256703 real time: 256867 gc time: 3211
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -405,6 +427,6 @@ raco test: (submod ".\\sicm\\tests\\simplify\\split-poly.rkt" test)
 5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x257) (* -1 x258)) (eq:0) (x258 x257)) ((+ -7 (* 3 x257) x258) (eq:1) (x258 x257)))
-'(((+ -5 (* 3 x265) (* -1 x266)) (eq:0) (x266 x265)) ((+ k267 (* 3 x265) x266) (eq:1) (x266 x265 k267)))
-9/386 test failures
+'(((+ -5 (* 3 x249) (* -1 x250)) (eq:0) (x250 x249)) ((+ -7 (* 3 x249) x250) (eq:1) (x250 x249)))
+'(((+ -5 (* 3 x257) (* -1 x258)) (eq:0) (x258 x257)) ((+ k259 (* 3 x257) x258) (eq:1) (x258 x257 k259)))
+10/398 test failures

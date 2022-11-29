@@ -2,13 +2,16 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         racket/flonum
+(require (only-in "../../rkt/glue.rkt" if false true
+                  fix:= fix:< fix:> fix:+ fix:- fix:*
+                  flo:+ flo:- flo:* flo:/)
+         (only-in "../../rkt/define.rkt" define default-object?)
+         (only-in "../../rkt/todo.rkt" pp)
          "../../kernel-intr.rkt"
-         "../../rkt/default-object.rkt"
          "../linear/full-pivot.rkt"
          "advance.rkt"
          )
+(define real:* *)
 
 ;;;; Gear integrators for stiff differential equations
 
@@ -124,7 +127,7 @@
 	  done)
    ((gear-advance-generator
      derivative-and-jacobian dimension lte-tolerance
-     convergence-tolerance #f spice-mode?)
+     convergence-tolerance false spice-mode?)
     start-state
     step-required
     h-suggested
@@ -158,7 +161,7 @@
 	  done)
    ((gear-advance-generator
      generalized-corrector dimension lte-tolerance
-     convergence-tolerance #t spice-mode?)
+     convergence-tolerance true spice-mode?)
     start-state
     step-required
     h-suggested
@@ -178,15 +181,13 @@
    done))
 
 (define (gear-advance-generator f&df dimension lte
-	                [convergence-tolerance default-object]
-                        [implicit? default-object]
-                        [spice-mode? default-object])
+                     #:optional convergence-tolerance implicit? spice-mode?)
   (let* ((lte-measure (parse-error-measure lte))
 	 (convergence-tolerance
 	  (parse-error-measure lte *gear-fixed-point-margin*))
 	 (convergence-measure (parse-error-measure convergence-tolerance))
-	 (implicit? (if (default-object? implicit?) #f implicit?))
-	 (spice-mode? (if (default-object? spice-mode?) #f spice-mode?))
+	 (implicit? (if (default-object? implicit?) false implicit?))
+	 (spice-mode? (if (default-object? spice-mode?) false spice-mode?))
 	 (stepper
 	  (gear-integrator f&df
 			   lte-measure
@@ -207,8 +208,8 @@
 	       (order 1)
 	       (wins 1)
 	       (accum-error 0.0))
-	(when advance-wallp?
-	    (println `(advance: ,step-achieved ,(car states))))
+	(if advance-wallp?
+	    (pp `(advance: ,step-achieved ,(car states))))
 	(continue (car states) step-achieved h
 	  (lambda ()
 	    (stepper states fx h order wins accum-error
@@ -236,9 +237,7 @@
     advance))
 
 (define (gear-stepper-generator f&df dimension lte
-                                [convergence-tolerance default-object]
-                                [implicit? default-object]
-                                [spice-mode? default-object])
+                     #:optional convergence-tolerance implicit? spice-mode?)
   (let ((gear-advancer
 	 (gear-advance-generator f&df dimension
 				 lte convergence-tolerance
@@ -452,7 +451,7 @@
 	 (b (- 1.0 (* m (exact->inexact *spice-good-step*)))))
     (/ h (+ (* m (exact->inexact niter)) b))))
 
-(define gear-wallp? #f)
+(define gear-wallp? false)
 
 ;;;       Stepsize and order control parameters
 
@@ -853,145 +852,145 @@
 ;;; (pp (flonumize (gear-generator 1 0)))
 
 (define (gc1 dt1 ts)
-  (list (fl/ 1. dt1) (fl/ -1. dt1)))
+  (list (flo:/ 1. dt1) (flo:/ -1. dt1)))
 
 ;;; (pp (flonumize (gear-generator 2 0)))
 
 (define (gc2 dt1 ts)
-  (let ((dt3 (fl- (list-ref ts 1) (list-ref ts 0))))
-    (let ((V-106 (fl* dt1 dt3)) (V-105 (fl* -1. dt3)))
-      (list (fl/ (fl+ (fl* 2. dt1) V-105)
-		   (fl+ (fl* dt1 dt1) (fl* V-105 dt1)))
-	    (fl/ (fl+ dt1 V-105) V-106)
-	    (fl/ (fl* -1. dt1)
-		   (fl+ V-106 (fl* -1. (fl* dt3 dt3))))))))
+  (let ((dt3 (flo:- (list-ref ts 1) (list-ref ts 0))))
+    (let ((V-106 (flo:* dt1 dt3)) (V-105 (flo:* -1. dt3)))
+      (list (flo:/ (flo:+ (flo:* 2. dt1) V-105)
+		   (flo:+ (flo:* dt1 dt1) (flo:* V-105 dt1)))
+	    (flo:/ (flo:+ dt1 V-105) V-106)
+	    (flo:/ (flo:* -1. dt1)
+		   (flo:+ V-106 (flo:* -1. (flo:* dt3 dt3))))))))
 
 ;;; (pp (flonumize (gear-generator 3 0)))
 
 (define (gc3 dt1 ts)
-  (let ((tn-1 (list-ref ts 0)) (V-86 (fl* dt1 dt1)))
-    (let ((dt4 (fl- (list-ref ts 2) tn-1))
-	  (dt3 (fl- (list-ref ts 1) tn-1)))
-      (let ((V-95 (fl* dt4 dt4))
-	    (V-94 (fl* dt3 dt3))
-	    (V-91 (fl* dt4 -1.))
-	    (V-90 (fl* dt3 -1.))
-	    (V-89 (fl* dt3 dt4))
-	    (V-88 (fl* dt1 dt4))
-	    (V-87 (fl* dt1 dt3)))
-	(let ((V-93 (fl* V-89 dt1)) (V-92 (fl+ (fl* -1. V-86) V-88)))
-	  (list (fl/ (fl+ (fl* 3. V-86)
-			      (fl+ (fl+ (fl* V-87 -2.)
-					    (fl* V-88 -2.))
+  (let ((tn-1 (list-ref ts 0)) (V-86 (flo:* dt1 dt1)))
+    (let ((dt4 (flo:- (list-ref ts 2) tn-1))
+	  (dt3 (flo:- (list-ref ts 1) tn-1)))
+      (let ((V-95 (flo:* dt4 dt4))
+	    (V-94 (flo:* dt3 dt3))
+	    (V-91 (flo:* dt4 -1.))
+	    (V-90 (flo:* dt3 -1.))
+	    (V-89 (flo:* dt3 dt4))
+	    (V-88 (flo:* dt1 dt4))
+	    (V-87 (flo:* dt1 dt3)))
+	(let ((V-93 (flo:* V-89 dt1)) (V-92 (flo:+ (flo:* -1. V-86) V-88)))
+	  (list (flo:/ (flo:+ (flo:* 3. V-86)
+			      (flo:+ (flo:+ (flo:* V-87 -2.)
+					    (flo:* V-88 -2.))
 				     V-89))
-		       (fl+ (fl* V-86 dt1)
-			      (fl+ (fl+ (fl* V-90 V-86)
-					    (fl* V-91 V-86))
-				     (fl* V-88 dt3))))
-		(fl/ (fl+ (fl+ V-92 (fl* V-90 dt4)) V-87) V-93)
-		(fl/ V-92
-		       (fl+ (fl* dt1 V-94)
-			      (fl+ (fl* V-87 V-91)
-				     (fl+ (fl* -1. (fl* V-94 dt3))
-					    (fl* V-94 dt4)))))
-		(fl/ (fl+ V-86 (fl* V-87 -1.))
-		       (fl+ V-93
-			      (fl+ (fl+ (fl* -1. (fl* dt1 V-95))
-					    (fl* V-90 V-95))
-				     (fl* V-95 dt4))))))))))
+		       (flo:+ (flo:* V-86 dt1)
+			      (flo:+ (flo:+ (flo:* V-90 V-86)
+					    (flo:* V-91 V-86))
+				     (flo:* V-88 dt3))))
+		(flo:/ (flo:+ (flo:+ V-92 (flo:* V-90 dt4)) V-87) V-93)
+		(flo:/ V-92
+		       (flo:+ (flo:* dt1 V-94)
+			      (flo:+ (flo:* V-87 V-91)
+				     (flo:+ (flo:* -1. (flo:* V-94 dt3))
+					    (flo:* V-94 dt4)))))
+		(flo:/ (flo:+ V-86 (flo:* V-87 -1.))
+		       (flo:+ V-93
+			      (flo:+ (flo:+ (flo:* -1. (flo:* dt1 V-95))
+					    (flo:* V-90 V-95))
+				     (flo:* V-95 dt4))))))))))
 
 ;;;(pp (flonumize (gear-generator 4 0)))
 
 (define (gc4 dt1 ts)
-  (let ((V-137 (fl* dt1 -1.))
-	(V-119 (fl* 2. dt1))
+  (let ((V-137 (flo:* dt1 -1.))
+	(V-119 (flo:* 2. dt1))
 	(tn-1 (list-ref ts 0))
-	(V-114 (fl* dt1 dt1)))
-    (let ((dt5 (fl- (list-ref ts 3) tn-1))
-	  (dt4 (fl- (list-ref ts 2) tn-1))
-	  (dt3 (fl- (list-ref ts 1) tn-1))
-	  (V-115 (fl* V-114 dt1)))
-      (let ((V-142 (fl* dt5 dt5))
-	    (V-139 (fl* dt4 dt4))
-	    (V-135 (fl* dt3 dt3))
-	    (V-131 (fl* dt5 dt1))
-	    (V-130 (fl* dt1 dt4))
-	    (V-126 (fl* dt5 dt3))
-	    (V-125 (fl* dt5 -1.))
-	    (V-124 (fl* dt4 -1.))
-	    (V-123 (fl* dt3 -1.))
-	    (V-122 (fl* dt5 dt4))
-	    (V-121 (fl* V-119 dt5))
-	    (V-120 (fl* dt4 dt3))
-	    (V-118 (fl* V-114 dt5))
-	    (V-117 (fl* V-114 dt4))
-	    (V-116 (fl* V-114 dt3)))
-	(let ((V-144 (fl* V-142 dt5))
-	      (V-143 (fl* dt3 V-142))
-	      (V-141 (fl* V-139 dt4))
-	      (V-140 (fl* V-123 V-130))
-	      (V-138 (fl* V-135 V-137))
-	      (V-136 (fl* V-135 dt3))
-	      (V-134 (fl+ V-117 (fl* -1. V-115)))
-	      (V-132 (fl* V-131 dt3))
-	      (V-129 (fl* V-122 -1.))
-	      (V-128 (fl+ (fl+ (fl* V-125 V-114) (fl* V-123 V-114))
+	(V-114 (flo:* dt1 dt1)))
+    (let ((dt5 (flo:- (list-ref ts 3) tn-1))
+	  (dt4 (flo:- (list-ref ts 2) tn-1))
+	  (dt3 (flo:- (list-ref ts 1) tn-1))
+	  (V-115 (flo:* V-114 dt1)))
+      (let ((V-142 (flo:* dt5 dt5))
+	    (V-139 (flo:* dt4 dt4))
+	    (V-135 (flo:* dt3 dt3))
+	    (V-131 (flo:* dt5 dt1))
+	    (V-130 (flo:* dt1 dt4))
+	    (V-126 (flo:* dt5 dt3))
+	    (V-125 (flo:* dt5 -1.))
+	    (V-124 (flo:* dt4 -1.))
+	    (V-123 (flo:* dt3 -1.))
+	    (V-122 (flo:* dt5 dt4))
+	    (V-121 (flo:* V-119 dt5))
+	    (V-120 (flo:* dt4 dt3))
+	    (V-118 (flo:* V-114 dt5))
+	    (V-117 (flo:* V-114 dt4))
+	    (V-116 (flo:* V-114 dt3)))
+	(let ((V-144 (flo:* V-142 dt5))
+	      (V-143 (flo:* dt3 V-142))
+	      (V-141 (flo:* V-139 dt4))
+	      (V-140 (flo:* V-123 V-130))
+	      (V-138 (flo:* V-135 V-137))
+	      (V-136 (flo:* V-135 dt3))
+	      (V-134 (flo:+ V-117 (flo:* -1. V-115)))
+	      (V-132 (flo:* V-131 dt3))
+	      (V-129 (flo:* V-122 -1.))
+	      (V-128 (flo:+ (flo:+ (flo:* V-125 V-114) (flo:* V-123 V-114))
 			    V-115))
-	      (V-127 (fl* V-122 dt1)))
-	  (let ((V-133 (fl* V-132 dt4)))
+	      (V-127 (flo:* V-122 dt1)))
+	  (let ((V-133 (flo:* V-132 dt4)))
 
-	    (list (fl/ (fl+ (fl+ (fl+ (fl* 4. V-115)
-					      (fl* V-116 -3.))
-				       (fl+ (fl* V-117 -3.)
-					      (fl* V-118 -3.)))
-				(fl+ (fl+ (fl* V-119 V-120)
-					      (fl* V-121 dt3))
-				       (fl+ (fl* V-121 dt4)
-					      (fl* V-122 V-123))))
-			 (fl+ (fl+ (fl+ (fl* V-114 V-114)
-					      (fl* V-123 V-115))
-				       (fl+ (fl* V-124 V-115)
-					      (fl* V-125 V-115)))
-				(fl+ (fl+ (fl* V-120 V-114)
-					      (fl* V-126 V-114))
-				       (fl+ (fl* V-122 V-114)
-					      (fl* V-127 V-123)))))
-		  (fl/ (fl+ (fl+ V-128
-				       (fl* V-129 dt3))
-				(fl+ (fl+ V-127
-					      (fl* V-126 dt1))
-				       (fl+ (fl* V-130 dt3)
-					      (fl* V-124 V-114))))
+	    (list (flo:/ (flo:+ (flo:+ (flo:+ (flo:* 4. V-115)
+					      (flo:* V-116 -3.))
+				       (flo:+ (flo:* V-117 -3.)
+					      (flo:* V-118 -3.)))
+				(flo:+ (flo:+ (flo:* V-119 V-120)
+					      (flo:* V-121 dt3))
+				       (flo:+ (flo:* V-121 dt4)
+					      (flo:* V-122 V-123))))
+			 (flo:+ (flo:+ (flo:+ (flo:* V-114 V-114)
+					      (flo:* V-123 V-115))
+				       (flo:+ (flo:* V-124 V-115)
+					      (flo:* V-125 V-115)))
+				(flo:+ (flo:+ (flo:* V-120 V-114)
+					      (flo:* V-126 V-114))
+				       (flo:+ (flo:* V-122 V-114)
+					      (flo:* V-127 V-123)))))
+		  (flo:/ (flo:+ (flo:+ V-128
+				       (flo:* V-129 dt3))
+				(flo:+ (flo:+ V-127
+					      (flo:* V-126 dt1))
+				       (flo:+ (flo:* V-130 dt3)
+					      (flo:* V-124 V-114))))
 			 V-133)
-		  (fl/ (fl+ (fl+ V-134 (fl* V-129 dt1)) V-118)
-			 (fl+ (fl+ (fl+ (fl* dt1 V-136)
-					      (fl* V-138 dt4))
-				       (fl+ (fl* V-138 dt5)
+		  (flo:/ (flo:+ (flo:+ V-134 (flo:* V-129 dt1)) V-118)
+			 (flo:+ (flo:+ (flo:+ (flo:* dt1 V-136)
+					      (flo:* V-138 dt4))
+				       (flo:+ (flo:* V-138 dt5)
 					      V-133))
-				(fl+ (fl+ (fl* -1. (fl* V-135 V-135))
-					      (fl* V-136 dt4))
-				       (fl+ (fl* V-136 dt5)
-					      (fl* V-125
-						     (fl* dt4 V-135))))))
-		  (fl/ (fl+ V-128 V-132)
-			 (fl+ (fl+ (fl+ (fl* dt1 (fl* dt3 V-139))
-					      (fl* V-140 dt5))
-				       (fl+ (fl* V-137 V-141)
-					      (fl* V-131 V-139)))
-				(fl+ (fl+ (fl* V-123 V-141)
-					      (fl* V-126 V-139))
-				       (fl+ (fl* V-139 V-139)
-					      (fl* V-125 V-141)))))
-		  (fl/ (fl+ (fl+ V-134 V-140) V-116)
-			 (fl+ (fl+ (fl+ (fl* V-130 V-126)
-					      (fl* V-143 V-137))
-				       (fl+ (fl* V-124 (fl* V-142 dt1))
-					      (fl* dt1 V-144)))
-				(fl+ (fl+ (fl* V-143 V-124)
-					      (fl* dt3 V-144))
-				       (fl+ (fl* dt4 V-144)
-					      (fl* -1.
-						     (fl* V-142
+				(flo:+ (flo:+ (flo:* -1. (flo:* V-135 V-135))
+					      (flo:* V-136 dt4))
+				       (flo:+ (flo:* V-136 dt5)
+					      (flo:* V-125
+						     (flo:* dt4 V-135))))))
+		  (flo:/ (flo:+ V-128 V-132)
+			 (flo:+ (flo:+ (flo:+ (flo:* dt1 (flo:* dt3 V-139))
+					      (flo:* V-140 dt5))
+				       (flo:+ (flo:* V-137 V-141)
+					      (flo:* V-131 V-139)))
+				(flo:+ (flo:+ (flo:* V-123 V-141)
+					      (flo:* V-126 V-139))
+				       (flo:+ (flo:* V-139 V-139)
+					      (flo:* V-125 V-141)))))
+		  (flo:/ (flo:+ (flo:+ V-134 V-140) V-116)
+			 (flo:+ (flo:+ (flo:+ (flo:* V-130 V-126)
+					      (flo:* V-143 V-137))
+				       (flo:+ (flo:* V-124 (flo:* V-142 dt1))
+					      (flo:* dt1 V-144)))
+				(flo:+ (flo:+ (flo:* V-143 V-124)
+					      (flo:* dt3 V-144))
+				       (flo:+ (flo:* dt4 V-144)
+					      (flo:* -1.
+						     (flo:* V-142
 							    V-142)))))))))))))
 
 (define gear-correctors
@@ -1009,7 +1008,7 @@
 	(k+1 (fix:+ k 1))
 	(dfk 1))			;ugh!
     (lambda (h)
-      (* C (expt h k+1) dfk))))
+      (real:* C (expt h k+1) dfk))))
 
 ;;; Ugbletchreous Lagrange polynomial extrapolators.
 

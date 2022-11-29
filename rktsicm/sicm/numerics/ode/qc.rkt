@@ -2,10 +2,11 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if write-line false let*
+                  fix:+)
+         (only-in "../../rkt/define.rkt" define default-object?)
+         (only-in "../../rkt/todo.rkt" pp)
          "../../kernel-intr.rkt"
-         "../../rkt/default-object.rkt"
-         "../../rkt/undefined.rkt"
          "../linear/gauss-jordan.rkt"
          "advance.rkt"
          )
@@ -57,9 +58,9 @@
               (mder (apply method der tolerance others)))
           (define (qc-stepper state h-init continue)
             (let ((stepper (mder state)))
-              (when *qc-wallp? (println `(qc state: ,state)))
+              (if *qc-wallp? (write-line `(qc state: ,state)))
               (let loop ((h h-init))
-                (when *qc-wallp? (println `(qc h: ,h)))
+                (if *qc-wallp? (write-line `(qc h: ,h)))
                 (let ((h/2 (* 0.5 h)))
                   (stepper              ;first halfstep
                    h/2
@@ -71,9 +72,9 @@
                          h
                          (lambda (fullstep nf) ;fullstep succeeded
                            (let* ((err (error-measure 2halfsteps fullstep))
-                                  (next-h undefined-value))
-                             (when *qc-wallp?
-                                 (println
+                                  (next-h))
+                             (if *qc-wallp?
+                                 (write-line
                                   `(qc fullstep err: ,err ,nh ,n2h ,nf)))
                              (if (> err *qc-trigger-point*)
                                  (loop (if *qc-press*   ;fails error spec.
@@ -84,13 +85,13 @@
                                                        (fullweight fullstep))))
                                    (continue good-state h (h-adjust h err))))))
                          (lambda ()     ;fullstep failed
-                           (when *qc-wallp? (println `(qc: fullstep failed)))
+                           (if *qc-wallp? (write-line `(qc: fullstep failed)))
                            (loop (* *qc-fullstep-reduction-factor* h)))))
                       (lambda ()        ;second halfstep failed
-                        (when *qc-wallp? (println `(qc: second halfstep failed)))
+                        (if *qc-wallp? (write-line `(qc: second halfstep failed)))
                         (loop (* *qc-2halfsteps-reduction-factor* h)))))
                    (lambda ()           ;first halfstep failed
-                     (when *qc-wallp? (println `(qc: first halfstep failed)))
+                     (if *qc-wallp? (write-line `(qc: first halfstep failed)))
                      (loop (* *qc-halfstep-reduction-factor* h))))))))
           qc-stepper))
       qc-stepper-maker)))
@@ -104,7 +105,7 @@
 
 (define *qc-press* #t)           ; "Numerical Recipes 1st edition" prescription
 
-(define *qc-wallp? #f)
+(define *qc-wallp? false)
 (define *qc-zero-protect* 1.0e-20)
 
 ;;; A "simple" explicit method, based on fourth-order Runge-Kutta:
@@ -166,7 +167,7 @@
 
 ;;; The following are predictor-corrector methods.
 
-(define pc-wallp? #f)
+(define pc-wallp? false)
 
 ;;; A trapezoid method: xn+1 is found by corrector iteration.
 
@@ -200,7 +201,7 @@
 ;Value: (#(2.7182832352360498) 1. .11894979864256087)
 |#
 
-(define (c-trapezoid f qc-tolerance [convergence-tolerance default-object])
+(define (c-trapezoid f qc-tolerance #:optional convergence-tolerance)
   (let ((error-measure
 	 (parse-error-measure
 	  (if (default-object? convergence-tolerance)
@@ -227,7 +228,7 @@
 			   (nverr (error-measure ncorr corrected)))
 		      (if (< nverr verr)
 			  (lp corrected ncorr (fix:+ count 1))
-			  (begin (when pc-wallp? (println `(pc failed: ,nverr ,verr)))
+			  (begin (if pc-wallp? (write-line `(pc failed: ,nverr ,verr)))
 				 (fail)))))))))
 	trapstep))))
 
@@ -282,7 +283,7 @@
 ;Value: (#(2.718279922395027) 1. .11684285320335219)
 |#
 
-(define (n-trapezoid f-df qc-tolerance dimension [convergence-tolerance default-object])
+(define (n-trapezoid f-df qc-tolerance dimension #:optional convergence-tolerance)
   (let* ((convergence-tolerance
 	  (if (default-object? convergence-tolerance)
 	      qc-tolerance
@@ -310,7 +311,7 @@
 			       (lambda (dx . ignore)
 				 (vector+vector (pad-vector dx) xn+1))
 			       (lambda ()
-				 (when pc-wallp? (println `(gj failed: ,A ,b)))
+				 (if pc-wallp? (pp `(gj failed: ,A ,b)))
 				 (fail)))))))
 		  (let lp ((predicted predicted)
 			   (corrected (corrector predicted))
@@ -322,8 +323,8 @@
 				 (nverr (error-measure ncorr corrected)))
 			    (if (< nverr verr)
 				(lp corrected ncorr (fix:+ count 1))
-				(begin (when pc-wallp?
-					   (println `(gj nr failed: ,nverr ,verr)))
+				(begin (if pc-wallp?
+					   (write-line `(gj nr failed: ,nverr ,verr)))
 				       (fail)))))))))
 	      trapstep)))))
 

@@ -2,11 +2,13 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         racket/vector
-         "../../kernel-intr.rkt"
+(require (only-in "../../rkt/glue.rkt" if subvector make-initialized-vector false define-integrable 1+ write-line
+                  fix:= fix:< fix:> fix:+ fix:- fix:1+)
+         (only-in "../../rkt/define.rkt" define default-object?)
+         (only-in "../../rkt/todo.rkt" pp)
          "../../general/assert.rkt"
          "../../general/table.rkt"
+         "../../kernel-intr.rkt"
          )
 
 ;;; The advance-generator is used with 1-step adaptive integrators to
@@ -61,8 +63,8 @@
 	     (current-increment 0.0)
 	     (h (min-step-size goal-increment h-suggested max-h))
              (h-suggested h-suggested))
-      (when advance-wallp?
-	  (println `(advance: ,current-increment ,state ,h)))
+      (if advance-wallp?
+	  (pp `(advance: ,current-increment ,state ,h)))
       (if (close-enuf? goal-increment current-increment
 		       *independent-variable-tolerance*)
 	  (done state current-increment h-suggested)
@@ -80,9 +82,9 @@
   advance)
 
 
-(define advance-wallp? #f)
+(define advance-wallp? false)
 
-(define (first-with-sign-of-second x y)
+(define-integrable (first-with-sign-of-second x y)
   (if (> y 0.0)
       (abs x)
       (- (abs x))))
@@ -133,14 +135,14 @@
 	(update last-value
 		(lambda (value fvalue)
 		  (let ((d (measure value last-value)))
-		    (when *fixed-point-wallpaper*
-			(println
+		    (if *fixed-point-wallpaper*
+			(write-line
 			 `(vector-fixed-point ,count d ,d ,start ,value)))
 		    (if (< d 2.0)
 			(succeed value fvalue count)
 			(if (fix:> count *vector-fixed-point-iteration-loss*)
 			    (fail value fvalue)
-			    (improve value (+ 1 count))))))))))
+			    (improve value (1+ count))))))))))
 
 
 
@@ -148,11 +150,12 @@
 
 (define *vector-fixed-point-ridiculously-large* 1.0e50)
 
-(define *fixed-point-wallpaper* #f)
+(define *fixed-point-wallpaper* false)
 
 ;;; Error measures
 
-(define (parse-error-measure tolerance-specification [multiplier 1.0])
+(define (parse-error-measure tolerance-specification #:optional multiplier)
+  (if (default-object? multiplier) (set! multiplier 1.0))
   (cond ((number? tolerance-specification) ;uniform relative error -- scale = 1
 	 (max-norm (* multiplier tolerance-specification)))
 	((procedure? tolerance-specification) ;arbitrary user-supplied procedure
@@ -167,7 +170,7 @@
       (let lp ((i 0) (accumulation 0.0))
 	(if (fix:= i n)
 	    (summarize accumulation n)
-	    (lp (fix:+ 1 i)
+	    (lp (fix:1+ i)
 		(accumulate (each-component (vector-ref v1 i)
 					    (vector-ref v2 i)
 					    i)
@@ -184,9 +187,13 @@
 ;;; unity weights.  (Of course, as p gets very large the lp-norm will
 ;;; approach the same value as the max-norm.)
 
-(define (lp-norm p [tolerance *machine-epsilon*]
-                 [breakpoints (lambda (i) *norm-breakpoint*)]
-                 [weights (lambda (i) 1.0)])
+(define (lp-norm p #:optional tolerance breakpoints weights)
+  (if (default-object? tolerance)
+      (set! tolerance *machine-epsilon*))
+  (if (default-object? breakpoints)
+      (set! breakpoints (lambda (i) *norm-breakpoint*)))
+  (if (default-object? weights)
+      (set! weights (lambda (i) 1.0)))
   (let ((q (/ 1 p))
         (tt (/ 2 tolerance)))
     (vector-metric (lambda (a n)
@@ -202,9 +209,13 @@
                               p)
                         (weights i))))))
 
-(define (max-norm [tolerance *machine-epsilon*]
-                  [breakpoints (lambda (i) *norm-breakpoint*)]
-                  [weights (lambda (i) 1.0)])
+(define (max-norm #:optional tolerance breakpoints weights)
+  (if (default-object? tolerance)
+      (set! tolerance *machine-epsilon*))
+  (if (default-object? breakpoints)
+      (set! breakpoints (lambda (i) *norm-breakpoint*)))
+  (if (default-object? weights)
+      (set! weights (lambda (i) 1.0)))
   (let ((tt (/ 2 tolerance)))
     (vector-metric (lambda (a n) (* a tt))
                    max
@@ -228,7 +239,7 @@
 	 (lambda (x) x))
 	((list? dimension)
 	 (let ((start (cadr dimension)) (end (caddr dimension)))
-	   (lambda (v) (vector-copy v start end))))
+	   (lambda (v) (subvector v start end))))
 	(else (error "Bad dimension -- VECTOR-CLIPPER" dimension))))
 
 (define (vector-padder dimension)
@@ -240,7 +251,7 @@
 		(end (caddr dimension))
 		(j-size (fix:- end start)))
 	   (lambda (v)
-	     (build-vector state-size
+	     (make-initialized-vector state-size
 	       (lambda (i)
 		 (if (and (or (fix:< start i)
 			      (fix:= start i))

@@ -2,7 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/undefined.rkt"
+(require (only-in "../../rkt/glue.rkt" if write-line symbol-upcase symbol-downcase)
+         (only-in "../../rkt/define.rkt" define)
+         (only-in "../../rkt/todo.rkt" pp)
          "be.rkt"
          "bulirsch-stoer.rkt"
          "gear.rkt"
@@ -12,7 +14,7 @@
 
 ;;; Default settings
 
-(define *ode-integration-method* 'bulirsch-stoer)
+(define *ode-integration-method* 'BULIRSCH-STOER)
 
 ;;; (set! *ode-integration-method* 'QCRK4)
 ;;; (set! *ode-integration-method* 'BULIRSCH-STOER)
@@ -25,7 +27,7 @@
 
 (define *progress-monitor* #f)
 
-(define *last-state* undefined-value)
+(define *last-state*)
 
 ;;; ode-advancer returns a procedure of the form
 ;;; (lambda (state dt continue) ...)
@@ -44,7 +46,7 @@
 |#
 
 (define (ode-advancer sysder local-error-tolerance dimension)
-  (case *ode-integration-method*
+  (case (symbol-downcase *ode-integration-method*)
     ((bulirsch-stoer)
      (bs-advancer sysder local-error-tolerance dimension))
     ((qcrk4)
@@ -57,7 +59,7 @@
      ;; actually sysder here is f&df
      (gear-advancer sysder local-error-tolerance dimension))
     (else
-     (println `(methods: bulirsch-stoer qcrk4 qcctrap2 qcceuler explicit-gear))
+     (write-line `(methods: bulirsch-stoer qcrk4 qcctrap2 qcceuler explicit-gear))
      (error "Unknown ode integrator" *ode-integration-method*))))
 
 (define (set-ode-integration-method! method)
@@ -74,7 +76,7 @@
      ;; actually sysder here is f&df
      (set! *ode-integration-method* 'explicit-gear))
     (else
-     (println
+     (write-line
       `(available methods: bulirsch-stoer qcrk4 qcctrap2 qcceuler explicit-gear))
      (display
       "Note: for x' = f(x), Gear needs f&df, all others need only f.")
@@ -82,12 +84,12 @@
      `(currently: ,*ode-integration-method*))))
 
 (define (advance-monitor ns step-achieved step-suggested cont)
-  (when *progress-monitor* (println `(,ns ,step-achieved ,step-suggested)))
+  (if *progress-monitor* (pp `(,ns ,step-achieved ,step-suggested)))
   (set! *last-state* ns)
   (cont))
 
 (define (final-step-monitor ns step-achieved step-suggested)
-  (when *progress-monitor* (println `(,ns ,step-achieved ,step-suggested)))
+  (if *progress-monitor* (pp `(,ns ,step-achieved ,step-suggested)))
   (set! *last-state* ns)
   ns)
 

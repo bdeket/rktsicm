@@ -1,18 +1,15 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out) ->fl))
+(provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
-         racket/flonum
+(require (only-in "../../rkt/glue.rkt" if list-head iota
+                  fix:= fix:+ fix:-)
+         (only-in "../../rkt/define.rkt" define lambda default-object?)
          "../../kernel-intr.rkt"
-         "../../rkt/default-object.rkt"
-         "../../rkt/undefined.rkt"
-         "../../general/list-utils.rkt"
          "../../enclose/alt-magic.rkt"
+         (only-in "../signals/cph-dsp/flovec.rkt" ->flonum)
          "ode-advancer.rkt"
          )
-
-(define (->fl x) (exact->inexact x))
 
 ;;;; State advancer for parametric system derivatives with
 ;;;    arbitrarily-structured states.
@@ -39,20 +36,20 @@
 |#
 
 (define (evolve parametric-sysder . parameters)
-  (lambda (initial-state monitor dt-monitor tfinal [eps default-object] [dt default-object])
+  (lambda (initial-state monitor dt-monitor tfinal #:optional eps dt)
     (let* (;; First float all numeric arguments.
-	   (dt-monitor (->fl dt-monitor))
+	   (dt-monitor (->flonum dt-monitor))
 	   (dt (if (default-object? dt)
 		   dt-monitor
-		   (->fl dt)))
+		   (->flonum dt)))
 	   (eps (cond ((default-object? eps)
 		       *default-advancer-tolerance*)
 		      ((number? eps) 
-		       (->fl eps))
+		       (->flonum eps))
 		      (else eps)))	; may be a custom procedure
-	   (tfinal (->fl tfinal))
-	   (parameters (map ->fl parameters))
-	   (initial-state (s:map/r ->fl initial-state))
+	   (tfinal (->flonum tfinal))
+	   (parameters (map ->flonum parameters))
+	   (initial-state (s:map/r ->flonum initial-state))
 
 	   (direction (sign (- tfinal (s:ref initial-state 0))))
            (dt-monitor (* direction (abs dt-monitor)))
@@ -166,15 +163,15 @@
 |#
 
 (define (state-advancer sysder . params)
-  (let* ((params (map ->fl params))
+  (let* ((params (map ->flonum params))
 	 (free-run (apply free-run-state-advancer sysder params)))
-    (lambda (initial-state dt-required [eps default-object] [continue default-object])
-      (let ((initial-state (s:map/r ->fl initial-state))
-	    (dt-required (->fl dt-required))
+    (lambda (initial-state dt-required #:optional eps continue)
+      (let ((initial-state (s:map/r ->flonum initial-state))
+	    (dt-required (->flonum dt-required))
 	    (eps (cond ((default-object? eps)
 			*default-advancer-tolerance*)
 		       ((number? eps) 
-			(->fl eps))
+			(->flonum eps))
 		       (else eps)))
 	    (continue
 	     (if (default-object? continue)
@@ -282,6 +279,7 @@
 	 parametric-flat-sysder)))
 
 (define *compiling-sysder? #t)
+(define (set!-*compiling-sysder? x) (set! *compiling-sysder? x))
 (define *max-compiled-sysder-table-size* 3)
 (define *compiled-sysder-table-size* 0)
 (define *compiled-sysder-table* '())
@@ -304,7 +302,7 @@
 			    *max-compiled-sysder-table-size*)
 		     (set! *compiled-sysder-table*
 			   (cons (list x ans)
-				 (take *compiled-sysder-table* sm1))))
+				 (list-head *compiled-sysder-table* sm1))))
 		    (else
 		     (set! *compiled-sysder-table*
 			   (cons (list x ans) *compiled-sysder-table*))
@@ -321,20 +319,20 @@
 ;;;    (lambda (params) (lambda (v) ...))
 ;;; instead of the parameters spread out as in the source.
 
-(define *compiler-simplifier* undefined-value)
+(define *compiler-simplifier*)
 ;;; If no "simplification" is desired 
 ;;;(set! *compiler-simplifier* expression)
 ;;; Default is to use usual simplifier
 (set! *compiler-simplifier* g:simplify)
 
 ;;; For debugging
-(define *last-expression-to-compiler undefined-value)
-(define *last-compiled-result undefined-value)
+(define *last-expression-to-compiler)
+(define *last-compiled-result)
 
-(define (compile-parametric n-params n-state-vars procedure
-                            [simplifier *compiler-simplifier*]
-                            [compiler lambda->numerical-procedure])
+(define (compile-parametric n-params n-state-vars procedure #:optional simplifier compiler)
   (let ((parameter-arity (procedure-arity procedure)))
+    (if (default-object? simplifier) (set! simplifier *compiler-simplifier*))
+    (if (default-object? compiler) (set! compiler lambda->numerical-procedure))
     (let ((param-names
 	   (generate-list n-params
 			  (lambda (i)
@@ -362,12 +360,12 @@
 		  (let (,@(map (lambda (pn j)
 				 `(,pn (list-ref ,params ,j)))
 			       param-names
-			       (build-list n-params values)))
+			       (iota n-params)))
 		    (lambda (,state)
 		      (let (,@(map (lambda (xi i)
 				     `(,xi (vector-ref ,state ,i)))
 				   state-var-names
-				   (build-list n-state-vars values)))
+				   (iota n-state-vars)))
 			,sderiv-exp))))))
           (set! *last-expression-to-compiler lexp)
 	  (let ((clexp (compiler lexp)))

@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "infinities.rkt"))
 
-(require (only-in "../../rkt/glue.rkt" if)
+(require (only-in "../../rkt/glue.rkt" if symbol-upcase)
          (only-in "../../rkt/define.rkt" define default-object?)
          "rational.rkt"
          "infinities.rkt"
@@ -11,8 +11,6 @@
          "../ode/bulirsch-stoer.rkt"
          "../extrapolate/re.rkt"
          )
-
-(define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
 
 ;;;; Interface system for QUADRATURE 
 

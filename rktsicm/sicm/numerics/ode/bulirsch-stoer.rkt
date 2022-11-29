@@ -1,16 +1,16 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out) ->fl for))
+(provide (except-out (all-defined-out) for))
 
-(require "../../rkt/fixnum.rkt"
-         racket/flonum
+(require (only-in "../../rkt/glue.rkt" if make-initialized-vector let false subvector-move-left!
+                  fix:< fix:+ fix:- fix:* fix:1+
+                  flo:= flo:< flo:+ flo:- flo:* flo:/ flo:expt)
+         (only-in "../../rkt/define.rkt" define default-object? define-integrable)
+         (only-in "../../rkt/todo.rkt" pp)
          "../../kernel-intr.rkt"
-         "../../rkt/undefined.rkt"
          "advance.rkt"
          "../signals/cph-dsp/flovec.rkt"
          )
-
-(define ->fl exact->inexact)
 
 ;;;; Bulirsch-Stoer integration: Send bug reports to gjs@mit.edu
 ;;;    Ideas from Jack Wisdom, from Michel Henon, from B&S
@@ -81,9 +81,9 @@
      (let ((x (vector-ref vin 0)))
        (vector-set! vout 0 1.0)
        (vector-set! vout 1
-		    (fl- 0.0
-			   (fl/ (flcos (fl/ 1.0 x))
-				  (fl* x x))))))
+		    (flo:- 0.0
+			   (flo:/ (flo:cos (flo:/ 1.0 x))
+				  (flo:* x x))))))
    2
    1e-14))				;error tolerated
  (vector -2.0 (f -2.0))
@@ -128,10 +128,10 @@
     ;(declare (integrate i))
     (fix:< i n)))
 
-(define *max-tableau-depth* undefined-value)
-(define *max-tableau-width* undefined-value)
-(define bulirsch-stoer-steps undefined-value)
-(define bulirsch-stoer-magic-vectors undefined-value)
+(define *max-tableau-depth*)
+(define *max-tableau-width*)
+(define bulirsch-stoer-steps)
+(define bulirsch-stoer-magic-vectors)
 
 
 (define (bulirsch-stoer-setup max-depth max-width)
@@ -142,22 +142,27 @@
   (set! *max-tableau-depth* max-depth)
   (set! *max-tableau-width* max-width)
   (let ((bulirsch-stoer-integers (cons-stream 1 (bsi 0))))
+    #;
+    (pp (stream-head bulirsch-stoer-integers max-depth))
     (set! bulirsch-stoer-steps
 	  (list->vector
 	   (map (lambda (x) (fix:* 2 x))
 		(stream-head bulirsch-stoer-integers max-depth))))
     (set! bulirsch-stoer-magic-vectors
-	  (build-vector *max-tableau-depth*
+	  (make-initialized-vector *max-tableau-depth*
 	    (lambda (m)
 	      (flo:make-initialized-vector (min m *max-tableau-width*)
 		(lambda (k)
 		  (exact->inexact
 		   (square (/ (stream-ref bulirsch-stoer-integers m)
 			      (stream-ref bulirsch-stoer-integers
-					  (fix:- m (fix:+ 1 k)))))))))))))
+					  (fix:- m (fix:1+ k)))))))))))
+    'done))
 
 
-(bulirsch-stoer-setup 10 6)
+(void
+ (bulirsch-stoer-setup 10 6)
+ )
 ;;; (1 2 3 4 6 8 12 16 24 32)
 
 #|
@@ -167,53 +172,53 @@
   #(1 2 3 4 6 8 12 16 24 32 48 64 96))	       
 |#
 
-(define (vector-copy-into-vector dim v1 v2)
-  (for 0 (less-than dim) add1
+(define-integrable (vector-copy-into-vector dim v1 v2)
+  (for 0 (less-than dim) fix:1+
        (lambda (i)
 	 ;(declare (integrate i))
 	 (vector-set! v2 i (vector-ref v1 i)))))
 
-(define (flo:vector-copy-into-vector dim v1 v2)
-  (for 0 (less-than dim) add1
+(define-integrable (flo:vector-copy-into-vector dim v1 v2)
+  (for 0 (less-than dim) fix:1+
        (lambda (i)
 	 ;(declare (integrate i))
 	 (flo:vector-set! v2 i (flo:vector-ref v1 i)))))
 
-(define (flo:vector-copy source)
+(define-integrable (flo:vector-copy source)
   (flo:make-initialized-vector (flo:vector-length source)
 			       (lambda (i)
 				 ;(declare (integrate i))
 				 (flo:vector-ref source i))))
 
 
-(define (c*v+v dim c v1 v2 ans)
-  (for 0 (less-than dim) add1
+(define-integrable (c*v+v dim c v1 v2 ans)
+  (for 0 (less-than dim) fix:1+
        (lambda (i)
 	 ;(declare (integrate i))
 	 (flo:vector-set! ans i
-			  (fl+ (fl* c (flo:vector-ref v1 i))
+			  (flo:+ (flo:* c (flo:vector-ref v1 i))
 				 (flo:vector-ref v2 i))))))
 
-(define (c*v+v+v*c dim c1 v1 v2 v3 c2 ans)
-  (for 0 (less-than dim) add1
+(define-integrable (c*v+v+v*c dim c1 v1 v2 v3 c2 ans)
+  (for 0 (less-than dim) fix:1+
        (lambda (i)
 	 ;(declare (integrate i))
 	 (flo:vector-set! ans i
-		      (fl* c2
-			     (fl+
-			      (fl+ (fl* c1 (flo:vector-ref v1 i))
+		      (flo:* c2
+			     (flo:+
+			      (flo:+ (flo:* c1 (flo:vector-ref v1 i))
 				     (flo:vector-ref v2 i))
 			      (flo:vector-ref v3 i)))))))
 
 
-(define (vector-copy-into-floating-vector dim v1 v2)
-  (for 0 (less-than dim) add1
+(define-integrable (vector-copy-into-floating-vector dim v1 v2)
+  (for 0 (less-than dim) fix:1+
        (lambda (i)
 	 ;(declare (integrate i))
-	 (flo:vector-set! v2 i (->fl (vector-ref v1 i))))))
+	 (flo:vector-set! v2 i (->flonum (vector-ref v1 i))))))
 
-(define (floating-vector-copy-into-vector dim v1 v2)
-  (for 0 (less-than dim) add1
+(define-integrable (floating-vector-copy-into-vector dim v1 v2)
+  (for 0 (less-than dim) fix:1+
        (lambda (i)
 	 ;(declare (integrate i))
 	 (vector-set! v2 i (flo:vector-ref v1 i)))))
@@ -233,8 +238,8 @@
 	(lambda (y0 HH)
 	  (g y0 g$y0)
 	  (lambda (n yn)
-	    (let* ((h (fl/ HH (exact->inexact n)))
-		   (2h (fl* 2.0 h)))
+	    (let* ((h (flo:/ HH (exact->inexact n)))
+		   (2h (flo:* 2.0 h)))
 	      ;; Fortran
 	      (c*v+v dim h g$y0 y0 eta_1)
 	      (let lp ((j 2) (eta_j-1 y0) (eta_j eta_1))
@@ -309,18 +314,18 @@
 	(gragg-output1 (flo:make-vector n 0.0))
 	(gragg-output2 (flo:make-vector n 0.0))
 	(tableau
-	 (build-vector n
+	 (make-initialized-vector n
 	    (lambda (i) (flo:make-vector *max-tableau-width* 0.0)))))
     (lambda (state delta-t-suggested continuation)
       ;; continuation = (lambda (new-state actual-delta-t suggested-delta-t) ...)
-      (when bulirsch-stoer-state-wallp
-	  (println `(bulirsch-stoer-state ,state ,delta-t-suggested)))
+      (if bulirsch-stoer-state-wallp
+	  (pp `(bulirsch-stoer-state ,state ,delta-t-suggested)))
       (let outside ((delta-t delta-t-suggested))
 	(let ((modified-midpoint (mm state delta-t)))
 	  (modified-midpoint 2 state-estimate1)
 	  (flo:vector-copy-into-vector n state-estimate1 gragg-output1)
 	  (let m-loop ((m 1)
-		       (old-verr undefined-value)
+		       (old-verr)
 		       (old-state-estimate state-estimate1)
 		       (new-state-estimate state-estimate2)
 		       (old-out gragg-output1)
@@ -331,60 +336,60 @@
 		      (d (vector-ref bulirsch-stoer-magic-vectors m)))
 		  (modified-midpoint (vector-ref bulirsch-stoer-steps m) new-out)
 
-		  (for 0 (less-than n) add1
+		  (for 0 (less-than n) fix:1+
 		       (lambda (i)	;coordinates
 			 ;(declare (integrate i))
 			 (let* ((dta (flo:vector-ref old-out i))
 				(yb (flo:vector-ref new-out i))
 				(c yb))
-			   (for 0 (less-than m1) add1
+			   (for 0 (less-than m1) fix:1+
 				(lambda (k) ;width of tableau
 				  ;(declare (integrate k))
-				  (let* ((b1 (fl* (flo:vector-ref d k) dta))
-					 (den (fl- b1 c))
+				  (let* ((b1 (flo:* (flo:vector-ref d k) dta))
+					 (den (flo:- b1 c))
 					 (dtn dta))
-				    (if (not (fl= den 0.0))
-					(let ((b (fl/ (fl- c dta) den)))
-					  (set! dtn (fl* c b))
-					  (set! c (fl* b1 b)))
+				    (if (not (flo:= den 0.0))
+					(let ((b (flo:/ (flo:- c dta) den)))
+					  (set! dtn (flo:* c b))
+					  (set! c (flo:* b1 b)))
 					(set! fail #t))
 				    (set! dta (flo:vector-ref (vector-ref tableau i) k))
 				    (flo:vector-set! (vector-ref tableau i) k dtn)
-				    (set! yb (fl+ yb dtn)))))
+				    (set! yb (flo:+ yb dtn)))))
 			   (flo:vector-set! new-state-estimate i yb))))
 
 		  (let ((verr (error-measure new-state-estimate old-state-estimate)))
-		    (when bulirsch-stoer-error-wallp
-			(println `(bulirsch-stoer-error level: ,m error: ,verr h: ,delta-t)))
+		    (if bulirsch-stoer-error-wallp
+			(pp `(bulirsch-stoer-error level: ,m error: ,verr h: ,delta-t)))
 		    ;; In Jack's C program the first two conditions
 		    ;; below are interchanged and the minimum number
 		    ;; of iterations is set to (fix:< m 4)
 		    (cond ;;(fail) 
                           ;;not good to (outside (* 0.9 delta-t)) or to m-loop with m+1
-			  ((fl< verr 2.0)
+			  ((flo:< verr 2.0)
 			   (continuation (flo:vector-copy new-state-estimate)
 					 delta-t
-					 (fl* (fl* delta-t bulirsch-stoer-magic-multiplier)
-					    (flexpt bulirsch-stoer-magic-base
+					 (flo:* (flo:* delta-t bulirsch-stoer-magic-multiplier)
+					    (flo:expt bulirsch-stoer-magic-base
 						      (exact->inexact (fix:- m m1))))))
 			  ((fix:< m 2)
-			   (m-loop (add1 m) verr
+			   (m-loop (fix:1+ m) verr
 				   new-state-estimate old-state-estimate
 				   new-out old-out #f))
-			  ((not (fl< verr old-verr))
-			   (outside (fl* 0.5 delta-t)))
+			  ((not (flo:< verr old-verr))
+			   (outside (flo:* 0.5 delta-t)))
 			  (else
-			   (m-loop (add1 m) verr
+			   (m-loop (fix:1+ m) verr
 				   new-state-estimate old-state-estimate
 				   new-out old-out #f)))))
 
-		(outside (fl* 0.5 delta-t)))))))))
+		(outside (flo:* 0.5 delta-t)))))))))
 
 (define bulirsch-stoer-magic-multiplier 1.5)
 (define bulirsch-stoer-magic-base 0.6)
 
-(define bulirsch-stoer-error-wallp #f)
-(define bulirsch-stoer-state-wallp #f)
+(define bulirsch-stoer-error-wallp false)
+(define bulirsch-stoer-state-wallp false)
 
 (add-integrator!
  'bulirsch-stoer-lisptran
@@ -422,10 +427,7 @@
 
 (define (system-derivative->lisptran-derivative f) ; y' = f(y)
   (define (lisptran-derivative y yprime)
-    (define temp (f y))
-    (flo:subvector-move! (if (flo:vector? temp) temp (vector->flonum-vector temp))
-                         0 (vector-length y)
-                         (if (flo:vector? yprime) yprime (vector->flonum-vector yprime)) 0))
+    (subvector-move-left! (f y) 0 (vector-length y) yprime 0))
   lisptran-derivative)
 
 (define (lisptran-derivative->system-derivative f!) ; f!(y y')

@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if fix:+ write-line)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt"
          "advance.rkt"
          "qc.rkt"
@@ -30,9 +31,10 @@
 |#
 
 
-(define (c-euler f qc-tolerance [convergence-tolerance qc-tolerance])
+(define (c-euler f qc-tolerance #:optional convergence-tolerance)
   (let ((error-measure
-	 (parse-error-measure convergence-tolerance)))
+	 (parse-error-measure
+          (if (default-object? convergence-tolerance) qc-tolerance convergence-tolerance))))
     (lambda (xn)
       (let ((d (f xn)))
 	(define (estep dt succeed fail)
@@ -48,6 +50,6 @@
 			   (nverr (error-measure ncorr corrected)))
 		      (if (< nverr verr)
 			  (lp corrected ncorr (fix:+ count 1))
-			  (begin (when pc-wallp? (println `(pc failed: ,nverr ,verr)))
+			  (begin (if pc-wallp? (write-line `(pc failed: ,nverr ,verr)))
 				 (fail)))))))))
 	estep))))

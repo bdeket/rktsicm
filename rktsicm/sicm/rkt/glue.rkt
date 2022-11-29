@@ -49,6 +49,7 @@
 (define fold-left foldl)
 (define make-initialized-vector build-vector)
 (define subvector vector-copy)
+(define (subvector-move-left! V vs ve T ts) (vector-copy! T ts V vs ve))
 (define (vector-tail v t) (vector-copy v t))
 (define string:<? string<?)
 (define write-line writeln)
@@ -56,6 +57,10 @@
 (define (for-each-vector-element v f) (vector-map f v))
 (define 1+ add1)
 (define unspecific void)
+
+(define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
+(define (symbol-downcase sym) (string->symbol (string-downcase (symbol->string sym))))
+
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))
 

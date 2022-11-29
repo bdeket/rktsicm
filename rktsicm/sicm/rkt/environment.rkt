@@ -2,6 +2,7 @@
 
 (require (for-syntax racket/base)
          racket/function
+         racket/sequence
          (rename-in racket/base [object-name procedure-name]))
 (require (only-in "racket-help.rkt" rktsicm-logger))
 
@@ -65,9 +66,14 @@
          proc
          (error "wrong procedure arity" (procedure-arity proc)))]))
 
-(define (environment-bindings env)
-  (for/list ([sym (namespace-mapped-symbols env)])
-    (cons sym (namespace-variable-value sym #t #f env))))
+(define (environment-bindings env [indirect? #t])
+  (for/list ([sym (sequence-map (λ (s)
+                                  (cons s
+                                        (with-handlers ([exn:fail:syntax? (λ (e) not-defined)])
+                                          (namespace-variable-value s indirect? (λ () not-defined) env))))
+                                (namespace-mapped-symbols env))]
+             #:unless (eq? not-defined (cdr sym)))
+    sym))
 
 
 (define (->environment . rst) (make-empty-namespace))

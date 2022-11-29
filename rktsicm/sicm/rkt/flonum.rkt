@@ -10,7 +10,11 @@
                     [fl-  flo:-]
                     [fl*  flo:*]
                     [fl/  flo:/]
-                    [flabs flo:abs]))
+                    [flabs flo:abs]
+                    [flexpt flo:expt]
+                    [flcos flo:cos]
+                    [flsin flo:sin]
+                    [fltan flo:tan]))
 (provide (all-from-out racket/flonum)
          (all-defined-out))
 

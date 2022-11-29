@@ -1,7 +1,7 @@
 #lang racket/base
 
 (provide (all-defined-out)
-         (except-out (all-from-out 'flo:vector) ->fl))
+         (all-from-out 'flo:vector))
 
 (require "../../../rkt/fixnum.rkt"
          (except-in racket/flonum ->fl)
@@ -21,9 +21,9 @@
            in-flo:vector
            for/flo:vector
            set-<flo:vector>-l!
-           ->fl)
+           ->flonum)
   
-  (define (->fl x) (if (flonum? x) x (exact->inexact x)))
+  (define (->flonum x) (if (flonum? x) x (exact->inexact x)))
 
   (struct <flo:vector> (v [l #:mutable]) #:transparent
     #:methods gen:equal+hash
@@ -36,7 +36,7 @@
        (λ (v _) (equal-hash-code (in-flo:vector v))))
      (define hash2-proc
        (λ (v _) (equal-secondary-hash-code (in-flo:vector v))))])
-  (define (flo:vector . vs) (for/flo:vector ([v (in-list vs)]) (->fl v)))
+  (define (flo:vector . vs) (for/flo:vector ([v (in-list vs)]) (->flonum v)))
 
   (define (flo:vector-length FV)   (<flo:vector>-l FV))
   (define (flo:vector-ref FV n)    (flvector-ref  (<flo:vector>-v FV) n))
@@ -65,21 +65,21 @@
 (define (vector->flonum-vector vector)
   (when (not (vector? vector))
       (raise-argument-error 'VECTOR->FLONUM-VECTOR "vector" vector))
-  (for/flo:vector ([i (in-vector vector)]) (->fl i)))
+  (for/flo:vector ([i (in-vector vector)]) (->flonum i)))
 
 (define (list->flonum-vector lst)
   (when (not (list? lst))
       (raise-argument-error 'LIST->FLONUM-VECTOR "list" lst))
-  (for/flo:vector ([i (in-list lst)]) (->fl i)))
+  (for/flo:vector ([i (in-list lst)]) (->flonum i)))
 
 (define (flo:make-vector n [value 0.0])
   (guarantee-nonnegative-fixnum n 'FLO:MAKE-VECTOR)
-  (define flval (->fl value))
+  (define flval (->flonum value))
   (for/flo:vector ([i (in-range n)]) flval))
 
 (define (flo:make-initialized-vector n initialization)
   (guarantee-nonnegative-fixnum n 'FLO:MAKE-INITIALIZED-VECTOR)
-  (for/flo:vector ([i (in-range n)]) (->fl (initialization i))))
+  (for/flo:vector ([i (in-range n)]) (->flonum (initialization i))))
 
 (define (flo:subvector vector start end)
   (guarantee-flonum-subvector vector start end 'FLO:SUBVECTOR)
@@ -88,7 +88,7 @@
 (define (flo:vector-grow vector length [value 0.0])
   (guarantee-flonum-vector vector 'FLO:VECTOR-GROW)
   (guarantee-nonnegative-fixnum length 'FLO:VECTOR-GROW)
-  (define flval (->fl value))
+  (define flval (->flonum value))
   (define len (flo:vector-length vector))
   (for/flo:vector ([i (in-range (+ len length))])
     (if (< i len)
@@ -142,14 +142,14 @@
 
 (define (flo:vector-fill! vector value)
   (guarantee-flonum-vector vector 'FLO:VECTOR-FILL!)
-  (define flval (->fl value))
+  (define flval (->flonum value))
   (for ([i (in-range (flo:vector-length vector))])
     (flo:vector-set! vector i flval)))
 
 (define (flo:subvector-fill! vector start end value)
   (guarantee-flonum-subvector vector start end 'FLO:SUBVECTOR-FILL!)
   (for ([i (in-range start end)])
-    (flo:vector-set! vector i (->fl value))))
+    (flo:vector-set! vector i (->flonum value))))
 
 #|
 (define-syntax ucode-primitive
