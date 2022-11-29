@@ -59,6 +59,8 @@
 (define 1+ add1)
 (define unspecific void)
 (define rationalize->exact rationalize)
+(define (floor->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
+(define (round->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
 
 (define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
 (define (symbol-downcase sym) (string->symbol (string-downcase (symbol->string sym))))

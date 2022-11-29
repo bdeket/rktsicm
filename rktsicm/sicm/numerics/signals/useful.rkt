@@ -2,19 +2,24 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if round->exact
+                  fix:= fix:-)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          "fourier.rkt"
          "sigfun.rkt"
          )
 
-(define (unit-step [place 0])
+(define (unit-step #:optional place)
+  (if (default-object? place) (set! place 0))
   (define (step t)
     (if (< t place) 0 1))
   step)
 
-(define (unit-boxcar [half-width 1] [place 0])
+(define (unit-boxcar #:optional half-width place)
+  (if (default-object? half-width) (set! half-width 1))
+  (if (default-object? place) (set! place 0))
   (define (boxcar t)
     (if (< (abs (- t place)) half-width) 1 0))
   boxcar)
@@ -33,7 +38,9 @@
   x)
 |#
 
-(define (ramp [slope 1] [place 0])
+(define (ramp #:optional slope place)
+  (if (default-object? slope) (set! slope 1))
+  (if (default-object? place) (set! place 0))
   (define (the-ramp t)
     (* slope (- t place)))
   the-ramp)
@@ -73,7 +80,7 @@
 	 (period (- maxx minx))
 	 (height (/ *nsamples* period))
 	 (space (* height spacing))
-	 (ispace (inexact->exact (round space)))
+	 (ispace (round->exact space))
          (ns/2 (quotient *nsamples* 2)))
     (assert (= (- space ispace) 0))
     (sigfun:make (circular-interpolate
@@ -102,7 +109,7 @@
                 (let ((x (car spec)) (area (cadr spec)))
                   ;; x is in period units
                   (let ((x-in-samples
-                         (inexact->exact (round (* x samples/period-unit)))))
+                         (round->exact (* x samples/period-unit))))
                     (vector-set! stuff
                                    (+ ns/2 x-in-samples)
                                    (* area height)))))

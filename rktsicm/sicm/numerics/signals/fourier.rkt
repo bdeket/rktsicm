@@ -2,8 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../../kernel-intr.rkt"
-         "../../rkt/undefined.rkt"
+(require (only-in "../../rkt/glue.rkt" floor->exact)
+         (only-in "../../rkt/define.rkt" define default-object?)
+         "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          "dft.rkt"
          "fft.rkt"
@@ -40,7 +41,7 @@
 ;;; Today we will just specify the total number of samples.  This can
 ;;; be changed to any power of two. 
 
-(define *nsamples* undefined-value)
+(define *nsamples*)
 
 ;;; And we can specify the interval of time around zero, we are not
 ;;; allowing non-symmetric spans. (No shifts today!)
@@ -51,11 +52,11 @@
 ;;; The following global variables are assigned to help in debugging.
 ;;; They will be reassigned for each transform done.
 
-(define *time-half-width* undefined-value)
-(define *time-domain-sampling-interval* undefined-value)
+(define *time-half-width*)
+(define *time-domain-sampling-interval*)
 
-(define *frequency-half-width* undefined-value)
-(define *frequency-domain-sampling-interval* undefined-value)
+(define *frequency-half-width*)
+(define *frequency-domain-sampling-interval*)
 
 ;;; This sets the defaults to DFT standard.
 
@@ -65,9 +66,12 @@
   (set! *frequency-domain-sampling-interval* 1)
   (set! *frequency-half-width* (/ *nsamples* 2))
   (set! *time-domain-sampling-interval* (/ 1 *nsamples*))
-  (set! *time-half-width* 1/2))
+  (set! *time-half-width* 1/2)
+  'done)
   
-(set-nsamples! 1024)
+(void
+ (set-nsamples! 1024)
+ )
 
 (define (set-time-period! new)
   (set! *time-half-width* new)
@@ -76,7 +80,8 @@
   (set! *frequency-half-width*
 	(/ *nsamples* (* 4 *time-half-width*)))
   (set! *frequency-domain-sampling-interval*
-	(/ (* 2 *frequency-half-width*) *nsamples*)))
+	(/ (* 2 *frequency-half-width*) *nsamples*))
+  'done)
 
 (define (set-frequency-period! new)
   (set! *frequency-half-width* new)
@@ -85,7 +90,8 @@
   (set! *time-half-width*
 	(/ *nsamples* (* 4 *frequency-half-width*)))
   (set! *time-domain-sampling-interval*
-	(/ (* 2 *time-half-width*) *nsamples*)))
+	(/ (* 2 *time-half-width*) *nsamples*))
+  'done)
 
 (define (Fourier-transform f)
   (assert (sigfun? f))
@@ -124,7 +130,7 @@
 	 (dx (/ period nsamples)))
     (define (interpolation x)
       (let* ((xpos (/ (- x minx) dx))
-	     (ixpos (inexact->exact (floor xpos)))
+	     (ixpos (floor->exact xpos))
 	     (xoffset (- xpos ixpos))
 	     (ilo (modulo ixpos nsamples))
 	     (stuff (list-tail samples ilo))

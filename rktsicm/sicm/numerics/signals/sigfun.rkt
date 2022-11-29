@@ -2,8 +2,9 @@
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../../kernel-intr.rkt"
-         "../../rkt/default-object.rkt"
+(require (only-in "../../rkt/glue.rkt" if)
+         (only-in "../../rkt/define.rkt" define default-object?)
+         "../../kernel-intr.rkt"
          "../../general/assert.rkt"
          )
 (define-values (assign-operation sigfun:assign-operations)
@@ -37,8 +38,8 @@
 ;;; to eventually improve this system to allow non-symmetric spans,
 ;;; but right now only symmetric spans are allowed.
 
-(define (sigfun:make-span minx [maxx default-object])
-  (when (default-object? maxx)
+(define (sigfun:make-span minx #:optional maxx)
+  (if (default-object? maxx)
       (begin (set! maxx minx)
 	     (set! minx (- maxx))))
   (assert (< minx maxx))
