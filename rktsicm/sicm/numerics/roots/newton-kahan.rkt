@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../kernel-intr.rkt"
+(require (only-in "../../rkt/glue.rkt" if write-line)
+         "../../kernel-intr.rkt"
          "zeros.rkt"
          )
 
@@ -61,7 +62,7 @@
 (define (newton-kahan-search f&df x0 x1 eps) 
   (define (kahan-trick x)
     (let ((z (round (abs x))))
-      (when *kahan-wallp* (println `(kahan ,z)))
+      (if *kahan-wallp* (write-line `(kahan ,z)))
       z))
   (define (psi x) (f&df x /))
   (define (secant-improve xn psn xn-1 psn-1)

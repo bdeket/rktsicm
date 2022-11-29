@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if fix:+ write-line)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt"
          )
 
@@ -13,9 +14,8 @@
 ;;;   converge to full precision, but I have not proved it.  GJS
 
 (define (bisect-1 f x0 x1)
-  (let ((fx0 (f x0))
-        (fx1 (f x1)))
-    (when (> (* fx0 fx1) 0.0)
+  (let ((fx0 (f x0)) (fx1 (f x1)))
+    (if (> (* fx0 fx1) 0.0)
       (error "root not bounded" x0 x1 fx0 fx1))
     (let loop ((x0 x0) (fx0 fx0) (x1 x1) (fx1 fx1))
       (cond ((= fx0 0.0) x0)
@@ -154,26 +154,27 @@
 
 (define *bisect-error?* #f)
 
-(define (bisect f x0 x1 eps [n-break *bisect-break*])
-  (let loop ((x0 x0) (fx0 (f x0)) (x1 x1) (fx1 (f x1)) (iter 0))
-    (when *bisect-wallp* (println (list x0 x1)))
-    (if (= fx0 0.0) 
-        x0
-        (if (= fx1 0.0)
-            x1
-            (if (> (* fx1 fx0) 0.0)
-                (if *bisect-error?*
-                    (error "root not bounded")
-                    #f)
-                (let ((xm (if (< iter n-break) 
-                              (/ (+ x0 x1) 2.)
-                              (/ (- (* fx1 x0) (* fx0 x1)) (- fx1 fx0)))))
-                  (if (close-enuf? x0 x1 eps)
-                      xm
-                      (let ((fxm (f xm)))
-                        (if (< (* fx1 fxm) 0.0)
-                            (loop xm fxm x1 fx1 (fix:+ iter 1))
-                            (loop x0 fx0 xm fxm (fix:+ iter 1)))))))))))
+(define (bisect f x0 x1 eps #:optional n-break)
+  (let ((n-break (if (default-object? n-break) *bisect-break* n-break)))
+    (let loop ((x0 x0) (fx0 (f x0)) (x1 x1) (fx1 (f x1)) (iter 0))
+      (if *bisect-wallp* (write-line (list x0 x1)))
+      (if (= fx0 0.0) 
+          x0
+          (if (= fx1 0.0)
+              x1
+              (if (> (* fx1 fx0) 0.0)
+                  (if *bisect-error?*
+                      (error "root not bounded")
+                      #f)
+                  (let ((xm (if (< iter n-break) 
+                                (/ (+ x0 x1) 2.)
+                                (/ (- (* fx1 x0) (* fx0 x1)) (- fx1 fx0)))))
+                    (if (close-enuf? x0 x1 eps)
+                        xm
+                        (let ((fxm (f xm)))
+                          (if (< (* fx1 fxm) 0.0)
+                              (loop xm fxm x1 fx1 (fix:+ iter 1))
+                              (loop x0 fx0 xm fxm (fix:+ iter 1))))))))))))
 
 #|
 ;;; for example

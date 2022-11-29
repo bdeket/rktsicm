@@ -4,19 +4,20 @@
          guarantee-flonum-vector
          guarantee-nonnegative-fixnum
          guarantee-flonum-subvector
-         guarantee-flonum-subvector-range)
+         guarantee-flonum-subvector-range
+         flo:vector-length flo:vector-set! flo:vector-ref)
 
 (require (only-in "../../../rkt/glue.rkt" if default-object default-object? unspecific define-integrable
-                  fix:<= fix:= fix:>= fix:< fix:+ fix:- fix:fixnum? make-list)
+                  fix:<= fix:= fix:>= fix:< fix:+ fix:- fix:fixnum? flo:flonum?
+                  error:wrong-type-argument make-list)
          racket/flonum
          racket/vector
          )
 
-(module extra racket/base
+(module flo:vector racket/base
   (provide (all-defined-out))
   (require racket/sequence
            "../../../general/assert.rkt")
-  (define (error:wrong-type-argument v t p) (raise-argument-error p t v))
   (define (error:bad-range-argument r p) (raise-argument-error p "index" r '??? '??? '???))
 
   (struct flo:vector (l H) #:mutable
@@ -32,7 +33,6 @@
   (define (flo:vector-ref V i) (hash-ref (flo:vector-H V) i 0.))
   (define (flo:vector-cons n) (flo:vector n (make-hash)))
   (define (flo:vector-set! V i v) (hash-set! (flo:vector-H V) i v))
-  (define flo:flonum? flonum?)
   (define (frmargs . args)
     (define H (make-hash))
     (for ([i (in-naturals)]
@@ -43,7 +43,7 @@
   (define (in-flo:vector V)
     (sequence-map (λ (i) (hash-ref (flo:vector-H V) i 0.))
                   (in-range (flo:vector-l V)) )))
-(require 'extra)
+(require 'flo:vector)
 
 
 ;;;; Floating-Point Vector Utilities

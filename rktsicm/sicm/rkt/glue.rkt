@@ -108,3 +108,5 @@
        (syntax/loc stx
          (let* n (v* ...)
            body ...)))]))
+
+(define (error:wrong-type-argument val exp proc) (raise-argument-error proc exp val))

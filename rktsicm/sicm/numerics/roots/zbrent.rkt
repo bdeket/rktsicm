@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if fix:= fix:+)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt")
 
 ;;;; Finds roots of function f in domain from x1 to x2.
@@ -18,9 +19,11 @@
 ;;; number of iterations required.  The number of function evaluations
 ;;; is always two more than the number of iterations.
 
-(define (zbrent f x1 x2 [tol 0] [itmax 100])
+(define (zbrent f x1 x2 #:optional tol itmax)
+  (if (default-object? tol) (set! tol 0))
+  (if (default-object? itmax) (set! itmax 100))
   (let ((fa (f x1)) (fb (f x2)))
-    (when (or (and (> fa 0) (> fb 0)) (and (< fa 0) (< fb 0)))
+    (if (or (and (> fa 0) (> fb 0)) (and (< fa 0) (< fb 0)))
 	(error "Root must be bracketed in zbrent" x1 x2))
     (let lp ((iter 0) (a x1) (fa fa)
 		      (b x2) (fb fb)
