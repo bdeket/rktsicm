@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" fix:= fix:+ fix:-)
          "../../kernel-intr.rkt"
          "../../general/assert.rkt")
 
@@ -156,11 +156,11 @@
 ;;; Streams of data have running moments
 
 (define (running-mean decay stream)
-  (let loop ((sum (stream-car stream))
+  (let loop ((sum (head stream))
 	     (count 1)
-	     (stream (stream-cdr stream)))
+	     (stream (tail stream)))
     (cons-stream (/ sum count)
-		 (loop (+ (stream-car stream) (* decay sum))
+		 (loop (+ (head stream) (* decay sum))
 		       (+ 1 (* decay count))
-		       (stream-cdr stream)))))
+		       (tail stream)))))
 

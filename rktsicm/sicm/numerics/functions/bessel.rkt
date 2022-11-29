@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if fix:= fix:< fix:+ fix:-)
          "../../kernel-intr.rkt"
          )
 
@@ -189,14 +189,14 @@
 			 (let ((bjm (- (* j tox bj) bjp)))
 			   (set! bjp bj)
 			   (set! bj bjm)
-			   (when (> (magnitude bj) bigno)
+			   (if (> (magnitude bj) bigno)
 			       (begin (set! bj (* bj bigni))
 				      (set! bjp (* bjp bigni))
 				      (set! ans (* ans bigni))
 				      (set! sum (* sum bigni))))
-			   (when (odd? j)
+			   (if (odd? j)
 			       (set! sum (+ sum bj)))
-			   (when (fix:= j n)
+			   (if (fix:= j n)
 			       (set! ans bjp))
 			   (lp (fix:- j 1))))))))))))
 

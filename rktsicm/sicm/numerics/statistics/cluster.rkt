@@ -2,6 +2,8 @@
 
 (provide (all-defined-out))
 
+(require (only-in "../../rkt/glue.rkt" if))
+
 ;;;; Cluster Analysis of a set of objects with a distance measure
 
 (define (cluster objects cluster-separation distance)
@@ -17,7 +19,7 @@
                                     (multiset-difference clusters candidates)))
                     (let scan-lp-2 ((c2 (cdr c1)))
                       (let ((d (cluster-separation (car c1) (car c2))))
-                        (when (< d min-d)
+                        (if (< d min-d)
                           (begin (set! candidates (list (car c1) (car c2)))
                                  (set! min-d d)))
                         (if (null? (cdr c2))

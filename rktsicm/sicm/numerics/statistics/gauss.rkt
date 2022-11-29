@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" fix:= fix:-)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt")
 
 ;;; UNIFORM-RANDOM produces an inexact number x,    0 <= x < 1
@@ -19,9 +20,10 @@
 ;;; gaussian-distributed numbers, with zero mean and unit
 ;;; standard deviation, by the following trick:
 
-(define (gaussian-random-pair [continue cons])
+(define (gaussian-random-pair #:optional continue)
   ;; continue = (lambda (y1 y2) ...)
-  (let ((x1 (uniform-random))
+  (let ((continue (if (default-object? continue) cons continue))
+    (x1 (uniform-random))
 	(x2 (uniform-random)))
     (let ((r (sqrt (* -2.0 (log x1)))))
       (continue (* r (cos (* 2pi x2)))

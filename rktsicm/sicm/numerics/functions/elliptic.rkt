@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/fixnum.rkt"
+(require (only-in "../../rkt/glue.rkt" if fix:< fix:+)
          "../../kernel-intr.rkt"
          "../quadrature/infinities.rkt"
          )
@@ -207,7 +207,7 @@
 	    (let ((cn (/ 1. (cosh u))))
 	      (cont (tanh u) cn cn))
 	    (let ((bo (< emc 0.)))
-	      (when bo 
+	      (if bo 
 		  (begin
 		    (set! d (- 1. emc))
 		    (set! emc (- (/ emc d)))
@@ -224,7 +224,7 @@
 			  (let* ((u (* c u))
 				 (sn (sin u))
 				 (cn (cos u)))
-			    (when (not (= sn 0.)) 
+			    (if (not (= sn 0.)) 
 				(let* ((a (/ cn sn))
 				       (c (* a c)))
 				  (let loop2 ((em em) (en en))
