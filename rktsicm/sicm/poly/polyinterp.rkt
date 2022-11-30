@@ -2,9 +2,10 @@
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" if)
          "../general/assert.rkt"
-         "../simplify.rkt"
+         "../kernel-gnrc.rkt"
+         "../simplify/pcf.rkt"
          "nchebpoly.rkt"
          "../numerics/optimize/unimin.rkt"
          )
@@ -29,7 +30,7 @@
     (let* ((x (car point-list))
            (px (apply * (map (lambda (u) (- x u)) 
 			     (cdr point-list)))))
-      (when (zero? px)
+      (if (zero? px)
           (error "MAKE-INTERP-POLY: abscissas not distinct"))
           (poly:scale (roots->poly (cdr point-list)) (/ 1 px))))
   (let loop ((p poly:zero) (points xs) (values ys))

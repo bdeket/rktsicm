@@ -2,11 +2,9 @@
 
 (provide (all-defined-out))
 
-(require (only-in racket/set
-                  set-subtract)
+(require (only-in "../rkt/glue.rkt" delete-duplicates find)
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
-         "../general/sets.rkt"
          "solve.rkt")
 
 ;;;; Utilities for interpreting solver results
@@ -229,7 +227,7 @@
 	      (else result)))))
 
 (define (substitution-variable-entry var solution)
-  (findf (lambda (subst)
+  (find (lambda (subst)
 	  (equal? var (substitution-variable subst)))
 	(substitutions solution)))
 
@@ -256,7 +254,7 @@
 		  (map (lambda (sub)
 			 (let ((var (substitution-variable sub)))
 			   (minimum-length-head
-			    (remove-duplicates
+			    (delete-duplicates
 			     (sort 
 			      (map (lambda (solution)
 				     (substitution-justifications
@@ -265,7 +263,7 @@
 			      (lambda (j1 j2)
 				(< (length j1) (length j2))))))))
 		       subs))))
-	    (lp (set-subtract sols equivalents)
+	    (lp (lset-difference equal? sols equivalents)
 		(lset-union equal?
                             (map (lambda (just)
                                    (make-solution req
@@ -281,8 +279,11 @@
 
 ;;; Examples of use
 
+(define (test-solver equations unknowns)
+  (cpp (solve-equations equations unknowns)))
+
 #|
-(solve-equations
+(test-solver
  (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
        (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
  '(x y))
@@ -290,7 +291,7 @@
 (full-solutions (() () (((= x 2) (A B)) ((= y 1) (A B))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+  x   y   z  1)  (list 'A))
        (make-equation '(+  x   y      2)  (list 'B))
        (make-equation '(+  x          1)  (list 'C)))
@@ -299,7 +300,7 @@
 (full-solutions (() () (((= x -1) (C)) ((= y -1) (B C)) ((= z 1) (A B))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
        (make-equation '(+ (* 3 x)     y  -5)  (list 'B)))
  '(x y))
@@ -307,7 +308,7 @@
 (contradictions (-2 (A B) ()) (2 (B A) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(-  3 (+ x y))  (list 'A))
        (make-equation '(-  5 (- x y))  (list 'B))
        (make-equation '(-  3 (+ (* (sqrt x) z) (square y)))  (list 'C)))
@@ -316,7 +317,7 @@
 (full-solutions (() () (((= x 4) (A B)) ((= y -1) (A B)) ((= z 1) (A B C))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
        (make-equation '(- 3 (+ a b))  (list 'B)))
  '(a b c))
@@ -324,7 +325,7 @@
 (underdetermined (() (c) (((= a (* 2/3 c)) (A B)) ((= b (+ 3 (* -2/3 c))) (A B))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
        (make-equation '(- 3 (- a c))  (list 'B)))
  '(a b c))
@@ -332,7 +333,7 @@
 (underdetermined (() (c) (((= a (+ 3 c)) (B)) ((= b (+ -3 (* -4/3 c))) (A B))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
        (make-equation '(- 3 (- a b))  (list 'B)))
  '(a b c))
@@ -350,7 +351,7 @@
   ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (* (- x (* 2 y)) (expt z 2)) (* 2 z) 1) (list 'C))
        (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
        (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
@@ -359,7 +360,7 @@
 (full-solutions (() () (((= x 2) (A B)) ((= y 1) (A B)) ((= z -1/2) (A B C))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(- 200/3 (/ 1 (+ (/ 1 R1) (/ 1 R2))))  (list 'A))
        (make-equation '(-  1/3 (/ R2 (+ R1 R2)))  (list 'B)))
  '(R1 R2))
@@ -377,7 +378,7 @@
   ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(- (* 1/3 (+ R1 R2)) R2)  (list 'B))
        (make-equation '(- (* 200/3 (+ R1 R2)) (* R1 R2))  (list 'A)))
  '(R1 R2))
@@ -426,7 +427,7 @@
 |#
 
 ;;;***
-(solve-equations
+(test-solver
  (list (make-equation '(- (expt x 2) 1)  (list 'A))
        (make-equation '(- x 1)  (list 'B)))
  '(x))
@@ -434,7 +435,7 @@
 (full-solutions (() () (((= x 1) (B))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(- (expt x 2) 1)  (list 'A))
        (make-equation '(- x -1)  (list 'B)))
  '(x))
@@ -442,7 +443,7 @@
 (full-solutions (() () (((= x -1) (B))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
        (make-equation '(- (expt y 2) 9) (list 'B))
        (make-equation '(- (- y x) 1) (list 'C)))
@@ -456,7 +457,7 @@
   ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
        (make-equation '(- (expt y 2) 9) (list 'B))
        (make-equation '(- (- y x) 2) (list 'C)))
@@ -549,7 +550,7 @@
  (16 (B C A (hypothetical (+ quadratic 1 -5 6))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
        (make-equation '(- (expt y 2) z) (list 'B))
        (make-equation '(- (- y x) 2) (list 'C)))
@@ -591,7 +592,7 @@
   ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
        (make-equation '(- (expt y 2) z) (list 'B))
        (make-equation '(- (- y x) 2) (list 'C)))
@@ -648,7 +649,7 @@
   ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A)))
  '(x))
 #|
@@ -657,7 +658,7 @@
  (() () (((= x 3) (A (hypothetical (+ quadratic 1 -5 6))))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
        (make-equation '(+ (expt x 2) (* -7 x) 10)  (list 'B)))
  '(x))
@@ -667,7 +668,7 @@
  (() () (((= x 2) (B (hypothetical (- quadratic 1 -7 10))))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
        (make-equation '(+ (expt x 2) (* a x) 10)  (list 'B)))
  '(a x))
@@ -685,21 +686,21 @@
   ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(- 2 (sqrt (+ x 1)))  (list 'A)))
  '(x))
 #|
 (full-solutions (() () (((= x 3) (A))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(- 2 (acos (sqrt (+ x 1))))  (list 'A)))
  '(x))
 #|
 (full-solutions (() () (((= x (* -1 (expt (sin 2) 2))) (A))) ()))
 |#
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ 1 x (square x))  (list 'A)))
  '(x))
 #|
@@ -717,7 +718,7 @@
 |#
 
 
-(solve-equations
+(test-solver
  (list (make-equation '(+ 1 x (square x))  (list 'A))
        (make-equation '(+ (square y) 3) (list 'B))
        (make-equation '(- (* 2 x) (-  y 1)) (list 'C)))

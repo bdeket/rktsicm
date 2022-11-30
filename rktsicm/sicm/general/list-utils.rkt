@@ -133,7 +133,7 @@
   (let lp ([s1 s1])
     (cond
       [(null? s1) s1]
-      [(member (car s1) s2 comp?) ]
+      [(member (car s1) s2 comp?) (lp (cdr s1))]
       [else (cons (car s1) (lp (cdr s1)))])))
 
 (define (lset-intersection comp? s1 s2)

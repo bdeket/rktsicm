@@ -11,12 +11,12 @@
          racket/stxparam
          (submod racket/performance-hint begin-encourage-inline))
 
-(define-syntax-parameter default-object?
+#;(define-syntax-parameter default-object?
   (λ (stx) (raise-syntax-error 'default-object?
                                "only valid within lambda with #:optional "
                                stx)))
-
 (define the-default-object (gensym 'default))
+(define (default-object? x) (eq? the-default-object x))
 
 (define-syntax (mylambda stx)
   (syntax-parse stx
@@ -24,9 +24,10 @@
      (with-syntax ([(oargs ...) (syntax->list #'(rst ...))])
        (quasisyntax/loc stx
          (lambda (margs ... [oargs the-default-object] ... . e)
-           (syntax-parameterize ([default-object? (syntax-rules ()
+           #;(syntax-parameterize ([default-object? (syntax-rules ()
                                                     [(_ a) (eq? the-default-object a)])])
-             body ...))))]
+             body ...)
+           body ...)))]
     [(_ (margs ... . e) body ...)
      (let ()
        (when (member '#:optional (syntax->datum #'(margs ...)))
@@ -82,4 +83,8 @@
         'ok
         'nok))
   (check-equal? (a) 'ok)
+
+  (mydefine (a2 #:optional b) (c2 b))
+  (mydefine (c2 b) (if (default-object? b) 'ok 'nok))
+  (check-equal? (a2) 'ok)
   )

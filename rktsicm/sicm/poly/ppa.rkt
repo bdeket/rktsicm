@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "../simplify.rkt"
+(require "../simplify/pcf.rkt"
          "hermite.rkt"
          "nchebpoly.rkt"
          "polyinterp.rkt"

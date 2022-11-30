@@ -2,11 +2,11 @@
 
 (provide (all-defined-out))
 
-(require racket/syntax
+(require (only-in "../rkt/glue.rkt" if any every delete find hash-table-ref/default hash-table-set!
+                  iota symbol generate-uninterned-symbol)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../kernel-intr.rkt"
          "../simplify.rkt"
-         "../rkt/default-object.rkt"
-         "../rkt/undefined.rkt"
          "../general/list-utils.rkt"
          "../general/sets.rkt"
          "../general/assert.rkt"
@@ -83,90 +83,95 @@ The general strategy is:
 (define (tough-equations solution) (cadddr solution))
 
 
-(define *outstanding-contradictions* (make-parameter undefined-value))
+(define *outstanding-contradictions* (make-parameter (gensym 'undefined)))
 
-(define (solve-incremental equations variables
-                           [succeed (λ (r f) r)]
-                           [fail default-object])
+(define (solve-incremental equations variables #:optional succeed fail)
   (define *solver-state* #f)
+  (define (default-succeed result fail)
+    result)
   (define (default-fail)
     (if (null? (*outstanding-contradictions*))
         `(failed ,@*solver-state*)
         `(contradictions ,@(*outstanding-contradictions*))))
+  (if (default-object? fail) (set! fail default-fail))
+  (if (default-object? succeed) (set! succeed default-succeed))
   (*outstanding-contradictions* '())
 
-  (let lp ([residual-eqs  equations]
-	   [residual-vars variables]
-	   [substitutions '()]
-	   [tough-eqns    '()]
-	   [progress      #f]
-	   [fail          (if (default-object? fail) default-fail fail)])
+  (let lp ((residual-eqs equations)
+	   (residual-vars     variables)
+	   (substitutions     '())
+	   (tough-eqns '())
+	   (progress #f)
+	   (fail fail))
   
     (define (current-solution)
-      (let ([solver-state (make-solution
-                           residual-eqs residual-vars substitutions tough-eqns)])
+      (let ((solver-state
+             (make-solution
+              residual-eqs residual-vars substitutions tough-eqns)))
         (set! *solver-state* solver-state)
         solver-state))
 
     (define (win)
       (succeed (current-solution) fail))
 
-    (cond
-      [(null? residual-vars)
-       (cond
-         [(correct-substitutions? equations substitutions)
-          (win)]
-         [(and (not (ormap contradictory-equation? residual-eqs))
-               (not (ormap contradictory-equation? tough-eqns)))
-          (win)]
-         [else (fail)])]
-      [(null? residual-eqs)
-       (cond
-         [(null? tough-eqns)
-           (if (correct-substitutions? equations substitutions)
-               (win)
-               (fail))]
-         [progress
-          (lp tough-eqns
-              residual-vars
-              substitutions
-              '()
-              #f fail)]
-         [else (fail)])]
-      [else
-       (let* ([eqs (sort residual-eqs less-difficult?)]
-              [eqn (car eqs)]
-              [vars (lset-intersection equal? residual-vars (equation-variables eqn))])
-         (if (null? vars)       ; contradiction!
-             (contradiction-failure (list eqn) fail)
-             (let ([var (car (sort vars (lower-order? eqn)))])
-               (isolate-var var eqn
-                            ;;succeed
-                            (lambda (new-substitution fail)	
-                              (use-new-substitution
-                               new-substitution
-                               (remove* (list eqn) residual-eqs)
-                               substitutions
-                               tough-eqns
-                               (lambda (new-residuals
-                                        new-substitutions
-                                        new-tough
-                                        fail)
-                                 (lp new-residuals
-                                     (remove* (list var) residual-vars)
-                                     new-substitutions
-                                     new-tough
-                                     #t fail))
-                               fail))
-                            (lambda ()     ; eqn too hard now
-                              (lp (remove* (list eqn) residual-eqs)
-                                  residual-vars
-                                  substitutions
-                                  (cons eqn tough-eqns)
-                                  progress fail))))))])))
+;;; Continued on next page
+
+;;; Continued
+
+    (cond ((null? residual-vars)
+           (cond ((correct-substitutions? equations substitutions)
+                  (win))
+                 ((and (not (any contradictory-equation? residual-eqs))
+                       (not (any contradictory-equation? tough-eqns)))
+                  (win))
+                 (else (fail))))
+          ((null? residual-eqs)
+           (cond ((null? tough-eqns)
+                  (if (correct-substitutions? equations substitutions)
+                      (win)
+                      (fail)))
+                 (progress
+                  (lp (append residual-eqs tough-eqns)
+                      residual-vars
+                      substitutions
+                      '()
+                      #f fail))
+                 (else (fail))))
+          (else
+           (let ((eqs (sort residual-eqs less-difficult?)))
+             (let ((eqn (car eqs)))
+                   (let ((vars
+                          (lset-intersection equal?
+                                             residual-vars (equation-variables eqn))))
+                     (if (null? vars)       ; contradiction!
+                         (contradiction-failure (list eqn) fail)
+                         (let ((var (car (sort vars (lower-order? eqn)))))
+                           (isolate-var var eqn
+                                        (lambda (new-substitution fail)	
+                                          (use-new-substitution
+                                           new-substitution
+                                           (delete eqn residual-eqs)
+                                           substitutions
+                                           tough-eqns
+                                           (lambda (new-residuals
+                                                    new-substitutions
+                                                    new-tough
+                                                    fail)
+                                             (lp new-residuals
+                                                 (delete var residual-vars)
+                                                 new-substitutions
+                                                 new-tough
+                                                 #t fail))
+                                           fail))
+                                        (lambda ()     ; eqn too hard now
+                                          (lp (delete eqn residual-eqs)
+                                              residual-vars
+                                              substitutions
+                                              (cons eqn tough-eqns)
+                                              progress fail))))))))))))
 
 (define (correct-substitutions? equations substitutions)
-  (andmap (lambda (equation)
+  (every (lambda (equation)
            (let ((expr
                   (equation-expression
                    (apply-substitutions-to-equation equation
@@ -225,7 +230,7 @@ The general strategy is:
                  old-substitutions))))
 
 (define (allowed-substitution? substitution-justs template-justs)
-  (not (ormap (lambda (premise)
+  (not (any (lambda (premise)
                 (and (root-premise? premise)
                      (member (root-premise-opposite premise)
                              template-justs)))
@@ -234,14 +239,13 @@ The general strategy is:
 (define (isolate-var var eqn succeed fail)
   ;; succeed = (lambda (new-substitution fail) ...)
   ;; fail    = (lambda () ...)
-  (isolatable? var
-               (equation-expression eqn)
+  (isolatable? var (equation-expression eqn)
                (lambda (value fail . root-premises)
                  ;; If there are multiple roots, we get root premises supporting
                  ;; the choice of root.  Seq quadratic-formula, below.
                  (let ((justs (equation-justifications eqn)))
                    ;;(pp `(isolate ,eqn ,value ,root-premises ,justs))
-                   (if (ormap (lambda (root-premise)
+                   (if (any (lambda (root-premise)
                                 (member (root-premise-opposite root-premise)
                                         justs))
                               root-premises)
@@ -323,7 +327,7 @@ The general strategy is:
 		         (lambda (kvar-value fail)
                            (let* ((kargval ((kernel-invert opspec) kvar-value))
                                   (to-solve (s:simplify (symb:- karg kargval))))
-                             (if (ormap (lambda (kernel) (occurs? kernel karg)) kernels)
+                             (if (any (lambda (kernel) (occurs? kernel karg)) kernels)
                                  (kernel-subproblem var to-solve kernel-map succeed fail)
                                  (isolatable? var to-solve succeed fail))))
                          fail))
@@ -384,9 +388,9 @@ The general strategy is:
                        (assimilate-expt t 1))
                       ((product? t)
                        (let ((f
-                              (findf (lambda (factor) (occurs? var factor))
+                              (find (lambda (factor) (occurs? var factor))
                                     (operands t))))
-                         (let ((others (remove* (list f) t)))
+                         (let ((others (delete f t)))
                            (cond ((equal? var f)
                                   (lp (cdr terms)
                                       const
@@ -447,9 +451,9 @@ The general strategy is:
                         (make-hypothetical premise-name #f))))
 
 (define (hash-table-intern! table key get-value)
-  (or (hash-ref table key #f)
+  (or (hash-table-ref/default table key #f)
       (let ((value (get-value)))
-        (hash-set! table key value)
+        (hash-table-set! table key value)
         value)))
 
 (define (root-premise? thing)
@@ -546,7 +550,7 @@ The general strategy is:
 	(lset-union equal? (equation-justifications equation) justs)))))
 
 (define (make-substitution var value justs)
-  (when (ormap (lambda (just)
+  (if (any (lambda (just)
                  (and (root-premise? just)
                       (member (root-premise-opposite just)
                               justs)))
@@ -563,7 +567,7 @@ The general strategy is:
   (let* ((specs (standardize-equation expr '() '() #f))
 	 (pexpr (car specs))
 	 (vspecs (cadr specs)))
-    (when (ormap (lambda (just)
+    (if (any (lambda (just)
                    (and (root-premise? just)
                         (member (root-premise-opposite just)
                                 justs)))
@@ -653,6 +657,10 @@ The general strategy is:
   (and (pair? x)
        (eq? (car x) 'D)))
 
+(define (D2? x)
+  (and (pair? x) 
+       (equal? (car x) '(expt D 2))))
+
 (define (Dn? x)
   (and (pair? x) 
        (expt? (car x))
@@ -688,11 +696,10 @@ The general strategy is:
  (((expt D 2) g) g (D f) f))
 |#
 
-(define (standardize-equation residual variables functions variable)
+(define (standardize-equation residual variables functions variable #:optional continue)
   ;; returns list = (new-residual new-map functions)
-  (define redo #f)
-  
-  (define (walk-expression expression map functions continue)
+  (let ((redo #f))	; True if an inexact number becomes exact
+    (define (walk-expression expression map functions continue)
     (cond ((pair? expression)
            (let ((rator (operator expression))
                  (rands (operands expression)))
@@ -723,7 +730,6 @@ The general strategy is:
            (continue expression map functions))
           (else
            (continue expression (list-adjoin expression map) functions))))
-    
   (define (walk-list elist map functions continue)
     (if (pair? elist)
         (walk-expression (car elist) map functions
@@ -734,8 +740,7 @@ The general strategy is:
                                                   cdr-map
                                                   cdr-functions)))))
         (continue elist map functions)))
-    
-  (let lp ([residual (s:simplify residual)])
+  (let lp ((residual (s:simplify residual)))
     (walk-expression (if (quotient? residual)
                          (symb:dividend residual)
                          residual)
@@ -745,7 +750,10 @@ The general strategy is:
                        (if redo
                            (begin (set! redo #f)
                                   (lp (s:simplify expression)))
-                           (list expression map funs))))))
+                           ((if (default-object? continue)
+                                  list
+                                  continue)
+                              expression map funs)))))))
 
 #|
 ;;; Signs of life.  
@@ -1377,12 +1385,12 @@ done
 ;;; given a structure of residuals that should be zero.
 
 
-(define (simple-solve struct unknowns [knowns default-object] [show-eqns? default-object])
+(define (simple-solve struct unknowns #:optional knowns show-eqns?)
   (define (make-equations resids)
     (map (lambda (e n)
-	   (make-equation e (list (format-symbol "eq:~a" n))))
+	   (make-equation e (list (symbol 'eq: n))))
 	 resids
-	 (build-list (length resids) values)))
+	 (iota (length resids))))
   (define (make-substitutions news olds expression)
     (assert (= (length news) (length olds)))
     (let lp ((n news) (o olds) (expression expression))
@@ -1398,13 +1406,13 @@ done
 	  (map (lambda (unk)
 		 (if (symbol? unk)
 		     unk
-		     (gensym 'x)))
+		     (generate-uninterned-symbol 'x)))
 	       unknowns))
 	 (internal-knowns
 	  (map (lambda (kn)
 		 (if (symbol? kn)
 		     kn
-		     (gensym 'k)))
+		     (generate-uninterned-symbol 'k)))
 	       knowns))
 	 (eqns
 	  (flush-tautologies
@@ -1418,7 +1426,7 @@ done
 	  (make-substitutions knowns internal-knowns
 	    (make-substitutions unknowns internal-unknowns 
 	      (solve-incremental eqns internal-unknowns)))))
-    (when (not (or (default-object? show-eqns?)
+    (if (not (or (default-object? show-eqns?)
                    (not show-eqns?)))
       (println eqns))
     #| ;;; Check solver for wrong solutions.

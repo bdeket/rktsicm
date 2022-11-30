@@ -2,63 +2,52 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-intr.rkt"
+(require (only-in "../rkt/glue.rkt" if random for-all? write-line false
+                  fix:= fix:< fix:+)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
-         "../simplify.rkt"
+         "../kernel-intr.rkt"
+         "../simplify/pcf.rkt"
          "../numerics/statistics/cluster.rkt"
          )
-
-;;; General Polynomial Root Finder
 
 ;; (needs "../numerical/cluster")
 ;; (to-initialize "poly-env")
 
-(define leading-coefficient poly:leading-coefficient)
-(define lowest-order poly:lowest-order)
-(define trailing-coefficient poly:trailing-coefficient)
-(define identity-poly poly:identity)
-
-(define horners-rule-with-error poly:horners-rule-with-error)
+;;; General Polynomial Root Finder
 
 (define (complex-random modulus)
-  (make-polar modulus (* (random) :2pi)))
+  (make-polar modulus (random :2pi)))
 
 
-;;get the value of p at x, and the error estimate, by Horners rule
+;;; Gets the value of p at x, and the error estimate, by Horners rule
+;;; defined in pcf.scm.
 
 (define (horners-rule p x)
-  (horners-rule-with-error p x list))
+  (poly:horners-rule-with-error p x list))
 
 (define (roots->poly roots)
+  ;;bdk;; reduce needs tree arguments... maybe a-reduce?
   (a-reduce poly:*
-	    (map (lambda (r) (poly:- identity-poly r))
+	    (map (lambda (r) (poly:- poly:identity r))
 		 roots)))
 
 ;;; This finds the roots of a univariate polynomial.
 
-(define (poly->roots given-poly [expand-multiplicities? #t])
+(define (poly->roots given-poly #:optional expand-multiplicities?)
   (let* ((given-poly (ensure-real given-poly))
 	 (all-real?
-	  (andmap (lambda (c) (zero? (imag-part c)))
-                  (poly/coefficients given-poly))))
+	  (for-all? (poly/coefficients given-poly)
+                    (lambda (c) (zero? (imag-part c))))))
     (define (search kernel-poly initial-roots)
       (let ((polish (root-polisher kernel-poly)))
 	(let find-loop ((deflated-poly kernel-poly) (roots initial-roots))
-	  (when root-wallp (println (list 'finder-loop deflated-poly roots)))
+	  (if root-wallp
+              (write-line (list 'finder-loop deflated-poly roots)))
 	  (if (fix:< (poly:degree deflated-poly) 1)
-	      (if (not (fix:= (length roots) (poly:degree given-poly)))
-		  (begin (error "Root finder failed" given-poly) 'foo)
-		  (let ((rs
-			 (sort (identify-multiple-roots roots)
-			       (lambda (r1 r2)
-				 (let ((mr1 (magnitude (cdr r1)))
-				       (mr2 (magnitude (cdr r2))))
-				   (or (< mr1 mr2)
-				       (and (= mr1 mr2)
-					    (< (real-part (cdr r1))
-					       (real-part (cdr r2))))))))))
-		    (if expand-multiplicities? (expand-multiplicities rs) rs)))
+	      (if (not (fix:= (length roots) (poly:degree kernel-poly)))
+		  (begin (error "Root finder failed" kernel-poly) 'foo)
+                  roots)
 	      (let ((root
 		     (clean-up-root
 		      (polish
@@ -66,19 +55,40 @@
 		(if (and all-real? (obviously-complex? root))
 		    (let ((cr (conjugate root)))
 		      (find-loop (ensure-real
-				  (deflate-poly deflated-poly (list root cr)))
+				  (deflate-poly deflated-poly
+                                    (list root cr)))
 				 (cons root (cons cr roots))))
 		    (find-loop (deflate-poly deflated-poly (list root))
 			       (cons root roots))))))))
     (let ((n (poly:degree given-poly))
-	  (m (lowest-order given-poly)))
+	  (m (poly:lowest-order given-poly)))
       (cond ((fix:< n 1) '())
 	    ((fix:= m 0)
-	     (search given-poly '()))
+	     (cluster-multiple-roots (search given-poly '())
+                                     expand-multiplicities?))
 	    (else	;factors of the indeterminate to be removed.
-	     (let ((zero-roots (make-list m 0.0)))
-	       (search (deflate-poly given-poly zero-roots)
-		       zero-roots)))))))
+	     (let ((zero-roots (make-list m 0)))
+	       (cluster-multiple-roots
+                (append zero-roots
+                        (search (deflate-poly given-poly zero-roots)
+                                '()))
+                expand-multiplicities?)))))))
+
+(define (cluster-multiple-roots roots expand-multiplicities?)
+    (if (default-object? expand-multiplicities?)
+      (set! expand-multiplicities? #t))
+    (let ((rs
+         (sort (identify-multiple-roots roots)
+               (lambda (r1 r2)
+                 (let ((mr1 (magnitude (cdr r1)))
+                       (mr2 (magnitude (cdr r2))))
+                   (or (< mr1 mr2)
+                       (and (= mr1 mr2)
+                            (< (real-part (cdr r1))
+                               (real-part (cdr r2))))))))))
+    (if expand-multiplicities?
+        (expand-multiplicities rs)
+        rs)))
 
 (define (ensure-real poly)
   (let lp ((poly poly))
@@ -91,24 +101,11 @@
 
 (define (bring-to-real c)
   (if (< (abs (imag-part c))
-	 (* imaginary-part-tolerance *machine-epsilon* (abs (real-part c))))
+	 (* imaginary-part-tolerance
+            *machine-epsilon*
+            (abs (real-part c))))
       (real-part c)
       c))
-
-(define (rescale-poly-roots poly searcher)
-  (let ((Nn (poly:degree poly))
-	(N0 (lowest-order poly)))
-    (if (fix:= Nn N0)
-	0
-	(let ((An (leading-coefficient poly))
-	      (A0 (trailing-coefficient poly)))
-	  (let ((k (/ A0 An)))
-	    (let ((c (expt k (/ 1.0 (- Nn N0)))))
-	      (if (< (/ 1.0 max-scale) (magnitude k) max-scale)
-		  (searcher poly)
-		  (* (searcher (poly:* (poly:arg-scale poly (list c))
-				       (/ 1.0 (* A0 (expt c N0)))))
-		     c))))))))
 
 ;;; Heuristic test
 
@@ -118,7 +115,6 @@
 	   (> (abs (imag-part root))
 	      (* (abs (real-part root))
 		 obviousity-factor)))))
-
 
 ;;; The following gets rid of microscopic imaginary parts or real
 ;;; parts that may arise from roundoff errors.
@@ -138,6 +134,21 @@
 		     (else
 		      (make-rectangular rr ri)))))))))
 
+(define (rescale-poly-roots poly searcher)
+  (let ((Nn (poly:degree poly))
+	(N0 (poly:lowest-order poly)))
+    (if (fix:= Nn N0)
+	0
+	(let ((An (poly:leading-coefficient poly))
+	      (A0 (poly:trailing-coefficient poly)))
+	  (let ((k (/ A0 An)))
+	    (let ((c (expt k (/ 1.0 (- Nn N0)))))
+	      (if (< (/ 1.0 max-scale) (magnitude k) max-scale)
+		  (searcher poly)
+		  (* (searcher (poly:* (poly:arg-scale poly (list c))
+				       (/ 1.0 (* A0 (expt c N0)))))
+		     c))))))))
+
 ;;; Deflation
 
 (define (deflate-poly p roots)
@@ -145,7 +156,7 @@
 	       (roots->poly roots)
 	       (lambda (q r)
 		 ;; We will test r for approximate zero to be sure
-		 (when root-wallp (println (list q r)))
+		 (if root-wallp (write-line (list q r)))
 		 q)))
 
 ;;; Clustering roots of polynomials to determine multiplicities can
@@ -159,10 +170,9 @@
 	    (list (cons 1 (car (cluster-elements cl))))
 	    (let ((mid (/ (apply + (cluster-elements cl)) n)))
 	      (if (< (cluster-diameter cl)
-		     (expt (magnitude
-			    (* cluster-tolerance
-			       (+ 1.0 mid)
-			       *machine-epsilon*))
+		     (expt (* cluster-tolerance
+			       (+ 1.0 (magnitude mid))
+			       *machine-epsilon*)
 			   (/ 1.0 n)))
 		  (list (cons n (clean-up-root mid)))
 		  (append (mult-scan (car (cluster-subclusters cl)))
@@ -173,8 +183,6 @@
       (cond ((null? roots) '())
 	    (clustering (mult-scan (car (cluster roots sd d))))
 	    (else (map (lambda (r) (cons 1 r)) roots))))))
-
-
 
 ;;; To undo this damage:
 
@@ -192,93 +200,104 @@
       (let* ((xn (bring-to-real xn))
 	     (vxn/err (horners-rule p xn))
 	     (dx (- xn xn-1)))
-	(let ((vxn (car vxn/err)) (dvxn (cadr vxn/err)) (err (cadddr vxn/err)))
-	  (when root-wallp (println `(trying ,xn ,vxn ,err)))
-	  (cond ((< (magnitude vxn)
+	(let ((vxn (car vxn/err))
+              (dvxn (cadr vxn/err))
+              (err (cadddr vxn/err))
+              (iter-count (fix:+ iter-count 1)))
+	  (if root-wallp (write-line `(trying ,xn ,vxn ,err)))
+	  (cond ((> iter-count root-searcher-max-iter)
+                 #f)                    ;failed
+                ((< (magnitude vxn)
 		    (* root-searcher-value-to-noise (magnitude err)))
-		 (when root-wallp (println `(found-winner-at ,xn ,vxn ,err)))
+		 (if root-wallp
+                     (write-line `(found-winner-at ,xn ,vxn ,err)))
 		 xn)			;good enuf.
-		((<= (magnitude vxn-1) (magnitude vxn)) ;losing
-		 (cond ((< shrink-count root-searcher-max-shrink)
-			;; Cuthbert's hack -- fatal with Laguerre method!
-			;;  try x^40 + 1 = 0
-			(try (+ xn-1 (/ dx root-searcher-shrink-factor))
-			     xn-1 vxn-1 dvxn-1 
-			     iter-count (fix:+ shrink-count 1)))
-		       ((< iter-count root-searcher-max-iter)
-			;; Try a desparate root-searcher-jiggle
-			(try (+ xn-1
-				(complex-random
-				 (* iter-count (magnitude xn-1)
-				    root-searcher-jiggle)))
-			     xn-1 vxn-1 dvxn-1 (+ iter-count 1) 0))
-		       (else
-			(error "Cannot make progress" p xn vxn)
-			'foo)))
 		((< (magnitude dx)
 		    (* root-searcher-minimum-progress *machine-epsilon*
 		       (magnitude xn)))
-		 (when root-wallp
-		     (println `(found-lazy-winner-at ,xn ,vxn ,err)))
+		 (if root-wallp
+		     (write-line `(found-lazy-winner-at ,xn ,vxn ,err)))
 		 xn)
 		((and (not (< (magnitude dvxn-1) minimum-denominator))
 		      (not (< (magnitude dvxn) minimum-denominator))
-		      (let* ((f (/ vxn dvxn))
-			     (d (- f (/ vxn-1 dvxn-1))))
-			(and (not (< (magnitude d) minimum-denominator))
-			     (let* ((q (magnitude (/ (- xn xn-1) d)))
-				    (iq (round q)))
-			       (and (> iq 1)
-				    (< (abs (- q iq)) (* *kahan-threshold* q))
-				    (begin
-				      (when root-wallp
-					  (println `(trying-kahan-trick ,iq)))
-				      (try (- xn (* f iq))
-					   xn vxn dvxn
-					   (fix:+ iter-count 1) 0))))))))
+                      (kahan-secant-method xn xn-1 vxn vxn-1 dvxn dvxn-1
+                                           try iter-count)))
+		((and (<= (magnitude vxn) (magnitude vxn-1))
+                      (improve xn vxn/err
+			       (lambda (xn+1)
+			         (try xn+1 xn vxn dvxn iter-count 0))
+			       (lambda ()
+			         (if root-wallp
+				     (write-line
+                                      `(zero-divide-at ,xn in searcher)))
+			         xn))))
+                (else
+                 (wrong-way xn xn-1 vxn-1 dvxn-1
+                            try iter-count shrink-count))))))
+    (or (start-search p root-searcher-x0 try improve)
+        (error "Search failed" p))))
 
-		((< iter-count root-searcher-max-iter)
-		 (improve xn vxn/err
-			  (lambda (xn+1)
-			    (try xn+1 xn vxn dvxn (fix:+ iter-count 1) 0))
-			  (lambda ()
-			    ; (error "zero-divide failure")
-			    (when root-wallp
-				(println `(zero-divide-at ,xn in searcher)))
-			    xn)))
-		(else
-		 (error "Search exceeded max iterations"
-			p xn vxn)
-		 'foo)))))
-    (let ((vx0/err (horners-rule p root-searcher-x0)))
-      (when root-wallp (println `(hunting-starting-at ,root-searcher-x0 ,p)))
-      (let ((vx0 (car vx0/err)) (dvx0 (cadr vx0/err)) (err0 (cadddr vx0/err)))
+(define (start-search p initial-x0 try improve)
+  (let ((vx0/err (horners-rule p initial-x0)))
+      (if root-wallp
+          (write-line `(hunting-starting-at ,initial-x0 ,p)))
+      (let ((vx0 (car vx0/err))
+            (dvx0 (cadr vx0/err))
+            (err0 (cadddr vx0/err)))
 	(if (< (magnitude vx0)
 	       (* root-searcher-value-to-noise (magnitude err0)))
 	    (begin
-	      (when root-wallp
-		  (println
-		   `(won-immediately-at ,root-searcher-x0 ,vx0 ,err0)))
-	      root-searcher-x0)	;good enuf.
-	    (improve root-searcher-x0 vx0/err
+	      (if root-wallp
+		  (write-line
+		   `(won-immediately-at ,initial-x0 ,vx0 ,err0)))
+	      initial-x0)	;good enuf.
+	    (improve initial-x0 vx0/err
 		     (lambda (x1)
-		       (try x1 root-searcher-x0 vx0 dvx0 1 0))
+                       (try x1 initial-x0 vx0 dvx0 1 0))
 		     (lambda ()
-		       ; (error "zero-divide failure")
-		       (when root-wallp
-			   (println
-			    `(zero-divide-at ,root-searcher-x0
+		       (if root-wallp
+			   (write-line
+			    `(zero-divide-at ,initial-x0
 					     in startup of searcher)))
-		       root-searcher-x0)))))))
+		       initial-x0))))))
+
+(define (kahan-secant-method xn xn-1 vxn vxn-1 dvxn dvxn-1 try iter-count)
+  (let* ((f (/ vxn dvxn))
+         (d (- f (/ vxn-1 dvxn-1))))
+    (and (not (< (magnitude d) minimum-denominator))
+         (let* ((q (magnitude (/ (- xn xn-1) d)))
+                (iq (round q)))
+           (and (> iq 1)
+                (< (abs (- q iq)) (* *kahan-threshold* q))
+                (begin (if root-wallp
+                           (write-line
+                            `(trying-kahan-trick ,iq)))
+                       (try (- xn (* f iq))
+                            xn vxn dvxn iter-count 0)))))))
+
+(define (wrong-way xn xn-1 vxn-1 dvxn-1 try iter-count shrink-count)
+  (cond ((< shrink-count root-searcher-max-shrink)
+         ;; Cuthbert's hack -- fatal with Laguerre method!
+         ;;  try x^40 + 1 = 0
+	 (try (+ xn-1 (/ (- xn xn-1) root-searcher-shrink-factor))
+	      xn-1 vxn-1 dvxn-1 
+	      iter-count (fix:+ shrink-count 1)))
+	(else
+         ;; Try a desparate root-searcher-jiggle
+	 (try (+ xn-1
+		 (complex-random
+		  (* iter-count (magnitude xn-1)
+		     root-searcher-jiggle)))
+	      xn-1 vxn-1 dvxn-1 iter-count 0))))
 
 (define (root-polisher p)
   (let ((improve (root-polisher-method p)))
     (define (try x vp-err)
       (let ((vp (car vp-err)) (vperr (cadddr vp-err)))
-	(when root-wallp (println `(polishing root ,x ,vp ,vperr)))
+	(if root-wallp (write-line `(polishing root ,x ,vp ,vperr)))
 	(if (< (magnitude vp)		;x is good enough
 	       (* root-polisher-value-to-noise (magnitude vperr)))
-	    (begin (when root-wallp (println `(win-at ,x)))
+	    (begin (if root-wallp (write-line `(win-at ,x)))
 		   x)
 	    (improve x vp-err
 		     (lambda (nx)
@@ -287,21 +306,21 @@
 				 *machine-epsilon*
 				 (+ (magnitude x) 1.0)))
 			   (begin
-			     (when root-wallp
-				 (println `(good-enuf-at ,nx)))
+			     (if root-wallp
+				 (write-line `(good-enuf-at ,nx)))
 			     nx)
 			   (let* ((nvp-err (horners-rule p nx))
 				  (nvp (car nvp-err)))
 			     (if (< (magnitude nvp) (magnitude vp))
 				 (try nx nvp-err)
 				 (begin
-				   (when root-wallp
-				       (println `(got-worse-at ,nx)))
+				   (if root-wallp
+				       (write-line `(got-worse-at ,nx)))
 				   x)))))
 		     (lambda ()
 		       ; (error "zero-divide failure")
-		       (when root-wallp
-			   (println `(zero-divide-at ,x in polisher)))
+		       (if root-wallp
+			   (write-line `(zero-divide-at ,x in polisher)))
 		       x)))))
     (lambda (x) (try x (horners-rule p x)))))
 
@@ -340,28 +359,16 @@
 			      gplus
 			      gminus)))
 	      (succeed (- x
-			  (if (< (magnitude denom) (* n minimum-denominator))
-			      (expt (magnitude (/ vp (leading-coefficient p)))
+			  (if (< (magnitude denom)
+                                 (* n minimum-denominator))
+			      (expt (magnitude
+                                     (/ vp
+                                        (poly:leading-coefficient p)))
 				    (/ 1.0 n))
 			      (/ n denom))))))))
     laguerre-improve))
 
-#|
-;;; Kahan's secant method -- this is not in the right form.
-;;;  But see the searcher.
-
-(define (kahan-method p)
-  (let ((dp (derivative p)))
-    (let ((psi (lambda (x vx) (/ vx (dp x)))))
-      (lambda (xn vxn xn-1 vxn-1)
-	(let ((f (psi xn vxn)))
-	  (- xn
-	     (* f
-		(round (magnitude (/ (- xn xn-1)
-				     (- f (psi xn-1 vxn-1))))))))))))
-|#
-
-(define root-wallp #f)
+(define root-wallp false)
 
 (define minimum-magnitude 1e-10)
 (define obviousity-factor 1e-3)

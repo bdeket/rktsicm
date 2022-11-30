@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require "../kernel-gnrc.rkt"
-         "../simplify.rkt"
+         "../simplify/pcf.rkt"
          )
 
 ;;; LEGENDRE.SCM -- the Legendre Polynomials returned as a stream or singly
@@ -25,7 +25,7 @@
 			    (b (/ (- n 1) n)))
 		       (poly:- (poly:* (poly:scale poly:identity a) p1)
 			       (poly:scale p2 b))))
-		   (stream-cdr legendre-polynomials)
+		   (tail legendre-polynomials)
 		   legendre-polynomials))))
 
 (define (legendre-polynomial n)

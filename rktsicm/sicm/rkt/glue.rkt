@@ -13,7 +13,7 @@
           "undefined.rkt")
          (all-defined-out)
          vector-copy
-         (rename-out [mylet let][mylet* let*]))
+         (rename-out [mylet let][mylet* let*][myrandom random]))
 
 (require (for-syntax racket/base)
          "applyhook.rkt"
@@ -27,8 +27,10 @@
          "racket-help.rkt"
          "undefined.rkt"
          (submod racket/performance-hint begin-encourage-inline)
-         (only-in racket/list take)
-         (only-in racket/vector vector-copy vector-map))
+         (only-in racket/list take remove-duplicates)
+         (only-in racket/vector vector-copy vector-map)
+         (only-in racket/syntax format-symbol)
+         )
 
 (define true #t)
 (define false #f)
@@ -61,9 +63,12 @@
 (define rationalize->exact rationalize)
 (define (floor->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
 (define (round->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
+(define (myrandom i) (if (flonum? i) (* i (random)) (random i)))
 
 (define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
 (define (symbol-downcase sym) (string->symbol (string-downcase (symbol->string sym))))
+
+(define delete-duplicates remove-duplicates)
 
 (define-syntax-rule (define-integrable head body ...)
   (begin-encourage-inline (define head body ...)))

@@ -2,9 +2,10 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" if false
+                  fix:= fix:< fix:+ fix:- fix:*)
          "../kernel-gnrc.rkt"
-         "../simplify.rkt"
+         "../simplify/pcf.rkt"
          "domain.rkt"
          )
 
@@ -44,7 +45,7 @@
 		 (cons-stream x
 			      (map-streams (lambda (p1 p2)
 					     (poly:- (poly:* 2x p1) p2))
-					   (stream-cdr chebyshev-polynomials)
+					   (tail chebyshev-polynomials)
 					   chebyshev-polynomials)))))
 
 
@@ -75,7 +76,7 @@
   (cons-stream '(1)
    (cons-stream '(0 1)
     (map-stream 2x
-		(stream-cdr scaled-chebyshev-expansions)))))
+		(tail scaled-chebyshev-expansions)))))
 
 
 ;;; For convenience, we also provide the non-scaled Chebyshev expansions
@@ -84,7 +85,7 @@
   (letrec (;; s = {1 1 2 4 8 16 ...}
 	   (s (cons-stream 1
 	       (cons-stream 1
-		(map-stream (lambda (x) (+ x x)) (stream-cdr s)))))
+		(map-stream (lambda (x) (+ x x)) (tail s)))))
            (c scaled-chebyshev-expansions))
     (map-streams (lambda (factor expansion)
                    (scale-list (/ 1 factor) expansion))
@@ -107,11 +108,11 @@
 	  (let ((v (poly:value p 0)))
 	    (poly:divide (poly:- p v) poly:identity
 			 (lambda (q r)
-			   (when (not (equal? r poly:zero))
+			   (if (not (equal? r poly:zero))
 			       (error "POLY->CHEB-EXP"))
 			   (lp q
-			       (stream-cdr c)
-			       (add-lists (scale-list v (stream-car c)) s)))))))))
+			       (tail c)
+			       (add-lists (scale-list v (head c)) s)))))))))
 
 
 ;;; Convert from Chebyshev expansion to polynomial form
@@ -204,7 +205,7 @@
 ;;; associated with Chebyshev polynomials from T[0] to T[N-1].
 
 (define (generate-cheb-exp f a b n)
-  (when (<= b a)
+  (if (<= b a)
       (error "Bad interval in GENERATE-CHEB-EXP"))
   (let ((interval-map    ;map [-1,1] onto [a,b]
           (let ((c (/ (+ a b) 2))
@@ -235,7 +236,7 @@
 ;;; back onto the original interval [a,b].
 
 (define (generate-approx-poly f a b n . optionals)
-  (let ((eps (if (null? optionals) #f (car optionals))))
+  (let ((eps (if (null? optionals) false (car optionals))))
     (let ((p (generate-cheb-exp f a b n)))
       (let ((pp (if eps (trim-cheb-exp p eps) p)))
         (poly-domain->general (cheb-exp->poly pp) a b)))))

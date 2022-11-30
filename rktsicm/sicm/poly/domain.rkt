@@ -3,8 +3,10 @@
 (provide (all-defined-out))
 
 (require "../kernel-gnrc.rkt"
-         "../simplify.rkt"
+         "../simplify/pcf.rkt"
          )
+
+;;bdk;; From polyinterp.scm
 
 ;;; Alter the coefficients of polynomial P so that its domain [a,b] is
 ;;;  mapped onto the canonical domain [-1,1].

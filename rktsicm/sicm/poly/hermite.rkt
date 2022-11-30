@@ -4,7 +4,7 @@
 
 (require "../rkt/fixnum.rkt"
          "../kernel-gnrc.rkt"
-         "../simplify.rkt")
+         "../simplify/pcf.rkt")
 
 ;;;; Hermite interpolation 6/1/89 (mh)
 
