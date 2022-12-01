@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
          "Lagrangian.rkt"
          "../poly/interp-generic.rkt"
          "../numerics/optimize/optimize.rkt"

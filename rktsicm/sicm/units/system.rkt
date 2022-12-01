@@ -197,8 +197,37 @@
                       name
                       (expt 10 log-value)))
 
-(define *numerical-constants* '())
+(define *numerical-constants* (make-parameter '()))
 
+(define-syntax define-constant
+  (syntax-rules (quote)
+    [(_ (quote dname) dtex-string ddescription the-value dunits duncertainty)
+     (define dname
+       (let ([sname 'dname][value the-value])
+         (if (environment-bound? scmutils-base-environment sname)
+             (write-line `(clobbering ,sname)))
+         (let ((constant (literal-number sname)))
+           (cond ((with-units? value)
+                  (assert (same-units? (u:units value) dunits))))
+           (set! value (g:simplify (u:value value)))
+           (eq-put! sname 'constant constant)
+           (add-property! constant 'name sname)
+           (add-property! constant 'numerical-value value)
+           (add-property! constant 'units dunits)
+           (add-property! constant 'tex-string dtex-string)
+           (add-property! constant 'description ddescription)
+           (if (real? value) (declare-known-reals sname))
+           (if duncertainty
+               (add-property! constant 'uncertainty duncertainty))
+           (*numerical-constants* (cons constant (*numerical-constants*)))
+           (define the-unit (with-units value dunits))
+           (environment-define scmutils-base-environment
+                               sname
+                               the-unit)
+           the-unit)))]
+    [(_ (quote name) tex-string description value units)
+     (define-constant (quote name) tex-string description value units #f)]))
+#;
 (define (define-constant name tex-string description value units
           #:optional uncertainty)
   (if (environment-bound? scmutils-base-environment name)
@@ -216,7 +245,7 @@
     (if (real? value) (declare-known-reals name))
     (if (not (default-object? uncertainty))
       (add-property! constant 'uncertainty uncertainty))
-    (set! *numerical-constants* (cons constant *numerical-constants*))
+    (*numerical-constants* (cons constant (*numerical-constants*)))
     (environment-define scmutils-base-environment
                         name
                         (with-units value units))
@@ -224,7 +253,7 @@
 
 (define (numerical-constants #:optional units? constants)
   (if (default-object? units?) (set! units? #t))
-  (if (default-object? constants) (set! constants *numerical-constants*))
+  (if (default-object? constants) (set! constants (*numerical-constants*)))
   (for-each (lambda (c)
               (environment-assign!
                scmutils-base-environment
@@ -238,7 +267,7 @@
 
 (define (symbolic-constants #:optional units? constants)
   (if (default-object? units?) (set! units? #t))
-  (if (default-object? constants) (set! constants *numerical-constants*))
+  (if (default-object? constants) (set! constants (*numerical-constants*)))
   (for-each (lambda (c)
               (environment-assign!
                scmutils-base-environment
@@ -252,7 +281,7 @@
 
 (define (get-constant-data name)
   (find (lambda (c) (eq? (get-property c 'name) name))
-         *numerical-constants*))
+         (*numerical-constants*)))
 
 ;;; & is used to attach units to a number, or to check that a number
 ;;; has the given units.

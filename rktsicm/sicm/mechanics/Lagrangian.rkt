@@ -2,8 +2,9 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../rkt/default-object.rkt"
+(require (only-in "../rkt/glue.rkt" if generate-uninterned-symbol
+                  fix:= fix:> fix:-)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "universal.rkt")
 
@@ -50,22 +51,22 @@
 ;;; Selectors are provided for the components of a state.
 
 (define (state->t state)
-  (when (not (and (vector? state) (fix:> (vector-length state) 0)))
+  (if (not (and (vector? state) (fix:> (vector-length state) 0)))
       (error "Cannot extract time from" state))
  (ref state 0))
 
 (define (state->q state)
-  (when (not (and (vector? state) (fix:> (vector-length state) 1)))
+  (if (not (and (vector? state) (fix:> (vector-length state) 1)))
       (error "Cannot extract coordinate from" state))
   (ref state 1))
 
 (define (state->qdot state)
-  (when (not (and (vector? state) (fix:> (vector-length state) 2)))
+  (if (not (and (vector? state) (fix:> (vector-length state) 2)))
       (error "Cannot extract velocity from" state))
   (ref state 2))
 
 (define (state->qddot state)
-  (when (not (and (vector? state) (fix:> (vector-length state) 3)))
+  (if (not (and (vector? state) (fix:> (vector-length state) 3)))
       (error "Cannot extract acceleration from" state))
   (ref state 3))
     
@@ -84,13 +85,13 @@
 (define Qdotdot  state->qddot)
 
 (define (literal-Lagrangian-state n-dof)
-  (up (literal-number (gensym 't))
+  (up (literal-number (generate-uninterned-symbol 't))
       (s:generate n-dof 'up
 		  (lambda (i)
-		    (literal-number (gensym 'x))))
+		    (literal-number (generate-uninterned-symbol 'x))))
       (s:generate n-dof 'up
 		  (lambda (i)
-		    (literal-number (gensym 'v))))))
+		    (literal-number (generate-uninterned-symbol 'v))))))
 
 ;;;; Chapter 1
 
@@ -107,8 +108,10 @@
 	     ((D q) t))))
 |#
 
-(define (path->state-path q [n 3])
-  (assert (fix:> n 1))
+(define (path->state-path q #:optional n)
+  (if (default-object? n)
+      (set! n 3)
+      (assert (fix:> n 1)))
   (lambda (t)
     (list->vector
      (cons t
@@ -182,7 +185,7 @@
 
 ;;; Given a Lagrangian, we can obtain Lagrange's equations of motion.
 
-(define ((Lagrange-equations Lagrangian [dissipation-function default-object]) q)
+(define ((Lagrange-equations Lagrangian #:optional dissipation-function) q)
   (let ((state-path (Gamma q)))
     (if (default-object? dissipation-function)
 	(- (D (compose ((partial 2) Lagrangian) state-path))
@@ -550,7 +553,7 @@
 	      state))))))
 |#
 
-(define ((Lagrangian->acceleration L [dissipation-function default-object]) state)
+(define ((Lagrangian->acceleration L #:optional dissipation-function) state)
   (let ((P ((partial 2) L))
 	(F ((partial 1) L)))
     (if (default-object? dissipation-function)
@@ -642,7 +645,7 @@
        (acceleration state)))))
 |#
 
-(define (Lagrangian->state-derivative L [dissipation-function default-object])
+(define (Lagrangian->state-derivative L #:optional dissipation-function)
   (if (default-object? dissipation-function)
       (let ((acceleration (Lagrangian->acceleration L)))
 	(lambda (state)

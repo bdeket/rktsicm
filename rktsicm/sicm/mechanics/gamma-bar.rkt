@@ -1,10 +1,9 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         racket/vector
-         "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" vector-head
+                  fix:= fix:> fix:-)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "Lagrangian.rkt"
@@ -183,12 +182,11 @@ a
 
 (define (clip-state n)
   (lambda (u)
-    (vector-copy u 0 n)))
+    (vector-head u n)))
 
 (define (clip state)
-  (vector-copy state
-	       0
-               (- (vector-length state)
+  (vector-head state
+	       (- (vector-length state)
 		  1)))
 
 

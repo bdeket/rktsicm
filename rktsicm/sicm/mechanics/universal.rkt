@@ -1,15 +1,14 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
-         "../kernel-gnrc.rkt"
          )
 
 
-(define D     g:derivative)
+(define D     derivative)
 
 (define I     g:identity)
 
@@ -81,7 +80,7 @@
   (define (output result x dummy)
     ((series:elementwise 
       (compose
-       g:simplify
+       simplify
        (lambda (term)
 	 (let ((ans term))
 	   (let walk ((x x) (dummy dummy))
@@ -98,7 +97,7 @@
 		   (else
 		    (set! ans (subst x dummy ans)))))
 	   ans))
-       g:simplify))
+       simplify))
      result))
   (if (null? (cdr args))
       (let* ((x (car args))

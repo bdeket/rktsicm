@@ -36,7 +36,9 @@
 (define-syntax (mydefine stx)
   (syntax-case stx ()
     [(_ (id . margs) body ...)
-     (syntax/loc stx (define id (mylambda margs body ...)))]
+     (if (list? (syntax-e #'id))
+         (syntax/loc stx (mydefine id (mylambda margs body ...)))
+         (syntax/loc stx (define id (mylambda margs body ...))))]
     [(_ id expr)
      (syntax/loc stx (define id expr))]
     [(_ id)
@@ -87,4 +89,8 @@
   (mydefine (a2 #:optional b) (c2 b))
   (mydefine (c2 b) (if (default-object? b) 'ok 'nok))
   (check-equal? (a2) 'ok)
+
+  (mydefine ((a3 #:optional b) c) (if (default-object? b) (list c) (list b c)))
+  (check-equal? ((a3 1) 2) (list 1 2))
+  (check-equal? ((a3) 2) (list 2))
   )

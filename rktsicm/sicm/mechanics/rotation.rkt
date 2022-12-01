@@ -1,9 +1,6 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
-
-(require "../kernel-gnrc.rkt"
-         )
 
 ;;;; Utilities for dealing with rotations
 
@@ -46,8 +43,9 @@
 
 (define (angle&axis->rotation-matrix theta n)
   ;; (assert (v:unit? n))
-  (let ((x (g:ref n 0)) (y (g:ref n 1)) (z (g:ref n 2)))
+  (let ((x (ref n 0)) (y (ref n 1)) (z (ref n 2)))
     (let ((colatitude (acos z))
+	  ;OK because (< colatitude :pi)
 	  (longitude (atan y x)))
       (* (rotate-z-matrix longitude)
 	 (rotate-y-matrix colatitude)
@@ -110,7 +108,7 @@
 
 
 (define (wcross->w A)
-  (up (g:ref A 1 2)
-      (g:ref A 2 0)
-      (g:ref A 0 1)))
+  (up (ref A 1 2)
+      (ref A 2 0)
+      (ref A 0 1)))
 

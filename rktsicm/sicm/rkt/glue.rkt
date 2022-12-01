@@ -54,6 +54,7 @@
 (define (subvector-move-left! V vs ve T ts) (vector-copy! T ts V vs ve))
 (define (subvector-fill! V s e v) (for ([i (in-range s e)]) (vector-set! V i v)))
 (define (vector-tail v t) (vector-copy v t))
+(define (vector-head v t) (vector-copy v 0 t))
 (define string:<? string<?)
 (define write-line writeln)
 (define pathname? path?)
