@@ -3,11 +3,11 @@
 (provide (except-out (all-defined-out) unit-system))
 
 (require (for-syntax racket/base)
-         "../rkt/default-object.rkt"
+         (only-in "../rkt/glue.rkt" if find write-line)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/environment.rkt" environment-bound? environment-define environment-assign! scmutils-base-environment generic-environment)
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
-         "../general/list-utils.rkt"
          "../kernel/express.rkt"
          "../kernel/generic.rkt"
          "../kernel/numbers.rkt"
@@ -37,56 +37,59 @@
                 values
                 (make-unit-system 'id base-spec '() '())
                 units)))))))]))
-#;(define (define-unit-system system-name [base-units default-object])
-  (when (environment-bound? scmutils-base-environment system-name)
-    (writeln `(clobbering ,system-name)))
+#;(define (define-unit-system system-name #:optional base-units)
+  (if (environment-bound? scmutils-base-environment system-name)
+    (write-line `(clobbering ,system-name)))
   (let ((n (length base-units)))    
     (let ((base-specs
            (map (lambda (base-spec i)
                   (let* ((unit-name (car base-spec))
                          (exponents
-                          (build-vector n
+                          (make-initialized-vector n
                                         (lambda (j) (if (fix:= i j) 1 0))))
                          (unit (make-unit system-name exponents 1)))
-                    (when (environment-bound? scmutils-base-environment
+                    (if (environment-bound? scmutils-base-environment
                                               unit-name)
-                      (writeln `(clobbering ,unit-name)))
+                      (write-line `(clobbering ,unit-name)))
                     (environment-define scmutils-base-environment
                                         unit-name
                                         unit)
                     (append base-spec (list unit))))
                 base-units
-                (build-list n values))))
-      (define system
-        (make-unit-system
-         system-name
-         base-specs          ;base units
-         '()	             ;derived units
-         '()	             ;additional units
-         ))
+                (iota n))))
       (environment-define scmutils-base-environment
-                          system-name
-                          system)
-      system)))
+			  system-name
+			  (list '*unit-system*
+				system-name
+				base-specs          ;base units
+				'()	            ;derived units
+				'()	            ;additional units
+				))))
+  system-name)
 
 (struct unit-system (name base [derived #:mutable] [alternate #:mutable])
   #:transparent
   #:constructor-name make-unit-system)
 
-#;(define (unit-system? system)
+(define base-units unit-system-base)
+(define derived-units unit-system-derived)
+(define alternate-units unit-system-alternate)
+#;#;#;#;#;
+(define (unit-system? system)
   (and (pair? system)
        (eq? (car system) '*unit-system*)))
 
-#;(define (unit-system-name system) (cadr system))
+(define (unit-system-name system)
+  (cadr system))
 
-(define base-units unit-system-base)
-;(define (base-units system) (caddr system))
+(define (base-units system)
+  (caddr system))
 
-(define derived-units unit-system-derived)
-;(define (derived-units system) (cadddr system))
+(define (derived-units system)
+  (cadddr system))
 
-(define alternate-units unit-system-alternate)
-;(define (alternate-units system)  (car (cddddr system)))
+(define (alternate-units system)
+  (car (cddddr system)))
 
 ;;; Data may be entered and results may be presented in derived units.
 
@@ -106,11 +109,14 @@
                   [unit-spec (list 'unit-name tex description unit)])
              (define-derived-unit! system unit-spec)
              unit))))]))
-#;(define (define-derived-unit system unit-name tex description content
-          [scale-factor 1])
+#;
+(define (define-derived-unit system unit-name tex description content
+          #:optional scale-factor)
   (assert (unit-system? system))
-  (when (environment-bound? scmutils-base-environment unit-name)
-      (writeln `(clobbering ,unit-name)))
+  (if (environment-bound? scmutils-base-environment unit-name)
+      (write-line `(clobbering ,unit-name)))
+  (if (default-object? scale-factor)
+      (set! scale-factor 1))
   (set! content
         (make-unit (unit-system-name system)
                    (unit-exponents content)
@@ -145,11 +151,14 @@
                   [unit-spec (list 'unit-name tex description unit)])
              (define-additional-unit! system unit-spec)
              unit))))]))
-#;(define (define-additional-unit system unit-name tex description content
-          [scale-factor 1])
+#;
+(define (define-additional-unit system unit-name tex description content
+          #:optional scale-factor)
   (assert (unit-system? system))
-  (when (environment-bound? scmutils-base-environment unit-name)
-    (writeln `(clobbering ,unit-name)))
+  (if (environment-bound? scmutils-base-environment unit-name)
+    (write-line `(clobbering ,unit-name)))
+  (if (default-object? scale-factor)
+      (set! scale-factor 1))
   (set! content
         (make-unit (unit-system-name system)
                    (unit-exponents content)
@@ -177,9 +186,10 @@
        (begin
          (add-multiplier (list 'name tex-string log-value))
          (expt 10 log-value)))]))
-#;(define (define-multiplier name tex-string log-value)
-  (when (environment-bound? scmutils-base-environment name)
-      (writeln `(clobbering ,name)))
+#;
+(define (define-multiplier name tex-string log-value)
+  (if (environment-bound? scmutils-base-environment name)
+      (write-line `(clobbering ,name)))
   (set! *multiplier-names*
         (cons (list name tex-string log-value)
               *multiplier-names*))
@@ -190,9 +200,9 @@
 (define *numerical-constants* '())
 
 (define (define-constant name tex-string description value units
-          [uncertainty default-object])
-  (when (environment-bound? scmutils-base-environment name)
-      (writeln `(clobbering ,name)))
+          #:optional uncertainty)
+  (if (environment-bound? scmutils-base-environment name)
+      (write-line `(clobbering ,name)))
   (let ((constant (literal-number name)))
     (cond ((with-units? value)
            (assert (same-units? (u:units value) units))))
@@ -203,8 +213,8 @@
     (add-property! constant 'units units)
     (add-property! constant 'tex-string tex-string)
     (add-property! constant 'description description)
-    (when (real? value) (declare-known-reals name))
-    (when (not (default-object? uncertainty))
+    (if (real? value) (declare-known-reals name))
+    (if (not (default-object? uncertainty))
       (add-property! constant 'uncertainty uncertainty))
     (set! *numerical-constants* (cons constant *numerical-constants*))
     (environment-define scmutils-base-environment
@@ -212,7 +222,9 @@
                         (with-units value units))
     name))
 
-(define (numerical-constants [units? #t] [constants *numerical-constants*])
+(define (numerical-constants #:optional units? constants)
+  (if (default-object? units?) (set! units? #t))
+  (if (default-object? constants) (set! constants *numerical-constants*))
   (for-each (lambda (c)
               (environment-assign!
                scmutils-base-environment
@@ -224,7 +236,9 @@
                         (unit-scale (get-property c 'units))))))
             constants))
 
-(define (symbolic-constants [units? #t] [constants *numerical-constants*])
+(define (symbolic-constants #:optional units? constants)
+  (if (default-object? units?) (set! units? #t))
+  (if (default-object? constants) (set! constants *numerical-constants*))
   (for-each (lambda (c)
               (environment-assign!
                scmutils-base-environment
@@ -237,13 +251,13 @@
             constants))
 
 (define (get-constant-data name)
-  (findf (lambda (c) (eq? (get-property c 'name) name))
+  (find (lambda (c) (eq? (get-property c 'name) name))
          *numerical-constants*))
 
 ;;; & is used to attach units to a number, or to check that a number
 ;;; has the given units.
 
-(define (& value u1 [u2 default-object])
+(define (& value u1 #:optional u2)
   (let ((units (if (default-object? u2) u1 u2))
         (scale (if (default-object? u2) 1 u1)))
     (assert (and (not (units? value)) (number? scale) (units? units)))
@@ -280,7 +294,7 @@
   (cond ((with-units? num)
          (let ((value (g:* (unit-scale (u:units num)) (u:value num)))
                (vect (unit-exponents (u:units num))))
-           (when (not (equal? vect (unit-exponents target-unit)))
+           (if (not (equal? vect (unit-exponents target-unit)))
                (error "Cannot express in given units"
                       num target-unit target-unit-expression))
            (list *unit-constructor*
@@ -323,7 +337,7 @@
 
 
 (define (find-unit-description vect ulist)
-  (findf (lambda (entry)
+  (find (lambda (entry)
            (equal? (unit-exponents (list-ref entry 3))
                    vect))
          ulist))
@@ -342,6 +356,12 @@
                              (list (list 'expt base-name exponent)))))
                     exponents
                     base-unit-names))))
+
+;;bdk;; was in convert
+(define-syntax unit-convert
+  (syntax-rules ()
+    ((unit-convert expr target-unit)
+     (express-as expr 'target-unit))))
 
 #|
 (with-units->expression SI &foot)

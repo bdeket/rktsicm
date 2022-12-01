@@ -2,7 +2,8 @@
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../general/assert.rkt"
+(require (only-in "../rkt/glue.rkt" if)
+         "../general/assert.rkt"
          "../kernel/generic.rkt"
          "../kernel/types.rkt"
          "../kernel/utils.rkt"
@@ -10,6 +11,7 @@
 (define-values (assign-operation with-units:assign-operations)
   (make-assign-operations 'with-units))
 
+(add-to-numerical-quantity? (λ (x) (and (with-units? x) (numerical-quantity? (u:value x)))))
 ;TODO
 (define angular '*angular*)
 
@@ -28,7 +30,6 @@
   (and (pair? x)
        (eq? (car x) with-units-type-tag)))
 |#
-(add-to-numerical-quantity? (λ (x) (and (with-units? x) (numerical-quantity? (u:value x)))))
 
 (define (without-units? x)
   (not (with-units? x)))
@@ -77,7 +78,7 @@
 (define (u:one-like x)			;can multiply anything with same units
   (with-units (g:one-like (u:value x))
     &unitless))
-
+
 (define (u:zero? x)
   (g:zero? (u:value x)))
 
@@ -330,6 +331,15 @@
 
 (assign-operation 'solve-linear   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
 (assign-operation 'solve-linear   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
+
+(assign-operation 'apply
+                  (lambda (f args)
+                    (let ((val (g:apply (u:value f) args)))
+                      (if (with-units? val)
+                          (assert (units:= val f)))
+                      (with-units val (u:units f))))
+                  with-units? any?)
+
 
 
 
