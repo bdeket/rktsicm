@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8547 real time: 8548 gc time: 249
+cpu time: 7969 real time: 7963 gc time: 236
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -169,9 +169,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 38438 real time: 38460 gc time: 250
-cpu time: 25812 real time: 25817 gc time: 252
-cpu time: 3219 real time: 3210 gc time: 31
+cpu time: 36688 real time: 36730 gc time: 78
+cpu time: 24453 real time: 24437 gc time: 94
+cpu time: 3141 real time: 3137 gc time: 32
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -276,7 +276,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 234 real time: 246 gc time: 0
+cpu time: 234 real time: 240 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -341,17 +341,35 @@ raco test: (submod ".\\sicm\\tests\\mechanics\\Lagrangian-transformations.rkt" t
 raco test: (submod ".\\sicm\\tests\\mechanics\\Lagrangian.rkt" test)
 11 success(es) 0 failure(s) 0 error(s) 11 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\mechanics\\Lie-transform.rkt" test)
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\mechanics\\Noether.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\mechanics\\Routhian.rkt" test)
+2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\mechanics\\action.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\mechanics\\canonical.rkt" test)
+10 success(es) 0 failure(s) 0 error(s) 10 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\mechanics\\gamma-bar.rkt" test)
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\mechanics\\qual+pointtransform.rkt" test)
+2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\mechanics\\rigid.rkt" test)
 10 success(es) 0 failure(s) 0 error(s) 10 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\mechanics\\symplectic.rkt" test)
+11 success(es) 0 failure(s) 0 error(s) 11 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\mechanics\\time-varying.rkt" test)
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\mechanics\\universal.rkt" test)
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
@@ -442,15 +460,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2563 real time: 2549 gc time: 219
-cpu time: 15984 real time: 16018 gc time: 470
-cpu time: 2547 real time: 2549 gc time: 62
-cpu time: 219 real time: 211 gc time: 15
-cpu time: 46 real time: 51 gc time: 0
-cpu time: 10500 real time: 10503 gc time: 315
+cpu time: 2500 real time: 2492 gc time: 219
+cpu time: 15157 real time: 15161 gc time: 517
+cpu time: 2437 real time: 2440 gc time: 77
+cpu time: 219 real time: 206 gc time: 31
+cpu time: 47 real time: 49 gc time: 0
+cpu time: 9906 real time: 9917 gc time: 266
 cpu time: 0 real time: 3 gc time: 0
-cpu time: 32 real time: 27 gc time: 0
-cpu time: 97859 real time: 97855 gc time: 1915
+cpu time: 31 real time: 26 gc time: 0
+cpu time: 92313 real time: 92314 gc time: 1737
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -486,4 +504,4 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-10/507 test failures
+10/536 test failures

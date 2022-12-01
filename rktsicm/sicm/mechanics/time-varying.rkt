@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "canonical.rkt"
+(require "canonical.rkt"
          "Hamiltonian.rkt"
          "point-transformation.rkt"
          "universal.rkt"

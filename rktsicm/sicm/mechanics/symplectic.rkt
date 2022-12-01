@@ -1,9 +1,9 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" if
+                  fix:= fix:+ fix:*)
          "canonical.rkt"
          "Hamiltonian.rkt"
          "Lagrangian.rkt"
@@ -267,7 +267,7 @@
 
 (define (symplectic-matrix? M)
   (let ((2n (m:dimension M)))
-    (when (not (even? 2n))
+    (if (not (even? 2n))
 	(error "Wrong type -- SYMPLECTIC-MATRIX?" M))
     (let ((J (symplectic-unit (quotient 2n 2))))
       (- J (* M J (transpose M))))))

@@ -1,25 +1,19 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         (only-in racket/math exact-floor)
-         "../kernel-gnrc.rkt"
-         "../numerics/roots/bisect.rkt"
-         (only-in "../rkt/todo.rkt" todos)
+(require (only-in "../rkt/glue.rkt" floor->exact
+                  fix:= fix:< fix:- flo:+ flo:- flo:* flo:/ flo:sin flo:cos flo:floor)
+         (only-in "../numerics/roots/bisect.rkt" bisect)
+         (only-in "../numerics/extrapolate/re.rkt" richardson-derivative)
          )
 
-(todos todo
-       [#:from "???"
-        richardson-derivative]
-       )
-(require 'todo)
 
 
 ;;; Homoclinic tangles
 
 (define ((unstable-manifold T xe ye dx dy A eps) param)
-  (let ((n (exact-floor (/ (log (/ param eps)) (log A)))))
+  (let ((n (floor->exact (/ (log (/ param eps)) (log A)))))
     ((iterated-map T n) (+ xe (* dx (/ param (expt A n))))
                         (+ ye (* dy (/ param (expt A n))))
                         cons
@@ -189,6 +183,7 @@
              (lambda ()
                (error "Map failed" x y)))))))
 
+;;bdk;; was in sections.scm
 (define ((iterated-map map n) x y continue fail)
   (when (fix:< n 0) (error "iterated-map: cannot invert map"))
   (let loop ((x x) (y y) (i n))
@@ -198,3 +193,10 @@
 	     (lambda (nx ny)
 	       (loop nx ny (fix:- i 1)))
 	     fail))))
+
+(define ((standard-map K) x y continue fail)
+  (let ((yp (flo:pv (flo:+ y (flo:* K (flo:sin x))))))
+    (continue (flo:pv (flo:+ x yp)) yp)))
+
+(define (flo:pv x)
+  (flo:- x (flo:* 2pi (flo:floor (flo:/ x 2pi)))))

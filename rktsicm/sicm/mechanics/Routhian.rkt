@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../rkt/default-object.rkt"
+(require (only-in "../rkt/define.rkt" define default-object?)
          "Lagrangian.rkt"
          "Hamiltonian.rkt"
          "universal.rkt"
@@ -164,7 +163,7 @@ Lagrange's equations for vx, x.
 
 |#
 
-(define ((Routhian->acceleration R [dissipation-function default-object]) s)
+(define ((Routhian->acceleration R #:optional dissipation-function) s)
   (if (default-object? dissipation-function)
       (let ((minus-P ((partial 2 0) R))
 	    (minus-F (((partial 1 0) R) s))
@@ -254,7 +253,7 @@ Lagrange's equations for vx, x.
 
 |#
 
-(define ((Routhian->state-derivative R [dissipation-function default-object]) s)
+(define ((Routhian->state-derivative R #:optional dissipation-function) s)
   (let ((minus-P ((partial 2 0) R))
 	(minus-F (((partial 1 0) R) s))
 	(vx (ref s 2 0))

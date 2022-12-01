@@ -1,24 +1,30 @@
 #lang racket/base
 
-(require "calculus.rkt"
-         "generic.rkt"
-         (except-in "mechanics.rkt" Lie-derivative)
-         "numerics.rkt"
-         "parameters.rkt"
-         "poly.rkt"
+(require "parameters.rkt"
+         (except-in "generic.rkt" ;;some constants overwritten in mechanics/../units/constants
+                     :pi    :+pi  :-pi
+                     :2pi   :+2pi :-2pi
+                     :pi/2 :+pi/2 :-pi/2
+                     :pi/3 :+pi/3 :-pi/3
+                     :pi/4 :+pi/4 :-pi/4
+                     :pi/6 :+pi/6 :-pi/6)
          "simplify.rkt"
+         "numerics.rkt"
+         "poly.rkt"
          "solve.rkt"
          "units.rkt"
+         (except-in "mechanics.rkt" Lie-derivative);;overwritten in calculus
+         "calculus.rkt"
          )
 
-(provide (all-from-out "calculus.rkt"
+(provide (all-from-out "parameters.rkt"
                        "generic.rkt"
-                       "mechanics.rkt"
-                       "numerics.rkt"
-                       "parameters.rkt"
-                       "poly.rkt"
                        "simplify.rkt"
+                       "numerics.rkt"
+                       "poly.rkt"
                        "solve.rkt"
                        "units.rkt"
+                       "mechanics.rkt"
+                       "calculus.rkt"
                        ))
 

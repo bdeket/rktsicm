@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "Hamiltonian.rkt"
+(require "Hamiltonian.rkt"
          )
 
 ;;; The Lie transform is just the time-advance operator using the Lie

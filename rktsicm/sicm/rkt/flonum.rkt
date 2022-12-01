@@ -19,7 +19,8 @@
                     [fltan flo:tan]
                     [flacos flo:acos]
                     [flasin flo:asin]
-                    [flatan flo:atan]))
+                    [flatan flo:atan]
+                    [flfloor flo:floor]))
 (provide (all-from-out racket/flonum)
          (all-defined-out))
 
