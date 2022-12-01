@@ -1,10 +1,11 @@
-#lang s-exp "../generic.rkt"
+#lang s-exp "../kernel.rkt"
 
 (provide (all-defined-out))
 
 (require (only-in "../rkt/glue.rkt" iota
                   fix:= fix:+ fix:-)
          "../general/list-utils.rkt"
+         "../kernel-gnrc.rkt"
          "sparse.rkt"
          "../numerics/linear/vandermonde.rkt"
          "../numerics/linear/lu.rkt"

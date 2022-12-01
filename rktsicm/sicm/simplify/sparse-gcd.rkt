@@ -1,4 +1,4 @@
-#lang s-exp "../generic.rkt"
+#lang s-exp "../kernel.rkt"
 
 (provide (all-defined-out))
 
@@ -9,6 +9,7 @@
          "../general/list-utils.rkt"
          "../general/permute.rkt"
          "../general/resource-limit.rkt"
+         "../kernel-gnrc.rkt"
          "pcfpf/pcf.rkt"
          "fpf.rkt"
          "pcfpf/pcf-fpf.rkt"

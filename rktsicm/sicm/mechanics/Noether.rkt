@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../general/list-utils.rkt"
+(require "../general/list-utils.rkt"
          "universal.rkt"
          )
 
@@ -20,7 +19,7 @@
 ;;; (D (lambda parms (compose L (F->C (apply F-tilde parms))))) = 0
 
 (define (Noether-integral L F-tilde)
-  (let ((zero-parameters (make-list (car (arity F-tilde)) 0)))
+  (let ((zero-parameters (make-list (arity-min (arity F-tilde)) 0)))
     (* ((partial 2) L) (apply (D F-tilde) zero-parameters))))
 
 #|

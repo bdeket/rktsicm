@@ -9,7 +9,7 @@
          racket/list
          syntax/srcloc
          racket/syntax
-         (only-in "../kernel-gnrc.rkt" simplify)
+         (only-in "../display/print.rkt" simplify)
          "../display/suppress-args.rkt")
 
 (provide check-unique-match? check-simplified?

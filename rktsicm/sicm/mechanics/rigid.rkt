@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../general/assert.rkt"
+(require "../general/assert.rkt"
          (only-in "../display/print.rkt" careful-simplify)
          "gamma-bar.rkt"
          "Lagrangian.rkt"
@@ -97,14 +96,14 @@
 
 (define ((Euler->omega angles-path) t)
   (define (M-on-path t)
-    (Euler->M (g:apply angles-path (list t))))
+    (Euler->M (angles-path t)))
   (define (w-cross t)
     (* ((D M-on-path) t)
        (transpose (M-on-path t))))
   (antisymmetric->column-matrix (w-cross t)))
 
 (define ((Euler->omega-body angles-path) t)
-  (* (transpose (Euler->M (g:apply angles-path (list t))))
+  (* (transpose (Euler->M (angles-path t)))
      ((Euler->omega angles-path) t)))
 
 #|

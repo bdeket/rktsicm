@@ -1,4 +1,4 @@
-#lang s-exp "../generic.rkt"
+#lang s-exp "../kernel.rkt"
 
 (provide (all-defined-out))
 
@@ -6,6 +6,7 @@
                   fix:= fix:> fix:< fix:+)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
+         "../kernel-gnrc.rkt"
          "fpf.rkt"
          )
 

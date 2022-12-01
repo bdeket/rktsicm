@@ -74,8 +74,6 @@
 
   [g:derivative derivative]
 
-  [g:simplify simplify]
-
   ;; Binary (and nary) operators from generic
 
   [g:= =]

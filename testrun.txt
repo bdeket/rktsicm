@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8672 real time: 8673 gc time: 281
+cpu time: 8547 real time: 8548 gc time: 249
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -169,9 +169,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 38063 real time: 38111 gc time: 190
-cpu time: 25000 real time: 24955 gc time: 155
-cpu time: 3046 real time: 3039 gc time: 0
+cpu time: 38438 real time: 38460 gc time: 250
+cpu time: 25812 real time: 25817 gc time: 252
+cpu time: 3219 real time: 3210 gc time: 31
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -276,7 +276,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 250 real time: 245 gc time: 0
+cpu time: 234 real time: 246 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -332,14 +332,26 @@ raco test: (submod ".\\sicm\\tests\\kernel\\structs.rkt" test)
 raco test: (submod ".\\sicm\\tests\\kernel\\utils.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\mechanics\\Hamiltonian.rkt" test)
+14 success(es) 0 failure(s) 0 error(s) 14 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\mechanics\\Lagrangian-transformations.rkt" test)
+5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\mechanics\\Lagrangian.rkt" test)
 11 success(es) 0 failure(s) 0 error(s) 11 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\mechanics\\Noether.rkt" test)
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\mechanics\\action.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\mechanics\\gamma-bar.rkt" test)
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\mechanics\\rigid.rkt" test)
+10 success(es) 0 failure(s) 0 error(s) 10 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\mechanics\\universal.rkt" test)
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
@@ -430,15 +442,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2469 real time: 2473 gc time: 173
-cpu time: 15969 real time: 15958 gc time: 532
-cpu time: 2609 real time: 2610 gc time: 63
-cpu time: 219 real time: 216 gc time: 31
-cpu time: 47 real time: 50 gc time: 0
-cpu time: 10344 real time: 10345 gc time: 377
+cpu time: 2563 real time: 2549 gc time: 219
+cpu time: 15984 real time: 16018 gc time: 470
+cpu time: 2547 real time: 2549 gc time: 62
+cpu time: 219 real time: 211 gc time: 15
+cpu time: 46 real time: 51 gc time: 0
+cpu time: 10500 real time: 10503 gc time: 315
 cpu time: 0 real time: 3 gc time: 0
-cpu time: 31 real time: 30 gc time: 0
-cpu time: 98062 real time: 98107 gc time: 2047
+cpu time: 32 real time: 27 gc time: 0
+cpu time: 97859 real time: 97855 gc time: 1915
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -469,9 +481,9 @@ raco test: (submod ".\\sicm\\tests\\solve\\solve-utils.rkt" test)
 23 success(es) 0 failure(s) 0 error(s) 23 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x249) (* -1 x250)) (eq:0) (x250 x249)) ((+ -7 (* 3 x249) x250) (eq:1) (x250 x249)))
-'(((+ -5 (* 3 x257) (* -1 x258)) (eq:0) (x258 x257)) ((+ k259 (* 3 x257) x258) (eq:1) (x258 x257 k259)))
+'(((+ -5 (* 3 x250) (* -1 x251)) (eq:0) (x251 x250)) ((+ -7 (* 3 x250) x251) (eq:1) (x251 x250)))
+'(((+ -5 (* 3 x258) (* -1 x259)) (eq:0) (x259 x258)) ((+ k260 (* 3 x258) x259) (eq:1) (x259 x258 k260)))
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-10/477 test failures
+10/507 test failures

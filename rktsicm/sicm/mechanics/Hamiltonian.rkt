@@ -2,8 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         racket/vector
+(require (only-in "../rkt/glue.rkt" if vector-tail generate-uninterned-symbol
+                  fix:= fix:>)
          "../general/assert.rkt"
          "Lagrangian.rkt"
          "universal.rkt"
@@ -43,7 +43,7 @@
 
 
 (define (state->p state)
-  (when (not (and (vector? state) (fix:> (vector-length state) 2)))
+  (if (not (and (vector? state) (fix:> (vector-length state) 2)))
     (error "Cannot extract momentum from" state))
   (ref state 2))
 
@@ -53,16 +53,16 @@
 
 
 (define (state->qp dynamic-state)
-  (vector-copy dynamic-state 1))
+  (vector-tail dynamic-state 1))
 
 (define (literal-Hamiltonian-state n-dof)
-  (up (literal-number (gensym 't))
+  (up (literal-number (generate-uninterned-symbol 't))
       (s:generate n-dof 'up
                   (lambda (i)
-                    (literal-number (gensym 'x))))
+                    (literal-number (generate-uninterned-symbol 'x))))
       (s:generate n-dof 'down
                   (lambda (i)
-                    (literal-number (gensym 'p))))))
+                    (literal-number (generate-uninterned-symbol 'p))))))
 
 
 (define ((Lstate->Hstate L) Ls)
@@ -229,13 +229,13 @@
       (let ((z (compatible-zero w)))
         (let ((M ((D w-of-v) z))
               (b (w-of-v z)))
-          (when (and untested? (zero? (simplify (determinant M))))
+          (if (and untested? (zero? (simplify (determinant M))))
             (error "Legendre Transform Failure: determinant=0"
                    F w))
           (let ((v (solve-linear-left M (- w b))))
             (- (* w v) (F v))))))
     (define (G w)
-      (when untested?
+      (if untested?
           (let ((thing (typical-object w)))
             (if (not (equal?
                       (simplify
@@ -243,7 +243,10 @@
                         thing))
                       (simplify thing)))
                 (error "Legendre Transform Failure: not quadratic"
-                       F w)
+                       F w (list (simplify
+                       ((compose w-of-v (D putative-G))
+                        thing))
+                      (simplify thing)))
                 (set! untested? #f))
             'tested))
       (putative-G w))
@@ -596,8 +599,8 @@
 |#
 
 (define ((Poisson-bracket f g) x)
-  (let ((fix: (f x)) (gx (g x)))
-    (cond ((or (structure? fix:) (structure? gx))
+  (let ((fx (f x)) (gx (g x)))
+    (cond ((or (structure? fx) (structure? gx))
            (s:map/r (lambda (af)
                       (s:map/r (lambda (ag)
                                  ((Poisson-bracket
@@ -605,7 +608,7 @@
                                    (compose (apply component ag) g))
                                   x))
                                (structure->access-chains gx)))
-                    (structure->access-chains fix:)))
+                    (structure->access-chains fx)))
           (else
            ((- (* ((partial 1) f) ((partial 2) g))
                (* ((partial 2) f) ((partial 1) g)))
@@ -810,6 +813,7 @@
 
 (define F (literal-function 'F (Hamiltonian 2)))
 (define G (literal-function 'G (Hamiltonian 2)))
+(define H (literal-function 'H (Hamiltonian 2)))
 
 (define L_F (Lie-derivative F))
 (define L_G (Lie-derivative G))
