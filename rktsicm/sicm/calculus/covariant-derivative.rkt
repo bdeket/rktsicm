@@ -1,10 +1,10 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
-         "../rkt/default-object.rkt"
+(require (only-in "../rkt/glue.rkt" any iota
+                  fix:=)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "basis.rkt"
          "dgutils.rkt"
@@ -22,12 +22,24 @@
 
 ;;; More complete covariant derivative procedure
 
-(define (covariant-derivative Cartan [map default-object])
+(define (covariant-derivative Cartan #:optional map)
   (cond ((default-object? map)
 	 (covariant-derivative-ordinary Cartan))
 	(else
 	 (covariant-derivative-ordinary
-	  (Cartan->Cartan-over-map Cartan map)))))
+          (let ((basis (basis->basis-over-map map (Cartan->basis Cartan)))
+                (Cartan-forms
+                 (s:map/r (form-field->form-field-over-map map)
+                          (Cartan->forms Cartan))))
+            (make-Cartan (compose Cartan-forms (differential map))
+			 basis))))))
+
+;; (define (covariant-derivative Cartan #!optional map)
+;;   (cond ((default-object? map)
+;; 	 (covariant-derivative-ordinary Cartan))
+;; 	(else
+;; 	 (covariant-derivative-ordinary
+;; 	  (Cartan->Cartan-over-map Cartan map)))))
 
 (define (covariant-derivative-ordinary Cartan)
   (assert (Cartan? Cartan))
@@ -60,7 +72,7 @@
 		(eq? (car types) manifold-point?))
 	   (declare-argument-types! f types)
 	   ((X f) (car args)))
-	  ((ormap (lambda (type)
+	  ((any (lambda (type)
 		  (not (or (eq? type vector-field?)
 			   (eq? type 1form-field?))))
 		types)
@@ -76,14 +88,14 @@
     (let ((vector-basis (basis->vector-basis basis))
           (1form-basis (basis->1form-basis basis)))
       (lambda (V)
-	(let ((CV (g:apply Cartan-forms (list V))))
+	(let ((CV (Cartan-forms V)))
 	  (lambda (U)
-	    (let ((u-components (g:apply 1form-basis (list U))))
+	    (let ((u-components (1form-basis U)))
 	      (let ((deriv-components
 		     (+ (V u-components)
 			(* CV u-components))))
 		(define (the-derivative f)
-		  (* (g:apply vector-basis (list f)) deriv-components))
+		  (* (vector-basis f) deriv-components))
 		(procedure->vector-field the-derivative
 		  `((nabla ,(diffop-name V))
 		    ,(diffop-name U)))))))))))	  
@@ -109,7 +121,7 @@
 	 (1form-basis (basis->1form-basis basis))
 	 (Cartan-forms (Cartan->forms Cartan)))
     (lambda (V)
-      (let ((CV (g:apply Cartan-forms (list V))))
+      (let ((CV (Cartan-forms V)))
 	(lambda (T)
 	  (let ((arg-types (argument-types T)))
 	    (define (the-derivative . args)
@@ -159,7 +171,7 @@
 					  (s:map/r (lambda (w)
 						     (w (list-ref args i)))
 						   1form-basis)))))))
-			   arg-types (build-list (length arg-types) values)))))
+			   arg-types (iota (length arg-types))))))
 		(g:+ VT corrections)))
 	    (declare-argument-types! the-derivative arg-types)
 	    the-derivative))))))
@@ -267,7 +279,7 @@
 	       (procedure->1form-field
 		(lambda (u)
 		  (+ (* J (u J-inv))
-		     (* J (* (g:apply forms (list u)) J-inv)))))))
+		     (* J (* (forms u) J-inv)))))))
 	  (make-Cartan omega-prime-forms basis-prime))))))
 
 (define (symmetrize-Christoffel G)
@@ -567,7 +579,14 @@
 	(Cartan-forms
 	 (s:map/r (form-field->form-field-over-map map)
 		  (Cartan->forms Cartan))))
-    (make-Cartan (compose Cartan-forms (differential map)) basis)))
+    (make-Cartan Cartan-forms basis)))
+
+;; (define (Cartan->Cartan-over-map Cartan map)
+;;   (let ((basis (basis->basis-over-map map (Cartan->basis Cartan)))
+;; 	(Cartan-forms
+;; 	 (s:map/r (form-field->form-field-over-map map)
+;; 		  (Cartan->forms Cartan))))
+;;     (make-Cartan (compose Cartan-forms (differential map)) basis)))
 
 #|
 (define M (make-manifold S^2-type 2 3))

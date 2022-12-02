@@ -1,4 +1,4 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
@@ -171,23 +171,35 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 
        g(t) = ( Y(f) ((I + t v(I))(x)) - Y(f circ (I + t v(I)))(x))
 
+;;; Sam Ritchie noticed (19 Nov 2021) that the identity functtion is
+;;; not a R^n-valued function of manifold points.
+;; (define ((((Lie-test V) Y) f) x)
+;;   (define (g t)
+;;     (- ((Y f) ((+ identity (* t (V identity))) x))
+;;        ((Y (compose f (+ identity (* t (V identity))))) x)))
+;;   ((D g) 0))
 
+;;; this result is a consequence of confusing manifold points
+;;; with tuples of coordinates in the embedding space.
+
+
+;; Suggested patch
 (define ((((Lie-test V) Y) f) x)
-  (define (g t)
-    (- ((Y f) ((+ identity (* t (V identity))) x))
-       ((Y (compose f (+ identity (* t (V identity))))) x)))
-  ((D g) 0))
-
+  (let ((I (chart R2-rect)))
+    (define (g t)
+      (- ((compose (Y f) (point R2-rect))
+          ((+ I (* t (V I))) x))
+         ((Y (compose f
+                      (point R2-rect)
+                      (+ I (* t (V I)))))
+          x)))
+    ((D g) 0)))
 
 (pec (- ((((Lie-test X) Y) f) R2-rect-point)
 	((((Lie-derivative X) Y) f) R2-rect-point)))
 #| Result:
 0
 |#
-
-;;; this result is a consequence of confusing manifold points
-;;; with tuples of coordinates in the embedding space.
-
 (clear-arguments)
 |#
 

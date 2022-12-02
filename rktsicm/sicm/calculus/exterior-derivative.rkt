@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "dgutils.rkt"
@@ -73,15 +72,15 @@ v1_bar(w(v2_bar))(x) - v2_bar(w(v1_bar))(x)
 			  (lambda (i)
 			    (let ((rest (delete-nth i vectors)))
 			      (+ (* (if (even? i) +1 -1)
-				    (((g:ref vectors i) (apply kform rest))
+				    (((ref vectors i) (apply kform rest))
 				     point))
 				 (sigma
 				  (lambda (j)
 				    (* (if (even? (fix:+ i j)) +1 -1)
 				       ((apply kform
 					       (cons
-						(commutator (g:ref vectors i)
-							    (g:ref vectors j))
+						(commutator (ref vectors i)
+							    (ref vectors j))
 						;; j-1 because already deleted i.
 						(delete-nth (fix:- j 1)
 							    rest)))

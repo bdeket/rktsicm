@@ -68,7 +68,20 @@
                            (* -1 ((partial 0) X^0) Y^0 ((partial 0) f))
                            (* -1 ((partial 0) X^1) Y^0 ((partial 1) f))
                            (* -1 ((partial 1) X^0) ((partial 0) f) Y^1)
-                           (* -1 ((partial 1) X^1) Y^1 ((partial 1) f)))))
+                           (* -1 ((partial 1) X^1) Y^1 ((partial 1) f))))
+    (define ((((Lie-test V) Y) f) x)
+      (let ((I (chart R2-rect)))
+        (define (g t)
+          (- ((compose (Y f) (point R2-rect))
+              ((+ I (* t (V I))) x))
+             ((Y (compose f
+                          (point R2-rect)
+                          (+ I (* t (V I)))))
+              x)))
+        ((D g) 0)))
+    (check-simplified? (- ((((Lie-test X) Y) f) R2-rect-point)
+                          ((((Lie-derivative X) Y) f) R2-rect-point))
+                       0))
    (test-case
     "Lie derivative satisfies extended Leibnitz rule"
     (define V (literal-vector-field 'V R2-rect))

@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "basis.rkt"
+(require "basis.rkt"
          "indexed/types.rkt"
          "manifold.rkt"
          "form-fields.rkt"

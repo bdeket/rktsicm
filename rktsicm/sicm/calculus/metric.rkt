@@ -1,13 +1,11 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../mechanics/universal.rkt"
+(require (only-in "../mechanics/universal.rkt" D)
          "basis.rkt"
          "dgutils.rkt"
          "form-fields.rkt"
-         "hodge-star.rkt"
          "indexed/types.rkt"
          "manifold.rkt"
          "vector-fields.rkt"
@@ -145,9 +143,9 @@
 	  (coordinate-system->metric-components coordinate-system))
 	 (Chi (chart coordinate-system)))
   (define ((the-metric v1 v2) m)
-    (let ((gcoeffs (g:apply ->components (list (Chi m)))))
-      (* (* gcoeffs (g:apply (g:apply 1form-basis (list v1)) (list m)))
-	 (g:apply (g:apply 1form-basis (list v2)) (list m)))))
+    (let ((gcoeffs (->components (Chi m))))
+      (* (* gcoeffs ((1form-basis v1) m))
+	 ((1form-basis v2) m))))
   (declare-argument-types! the-metric
 			   (list vector-field? vector-field?))
   the-metric))
@@ -174,7 +172,7 @@
 	     (coordinate-system->metric-components coordinate-system)))
 	 (Chi (chart coordinate-system)))
   (define ((the-inverse-metric w1 w2) m)
-    (let ((gcoeffs (g:apply ->components (list (Chi m)))))
+    (let ((gcoeffs (->components (Chi m))))
       (* (* gcoeffs
 	    (s:map/r (lambda (e) ((w1 e) m))
 		     vector-basis))
@@ -226,8 +224,8 @@
 					 (lambda (j)
 					   (gij i j)))))))
 	  (define (the-metric v1 v2)
-	    (* (* gcoeffs (g:apply 1form-basis (list v1)))
-	       (g:apply 1form-basis (list v2))))
+	    (* (* gcoeffs (1form-basis v1))
+	       (1form-basis v2)))
 	  (declare-argument-types! the-metric
 				   (list vector-field? vector-field?))
 	  the-metric)))))
@@ -283,7 +281,7 @@
 
 (define (metric->inverse-components metric basis)
   (define (the-coeffs m)
-    (let ((g_ij (g:apply (metric->components metric basis) (list m)))
+    (let ((g_ij ((metric->components metric basis) m))
 	  (1form-basis (basis->1form-basis basis)))
       (let ((g^ij
 	     (s:inverse (typical-object 1form-basis)

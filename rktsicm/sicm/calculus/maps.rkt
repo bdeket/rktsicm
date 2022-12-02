@@ -1,10 +1,9 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
-         "../rkt/default-object.rkt"
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "basis.rkt"
          "dgutils.rkt"
@@ -298,7 +297,7 @@ r0
      (lambda (f)
        (lambda (m)
 	 ;;(assert (= m (mu:N->M n)))
-	 (g:apply (g:apply V-over-mu (list f)) (list n))))
+	 ((V-over-mu f) n)))
      `(vector-field-over-map->vector-field
        ,(diffop-name V-over-mu))))
 
@@ -439,7 +438,7 @@ r0
 (define (pullback-vector-field mu:N->M mu^-1:M->N)
   (pushforward-vector mu^-1:M->N mu:N->M))
 
-(define ((pullback mu:N->M [mu^-1:M->N default-object]) thing)
+(define ((pullback mu:N->M #:optional mu^-1:M->N) thing)
   (if (vector-field? thing)
       (if (default-object? mu^-1:M->N)
 	  (error "Pullback vector needs inverse map")

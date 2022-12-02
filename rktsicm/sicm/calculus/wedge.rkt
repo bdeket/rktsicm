@@ -1,10 +1,10 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
-         "../rkt/int.rkt"
+(require (only-in "../rkt/glue.rkt" if iota
+                  fix:= fix:+)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "../general/permute.rkt"
@@ -28,7 +28,7 @@
 	  (define (the-wedge . args)
 	    (assert (fix:= (length args) n)
 		    "Wrong number of args to wedge product")
-	    (let ((perms (permutations (build-list n values))))
+	    (let ((perms (permutations (iota n))))
 	      (g:* k                    ; Error in Singer.
 		   (apply g:+
 			  (map (lambda (p)
@@ -55,15 +55,18 @@
 (define (get-rank op)
   (cond ((operator? op)
 	 (let ((a (o:arity op)))
-           (when (not (exact-integer? a))
+           (unless (exactly-n? a)
              (error (format "Unknown rank operator ~a -> ~a" op a)))
 	   a))
 	((function? op) 0)
 	(else (error "Bad rank " op))))
 
-(define (rank->arity n) n)
+(define (rank->arity n)
+  (exact-arity n))
 
-(define (procedure->nform-field proc n [name 'unnamed-nform-field])
+(define (procedure->nform-field proc n #:optional name)
+  (if (default-object? name)
+      (set! name 'unnamed-nform-field))
   (if (= n 0)
       (proc)
       (let ((the-field (make-operator proc name wedge (rank->arity n))))
@@ -139,7 +142,7 @@
 	  (define (the-alternation . args)
 	    (assert (fix:= (length args) n)
 		    "Wrong number of args to alternation")
-	    (let ((perms (permutations (build-list n values))))
+	    (let ((perms (permutations (iota n))))
 	      (g:* (/ 1 (factorial n))
 		   (apply g:+
 			  (map (lambda (p)
@@ -152,20 +155,20 @@
 				  n
 				  `(Alt ,(diffop-name form)))))))
 
-(define (tensor-product2 form1 form2)
-  (let ((n1 (get-rank form1)) (n2 (get-rank form2)))
+(define (tensor-product2 t1 t2)
+  (let ((n1 (get-rank t1)) (n2 (get-rank t2)))
     (if (or (zero? n1) (zero? n2))
-        (* form1 form2)
+        (* t1 t2)
         (let ((n (fix:+ n1 n2)))
           (define (the-product . args)
             (assert (fix:= (length args) n)
                     "Wrong number of args to tensor product")
             (define-values (h t) (split-at args n1))
-            (* (apply form1 h) (apply form2 t)))
+            (* (apply t1 h) (apply t2 t)))
           (procedure->nform-field the-product
                                   n
-                                  `(tensor-product ,(diffop-name form1)
-                                                   ,(diffop-name form2)))))))
+                                  `(tensor-product ,(diffop-name t1)
+                                                   ,(diffop-name t2)))))))
 
 (define (w2 form1 form2)
   (let ((n1 (get-rank form1)) (n2 (get-rank form2)))

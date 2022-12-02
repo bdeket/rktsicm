@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../mechanics/universal.rkt"
+(require (only-in "../mechanics/universal.rkt" D)
          )
 
 #|
