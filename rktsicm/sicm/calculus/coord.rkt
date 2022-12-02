@@ -1,42 +1,31 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require (for-syntax racket/base
-                     racket/syntax)
-         "../kernel-gnrc.rkt"
-         "../rkt/default-object.rkt"
-         "../general/assert.rkt"
-         "basis.rkt"
-         "dgutils.rkt"
-         "indexed/types.rkt"
-         "manifold.rkt"
-         "maps.rkt"
-         "form-fields.rkt"
-         "vector-fields.rkt"
-         "wedge.rkt"
+(require (for-syntax "../generic.rkt"
+                     (only-in racket/syntax format-symbol))
          )
 
 
 ;; (define-values (v1 v2 v3 ...) values-expr)
 
-;we get this from racket
-#;(define-syntax define-values
+#; ;;bdk;; we get this from racket
+(define-syntax define-values
   (er-macro-transformer
    (lambda (exp r c)
      (let* ((names (cadr exp))
-	    (values-expr (caddr exp))
-	    (temps (map generate-uninterned-symbol names)))
+            (values-expr (caddr exp))
+            (temps (map generate-uninterned-symbol names)))
        `(,(r 'begin)
-	 ,@(map (lambda (name) 
-		  `(,(r 'define) ,name))
-		names)
-	 (,(r 'call-with-values)
-	  (,(r 'lambda) () ,values-expr)
-	  (,(r 'lambda) ,temps
-		       ,@(map (lambda (name temp) 
-				`(,(r 'set!) ,name ,temp))
-			      names temps))))))))
+         ,@(map (lambda (name) 
+                  `(,(r 'define) ,name))
+                names)
+         (,(r 'call-with-values)
+          (,(r 'lambda) () ,values-expr)
+          (,(r 'lambda) ,temps
+                        ,@(map (lambda (name temp) 
+                                 `(,(r 'set!) ,name ,temp))
+                               names temps))))))))
 	     
 
 ;; Use:
@@ -96,7 +85,8 @@
                      (map cadr (ultra-flatten (coord-sys 'coordinate-basis-vector-field-specs)))
                      (map cadr (ultra-flatten (coord-sys 'coordinate-basis-1form-field-specs))))])
                (apply values chart-functions))))))]))
-#;(define-syntax define-coordinates
+#;
+(define-syntax define-coordinates
   (er-macro-transformer
    (lambda (e r c)
      (define (quote-symbol-names symbs)
@@ -117,14 +107,12 @@
 		     (cdr symbs))))
 	((symbol? symbs) (list symbs))
 	(else (error "bad coordinate prototype" symbs))))
-
      (let ((coord-proto-symbs (cadr e))
 	   (coord-proto (quote-symbol-names (cadr e)))
 	   (coord-sys-expr (caddr e))
 	   (coord-sys (generate-uninterned-symbol 'coord-sys))
 	   (chart-functions (generate-uninterned-symbol 'chart-fn))
 	   (proto (generate-uninterned-symbol 'coord-proto)))
-
        (let* ((coord-symbs (get-symbol-names coord-proto-symbs))
 	      (coord-vector-syms 
 	       (map (lambda (sym) (symbol 'd/d sym)) coord-symbs))
@@ -179,7 +167,8 @@ a
   (let ()
     (define-coordinates names coord-sys)
     body ...))
-#;(define-syntax using-coordinates
+#;
+(define-syntax using-coordinates
   (er-macro-transformer
    (lambda (x r c)
      (let ((coord-proto (cadr x))

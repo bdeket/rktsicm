@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../parameters.rkt"
+(require "../parameters.rkt"
          "../general/memoize.rkt"
          "../general/hashcons.rkt"
          )
@@ -63,25 +62,22 @@
   (hash-memoize-1arg (compose canonical-copy g:simplify)))
 
 (define (simplify-numerical-expression expr)
-  (cond
-    [(and (pair? expr) (eq? (car expr) '*number*))
-     ;TODO we should not be constructing tagged literals overhere
-     (define result (memoized-simplify expr))
-     (define H (hash-copy (cdr expr)))
-     (hash-set! H 'expression result)
-     (cons '*number* H)]
-    #;[(and (pair? expr) (eq? (car expr) '*number*))
-     (define result (make-numerical-literal
-                     (memoized-simplify expr)))
-     ;(set-cdr! (cdr result) (cddr expr))
-     ;result
-     ]
-    [else expr]))
+  (cond ((and (pair? expr) (eq? (car expr) '*number*))
+         (let ((result
+                (make-numerical-literal
+                 (memoized-simplify expr))))
+           ;; copy extra properties, if any
+           (for ([(k v) (in-hash (cdr expr))]
+                 #:unless (eq? k 'expression))
+             (hash-set! (cdr result) k v)) #;
+           (set-cdr! (cdr result) (cddr expr))
+           result))
+        (else expr)))
 
 
 (define (with-incremental-simplifier thunk)
-  (parameterize ([incremental-simplifier g:simplify]
-                 [enable-constructor-simplifications? #t])
+  (parameterize ((incremental-simplifier g:simplify)
+                 (enable-constructor-simplifications? #t))
     (clear-memoizer-tables)
     (thunk)))
 

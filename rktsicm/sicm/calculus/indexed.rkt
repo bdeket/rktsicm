@@ -1,13 +1,13 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "indexed/types.rkt"))
 
-(require "indexed/types.rkt"
-         "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" if every any
+                  fix:= fix:< fix:<= fix:+ fix:-)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
+         "indexed/types.rkt"
          "basis.rkt"
          "form-fields.rkt"
          "manifold.rkt"
@@ -19,7 +19,33 @@
 ;;;;    Minimal support for Indexed Objects
 ;;; e.g. the components of tensors relative to a basis.
 
+#| ;;bdk;; moved to inexed/types
+;;; A minimal interface for multi-index stuff.
+
+(define (argument-types proc)
+  (eq-get proc 'argument-types))
+
+(define has-argument-types? argument-types)
+
+(define (declare-argument-types! proc argument-types)
+  (assert (procedure? proc))
+  (eq-put! proc 'argument-types argument-types))
+
 ;;; argument-types are, for example 
+;;;    (list 1form-field? vector-field? vector-field?), 
+;;; for a Christoffel-2: it takes one 1form field and two vector fields.
+
+(define (index-types proc)
+  (eq-get proc 'index-types))
+
+(define has-index-types? index-types)
+
+(define (declare-index-types! proc index-types)
+  (assert (procedure? proc))
+  (eq-put! proc 'index-types index-types))
+|#
+
+;;; *index-types* are, for example 
 ;;;    (list up down down), 
 ;;; for a Christoffel-2: it takes one 1form field and two vector fields.
 
@@ -38,11 +64,11 @@
 	(vector-basis (basis->vector-basis basis))
 	(1form-basis (basis->1form-basis basis)))
     (assert (and arg-types
-		 (andmap  (lambda (arg-type)
+		 (every  (lambda (arg-type)
 			  (or (eq? arg-type 1form-field?)
 			      (eq? arg-type vector-field?)))
 			arg-types)
-		 (not (ormap (lambda (arg-type) ;forms then vectors.
+		 (not (any (lambda (arg-type) ;forms then vectors.
 			     (eq? arg-type 1form-field?))
 			   (or (memq vector-field? arg-types)
 			       '()))))
@@ -71,17 +97,17 @@
 	(1form-basis (basis->1form-basis basis))
 	(n (basis->dimension basis)))
     (assert (and index-types
-		 (andmap (lambda (index-type)
+		 (every (lambda (index-type)
 			  (or (eq? index-type up) (eq? index-type down)))
 			index-types)
-		 (not (ormap (lambda (index-type)	;ups before downs
+		 (not (any (lambda (index-type)	;ups before downs
 			     (eq? index-type up))
 			   (or (memq down index-types)
 			       '()))))
 	    "Bad index types")
     (define (function . args)
       (assert (fix:= (length index-types) (length args)))
-      (assert (andmap (lambda (index-type arg)
+      (assert (every (lambda (index-type arg)
 		       (or (and (eq? index-type up) (1form-field? arg))
 			   (and (eq? index-type down) (vector-field? arg))))
 		     index-types args)
@@ -92,7 +118,7 @@
 	      (set! sum (g:+ (g:* (indexed (reverse indices)) term) sum))
 	      (let ((arg (car args)))
 		(let dloop ((i 0))
-		  (when (fix:< i n)
+		  (if (fix:< i n)
 		      (begin
 			(aloop (cdr args)
 			       (g:* (cond ((vector-field? arg)
@@ -218,17 +244,17 @@
 	  (sigma (lambda (i)
                    (define-values (h t) (split-at args nuc))
 		   (T (append
-		       (list-with-inserted-coord h #;(take args nuc) u i)
-		       (list-with-inserted-coord t #;(drop args nuc) d i))))
+		       (list-with-inserted-coord h #;(list-head args nuc) u i)
+		       (list-with-inserted-coord t #;(list-tail args nuc) d i))))
 		 0 (fix:- n 1)))
 	(declare-index-types! contraction
           (append (make-list nuc up) (make-list ndc down)))
 	contraction))))
 
 (define (list-with-inserted-coord list index coord)
-  ;(append (take list index) (cons coord (drop list index)))
   (define-values (h t) (split-at list index))
-  (append h (cons coord t)))
+  (append h (cons coord t))#;
+  (append (list-head list index) (cons coord (list-tail list index))))
 
 #|
 (((indexed->typed (i:contract iT1 0 0 2)
@@ -278,7 +304,7 @@
 		       (cond ((eq? shape 'up) vector-field?)
 			     ((eq? shape 'down) 1form-field?)
 			     (else (error "Bad Shape"))))
-		     (lp (g:ref cf 0)))
+		     (lp (ref cf 0)))
 	       '())))
 	(coeff-functions
 	 (maybe-simplify-coeff-functions coeff-functions basis)))

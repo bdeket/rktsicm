@@ -1,4 +1,4 @@
-#lang racket/base
+#lang s-exp "../../generic.rkt"
 
 (provide make-manifold-point
          manifold-point?

@@ -1,11 +1,14 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" if
+                  fix:=)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
-         "../kernel-gnrc.rkt"
          "../general/assert.rkt"
+         "../general/memoize.rkt"
+         (only-in "../mechanics/universal.rkt" D)
          "dgutils.rkt"
          "indexed/types.rkt"
          "manifold/manifold-point.rkt"
@@ -28,8 +31,10 @@
 ;;; operator multiplies by composition.  Like D it takes the given
 ;;; function to another function of a point.
 
-(define (procedure->vector-field vfp [name 'unnamed-vector-field])
-  (let ((the-field (make-operator vfp name 'vector-field)))
+(define (procedure->vector-field vfp #:optional name)
+  (if (default-object? name)
+      (set! name 'unnamed-vector-field))
+  (let ((the-field (make-operator vfp name 'vector-field (exact-arity 1))))
     (declare-argument-types! the-field (list function?))
     the-field))
 
@@ -39,15 +44,24 @@
 ;;; specified in the given coordinate system.
 
 (define ((vector-field-procedure components coordinate-system) f)
-  (compose (* (g:derivative (compose f (coordinate-system '->point)))
+  (compose (* (D (compose f (coordinate-system '->point)))
 	      components)
 	   (coordinate-system '->coords)))
 
-(define (components->vector-field components coordinate-system
-                                  [name `(vector-field ,components)])
-  (procedure->vector-field
-   (vector-field-procedure components coordinate-system)
-   name))
+;; (define (components->vector-field components coordinate-system #!optional name)
+;;   (if (default-object? name) (set! name `(vector-field ,components)))
+;;   (procedure->vector-field
+;;    (vector-field-procedure components coordinate-system)
+;;    name))
+
+
+;;; Sam Ritchie (Nov 2021) noticed that introducing heavy memoization here
+;;; speeds things up!  See end of general/memoize.scm for this hack.
+
+(define (components->vector-field components coordinate-system #:optional name)
+  (if (default-object? name) (set! name `(vector-field ,components)))
+  (let ((vfp (vector-field-procedure components coordinate-system)))
+    (procedure->vector-field (samritchie-memoizer vfp) name)))
    
 
 ;;; We can extract the components function for a vector field, given a
@@ -58,15 +72,17 @@
   ((vf (coordinate-system '->coords)) 
    ((coordinate-system '->point) coords)))
 
-(define (vf:zero f) zero-manifold-function)
+(define (vf:zero f)
+  ;;(assert (manifold-function? f))
+  zero-manifold-function)
 
 (define (vf:zero-like op)
   (assert (vector-field? op) "vf:zero-like")
-  (make-operator vf:zero
-	   'vf:zero
-	   (operator-subtype op)
-	   (operator-arity op)
-	   (operator-optionals op)))
+  (make-op vf:zero
+           'vf:zero
+           (operator-subtype op)
+           (operator-arity op)
+           (operator-optionals op)))
 
 (assign-operation 'zero-like vf:zero-like vector-field?)
 
@@ -97,13 +113,22 @@
 ;;; For any coordinate system we can make a coordinate basis.
 
 (define ((coordinate-basis-vector-field-procedure coordinate-system . i) f)
-  (compose ((apply g:partial i) (compose f (coordinate-system '->point)))
+  (compose ((apply partial i) (compose f (coordinate-system '->point)))
 	   (coordinate-system '->coords)))
 
+;; (define (coordinate-basis-vector-field coordinate-system name . i)
+;;   (procedure->vector-field
+;;    (apply coordinate-basis-vector-field-procedure coordinate-system i)
+;;    name))
+
+;;; Sam Ritchie (Nov 2021) noticed that introducing heavy memoization here
+;;; speeds things up!
+
 (define (coordinate-basis-vector-field coordinate-system name . i)
-  (procedure->vector-field
-   (apply coordinate-basis-vector-field-procedure coordinate-system i)
-   name))
+  (let ((vfp
+         (apply coordinate-basis-vector-field-procedure
+                coordinate-system i)))
+    (procedure->vector-field (samritchie-memoizer vfp) name)))
 
 #|
 (define (coordinate-system->vector-basis coordinate-system)
@@ -134,8 +159,8 @@
   (procedure->vector-field
    (lambda (f)
      (lambda (point)
-       (* (s:apply (s:apply vector-basis (list f)) (list point))
-	  (s:apply components (list point)))))
+       (* ((vector-basis f) point)
+	  (components point))))
    `(+ ,@(map (lambda (component basis-element)
 		`(* ,(diffop-name component)
 		    ,(diffop-name basis-element)))
@@ -229,7 +254,7 @@
 |#
 ;;; has length 1
 
-(pec ((d/dz (up x y z))
+(pec ((d/dzeta (up x y z))
       ((R3-rect '->point) (up 'x 'y 'z))))
 #| Result:
 (up 0 0 1)
@@ -314,7 +339,7 @@
       (let ((b
              (compose (sfv (coordsys '->coords))
                       (coordsys '->point))))
-        (* ((g:derivative f) x) (b x)))))
+        (* ((D f) x) (b x)))))
   (make-operator v))
 
 #|

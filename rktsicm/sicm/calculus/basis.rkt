@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
          "../general/assert.rkt"
          "dgutils.rkt"
          "form-fields.rkt"
@@ -13,6 +12,7 @@
 
 ;;; The following give us dual bases 
 ;;; Basis objects have a dimension, a basis, a dual basis.
+
 
 ;;; coordinate bases
 

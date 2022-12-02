@@ -1,24 +1,23 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "manifold/manifold-point.rkt"
                        "manifold/helper.rkt"))
 
-(require "manifold/manifold-point.rkt"
-         "manifold/helper.rkt"
-         "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
-         "../rkt/default-object.rkt"
-         "../rkt/racket-help.rkt"
+(require (only-in "../rkt/glue.rkt" if symbol warn find generate-uninterned-symbol write-line every make-initialized-list list-head
+                  fix:= fix:< fix:>= fix:+)
+         (only-in "../rkt/define.rkt" define default-object?)
+         (only-in "../rkt/environment.rkt" environment-define environment-bound? environment-lookup environment-assign! scmutils-base-environment user-generic-environment)
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
+         "manifold/manifold-point.rkt"
+         "manifold/helper.rkt"
          "../mechanics/rotation.rkt"
          "basis.rkt"
          "form-fields.rkt"
          "frame-maker.rkt"
          "vector-fields.rkt"
-         "../rkt/environment.rkt"
          )
 (define-values (assign-operation manifold:assign-operations)
   (make-assign-operations 'manifold))
@@ -26,16 +25,53 @@
 
 ;;;;  Manifolds are built here.
 
+#| ;;bdk;; moved to manifold/manifold-point p1
+(define-record-type <manifold-point>
+    (%make-manifold-point spec manifold)
+    manifold-point?
+  (spec manifold-point-representation)
+  (manifold point->manifold)
+  (coordinate-representations coordinate-reps set-coordinate-reps!))
+
+(define (make-manifold-point spec manifold coordinate-system coordinate-rep)
+  (let ((m (%make-manifold-point spec manifold)))
+    (set-coordinate-reps! m (list (list coordinate-system coordinate-rep)))
+    m))
+
+(define (transfer-point embedded embedding)
+  (lambda (point)
+    (assert (eq? (embedded 'manifold) (point->manifold point)))
+    (assert (= ((embedded 'manifold) 'embedding-dimension)
+	       ((embedding 'manifold) 'embedding-dimension)))		 
+    (let ((m (%make-manifold-point
+	      (manifold-point-representation point)
+	      (embedding 'manifold))))
+      (set-coordinate-reps! m '())
+      m)))
+|#
+
 ;;; A Kludge.
 (define (get-coordinate-rep point)
   ;(assert (eq? ((point->manifold point) 'name) manifold-name))
   (let ((rep
-         (findf (lambda (rep)
+         (find (lambda (rep)
                   ;(eq? ((car rep) 'name) chart-name)
                   #t)
                 (coordinate-reps point))))
     (assert rep)
     (cadr rep)))
+
+#| ;;bdk;; moved to manifold/manifold-point p2
+(define (get-coordinates point coordinate-system thunk)
+  (let ((entry (assq coordinate-system (coordinate-reps point))))
+    (if entry
+	(cadr entry)
+	(let ((val (s:map/r simplify-numerical-expression (thunk))))
+	  (set-coordinate-reps! point
+				(cons (list coordinate-system val)
+				      (coordinate-reps point)))
+	  val))))
+|#
 
 (define (my-manifold-point? point manifold)
   (and (manifold-point? point)
@@ -45,16 +81,35 @@
 ;;; There is a kludge in this system... A single coordinate is just
 ;;; the number:
 
-(define (specify-manifold manifold-name [type Real])
+#| ;;bdk;; moved to manifold/helper
+(define (c:generate n type proc)
+  (if (fix:= n 1)
+      (proc 0)
+      (s:generate n type proc)))
+
+(define (c:lookup m struct)
+  (if (structure? struct)
+      (assq m
+	    (vector->list
+	     (if (up? struct)
+		(up->vector struct)
+		(down->vector struct))))
+      struct))
+|#
+
+(define (specify-manifold manifold-name #:optional type)
+  (if (default-object? type) (set! type Real))
   (let ((patches '()) (counter 0) (distinguished-points '()))
-    (define (generator dimension [embedding-dimension dimension])
+    (define (generator dimension #:optional embedding-dimension)
       (assert (exact-integer? dimension))
-      (assert (and (exact-integer? embedding-dimension)
-                   (fix:>= embedding-dimension dimension)))
+      (if (default-object? embedding-dimension)
+          (set! embedding-dimension dimension)
+          (assert (and (exact-integer? embedding-dimension)
+                       (fix:>= embedding-dimension dimension))))
       (set! counter (+ counter 1))      
       (let ((name
-             (symbol (let* ([namestring (symbol->string manifold-name)]
-                            [p (regexp-match #px".*(?=\\^n)" namestring)])
+             (symbol (let* ((namestring (symbol->string manifold-name))
+                            (p (regexp-match #px".*(?=\\^n)" namestring)))
                        (if p
                            (string->symbol
                             (string-append (car p)
@@ -163,7 +218,7 @@
                                   patch-name
                                   manifold-type
                                   transformations
-                                  [coordinate-prototype default-object])
+                                  #:optional coordinate-prototype)
   (define (the-coordinate-system-generator the-patch)
     (let* ((manifold (the-patch 'manifold))
            (transform-delivery (transformations manifold))
@@ -171,7 +226,7 @@
             (if (default-object? coordinate-prototype)
                 (c:generate (manifold 'dimension) 'up
                             (lambda (i) (symbol 'x i)))
-                (when
+                (begin
                     (assert
                      (fix:= (manifold 'dimension)
                           (s:dimension coordinate-prototype)))
@@ -200,9 +255,17 @@
              (lambda (new)
                (assert (fix:= (manifold 'dimension) (s:dimension new)))
                (set! coordinate-prototype new)
+               ;; Patch from Sam Ritchie on 7 April 2021
+               (let ((new-chains
+                      (s:map-chain (lambda (element chain) chain)
+                                   coordinate-prototype)))
+                 (set! access-chains new-chains)
+                 (set! dual-chains (flip-indices new-chains)))
+               #|
                (set! access-chains 
                      (s:map-chain (lambda (element chain) chain)
                                   coordinate-prototype))
+               |#
                (set! coordinate-function-specs #f)
                (set! coordinate-basis-vector-field-specs #f)
                (set! coordinate-basis-1form-field-specs #f)
@@ -211,7 +274,7 @@
             ((dual-chains) dual-chains)
 
             ((coordinate-function-specs)
-             (when (not coordinate-function-specs)
+             (if (not coordinate-function-specs)
                (set! coordinate-function-specs
                      (s:map/r
                       (lambda (coordinate-name access-chain)
@@ -223,7 +286,7 @@
                       access-chains)))
              coordinate-function-specs)
             ((coordinate-basis-vector-field-specs)
-             (when (not coordinate-basis-vector-field-specs)
+             (if (not coordinate-basis-vector-field-specs)
                (set! coordinate-basis-vector-field-specs
                      (flip-indices
                       (s:map/r
@@ -242,7 +305,7 @@
                        access-chains))))
              coordinate-basis-vector-field-specs)
             ((coordinate-basis-1form-field-specs)
-             (when (not coordinate-basis-1form-field-specs)
+             (if (not coordinate-basis-1form-field-specs)
                (set! coordinate-basis-1form-field-specs
                      (s:map/r
                       (lambda (coordinate-name access-chain)
@@ -261,7 +324,7 @@
              coordinate-basis-1form-field-specs)
 
             ((coordinate-basis)
-             (when (not coordinate-basis)
+             (if (not coordinate-basis)
                (set! coordinate-basis
                      (coordinate-system->basis the-coordinate-system)))
              coordinate-basis)
@@ -325,7 +388,7 @@
    (typical-coords coordinate-system)))
 
 (define (typical-coords coordinate-system)
-  (s:map/r gensym
+  (s:map/r generate-uninterned-symbol
            (coordinate-system 'coordinate-prototype)))
 
 (define (corresponding-velocities coords)
@@ -344,22 +407,23 @@
 ;;;      dr and dtheta are coordinate 1form fields.
 
 (define (install-coordinates coordinate-system
-                             [coordinate-prototype default-object])
-  (define env (current-namespace))
+                             #:optional coordinate-prototype env)
+  (define user-generic-environment (if (default-object? env) (current-namespace) env))
   (define (install-symbol name value)
-    (when (environment-bound? env name)
+    (if (environment-bound? user-generic-environment name)
         (begin
-          (writeln `(clobbering ,name))
+          (write-line `(clobbering ,name))
           (set! *saved-environment-values*
                 (cons (cons name
-                            (environment-lookup env name))
+                            (environment-lookup user-generic-environment
+                                                name))
                       *saved-environment-values*))))
-    (environment-define env name value))
+    (environment-define user-generic-environment name value))
   (define (install-symbols s)
     (s:foreach (lambda (symval)
                  (install-symbol (car symval) (cadr symval)))
                s))
-  (when (not (default-object? coordinate-prototype))
+  (if (not (default-object? coordinate-prototype))
       ((coordinate-system 'set-coordinate-prototype!) coordinate-prototype))
   (install-symbols (coordinate-system 'coordinate-function-specs))
   (install-symbols (coordinate-system 'coordinate-basis-vector-field-specs))
@@ -402,7 +466,7 @@
                                    (my-manifold-point? point manifold)))
                                 ((point->coords)
                                  (lambda (point)
-                                   (when (not ((me 'check-point) point))
+                                   (if (not ((me 'check-point) point))
                                        (error "Bad point: rectangular" point me))
                                    (get-coordinates point me
                                                     (lambda ()
@@ -424,18 +488,18 @@
                                    (and (up? coords)
                                         (fix:= (s:dimension coords) (manifold 'dimension))
                                         (not (fix:< (s:dimension coords) 2))
-                                        (or (not (number? (g:ref coords 0)))
-                                            (not (< (g:ref coords 0) 0))))))
+                                        (or (not (number? (ref coords 0)))
+                                            (not (< (ref coords 0) 0))))))
                                 ((coords->point)
                                  (lambda (coords)
                                    (if ((me 'check-coordinates) coords)
-                                       (let ((r (g:ref coords 0)) (theta (g:ref coords 1)))
+                                       (let ((r (ref coords 0)) (theta (ref coords 1)))
                                          (make-manifold-point
                                           (s:generate (s:dimension coords) 'up
                                                       (lambda (i)
                                                         (cond ((= i 0) (* r (cos theta)))
                                                               ((= i 1) (* r (sin theta)))
-                                                              (else (g:ref coords i)))))
+                                                              (else (ref coords i)))))
                                           manifold
                                           me
                                           coords))
@@ -446,7 +510,7 @@
                                    (my-manifold-point? point manifold)))
                                 ((point->coords)
                                  (lambda (point)
-                                   (when (not ((me 'check-point) point))
+                                   (if (not ((me 'check-point) point))
                                        (error "Bad point: polar/cylindrial" point me))
                                    (get-coordinates point me
                                                     (lambda ()
@@ -454,16 +518,16 @@
                                                         (if (and (up? prep)
                                                                  (fix:= (s:dimension prep)
                                                                         (manifold 'embedding-dimension)))
-                                                            (let ((x (g:ref prep 0)) (y (g:ref prep 1)))
+                                                            (let ((x (ref prep 0)) (y (ref prep 1)))
                                                               (let ((rsq (+ (square x) (square y))))
-                                                                (when (and (number? rsq) (= rsq 0))
+                                                                (if (and (number? rsq) (= rsq 0))
                                                                     (error "polar/cylindrical singular"
                                                                            point me))
                                                                 (s:generate (s:dimension prep) 'up
                                                                             (lambda (i)
                                                                               (cond ((= i 0) (sqrt rsq))
                                                                                     ((= i 1) (atan y x))
-                                                                                    (else (g:ref prep i)))))))
+                                                                                    (else (ref prep i)))))))
                                                             (error "Bad point: polar/cylindrial"
                                                                    point me)))))))
                                 ((manifold) manifold)
@@ -480,21 +544,21 @@
                                    (and (up? coords)
                                         (fix:= (s:dimension coords) (manifold 'dimension))
                                         (not (fix:< (s:dimension coords) 3))
-                                        (or (not (number? (g:ref coords 0)))
-                                            (not (< (g:ref coords 0) 0))))))
+                                        (or (not (number? (ref coords 0)))
+                                            (not (< (ref coords 0) 0))))))
                                 ((coords->point)
                                  (lambda (coords)
                                    (if ((me 'check-coordinates) coords)
-                                       (let ((r (g:ref coords 0)) 
-                                             (theta (g:ref coords 1)) 
-                                             (phi (g:ref coords 2)))
+                                       (let ((r (ref coords 0)) 
+                                             (theta (ref coords 1)) 
+                                             (phi (ref coords 2)))
                                          (make-manifold-point
                                           (s:generate (s:dimension coords) 'up
                                                       (lambda (i)
                                                         (cond ((= i 0) (* r (sin theta) (cos phi)))
                                                               ((= i 1) (* r (sin theta) (sin phi)))
                                                               ((= i 2) (* r (cos theta)))
-                                                              (else (g:ref coords i)))))
+                                                              (else (ref coords i)))))
                                           manifold
                                           me
                                           coords))
@@ -504,7 +568,7 @@
                                  (lambda (point) (my-manifold-point? point manifold)))
                                 ((point->coords)
                                  (lambda (point)
-                                   (when (not ((me 'check-point) point))
+                                   (if (not ((me 'check-point) point))
                                        (error "Bad point: spherical/cylindrial" point me))
                                    (get-coordinates point me
                                                     (lambda ()
@@ -512,12 +576,12 @@
                                                         (if (and (up? prep)
                                                                  (fix:= (s:dimension prep)
                                                                         (manifold 'embedding-dimension)))
-                                                            (let ((x (g:ref prep 0)) 
-                                                                  (y (g:ref prep 1))
-                                                                  (z (g:ref prep 2)))
+                                                            (let ((x (ref prep 0)) 
+                                                                  (y (ref prep 1))
+                                                                  (z (ref prep 2)))
                                                               (let ((r (sqrt
                                                                         (+ (square x) (square y) (square z)))))
-                                                                (when (and (number? r) (= r 0))
+                                                                (if (and (number? r) (= r 0))
                                                                     (error "spherical/cylindrical singular"
                                                                            point me))
                                                                 (s:generate (s:dimension prep) 'up
@@ -525,7 +589,7 @@
                                                                               (cond ((= i 0) r)
                                                                                     ((= i 1) (acos (/ z r)))
                                                                                     ((= i 2) (atan y x))
-                                                                                    (else (g:ref prep i)))))))
+                                                                                    (else (ref prep i)))))))
                                                             (error "Bad point: spherical/cylindrial"
                                                                    point me)))))))
                                 ((manifold) manifold)
@@ -544,10 +608,10 @@
                                 ((coords->point)
                                  (lambda (coords)
                                    (if ((me 'check-coordinates) coords)
-                                       (let ((t (g:ref coords 0))
-                                             (r (g:ref coords 1))
-                                             (theta (g:ref coords 2))
-                                             (phi   (g:ref coords 3)))
+                                       (let ((t (ref coords 0))
+                                             (r (ref coords 1))
+                                             (theta (ref coords 2))
+                                             (phi   (ref coords 3)))
                                          (make-manifold-point
                                           (up t
                                               (* r (sin theta) (cos phi)) 
@@ -563,18 +627,18 @@
                                    (my-manifold-point? point manifold)))
                                 ((point->coords)
                                  (lambda (point)
-                                   (when (not ((me 'check-point) point))
+                                   (if (not ((me 'check-point) point))
                                        (error "Bad point: spacetime-spherical" point me))
                                    (get-coordinates point me
                                                     (lambda ()
                                                       (let ((prep (manifold-point-representation point)))
                                                         (if (and (up? prep) (fix:= (s:dimension prep) 4))
-                                                            (let ((t (g:ref prep 0))
-                                                                  (x (g:ref prep 1))
-                                                                  (y (g:ref prep 2))
-                                                                  (z (g:ref prep 3)))
+                                                            (let ((t (ref prep 0))
+                                                                  (x (ref prep 1))
+                                                                  (y (ref prep 2))
+                                                                  (z (ref prep 3)))
                                                               (let ((r (sqrt (+ (square x) (square y) (square z)))))
-                                                                (when (and (number? r) (= r 0))
+                                                                (if (and (number? r) (= r 0))
                                                                     (error "spacetime-spherical singular" point me))
                                                                 (up t
                                                                     r
@@ -720,6 +784,8 @@
 
 (define S^2-type (specify-manifold 'S^2))
 
+(define S^2 S^2-type)                   ; A useful alias
+
 (define (S^2-coordinates orientation)
   (let ((orientation^-1 (invert orientation)))
     (lambda (manifold)
@@ -727,15 +793,15 @@
         (define (coordinates-ok? coords)
           (and (up? coords)
                (fix:= (s:dimension coords) 2)
-               (or (not (number? (g:ref coords 0)))
-                   (not (< (g:ref coords 0) 0)))))
+               (or (not (number? (ref coords 0)))
+                   (not (< (ref coords 0) 0)))))
         (case m
           ((check-coordinates) coordinates-ok?)
           ((coords->point)
            (lambda (coords)
              (if (coordinates-ok? coords)
-                 (let ((colatitude (g:ref coords 0))
-                       (longitude (g:ref coords 1)))
+                 (let ((colatitude (ref coords 0))
+                       (longitude (ref coords 1)))
                    (make-manifold-point
                     (* orientation
                        (up (* (sin colatitude) (cos longitude))
@@ -749,7 +815,7 @@
            (lambda (point) (my-manifold-point? point manifold)))
           ((point->coords)
            (lambda (point)
-             (when (not ((me 'check-point) point))
+             (if (not ((me 'check-point) point))
                  (error "Bad point: S^2-spherical" point me))
              (get-coordinates point me
                               (lambda ()
@@ -759,9 +825,9 @@
                                   (if (and (up? prep)
                                            (fix:= (s:dimension prep)
                                                   (manifold 'embedding-dimension)))
-                                      (let ((x (g:ref prep 0))
-                                            (y (g:ref prep 1))
-                                            (z (g:ref prep 2)))
+                                      (let ((x (ref prep 0))
+                                            (y (ref prep 1))
+                                            (z (ref prep 2)))
                                         ;; (if (and (number? x) (= x 0))
                                         ;;     (error "S^2-spherical singular" point me))
                                         (up (acos z) (atan y x)))
@@ -809,6 +875,8 @@
 
 (define S^n-type (specify-manifold 'S^n))
 
+(define S^n S^n-type)
+
 ;; Manifold points are represented by
 ;;(up 
 ;;    (* (sin theta0) (cos theta1) )
@@ -844,12 +912,12 @@
                  (and (up? coords)
                       (fix:= (s:dimension coords) (manifold 'dimension))
                       (let ((remaining-coords (butlast (up-structure->list coords))))
-                        (andmap (lambda (coord)
+                        (every (lambda (coord)
                                  (or (not (number? coord)) (not (< coord 0))))
                                remaining-coords))))))
           ((coords->point)
            (lambda (coords)
-             (when (not ((me 'check-coordinates) coords))
+             (if (not ((me 'check-coordinates) coords))
                  (error "Bad coordinates: S^n-spherical" coords me))
              (if (fix:= n 1)
                  (let ((pt (up (cos coords) (sin coords))))
@@ -860,23 +928,23 @@
                         (pt
                          (list->up-structure
                           (list-top-to-bottom
-                           (build-list (fix:+ n 1)
+                           (make-initialized-list (fix:+ n 1)
                                        (lambda (i)
                                          (if (fix:= i n)
                                              (apply * sines)
                                              (apply *
                                                     (cons (list-ref cosines i)
-                                                          (take sines i))))))))))
+                                                          (list-head sines i))))))))))
                    (make-manifold-point (* orientation-matrix pt)
                                         manifold me coords)))))
           ((check-point)
            (lambda (point) (my-manifold-point? point manifold)))
           ((point->coords)
            (lambda (point)
-             (when (not ((me 'check-point) point))
+             (if (not ((me 'check-point) point))
                  (error "Bad point: S^n-spherical" point me))
              (define (safe-atan y x)
-               (when (and (number? y) (number? x) (= y 0) (= x 0))
+               (if (and (number? y) (number? x) (= y 0) (= x 0))
                    (warn "S^n-spherical singular" point me))  
                (atan y x))
              (let* ((pt
@@ -886,7 +954,7 @@
                         (* orientation-inverse-matrix
                            (manifold-point-representation point)))))) )
                (if (fix:= n 1)
-                   (safe-atan (g:ref pt 1) (g:ref pt 0))
+                   (safe-atan (ref pt 1) (ref pt 0))
                    (let lp ((r (car pt)) (rest (cdr pt))
                                          (ans (list (safe-atan (car pt) (cadr pt)))))
                      (if (null? (cdr rest))
@@ -1028,17 +1096,17 @@
                       (fix:= (s:dimension coords) n)))))
           ((coords->point)
            (lambda (coords)
-             (when (not ((me 'check-coordinates) coords))
+             (if (not ((me 'check-coordinates) coords))
                  (error "Bad coordinates: S^n-stereographic"
                         coords me))
              (let* ((coords (if (fix:= n 1) (up coords) coords))
-                    (delta (g:dot-product coords coords))
+                    (delta (dot-product coords coords))
                     (xn (/ (- delta 1) (+ 1 delta)))
                     (pt (s:generate
                          (fix:+ n 1) 'up
                          (lambda (i)
                            (if (fix:= i n) xn
-                               (/ (* 2 (g:ref coords i))
+                               (/ (* 2 (ref coords i))
                                   (+ 1 delta)))))))
                (make-manifold-point (* orientation-matrix pt)
                                     manifold me coords))))
@@ -1046,19 +1114,19 @@
            (lambda (point) (my-manifold-point? point manifold)))
           ((point->coords)
            (lambda (point)
-             (when (not ((me 'check-point) point))
+             (if (not ((me 'check-point) point))
                  (error "Bad point: S^n" point me))
              (let* ((n (manifold 'dimension))
                     (pt (* orientation-inverse-matrix
                            (manifold-point-representation point))))
-               (when (and (number? (g:ref pt n)) (= (g:ref pt n) 1))
+               (if (and (number? (ref pt n)) (= (ref pt n) 1))
                    (error "S^n-stereographic singular" point me))
                (let ((coords
                       (s:generate n 'up
                                   (lambda (i)
-                                    (/ (g:ref pt i)
-                                       (- 1 (g:ref pt n)))))))
-                 (if (fix:= n 1) (g:ref coords 0) coords)))))
+                                    (/ (ref pt i)
+                                       (- 1 (ref pt n)))))))
+                 (if (fix:= n 1) (ref coords 0) coords)))))
           ((manifold) manifold)
           ((orientation) orientation-function)
           (else (error "S^n-stereographic: Bad message" m me))))
@@ -1182,10 +1250,10 @@
                  (and (up? coords) (fix:= (s:dimension coords) n)))))
           ((coords->point)
            (lambda (coords)
-             (when (not ((me 'check-coordinates) coords))
+             (if (not ((me 'check-coordinates) coords))
                  (error "Bad coordinates: S^n" coords me))
              (let* ((coords (if (fix:= n 1) (up coords) coords))
-                    (delta (g:dot-product coords coords))
+                    (delta (dot-product coords coords))
                     (d (sqrt (+ 1 delta)))
                     (xn (/ 1 d))
                     (pt (s:generate
@@ -1193,27 +1261,27 @@
                          (lambda (i)
                            (if (fix:= i n)
                                xn
-                               (/ (g:ref coords i) d))))))
+                               (/ (ref coords i) d))))))
                (make-manifold-point (* orientation-matrix pt)
                                     manifold me coords))))
           ((check-point)
            (lambda (point) (my-manifold-point? point manifold)))
           ((point->coords)
            (lambda (point)
-             (when (not ((me 'check-point) point))
+             (if (not ((me 'check-point) point))
                  (error "Bad point: S^n-gnomic" point me))
              (let* ((n (manifold 'dimension))
                     (pt (* orientation-inverse-matrix
                            (manifold-point-representation point))))
-               (when (and (number? (g:ref pt n)) (not (> 0 (g:ref pt n))))
+               (if (and (number? (ref pt n)) (not (> 0 (ref pt n))))
                    (error "Point not covered by S^n-gnomic coordinate patch."
                           point me))
                (let ((coords
                       (s:generate n 'up
                                   (lambda (i)
-                                    (/ (g:ref pt i)
-                                       (g:ref pt n))))))
-                 (if (fix:= n 1) (g:ref coords 0) coords)))))
+                                    (/ (ref pt i)
+                                       (ref pt n))))))
+                 (if (fix:= n 1) (ref coords 0) coords)))))
           ((manifold) manifold)
           ((orientation) orientation-function)
           (else (error "S^n: Bad message" m me))))
@@ -1350,6 +1418,7 @@
 
 (define SO3-type (specify-manifold 'SO3))
 
+
 (define Euler-chart
   (lambda (manifold)
     (define (me m)
@@ -1358,15 +1427,15 @@
          (lambda (coords)
            (and (up? coords)
                 (fix:= (s:dimension coords) 3)
-                (or (not (number? (g:ref coords 0)))
-                    (not (= (g:ref coords 0) 0))))))
+                (or (not (number? (ref coords 0)))
+                    (not (= (ref coords 0) 0))))))
         ((coords->point)
          (lambda (coords)
-           (when (not ((me 'check-coordinates) coords))
+           (if (not ((me 'check-coordinates) coords))
                (error "Bad coordinates: Euler-angles" coords me))
-           (let ((theta (g:ref coords 0))
-                 (phi (g:ref coords 1))
-                 (psi (g:ref coords 2)))
+           (let ((theta (ref coords 0))
+                 (phi (ref coords 1))
+                 (psi (ref coords 2)))
              (let ((Mx-theta (rotate-x-tuple theta))
                    (Mz-phi (rotate-z-tuple phi))
                    (Mz-psi (rotate-z-tuple psi)))
@@ -1380,17 +1449,18 @@
          (lambda (point) (my-manifold-point? point manifold)))
         ((point->coords)
          (lambda (point)
-           (when (not ((me 'check-point) point))
+           (if (not ((me 'check-point) point))
                (error "Bad manifold point: Euler-angles" point me))
            (get-coordinates point me
                             (lambda ()
                               (let ((the-point
                                      (manifold-point-representation point)))
-                                (let ((theta (acos (g:ref the-point 2 2)))
-                                      (phi (atan (g:ref the-point 2 0)
-                                                 (- (g:ref the-point 2 1))))
-                                      (psi (atan (g:ref the-point 0 2)
-                                                 (g:ref the-point 1 2))))
+                                (let* ((theta (acos (ref the-point 2 2)))
+                                       (sx (sin theta))
+                                       (phi (atan (/ (ref the-point 2 0) sx)
+                                                  (- (/ (ref the-point 2 1) sx))))
+                                       (psi (atan (/ (ref the-point 0 2) sx)
+                                                  (/ (ref the-point 1 2) sx))))
                                   (up theta phi psi)))))))
         ((manifold) manifold)
         (else (error "Euler-chart: Bad message" m me)) ))
@@ -1404,16 +1474,16 @@
          (lambda (coords)
            (and (up? coords)
                 (fix:= (s:dimension coords) 3)
-                (or (not (number? (g:ref coords 0)))
-                    (and (not (<= (g:ref coords 0) (- pi/2)))
-                         (not (>= (g:ref coords pi/2))))))))
+                (or (not (number? (ref coords 0)))
+                    (and (not (<= (ref coords 0) (- pi/2)))
+                         (not (>= (ref coords pi/2))))))))
         ((coords->point)
          (lambda (coords)
-           (when (not ((me 'check-coordinates) coords))
+           (if (not ((me 'check-coordinates) coords))
                (error "Bad coordinates: alternate-angles" coords me))
-           (let ((theta (g:ref coords 0))
-                 (phi (g:ref coords 1))
-                 (psi (g:ref coords 2)))
+           (let ((theta (ref coords 0))
+                 (phi (ref coords 1))
+                 (psi (ref coords 2)))
              (let ((Mx-theta (rotate-x-tuple theta))
                    (Mz-phi (rotate-z-tuple phi))
                    (My-psi (rotate-y-tuple psi)))
@@ -1423,19 +1493,20 @@
          (lambda (point) (my-manifold-point? point manifold)))
         ((point->coords)
          (lambda (point)
-           (when (not ((me 'check-point) point))
+           (if (not ((me 'check-point) point))
                (error "Bad manifold point: alternate-angles" point me))
            (get-coordinates point me
                             (lambda ()
                               (let ((the-point
                                      (manifold-point-representation point)))
-                                (let ((theta (asin (g:ref the-point 1 2)))
-                                      (phi
-                                       (atan (- (g:ref the-point 1 0))
-                                             (g:ref the-point 1 1)))
-                                      (psi
-                                       (atan (- (g:ref the-point 0 2))
-                                             (g:ref the-point 2 2))))
+                                (let* ((theta (asin (ref the-point 1 2)))
+                                       (cx (cos theta))
+                                       (phi
+                                        (atan (- (/ (ref the-point 1 0) cx))
+                                              (/ (ref the-point 1 1) cx)))
+                                       (psi
+                                        (atan (- (/ (ref the-point 0 2) cx))
+                                              (/ (ref the-point 2 2) cx))))
                                   (up theta phi psi)))))))
         ((manifold) manifold)
         (else (error "alternate-chart: Bad message" m me))))
@@ -1494,6 +1565,20 @@
 ;;; An alias.
 
 (define literal-manifold-function literal-scalar-field)
+
+#| ;;bdk;; moved to manifold/manifold-point
+(define (zero-manifold-function m)
+  (assert (manifold-point? m))
+  0)
+
+(define (one-manifold-function m)
+  (assert (manifold-point? m))
+  1)
+
+(define ((constant-manifold-function c) m)
+  (assert (manifold-point? m))
+  c)
+|#
 
 #|
 ;;; A scalar field can be defined by combining coordinate functions:

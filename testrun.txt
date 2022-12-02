@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 7969 real time: 7963 gc time: 236
+cpu time: 12641 real time: 12649 gc time: 406
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -169,9 +169,9 @@ expected:
 location:   gram-schmidt.rkt:87:4
 --------------------
 2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 36688 real time: 36730 gc time: 78
-cpu time: 24453 real time: 24437 gc time: 94
-cpu time: 3141 real time: 3137 gc time: 32
+cpu time: 64047 real time: 64231 gc time: 201
+cpu time: 43672 real time: 43962 gc time: 279
+cpu time: 5094 real time: 5082 gc time: 0
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
@@ -226,7 +226,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\vector-calculus.rkt" test)
 calculus/vector-calculus > Test setup for spherical system
 ERROR
 
-Bad point: rectangular (*diff* (() #<procedure:...ector-fields.rkt:99:0>) ((37) 1)) #<procedure:me>
+Bad point: rectangular (*diff* (() #<procedure:the-memoized-procedure>) ((37) 1)) #<procedure:me>
 --------------------
 --------------------
 calculus/vector-calculus > R4-rect
@@ -276,7 +276,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 234 real time: 240 gc time: 0
+cpu time: 359 real time: 365 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -460,15 +460,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2500 real time: 2492 gc time: 219
-cpu time: 15157 real time: 15161 gc time: 517
-cpu time: 2437 real time: 2440 gc time: 77
-cpu time: 219 real time: 206 gc time: 31
-cpu time: 47 real time: 49 gc time: 0
-cpu time: 9906 real time: 9917 gc time: 266
-cpu time: 0 real time: 3 gc time: 0
-cpu time: 31 real time: 26 gc time: 0
-cpu time: 92313 real time: 92314 gc time: 1737
+cpu time: 4047 real time: 4047 gc time: 327
+cpu time: 39859 real time: 39864 gc time: 968
+cpu time: 6094 real time: 6125 gc time: 94
+cpu time: 344 real time: 351 gc time: 15
+cpu time: 62 real time: 66 gc time: 0
+cpu time: 16735 real time: 16729 gc time: 518
+cpu time: 0 real time: 5 gc time: 0
+cpu time: 62 real time: 55 gc time: 0
+cpu time: 249344 real time: 249481 gc time: 3533
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)

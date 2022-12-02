@@ -1,10 +1,11 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" if fix:=)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
-         "../kernel-gnrc.rkt"
+         "../general/memoize.rkt"
          "dgutils.rkt"
          "manifold/manifold-point.rkt"
          "indexed/types.rkt"
@@ -30,20 +31,28 @@
 ;;; 1form fields multiply by wedge.  
 ;;;   (See wedge.scm for definition of get-rank.)
 
-(define (procedure->1form-field fp [name 'unnamed-1form-field])
-  (let ((the-field (make-operator fp name wedge)))
+(define (procedure->1form-field fp #:optional name)
+  (if (default-object? name)
+      (set! name 'unnamed-1form-field))
+  (let ((the-field (make-operator fp name wedge (exact-arity 1))))
     (declare-argument-types! the-field (list vector-field?))
     the-field))
 
-(define (ff:zero vf) zero-manifold-function)
+#; ;;bdk;; not necessary ;;; Dummy... forward reference so I can define dx, dy before wedge.
+(define (wedge f1 f2)
+  (error "Wedge not yet defined"))
+
+(define (ff:zero vf)
+  (assert (vector-field? vf))
+  zero-manifold-function)
 
 (define (ff:zero-like op)
   (assert (form-field? op) "ff:zero-like")
-  (make-operator ff:zero
-	   'ff:zero
-	   (operator-subtype op)
-	   (operator-arity op)
-	   (operator-optionals op)))
+  (make-op ff:zero
+           'ff:zero
+           (operator-subtype op)
+           (operator-arity op)
+           (operator-optionals op)))
 
 (assign-operation 'zero-like ff:zero-like form-field?)
 
@@ -67,8 +76,8 @@
   (s:map/r internal vf))
 
 
-(define (components->1form-field components coordinate-system
-                                 [name `(1form-field ,components)])
+(define (components->1form-field components coordinate-system #:optional name)
+  (if (default-object? name) (set! name `(1form-field ,components)))
   (procedure->1form-field
    (1form-field-procedure components coordinate-system)
    name))
@@ -109,10 +118,21 @@
     (vf (compose (apply component i) (coordinate-system '->coords))))
   (s:map/r internal vf))
 
+
+;; (define (coordinate-basis-1form-field coordinate-system name . i)
+;;   (procedure->1form-field
+;;    (apply coordinate-basis-1form-field-procedure coordinate-system i)
+;;    name))
+
+;;; Sam Ritchie speedup hack Nov 2021
+;;; see general/memoize.scm
+
 (define (coordinate-basis-1form-field coordinate-system name . i)
-  (procedure->1form-field
-   (apply coordinate-basis-1form-field-procedure coordinate-system i)
-   name))
+  (let ((ofp
+         (apply coordinate-basis-1form-field-procedure
+                coordinate-system
+                i)))
+    (procedure->1form-field (samritchie-memoizer ofp) name)))
 
 #|
 (define (coordinate-system->1form-basis coordinate-system)
@@ -136,7 +156,6 @@
 ;;; Given component functions defined on manifold points and a 1-form
 ;;; basis, to produce the 1-form field as a linear combination.
 
-;TODO: check this * doesn't need to be g:*
 (define (basis-components->1form-field components 1form-basis)
   (procedure->1form-field
    (lambda (v)
