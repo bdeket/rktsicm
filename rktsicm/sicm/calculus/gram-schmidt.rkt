@@ -1,8 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" iota)
          "../general/permute.rkt"
          )
 
@@ -10,50 +10,21 @@
 
 (define (Gram-Schmidt vector-basis metric)
   (define (make-positive x)
-    (sqrt (square x)))
-  #|
-  ;;; Fails in some symbolic situations!
-  (define (make-positive x)
-    (if (and (number? x) (negative? x))
-	(- x)
-	x))
-  |#
+    (if (and (number? x) (real? x))
+        (if (negative? x)
+            (- x)
+            x)
+	(sqrt (square x))))
   (define (normalize v)
     (* (/ 1 (sqrt (make-positive (metric v v)))) v))
-  (let* ((vects (ultra-flatten vector-basis))
-	 (e0 (normalize (car vects))))
-    (let lp ((ins (cdr vects)) (outs (list e0)))
-      (if (null? ins)
-	  (apply down (reverse outs))
-	  (lp (cdr ins)
-	      (cons (normalize
-		     (- (car ins)			   
-			(apply +
-			       (map (lambda (outv)
-				      (* (metric (car ins) outv)
-					 outv))
-				    outs))))
-		    outs))))))
-#|
-(define (Gram-Schmidt vector-basis metric)
-  (define (make-positive x)
-    (sqrt (square x)))
-  (define (normalize v)
-    (* (/ 1 (sqrt (make-positive (metric v v)))) v))
-  (let* ((vects (ultra-flatten vector-basis))
-	 (e0 (car vects)))
-    (let lp ((ins (cdr vects)) (outs (list e0)))
-      (if (null? ins)
-	  (apply down (map normalize (reverse outs)))
-	  (lp (cdr ins)
-	      (cons (- (car ins)			   
-		       (apply +
-			      (map (lambda (outv)
-				     (* (metric (car ins) outv)
-					outv))
-				   outs)))
-		    outs))))))
-|#
+  (let lp ((ins (ultra-flatten vector-basis)) (outs '()))
+    (if (null? ins)
+        (apply down (reverse outs))
+        (let ((q (normalize (car ins))))
+          (lp (map (lambda (v)
+                     (- v (* (metric q v) q)))
+                   (cdr ins))
+              (cons q outs))))))
 
 #|
 ;;; Orthonormalizing with respect to the Lorentz metric in 2 dimensions. 
@@ -180,6 +151,6 @@
 ;;; This may be needed... ugh!
 
 (define (completely-antisymmetric indices)
-  (permutation-parity indices (build-list (length indices) values)))
+  (permutation-parity indices (iota (length indices))))
 
 

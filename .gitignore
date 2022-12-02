@@ -7,6 +7,9 @@ compiled/
 .#*
 .DS_Store
 *.bak
+*.1
+*.2
+*.3
 *.scm
 *.sch
 *.xlsx

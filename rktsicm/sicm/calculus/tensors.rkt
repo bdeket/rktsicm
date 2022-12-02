@@ -1,8 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" iota generate-uninterned-symbol)
          "form-fields.rkt"
          "manifold.rkt"
          "vector-fields.rkt"
@@ -38,22 +38,22 @@
 			     args i
 			     thing))))
 	       (typical-point coordsys))))
-	  (build-list (length types) values))))
+	  (iota (length types)))))
 
 
 (define ((literal-field coordsys) type)
     (case type
       ((scalar function)
        (literal-manifold-function
-	(gensym 'g)
+	(generate-uninterned-symbol 'g)
 	coordsys))
       ((up vector)
        (literal-vector-field
-	(gensym 'v)
+	(generate-uninterned-symbol 'v)
 	coordsys))
       ((down 1form one-form)
        (literal-1form-field
-	(gensym 'omega)
+	(generate-uninterned-symbol 'omega)
 	coordsys))
       (else
        (error "Bad type list" type))))

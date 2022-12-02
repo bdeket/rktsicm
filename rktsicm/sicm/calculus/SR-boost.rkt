@@ -1,20 +1,17 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
-
-(require "../kernel-gnrc.rkt"
-         )
 
 ;;;; Special Relativity -- Boosts
 
 (define (make-4tuple ct space)
-   (up ct (g:ref space 0) (g:ref space 1) (g:ref space 2)))
+   (up ct (ref space 0) (ref space 1) (ref space 2)))
 
 (define (4tuple->ct v)
-   (g:ref v 0))
+   (ref v 0))
 
 (define (4tuple->space v)
-   (up (g:ref v 1) (g:ref v 2) (g:ref v 3)))
+   (up (ref v 1) (ref v 2) (ref v 3)))
 
 
 (define (proper-time-interval 4tuple)
@@ -31,7 +28,7 @@
     (let ((factor (/ (- gamma 1) (square beta))))
       (let ((xi-p-time (4tuple->ct xi-p))
             (xi-p-space (4tuple->space xi-p)))
-        (let ((beta-dot-xi-p (g:dot-product beta xi-p-space)))
+        (let ((beta-dot-xi-p (dot-product beta xi-p-space)))
           (make-4tuple
            (* gamma (+ xi-p-time beta-dot-xi-p))
            (+ (* gamma beta xi-p-time)
@@ -58,7 +55,7 @@
    (let ((delta-ct-prime (4tuple->ct 4tuple-prime))
 	(delta-x-prime (4tuple->space 4tuple-prime)))
      (let ((betasq (square v/c)))
-       (let ((bx (g:dot-product direction delta-x-prime))
+       (let ((bx (dot-product direction delta-x-prime))
 	    (gamma (/ 1 (sqrt (- 1 betasq)))))
 	(let ((alpha (- gamma 1)))
 	  (let ((delta-ct

@@ -1,8 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" if)
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
          )
@@ -57,7 +57,7 @@
 (define (claim! coords owner)
   (let ((other (frame-owner coords)))
     (if other
-	(when (not (eq? other owner))
+	(if (not (eq? other owner))
 	    (error "Someone else owns these coords" coords owner))
 	(eq-put! coords 'owner owner))
     coords))

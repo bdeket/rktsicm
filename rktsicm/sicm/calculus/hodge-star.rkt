@@ -1,12 +1,12 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
+(require (only-in "../rkt/glue.rkt" make-initialized-list)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "../general/permute.rkt"
          "../general/sets.rkt"
-         "../rkt/default-object.rkt"
          "basis.rkt"
          "form-fields.rkt"
          "wedge.rkt"
@@ -22,7 +22,7 @@
 ;;; if the spec is a basis that needs to be orthonormalized, 
 ;;; the optional orthonormalize? argument must be a coordinate system
 
-(define (Hodge-star metric spec [orthonormalize? default-object])  
+(define (Hodge-star metric spec #:optional orthonormalize?)  
   (let* ((basis
 	  (if (basis? spec)
 	      (if (default-object? orthonormalize?)
@@ -43,7 +43,7 @@
 				  on-vector-basis))
 		on-vector-basis)))
 	 (bsigns
-	  (build-list (basis->dimension basis)
+	  (make-initialized-list (basis->dimension basis)
 				 (lambda (i) (matrix-ref basis-check i i))))
 	 (on-1form-basis (ultra-flatten (basis->1form-basis basis))))
     (define (the-star pform-field)

@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../mechanics/universal.rkt"
+(require (only-in "../mechanics/universal.rkt" D)
          "hodge-star.rkt"
          "manifold.rkt"
          "metric.rkt"
@@ -49,15 +48,15 @@
     ; (assert (diagonal? gij))
     (s:generate (coordinate-system 'dimension) 'down
      (lambda (i)
-       (sqrt (g:ref gij i i))))))
+       (sqrt (ref gij i i))))))
 
 (define (coordinate-system->orthonormal-vector-basis coordsys)
   (s:generate (coordsys 'dimension) 'down
     (lambda (i)
-      (* (g:ref (coordinate-system->vector-basis coordsys) i)
+      (* (ref (coordinate-system->vector-basis coordsys) i)
 	 (/ 1
 	    (compose
-	     (g:ref (coordinate-system->Lame-coefficients coordsys) i)
+	     (ref (coordinate-system->Lame-coefficients coordsys) i)
 	     (chart coordsys)))))))
 
 #|

@@ -1,9 +1,8 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
          "../parameters.rkt"
          "../general/assert.rkt"
          "../general/eq-properties.rkt"

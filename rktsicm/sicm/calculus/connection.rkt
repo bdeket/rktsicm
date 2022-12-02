@@ -1,9 +1,9 @@
-#lang racket/base
+#lang s-exp "../generic.rkt"
 
 (provide (all-defined-out))
 
-(require "../kernel-gnrc.rkt"
-         "../general/assert.rkt"
+(require "../general/assert.rkt"
+         "../general/memoize.rkt"
          "basis.rkt"
          "covariant-derivative.rkt"
          "manifold.rkt"
@@ -416,8 +416,12 @@
      basis)))
 
 
+;;; Sam Ritchie Nov 2021 speedup hack
+;;; See end of general/memoize.scm
+
 (define (metric->connection-2 metric basis)
-  (let ((vector-basis (basis->vector-basis basis))
+  (let ((metric (samritchie-memoizer metric))
+        (vector-basis (basis->vector-basis basis))
 	(1form-basis (basis->1form-basis basis))
 	(inverse-metric (metric:invert metric basis)))
     (make-Christoffel

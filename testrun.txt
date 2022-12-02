@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 15109 real time: 15100 gc time: 734
+cpu time: 12843 real time: 12855 gc time: 215
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,109 +70,11 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
---------------------
-calculus/gram-schmidt > ...
-FAILURE
-name:       check-simplified?
-actual:
-  '((up (/ 1 (sqrt a)) 0 0)
-  (up
-   (/ (* -1 b) (sqrt (+ (* (expt a 2) d) (* -1 a (expt b 2)))))
-   (/ a (sqrt (+ (* (expt a 2) d) (* -1 a (expt b 2)))))
-   0)
-  (up
-   (/
-    (+ (* a b e (sqrt a)) (* -1 a c d (sqrt a)))
-    (sqrt
-     (+
-      (* (expt a 5) (expt d 2) f)
-      (* -1 (expt a 5) d (expt e 2))
-      (* -2 (expt a 4) (expt b 2) d f)
-      (* (expt a 4) (expt b 2) (expt e 2))
-      (* 2 (expt a 4) b c d e)
-      (* -1 (expt a 4) (expt c 2) (expt d 2))
-      (* (expt a 3) (expt b 4) f)
-      (* -2 (expt a 3) (expt b 3) c e)
-      (* (expt a 3) (expt b 2) (expt c 2) d))))
-   (/
-    (+ (* -1 (expt a 2) e (sqrt a)) (* a b c (sqrt a)))
-    (sqrt
-     (+
-      (* (expt a 5) (expt d 2) f)
-      (* -1 (expt a 5) d (expt e 2))
-      (* -2 (expt a 4) (expt b 2) d f)
-      (* (expt a 4) (expt b 2) (expt e 2))
-      (* 2 (expt a 4) b c d e)
-      (* -1 (expt a 4) (expt c 2) (expt d 2))
-      (* (expt a 3) (expt b 4) f)
-      (* -2 (expt a 3) (expt b 3) c e)
-      (* (expt a 3) (expt b 2) (expt c 2) d))))
-   (/
-    (+ (* (expt a 2) d (sqrt a)) (* -1 a (expt b 2) (sqrt a)))
-    (sqrt
-     (+
-      (* (expt a 5) (expt d 2) f)
-      (* -1 (expt a 5) d (expt e 2))
-      (* -2 (expt a 4) (expt b 2) d f)
-      (* (expt a 4) (expt b 2) (expt e 2))
-      (* 2 (expt a 4) b c d e)
-      (* -1 (expt a 4) (expt c 2) (expt d 2))
-      (* (expt a 3) (expt b 4) f)
-      (* -2 (expt a 3) (expt b 3) c e)
-      (* (expt a 3) (expt b 2) (expt c 2) d))))))
-expected:
-  '((up (/ 1 (sqrt a)) 0 0)
-  (up
-   (/ (* -1 b) (sqrt (+ (* (expt a 2) d) (* -1 a (expt b 2)))))
-   (/ a (sqrt (+ (* (expt a 2) d) (* -1 a (expt b 2)))))
-   0)
-  (up
-   (/
-    (+ (* b e) (* -1 c d))
-    (sqrt
-     (+
-      (* (expt a 2) (expt d 2) f)
-      (* -1 (expt a 2) d (expt e 2))
-      (* -2 a (expt b 2) d f)
-      (* a (expt b 2) (expt e 2))
-      (* 2 a b c d e)
-      (* -1 a (expt c 2) (expt d 2))
-      (* (expt b 4) f)
-      (* -2 (expt b 3) c e)
-      (* (expt b 2) (expt c 2) d))))
-   (/
-    (+ (* -1 a e) (* b c))
-    (sqrt
-     (+
-      (* (expt a 2) (expt d 2) f)
-      (* -1 (expt a 2) d (expt e 2))
-      (* -2 a (expt b 2) d f)
-      (* a (expt b 2) (expt e 2))
-      (* 2 a b c d e)
-      (* -1 a (expt c 2) (expt d 2))
-      (* (expt b 4) f)
-      (* -2 (expt b 3) c e)
-      (* (expt b 2) (expt c 2) d))))
-   (/
-    (+ (* a d) (* -1 (expt b 2)))
-    (sqrt
-     (+
-      (* (expt a 2) (expt d 2) f)
-      (* -1 (expt a 2) d (expt e 2))
-      (* -2 a (expt b 2) d f)
-      (* a (expt b 2) (expt e 2))
-      (* 2 a b c d e)
-      (* -1 a (expt c 2) (expt d 2))
-      (* (expt b 4) f)
-      (* -2 (expt b 3) c e)
-      (* (expt b 2) (expt c 2) d))))))
-location:   gram-schmidt.rkt:87:4
---------------------
-2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-cpu time: 63531 real time: 63617 gc time: 280
-cpu time: 42250 real time: 42303 gc time: 329
-cpu time: 5344 real time: 5337 gc time: 47
-1
+cpu time: 76062 real time: 76224 gc time: 419
+cpu time: 50110 real time: 50128 gc time: 267
+cpu time: 6109 real time: 6101 gc time: 63
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
 0
@@ -217,6 +119,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\metric.rkt" test)
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\ode.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\calculus\\so3.rkt" test)
+18 success(es) 0 failure(s) 0 error(s) 18 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\tensors.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -276,7 +181,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 453 real time: 459 gc time: 0
+cpu time: 407 real time: 408 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -460,15 +365,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 4125 real time: 4115 gc time: 425
-cpu time: 41000 real time: 41087 gc time: 1062
-cpu time: 6234 real time: 6226 gc time: 111
-cpu time: 359 real time: 352 gc time: 30
-cpu time: 63 real time: 67 gc time: 0
-cpu time: 16422 real time: 16435 gc time: 518
-cpu time: 0 real time: 5 gc time: 0
-cpu time: 47 real time: 40 gc time: 0
-cpu time: 254718 real time: 254973 gc time: 3529
+cpu time: 4406 real time: 4407 gc time: 296
+cpu time: 40484 real time: 40546 gc time: 953
+cpu time: 6172 real time: 6187 gc time: 159
+cpu time: 391 real time: 390 gc time: 0
+cpu time: 62 real time: 67 gc time: 0
+cpu time: 16828 real time: 16860 gc time: 590
+cpu time: 16 real time: 4 gc time: 0
+cpu time: 47 real time: 57 gc time: 0
+cpu time: 264125 real time: 265141 gc time: 3649
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -504,4 +409,4 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-10/536 test failures
+9/554 test failures
