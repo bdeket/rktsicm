@@ -1276,7 +1276,7 @@
                            (manifold-point-representation point))))
                (if (and (number? (ref pt n)) (not (> 0 (ref pt n))))
                    (error "Point not covered by S^n-gnomic coordinate patch."
-                          point me))
+                          (list point '-> pt) me))
                (let ((coords
                       (s:generate n 'up
                                   (lambda (i)

@@ -96,13 +96,7 @@
 
     (check-simplified? ((compose (S2p-spherical '->coords) (S2p-spherical '->point))
                         (up 'theta 'phi))
-                       ;; shoud simlify to
-                       #;'(up theta phi)
-                       '(up (atan
-                             (sqrt (* (expt (sin theta) 2) (+ (expt (cos phi) 2)
-                                                              (expt (sin phi) 2))))
-                             (cos theta))
-                            phi))
+                       '(up theta phi))
     
     (check-simplified? ((compose (S2p-spherical '->coords) (S2p-tilted '->point))
                         (up 'theta 'phi))
@@ -115,30 +109,7 @@
     (check-simplified? ((compose (S3-spherical '->coords)
                                  (S3-spherical '->point))
                         (up 'a 'b 'c))
-                       ;; should simplify to
-                       #;'(up a b c)
-                       '(up
-                         (atan
-                          (sqrt
-                           (+
-                            (expt (* (cos b) (sin a)) 2)
-                            (*
-                             (sqrt
-                              (+
-                               (expt (* (sin a) (sin b) (cos c)) 2)
-                               (expt (* (sin a) (sin b) (sin c)) 2)))
-                             (sqrt
-                              (+
-                               (expt (* (cos c) (sin a) (sin b)) 2)
-                               (expt (* (sin a) (sin b) (sin c)) 2))))))
-                          (cos a))
-                         (atan
-                          (sqrt
-                           (+
-                            (expt (* (cos c) (sin a) (sin b)) 2)
-                            (expt (* (sin a) (sin b) (sin c)) 2)))
-                          (* (cos b) (sin a)))
-                         c))
+                       '(up a b c))
     (check-simplified? ((compose (S3-spherical '->coords)
                                  (S3-tilted '->point))
                         (up 'a 'b 'c))
