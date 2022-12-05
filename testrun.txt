@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 12843 real time: 12855 gc time: 215
+cpu time: 8203 real time: 8200 gc time: 126
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,9 +70,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 76062 real time: 76224 gc time: 419
-cpu time: 50110 real time: 50128 gc time: 267
-cpu time: 6109 real time: 6101 gc time: 63
+cpu time: 46703 real time: 46714 gc time: 608
+cpu time: 30938 real time: 30946 gc time: 128
+cpu time: 3765 real time: 3764 gc time: 31
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -181,7 +181,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 407 real time: 408 gc time: 0
+cpu time: 218 real time: 222 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -304,18 +304,8 @@ raco test: (submod ".\\sicm\\tests\\numerics\\ode\\bulirsch-stoer.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\numerics\\ode\\interface.rkt" test)
---------------------
-numerics/ode/ode-advancer > 3*
-ERROR
-name:       check-within
-location:   interface.rkt:61:4
-
-matrix-by-rows: undefined;
- cannot reference an identifier before its definition
-  in module: top-level
---------------------
-4 success(es) 0 failure(s) 1 error(s) 5 test(s) run
-1
+5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\numerics\\ode\\ode-advancer.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
@@ -365,15 +355,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 4406 real time: 4407 gc time: 296
-cpu time: 40484 real time: 40546 gc time: 953
-cpu time: 6172 real time: 6187 gc time: 159
-cpu time: 391 real time: 390 gc time: 0
-cpu time: 62 real time: 67 gc time: 0
-cpu time: 16828 real time: 16860 gc time: 590
-cpu time: 16 real time: 4 gc time: 0
-cpu time: 47 real time: 57 gc time: 0
-cpu time: 264125 real time: 265141 gc time: 3649
+cpu time: 2313 real time: 2307 gc time: 172
+cpu time: 15000 real time: 14999 gc time: 422
+cpu time: 2468 real time: 2469 gc time: 93
+cpu time: 188 real time: 197 gc time: 16
+cpu time: 47 real time: 45 gc time: 0
+cpu time: 9609 real time: 9598 gc time: 298
+cpu time: 0 real time: 3 gc time: 0
+cpu time: 31 real time: 26 gc time: 0
+cpu time: 92563 real time: 92583 gc time: 1793
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -404,9 +394,9 @@ raco test: (submod ".\\sicm\\tests\\solve\\solve-utils.rkt" test)
 23 success(es) 0 failure(s) 0 error(s) 23 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x250) (* -1 x251)) (eq:0) (x251 x250)) ((+ -7 (* 3 x250) x251) (eq:1) (x251 x250)))
-'(((+ -5 (* 3 x258) (* -1 x259)) (eq:0) (x259 x258)) ((+ k260 (* 3 x258) x259) (eq:1) (x259 x258 k260)))
+'(((+ -5 (* 3 x436) (* -1 x437)) (eq:0) (x437 x436)) ((+ -7 (* 3 x436) x437) (eq:1) (x437 x436)))
+'(((+ -5 (* 3 x444) (* -1 x445)) (eq:0) (x445 x444)) ((+ k446 (* 3 x444) x445) (eq:1) (x445 x444 k446)))
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-9/554 test failures
+8/554 test failures

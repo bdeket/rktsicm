@@ -7,7 +7,7 @@
 (require (only-in "../rkt/glue.rkt" if symbol warn find generate-uninterned-symbol write-line every make-initialized-list list-head
                   fix:= fix:< fix:>= fix:+)
          (only-in "../rkt/define.rkt" define default-object?)
-         (only-in "../rkt/environment.rkt" environment-define environment-bound? environment-lookup environment-assign! scmutils-base-environment user-generic-environment)
+         (only-in "../rkt/environment.rkt" environment-define environment-bound? environment-lookup environment-assign! scmutils-base-environment)
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
@@ -414,9 +414,10 @@
         (begin
           (write-line `(clobbering ,name))
           (set! *saved-environment-values*
-                (cons (cons name
+                (cons (list name
                             (environment-lookup user-generic-environment
-                                                name))
+                                                name)
+							user-generic-environment)
                       *saved-environment-values*))))
     (environment-define user-generic-environment name value))
   (define (install-symbols s)
@@ -435,9 +436,9 @@
 
 (define (uninstall-coordinates)
   (for-each (lambda (saved-values)
-              (environment-assign! user-generic-environment
+              (environment-assign! (caddr saved-values)
                                    (car saved-values)
-                                   (cdr saved-values)))
+                                   (cadr saved-values)))
             *saved-environment-values*)
   (set! *saved-environment-values* '())
   'done)

@@ -4,7 +4,7 @@
 
 (require (only-in "../rkt/glue.rkt" if undefined-value? hash-table? pathname? any)
          (only-in "../rkt/todo.rkt" pp)
-         "../rkt/environment.rkt"
+         (only-in "../rkt/environment.rkt" generic-environment rule-environment numerical-environment scmutils-base-environment system-global-environment)
          "../general/assert.rkt"
          "../general/memoize.rkt"
          "../kernel-intr.rkt"

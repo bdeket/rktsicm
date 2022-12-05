@@ -3,7 +3,7 @@
 (provide (except-out (all-defined-out) unit-system))
 
 (require (for-syntax racket/base)
-         (only-in "../rkt/glue.rkt" if find write-line)
+         (only-in "../rkt/glue.rkt" if find write-line warn)
          (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/environment.rkt" environment-bound? environment-define environment-assign! scmutils-base-environment generic-environment)
          "../general/assert.rkt"
@@ -205,7 +205,7 @@
      (define dname
        (let ([sname 'dname][value the-value])
          (if (environment-bound? scmutils-base-environment sname)
-             (write-line `(clobbering ,sname)))
+             (warn `(clobbering ,sname)))
          (let ((constant (literal-number sname)))
            (cond ((with-units? value)
                   (assert (same-units? (u:units value) dunits))))

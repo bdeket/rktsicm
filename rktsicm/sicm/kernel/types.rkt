@@ -4,7 +4,7 @@
          (all-from-out "cstm/types.rkt")
          operator? differential?)
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" fix:= named-lambda)
          "../rkt/applyhook.rkt"
          "../parameters.rkt"
          "cstm/express.rkt"
@@ -65,7 +65,7 @@
                      (and (with-units? x)
                           (numerical-quantity? (u:value x))))])
     (values
-     (λ (x) (for/or ([pred? (in-list tests)]) (pred? x)))
+     (named-lambda (numerical-quantity? x) (for/or ([pred? (in-list tests)]) (pred? x)))
      (λ (test) (set! tests (append tests (list test)))))))
 
 (define (with-units? x)

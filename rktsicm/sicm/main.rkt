@@ -18,7 +18,7 @@
          )
 
 (provide (all-from-out "parameters.rkt"
-                       "generic.rkt"
+                       "generic.rkt" ;; provides the bindings making this a lang
                        "simplify.rkt"
                        "numerics.rkt"
                        "poly.rkt"
@@ -28,3 +28,21 @@
                        "calculus.rkt"
                        ))
 
+(require (only-in "rkt/environment.rkt" extend-environment
+                  scmutils-base-environment generic-environment)
+         racket/runtime-path)
+(define-runtime-path here ".")
+(define (mkpath x) `(file ,(path->string (build-path here x))))
+(void 'SETUP-ENVIRONMENT
+      (eval `(require ,@(map mkpath
+                             (list "display/print.rkt"
+                                   "numerics.rkt"
+                                   "poly.rkt"
+                                   "solve.rkt"
+                                   "units.rkt"
+                                   )))
+            scmutils-base-environment)
+      (eval `(require ,@(map mkpath
+                             (list "mechanics.rkt"
+                                   "calculus.rkt")))
+            generic-environment))

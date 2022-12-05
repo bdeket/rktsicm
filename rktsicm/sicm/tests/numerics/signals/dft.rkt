@@ -3,8 +3,10 @@
 (require rackunit
          "../../../numerics/signals/dft.rkt"
          "../../../numerics/signals/fft.rkt"
+         "../../../kernel-intr.rkt"
          racket/list
          )
+(kernel:assign-operations)
 
 (define pi (angle -1))
 (define 2pi (* 2 pi))

@@ -10,13 +10,11 @@
 (define-logger environment #:parent rktsicm-logger)
 
 (define system-global-environment (make-base-namespace))
-(define user-generic-environment  (make-base-namespace))
 (define scmutils-base-environment (make-base-namespace))
-(define generic-environment       (make-empty-namespace))
-(define rule-environment          (make-empty-namespace))
-(define symbolic-environment      (make-empty-namespace))
+(define generic-environment       (make-base-namespace))
+(define rule-environment          (make-base-namespace))
+(define symbolic-environment      (make-base-namespace))
 (define numerical-environment     (make-base-namespace))
-(eval '(require racket/math) numerical-environment)
 
 
 (define (environment-bound? env sym)
@@ -75,8 +73,6 @@
              #:unless (eq? not-defined (cdr sym)))
     sym))
 
-
-(define (->environment . rst) (make-empty-namespace))
 
 (define (extend-top-level-environment env)
   (extend-environment (make-empty-namespace) env))

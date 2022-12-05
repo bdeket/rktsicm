@@ -7,7 +7,7 @@
 
 (require (only-in "../rkt/glue.rkt" string:<? undefined-value undefined-value?
                   fix:= fix:< fix:+)
-         (only-in "../rkt/environment.rkt" user-generic-environment generic-environment rule-environment numerical-environment scmutils-base-environment procedure-name object-name)
+         (only-in "../rkt/environment.rkt" generic-environment rule-environment numerical-environment scmutils-base-environment procedure-name object-name)
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
          "../general/table.rkt"
@@ -183,7 +183,6 @@
 (define (procedure-expression f)
   (or (eq-get f 'function-name)
       (object-name f
-		   user-generic-environment
 		   generic-environment
 		   rule-environment
 		   numerical-environment

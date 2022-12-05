@@ -1,5 +1,7 @@
 #lang racket/base
 
+(provide generic-environment-maker)
+
 (require "cstm/genenv.rkt"
          (only-in "../rkt/environment.rkt" extend-environment environment-define
                   scmutils-base-environment generic-environment numerical-environment)
@@ -7,8 +9,8 @@
          "mathutil.rkt")
 
 
-(define (generic-environment-maker env)
-  (let ((e (extend-environment env scmutils-base-environment)))
+(define (generic-environment-maker new [base scmutils-base-environment])
+  (let ((e (extend-environment new base)))
     (let ((d (lambda (name value)
 	       (environment-define e name value))))
 	(d '*environment* 'generic-environment)
@@ -137,7 +139,7 @@
 	)
     e))
 
-;;bdk;; slightly differen
+#;;;bdk;; slightly differen
 (void (generic-environment-maker generic-environment))
 
 

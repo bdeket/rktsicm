@@ -11,8 +11,7 @@
  #%top
  #%app
 
- ;from litfun
- (all-from-out "kernel-intr.rkt"))
+ (except-out (all-from-out "kernel-intr.rkt") kernel:assign-operations))
 
 (define-syntax (provide-except-renamed-out stx)
   (syntax-case stx ()
@@ -29,3 +28,16 @@
                             make-rectangular make-polar real-part imag-part magnitude angle
                             inexact? zero?
                             apply raise time)
+
+;; set up some environments...
+(require (only-in "rkt/environment.rkt" extend-environment
+                  scmutils-base-environment numerical-environment generic-environment)
+         "kernel/genenv.rkt")
+(define-namespace-anchor anker)
+(void 'INSTALL-GENERICS-&-SETUP-ENVIRONMENT
+      (kernel:assign-operations)
+      (extend-environment scmutils-base-environment (namespace-anchor->namespace anker))
+      (namespace-undefine-variable! 'anker scmutils-base-environment)
+      (namespace-undefine-variable! 'provide-except-renamed-out scmutils-base-environment)
+      (extend-environment numerical-environment scmutils-base-environment)
+      (generic-environment-maker generic-environment scmutils-base-environment))

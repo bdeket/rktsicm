@@ -1,5 +1,7 @@
 #lang racket/base
 
+(provide symbolic-environment-maker)
+
 (require "../rkt/hashtable.rkt"
          "../rkt/environment.rkt"
          "../kernel-intr.rkt"
@@ -13,8 +15,8 @@
 	v
 	(error "Undefined symbolic operator" operator-symbol))))
 
-(define (symbolic-environment-maker [env (make-empty-namespace)])
-  (let ((e (extend-environment env scmutils-base-environment)))
+(define (symbolic-environment-maker [env (make-empty-namespace)][base scmutils-base-environment])
+  (let ((e (extend-environment env base)))
     (let ((d
 	   (lambda (name value)
 	     (environment-define e name value))))
@@ -107,4 +109,4 @@
       )
     e))
 
-(void (symbolic-environment-maker symbolic-environment))
+;(void (symbolic-environment-maker symbolic-environment))

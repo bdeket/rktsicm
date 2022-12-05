@@ -8,7 +8,7 @@
 (define kernel-tests
   (test-suite
    "kernel/quaternion"
-   (test-case "ORIG:quaternion->angle-axis >>> failing"
+   (test-case "ORIG:quaternion->angle-axis"
               (check-equal?
                (simplify
                 (quaternion->angle-axis

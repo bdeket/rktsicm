@@ -11,7 +11,8 @@
          ;(rename-in "../../enclose/jinx-cselim.rkt" [text/cselim cselim])
          "../../kernel-intr.rkt"
          "../../enclose/alt-magic.rkt"
-         "../../units.rkt"
+         "../../units/with-units.rkt"
+         "../../units/units.rkt"
          "rational.rkt"
          "quadrature.rkt"
          "../ode/interface.rkt"
