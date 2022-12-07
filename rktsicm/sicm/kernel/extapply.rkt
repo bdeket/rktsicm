@@ -32,10 +32,12 @@
                      (#%app g:apply f (list args ...)))])
     (#%app f args ...)))
 
-(define-syntax-rule (myapp f args ...)
-  (if (and (not (procedure? f)) (*enable-generic-apply*))
-      (#%app g:apply f (list args ...))
-      (#%app f args ...)))
+(define-syntax (myapp stx)
+  (syntax-case stx ()
+    [(myapp f args ...)
+     #`(if (and (not (procedure? f)) (*enable-generic-apply*))
+           #,(syntax/loc stx (#%app g:apply f (list args ...)))
+           #,(syntax/loc stx (#%app f args ...)))]))
 
 #|
 (define inapplicable-object/operator
