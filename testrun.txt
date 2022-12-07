@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8281 real time: 8299 gc time: 282
+cpu time: 8391 real time: 8395 gc time: 93
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,9 +70,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 48625 real time: 48652 gc time: 596
-cpu time: 31735 real time: 31757 gc time: 126
-cpu time: 3906 real time: 3896 gc time: 47
+cpu time: 45563 real time: 45567 gc time: 577
+cpu time: 29953 real time: 29968 gc time: 62
+cpu time: 3718 real time: 3723 gc time: 48
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -103,20 +103,8 @@ raco test: (submod ".\\sicm\\tests\\calculus\\tensors.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\vector-calculus.rkt" test)
---------------------
-calculus/vector-calculus > Test setup for spherical system
-ERROR
-
-Bad point: rectangular (*diff* (() #<procedure:the-memoized-procedure>) ((37) 1)) #<procedure:me>
---------------------
---------------------
-calculus/vector-calculus > R4-rect
-ERROR
-
-Bad point: rectangular (*diff* (() #<procedure:...nel/operator.rkt:170:11>) ((166) 1)) #<procedure:me>
---------------------
-0 success(es) 0 failure(s) 2 error(s) 2 test(s) run
-2
+2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\vector-fields.rkt" test)
 --------------------
 calculus/vector-fields > cylindrical >>> failing
@@ -142,7 +130,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 234 real time: 227 gc time: 0
+cpu time: 234 real time: 229 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -316,15 +304,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2485 real time: 2474 gc time: 265
-cpu time: 15515 real time: 15513 gc time: 422
-cpu time: 2500 real time: 2512 gc time: 46
-cpu time: 204 real time: 205 gc time: 16
-cpu time: 62 real time: 47 gc time: 0
-cpu time: 9906 real time: 9905 gc time: 360
+cpu time: 2391 real time: 2394 gc time: 204
+cpu time: 15187 real time: 15197 gc time: 469
+cpu time: 2485 real time: 2478 gc time: 80
+cpu time: 203 real time: 205 gc time: 15
+cpu time: 47 real time: 47 gc time: 0
+cpu time: 9812 real time: 9815 gc time: 205
 cpu time: 0 real time: 3 gc time: 0
-cpu time: 16 real time: 26 gc time: 0
-cpu time: 93016 real time: 93018 gc time: 1979
+cpu time: 31 real time: 27 gc time: 0
+cpu time: 93860 real time: 93920 gc time: 1832
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -360,4 +348,4 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-5/554 test failures
+3/554 test failures

@@ -2,28 +2,28 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../mechanics/universal.rkt" D)
-         "hodge-star.rkt"
+(require "hodge-star.rkt"
          "manifold.rkt"
          "metric.rkt"
          "vector-fields.rkt"
+         (only-in "exterior-derivative.rkt" d)
          )
 
 ;;;; Traditional vector calculus operators
 
 (define (gradient metric basis)
-  (compose (raise metric basis) D))
+  (compose (raise metric basis) d))
 
 (define (curl metric orthonormal-basis)
   (let ((star (Hodge-star metric orthonormal-basis))
 	(sharp (raise metric orthonormal-basis))
 	(flat (lower metric)))
-    (compose sharp star D flat)))
+    (compose sharp star d flat)))
 
 (define (divergence metric orthonormal-basis)
   (let ((star (Hodge-star metric orthonormal-basis))
 	(flat (lower metric)))
-    (compose star D star flat)))
+    (compose star d star flat)))
 
 (define (Laplacian metric orthonormal-basis)
   (compose (divergence metric orthonormal-basis)
