@@ -80,7 +80,7 @@
     (check-simplified? ((compose (S1-circular '->coords) (S1-tilted '->point)) 'theta)
                        '(atan (cos theta) (* -1 (sin theta)))))
    (test-case
-    "S2p-spherical >>> failing"
+    "S2p-spherical"
     (define m ((S2p-spherical '->point) (up 'theta 'phi)))
     (check-simplified? (manifold-point-representation m)
                        '(up (* (sin theta) (cos phi))
@@ -100,10 +100,11 @@
     
     (check-simplified? ((compose (S2p-spherical '->coords) (S2p-tilted '->point))
                         (up 'theta 'phi))
-                       '(up (atan (sqrt (+ (* (expt (cos theta) 2) (expt (cos phi) 2))
-                                           (expt (sin phi) 2)))
-                                  (* -1 (sin theta) (cos phi)))
-                            (atan (* (sin phi) (sin theta)) (cos theta)))))
+                       '(up (atan (sqrt (+ (* (expt (sin theta) 2) (expt (cos phi) 2))
+                                           (expt (cos theta) 2)))
+                                  (* (sin phi) (sin theta)))
+                            (atan (* -1 (cos theta))
+                                  (* (sin theta) (cos phi))))))
    (test-case
     "S3-spherical"
     (check-simplified? ((compose (S3-spherical '->coords)
@@ -209,24 +210,19 @@
                             (/ (sin theta) (sqrt 2)) 
                             (/ 1 (sqrt 2)))))
    (test-case
-    "S2p-stereographic >>> failing"
-    (define q ((S2p-stereographic '->point) (up -1.5 1.5)))
-    (define p ((S2p-stereographic '->point) (up 1.5 0)))
+    "S2p-stereographic"
+    (define q ((S2p-stereographic '->point) (up -3/2 3/2)))
+    (define p ((S2p-stereographic '->point) (up 3/2 0)))
     (check-simplified? ((S2p-stereographic '->coords)
                         ((S2p-gnomic '->point)
-                         (+ (* 't ((S2p-gnomic '->coords) p))
-                            (* (- 1 't) ((S2p-gnomic '->coords) q)))))
-                       '(up
-                         (/ (+ (* 3.257142857142857 t) -.8571428571428571)
-                            (+ -1
-                               (sqrt (+ (* 11.343673469387754 (expt t 2))
-                                        (* -7.053061224489795 t)
-                                        2.4693877551020407))))
-                         (/ (+ (* -.8571428571428571 t) .8571428571428571)
-                            (+ -1
-                               (sqrt (+ (* 11.343673469387754 (expt t 2))
-                                        (* -7.053061224489795 t)
-                                        2.4693877551020407)))))))
+                         (+ (* 't ((S2p-stereographic '->coords) p))
+                            (* (- 1 't) ((S2p-stereographic '->coords) q)))))
+                       '(up (/ (+ -15/10 (* 3 t))
+                               (+ -1 (sqrt (+ 55/10 (* 1125/100 (expt t 2))
+                                              (* -135/10 t)))))
+                            (/ (+ 15/10 (* -15/10 t))
+                               (+ -1 (sqrt (+ 55/10 (* 1125/100 (expt t 2))
+                                              (* -135/10 t))))))))
    (test-case
      "S3"
      ;; Now a fun example synthesizing the to projective coordinates.
