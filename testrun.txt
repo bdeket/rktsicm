@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8203 real time: 8200 gc time: 126
+cpu time: 12062 real time: 12055 gc time: 297
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,9 +70,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 46703 real time: 46714 gc time: 608
-cpu time: 30938 real time: 30946 gc time: 128
-cpu time: 3765 real time: 3764 gc time: 31
+cpu time: 62828 real time: 62857 gc time: 1095
+cpu time: 43297 real time: 43311 gc time: 236
+cpu time: 5297 real time: 5307 gc time: 109
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -101,13 +101,13 @@ expected:
    (sqrt (+ (* (expt (cos theta) 2) (expt (cos phi) 2)) (expt (sin phi) 2)))
    (* -1 (sin theta) (cos phi)))
   (atan (* (sin phi) (sin theta)) (cos theta)))
-location:   manifold.rkt:107:4
+location:   manifold.rkt:101:4
 --------------------
 --------------------
 calculus/manifold > S2p-stereographic >>> failing
 ERROR
 
-Point not covered by S^n-gnomic coordinate patch. #<manifold-point> #<procedure:me>
+Point not covered by S^n-gnomic coordinate patch. (#<manifold-point> -> #(0.9230769230769231 0 0.38461538461538464)) #<procedure:me>
 --------------------
 11 success(es) 1 failure(s) 1 error(s) 13 test(s) run
 2
@@ -148,23 +148,8 @@ ERROR
 
 ((f (#<procedure:...ernel/litfun.rkt:260:14> . #<manifold-point>))): Wrong type argument -- LITERAL-FUNCTION
 --------------------
---------------------
-calculus/vector-fields > R2-rect >>> failing
-FAILURE
-name:       check-simplified?
-actual:
-  '(up
-  (+ 1 (* -1/720 (expt a 6)) (* 1/24 (expt a 4)) (* -1/2 (expt a 2)))
-  (+ (* 1/120 (expt a 5)) (* -1/6 (expt a 3)) a))
-expected:
-  '(up
-  (+ 1 (* -1/720 (expt a 6)) (* 1/24 (expt a 4)) (* -1/2 (expt a 2)))
-  (+ (* 1/120 (expt a 5)) (* -1/6 (expt a 3)) a)
-  0)
-location:   vector-fields.rkt:107:4
---------------------
-1 success(es) 1 failure(s) 1 error(s) 3 test(s) run
-2
+2 success(es) 0 failure(s) 1 error(s) 3 test(s) run
+1
 raco test: (submod ".\\sicm\\tests\\calculus\\wedge.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
@@ -181,7 +166,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 218 real time: 222 gc time: 0
+cpu time: 390 real time: 402 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -355,15 +340,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2313 real time: 2307 gc time: 172
-cpu time: 15000 real time: 14999 gc time: 422
-cpu time: 2468 real time: 2469 gc time: 93
-cpu time: 188 real time: 197 gc time: 16
-cpu time: 47 real time: 45 gc time: 0
-cpu time: 9609 real time: 9598 gc time: 298
-cpu time: 0 real time: 3 gc time: 0
-cpu time: 31 real time: 26 gc time: 0
-cpu time: 92563 real time: 92583 gc time: 1793
+cpu time: 3375 real time: 3363 gc time: 346
+cpu time: 36359 real time: 36358 gc time: 718
+cpu time: 5844 real time: 5851 gc time: 62
+cpu time: 328 real time: 322 gc time: 31
+cpu time: 62 real time: 67 gc time: 16
+cpu time: 14047 real time: 14040 gc time: 439
+cpu time: 0 real time: 4 gc time: 0
+cpu time: 47 real time: 39 gc time: 0
+cpu time: 237609 real time: 237706 gc time: 3425
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -399,4 +384,4 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-8/554 test failures
+7/554 test failures

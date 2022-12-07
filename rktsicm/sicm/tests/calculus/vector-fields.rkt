@@ -101,7 +101,7 @@
                          (up (* 1/24 (expt a 4)) 0 0)
                          (up 0 (* 1/120 (expt a 5)) 0))))
    (test-case
-    "R2-rect >>> failing"
+    "R2-rect"
     (define-coordinates (up x y) R2-rect)
     (define circular (- (* x d/dy) (* y d/dx)))
     (check-simplified? ((((evolution 6) 'a circular) (R2-rect '->coords))
@@ -112,8 +112,7 @@
                                1)
                             (+ (* 1/120 (expt a 5))
                                (* -1/6 (expt a 3))
-                               a)
-                            0)))
+                               a))))
    ))
 
 (module+ test
