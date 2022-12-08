@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require (for-syntax "../generic.rkt"
-                     (only-in racket/syntax format-symbol))
+                     (only-in racket/syntax format-id))
          )
 
 
@@ -42,49 +42,38 @@
   (syntax-case stx ()
     [(_ names coord-sys)
      (let ()
-       (define (quote-symbol-names symbs)
-         (cond
-           ((and (pair? symbs)
-                 (memq (car symbs) '(up down)))
-            `(,(car symbs) ,@(map quote-symbol-names (cdr symbs))))
-           ((symbol? symbs)
-            `(quote ,symbs))
-           (else 
-            (error "bad coordinate prototype" symbs))))
+       ;get-symbol-names as syntax
+       (define (make-getter strc sym)
+         (define (inner stx)
+           (cond
+             [(let ([lst (syntax->list stx)])
+                (and lst (memq (syntax-e (car lst)) '(up down)) lst))
+              => (λ (lst)(strc (car lst) (map inner (cdr lst))))]
+             [(symbol? (syntax-e stx)) (sym stx)]
+             [else (error "bad coordinate prototype" (syntax->datum stx))]))
+         inner)
+       (define ->proto (make-getter (λ (c r) (cons c r)) (λ (s) (list 'quote (syntax-e s)))))
+       (define ->symbs (make-getter (λ (c r) (apply append r)) list))
 
-       (define (get-symbol-names symbs)
-         (cond
-           ((and (pair? symbs)
-                 (memq (car symbs) '(up down)))
-            (apply append
-                   (map get-symbol-names
-                        (cdr symbs))))
-           ((symbol? symbs) (list symbs))
-           (else (error "bad coordinate prototype" symbs))))
-
-       (let* ([coord-proto-symbs (syntax->datum #'names)]
-              [coord-proto (quote-symbol-names coord-proto-symbs)]
-
-              [coord-symbs (get-symbol-names coord-proto-symbs)]
+       (let* ([coord-symbs (->symbs #'names)]
               [coord-vector-syms 
-               (map (lambda (sym) (format-symbol "d/d~a" sym)) coord-symbs)]
+               (map (lambda (sym) (format-id sym "d/d~a" sym #:source sym #:props sym)) coord-symbs)]
               [coord-one-form-syms 
-               (map (lambda (sym) (format-symbol "d~a" sym)) coord-symbs)])
-       
-       #`(define-values #,(map (λ (x) (datum->syntax #'names x))
-                               (append coord-symbs
-                                       coord-vector-syms
-                                       coord-one-form-syms))
-           (let ([proto #,coord-proto])
-
-             ((coord-sys 'set-coordinate-prototype!) proto)
+               (map (lambda (sym) (format-id sym "d~a" sym #:source sym #:props sym)) coord-symbs)])
+       (quasisyntax/loc
+           stx
+         (define-values #,(append coord-symbs
+                                  coord-vector-syms
+                                  coord-one-form-syms)
+           (let ()
+             ((coord-sys 'set-coordinate-prototype!) #,(->proto #'names))
              
-             (let ([chart-functions
-                    (append
-                     (map cadr (ultra-flatten (coord-sys 'coordinate-function-specs)))
-                     (map cadr (ultra-flatten (coord-sys 'coordinate-basis-vector-field-specs)))
-                     (map cadr (ultra-flatten (coord-sys 'coordinate-basis-1form-field-specs))))])
-               (apply values chart-functions))))))]))
+             (apply
+              values
+              (append
+               (map cadr (ultra-flatten (coord-sys 'coordinate-function-specs)))
+               (map cadr (ultra-flatten (coord-sys 'coordinate-basis-vector-field-specs)))
+               (map cadr (ultra-flatten (coord-sys 'coordinate-basis-1form-field-specs))))))))))]))
 #;
 (define-syntax define-coordinates
   (er-macro-transformer

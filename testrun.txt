@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8391 real time: 8395 gc time: 93
+cpu time: 11890 real time: 11897 gc time: 253
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,9 +70,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 45563 real time: 45567 gc time: 577
-cpu time: 29953 real time: 29968 gc time: 62
-cpu time: 3718 real time: 3723 gc time: 48
+cpu time: 69641 real time: 69939 gc time: 1002
+cpu time: 45047 real time: 45129 gc time: 95
+cpu time: 5562 real time: 5597 gc time: 15
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -130,7 +130,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 234 real time: 229 gc time: 0
+cpu time: 328 real time: 326 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -304,15 +304,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2391 real time: 2394 gc time: 204
-cpu time: 15187 real time: 15197 gc time: 469
-cpu time: 2485 real time: 2478 gc time: 80
-cpu time: 203 real time: 205 gc time: 15
-cpu time: 47 real time: 47 gc time: 0
-cpu time: 9812 real time: 9815 gc time: 205
-cpu time: 0 real time: 3 gc time: 0
-cpu time: 31 real time: 27 gc time: 0
-cpu time: 93860 real time: 93920 gc time: 1832
+cpu time: 4032 real time: 4179 gc time: 360
+cpu time: 40218 real time: 40571 gc time: 766
+cpu time: 5938 real time: 5959 gc time: 142
+cpu time: 328 real time: 322 gc time: 15
+cpu time: 63 real time: 72 gc time: 0
+cpu time: 14484 real time: 14512 gc time: 485
+cpu time: 0 real time: 4 gc time: 0
+cpu time: 47 real time: 40 gc time: 15
+cpu time: 253640 real time: 254600 gc time: 3457
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
