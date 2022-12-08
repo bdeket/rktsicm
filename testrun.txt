@@ -45,7 +45,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 11890 real time: 11897 gc time: 253
+cpu time: 8453 real time: 8446 gc time: 158
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,9 +70,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 69641 real time: 69939 gc time: 1002
-cpu time: 45047 real time: 45129 gc time: 95
-cpu time: 5562 real time: 5597 gc time: 15
+cpu time: 47563 real time: 47563 gc time: 687
+cpu time: 31578 real time: 31578 gc time: 78
+cpu time: 3937 real time: 3946 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -106,14 +106,8 @@ raco test: (submod ".\\sicm\\tests\\calculus\\vector-calculus.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\vector-fields.rkt" test)
---------------------
-calculus/vector-fields > cylindrical >>> failing
-ERROR
-
-((f (#<procedure:...ernel/litfun.rkt:260:14> . #<manifold-point>))): Wrong type argument -- LITERAL-FUNCTION
---------------------
-2 success(es) 0 failure(s) 1 error(s) 3 test(s) run
-1
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\wedge.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
@@ -130,7 +124,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 328 real time: 326 gc time: 0
+cpu time: 234 real time: 228 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -304,15 +298,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 4032 real time: 4179 gc time: 360
-cpu time: 40218 real time: 40571 gc time: 766
-cpu time: 5938 real time: 5959 gc time: 142
-cpu time: 328 real time: 322 gc time: 15
-cpu time: 63 real time: 72 gc time: 0
-cpu time: 14484 real time: 14512 gc time: 485
-cpu time: 0 real time: 4 gc time: 0
-cpu time: 47 real time: 40 gc time: 15
-cpu time: 253640 real time: 254600 gc time: 3457
+cpu time: 2469 real time: 2460 gc time: 218
+cpu time: 16063 real time: 16081 gc time: 500
+cpu time: 2640 real time: 2642 gc time: 61
+cpu time: 219 real time: 210 gc time: 15
+cpu time: 47 real time: 58 gc time: 0
+cpu time: 10109 real time: 10115 gc time: 234
+cpu time: 0 real time: 3 gc time: 0
+cpu time: 32 real time: 33 gc time: 0
+cpu time: 96687 real time: 96714 gc time: 1920
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -348,4 +342,4 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-3/554 test failures
+2/554 test failures

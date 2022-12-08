@@ -75,12 +75,12 @@
                        '(up (sin theta0) (/ (cos theta0) r0) 0))
 
     (define R3-point ((R3-rect '->point) (up 'x0 'y0 'z0)))
-    (check-simplified? (series:print
-                        (((exp (* x d/dy))
-                          (literal-function 'f (-> (UP Real Real Real) Real)))
-                         R3-point)
-                        4)
-                       1)
+    (check-exn #px"Wrong type argument -- LITERAL-FUNCTION"
+               (λ ()(series:print
+                     (((exp (* x d/dy))
+                       (literal-function 'f (-> (UP Real Real Real) Real)))
+                      R3-point)
+                     4)))
     (check-simplified? (((coordinatize (literal-vector-field 'v R3-rect) R3-rect)
                          (literal-function 'f (-> (UP Real Real Real) Real)))
                         (up 'x0 'y0 'z0))
@@ -89,11 +89,12 @@
                            (* (((partial 2) f) (up x0 y0 z0)) (v^2 (up x0 y0 z0)))))
 
     (define circular (- (* x d/dy) (* y d/dx)))
-    (check-simplified? (series:for-each simplify
-                                        (((exp (coordinatize (* 'a circular) R3-rect))
-                                          identity)
-                                         (up 1 0 0))
-                                        6)
+    (check-simplified? (accumulate pp
+                                   (series:for-each (λ (x) (pp (simplify x)))
+                                                    (((exp (coordinatize (* 'a circular) R3-rect))
+                                                      identity)
+                                                     (up 1 0 0))
+                                                    6))
                        '((up 1 0 0)
                          (up 0 a 0)
                          (up (* -1/2 (expt a 2)) 0 0)
