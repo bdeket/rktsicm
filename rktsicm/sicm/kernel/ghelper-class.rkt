@@ -1,7 +1,8 @@
 #lang racket/base
 
 (require "cstm/ghelper.rkt"
-         "cstm/arity.rkt")
+         "cstm/arity.rkt"
+         "cstm/make-plain-procedure.rkt")
 
 (provide make-generic-operator)
 
@@ -34,10 +35,12 @@
 ;***************************************************************************************************
 ;*                                                                                                 *
 ;***************************************************************************************************
-(define (make-generic-operator arity [name* #f] [default-operation* #f])
+(define (make-generic-operator A [name* #f] [default-operation* #f])
 
-  (unless (procedure-arity? arity)
-    (raise-argument-error 'make-generic-operator "procedure-arity?" arity))
+  (define arity
+    (if (procedure-arity? A)
+        (normalize-arity A)
+        (raise-argument-error 'make-generic-operator "procedure-arity?" arity)))
 
   (define name
     (cond
@@ -85,10 +88,7 @@
     
   (define operator
     (procedure-rename
-     (λ arguments
-       (unless (arity-includes? arity (length arguments))
-         (raise-arity-error operator arity arguments))
-       (apply (find-handler arguments) arguments))
+     (make-plain-procedure (λ x (apply (find-handler x) x)) arity)
      (string->symbol (format "_~a_" name))))
 
   (set-operator-record! operator record)
@@ -103,6 +103,8 @@
   (define (foo-default x y z) 'foo-default)
   (define foo (make-generic-operator 3 'foo foo-default))
   (check-equal? (get-operator-record foo) (operator-record 'foo 3 (tree '() #t foo-default)))
+
+  (check-equal? (procedure-arity foo) 3)
 
   (check-exn #px"argument arity intersecting with operator arity"
              (λ () (assign-operation foo (λ (a b) 'a) any? any?)))
@@ -166,5 +168,15 @@
   (check-equal? (foo 'a 'a 'c) 'foo-default)
 
   (define bar (make-generic-operator 1 'bar))
+  (check-equal? (procedure-arity bar) 1)
   (assign-operation bar (λ (x) x))
+
+  (check-equal? (procedure-arity (make-generic-operator (arity-at-least 2)))
+                (arity-at-least 2))
+  (check-equal? (procedure-arity (make-generic-operator (list 0 (arity-at-least 2))))
+                (list 0 (arity-at-least 2)))
+  (check-equal? (procedure-arity (make-generic-operator (list 1 2 (arity-at-least 2) 3)))
+                (arity-at-least 1))
+  (check-equal? (procedure-arity (make-generic-operator (list 5 4 3)))
+                '(3 4 5))
   )
