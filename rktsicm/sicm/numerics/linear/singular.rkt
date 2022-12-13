@@ -2,6 +2,8 @@
 
 (provide (all-defined-out))
 
+;;bdk;; start original file
+
 ;;; We define the standard singular-matrix failure continuations as follows.
 
 (define (barf-on-zero-pivot dismiss)

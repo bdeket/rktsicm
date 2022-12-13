@@ -4,14 +4,15 @@
 
 (require "types.rkt")
 
-;;; An abstract quantity may be have a type-tagged expression.
 
+;;bdk;; insert 1
 (define (operator exp) (car exp))
 (define (operands exp) (cdr exp))
 
 (define first-operand cadr)
 (define second-operand caddr)
 (define rest-operands cddr)
+;;bdk;; insert 1 end
 
 ;;; Abstract quantities are represented with a type-tagged property list,
 ;;; implemented as an alist.
@@ -19,6 +20,7 @@
 ;;bdk;; change this to hash, since racket doesn't use mlists by default
 ;;bdk;; abstract-quantity needs to be (or/c symbol? (pair? symbol? hash?))
 
+;;bdk;; insert 2
 (define ((has-property? property-name) abstract-quantity)
   (cond
     [(pair? abstract-quantity)
@@ -51,7 +53,12 @@
   (if (pair? abstract-quantity)
       (hash-set! (cdr abstract-quantity) property-name property-value)
       (error "Bad abstract quantity -- ADD-PROPERTY!")))
+;;bdk;; insert 2 end
 
+
+
+;;bdk;; insert 3
+;;; An abstract quantity may be have a type-tagged expression.
 
 (define (make-numerical-literal expression)
   (make-literal number-type-tag expression))
@@ -63,7 +70,6 @@
 
 (define (make-literal type-tag expression)
   (cons type-tag (make-hasheq (list (cons 'expression expression)))))
-
 (define (make-combination type-tag operator operands) 
   (make-literal type-tag (cons operator operands)))
 
@@ -77,3 +83,4 @@
 	 abstract-quantity)
 	(else
 	 (error "Bad abstract quantity"))))
+;;bdk;; insert 3 end

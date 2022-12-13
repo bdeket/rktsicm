@@ -4,11 +4,14 @@
          (all-from-out "cstm/arity.rkt"))
 
 (require (only-in "../rkt/glue.rkt"
-                  fix:= fix:< fix:+ fix:- if default-object default-object? undefined-value true)
+                  fix:= fix:< fix:+ fix:- if undefined-value true)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/todo.rkt" pp)
          "../general/list-utils.rkt"
          "../general/eq-properties.rkt"
          "cstm/arity.rkt")
+
+;;bdk;; start original file
 
 ;;;;                  UTILS.SCM
 ;;; A few utilities
@@ -16,6 +19,7 @@
 ;;; 9/15/89 (gjs) -- added FORALL, EXISTS; moved ACCUMULATION, INVERSE-ACCUMULATION here.
 ;;; 7/16/89 (mh) correcting bug in DEFAULT-LOOKUP
 ;;; 9/22/89 (gjs) reduce->a-reduce
+
 
 (define (do-up low hi proc)
   ;; execute PROC for values beginning at LOW up to HI (exclusive)
@@ -114,11 +118,11 @@
   (if (or (null? l) (null? (cdr l)))
       l
       (let ((r (reverse l)))
-        (cons (car r) (reverse (cdr r))))))
+        (cons (car r) (reverse (cdr r))))));;bdk;; WAS REVERSE!
 
 ;;; Functional operators
 
-;;bdk;; arity moved to cstm/arity
+;;bdk;; moved to cstm/arity 1
 
 (define (compose . fs)
   (compose-n fs))
@@ -204,7 +208,7 @@
 				  (gi x y z))
 				g))))
 		 ((equal? a *one-or-two*)
-		  (lambda (x [y default-object])
+		  (lambda (x #:optional y)
 		    (if (default-object? y)
 			(apply f
 			       (map (lambda (gi)
@@ -248,14 +252,13 @@
 		  (lambda (x y z)
 		    (f (g x y z))))
 		 ((equal? a *one-or-two*)
-		  (lambda (x [y default-object])
+		  (lambda (x #:optional y)
 		    (if (default-object? y)
 			(f (g x))
 			(f (g x y)))))
 		 (else
 		  (lambda x
 		    (f (apply g x)))))))))
-
 
 (define (any? . args) #t)
 (define (none? . args) #f)
@@ -298,8 +301,9 @@
 (define (((unary-combine funary) f) . xs)
   (funary (apply f xs)))
 
+;;bdk;; moved to cstm/arity 2
 
-(define (iterated f n [id default-object])
+(define (iterated f n #:optional id)
   (if (fix:< n 0)
       (error "I don't know how to invert -- ITERATED" f n)
       (let ((ident (if (default-object? id) identity id)))
@@ -433,7 +437,7 @@
            (pp e)))
     e))
 
-(define (cpp x [port default-object])
+(define (cpp x #:optional port)
   (let ((port
 	 (if (default-object? port)
 	     (current-output-port)
@@ -471,8 +475,8 @@
   (display "|#")
   (newline))
 
-(define *last-notes* undefined-value)
-(define *last-notes-shown* undefined-value)
+(define *last-notes*)
+(define *last-notes-shown*)
 
 (define (show-notes)
   (set! *last-notes-shown* *last-notes*)

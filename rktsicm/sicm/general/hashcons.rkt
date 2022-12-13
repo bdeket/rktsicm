@@ -4,6 +4,8 @@
 
 (require "../rkt/hashtable.rkt")
 
+;;bdk;; start original file
+
 ;;;;         HashCONS
 ;;;  Apparently invented by Ershov 
 ;;;   (see CACM 1, 8, August 1958, pp. 3--6)

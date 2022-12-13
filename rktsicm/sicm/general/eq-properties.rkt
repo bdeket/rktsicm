@@ -5,6 +5,8 @@
 (require (only-in "../rkt/glue.rkt" hash-table/get hash-table/put! delq)
          "list-utils.rkt")
 
+;;bdk;; start original file
+
 (define (assoc-del itm lst [is-equal? equal?])
   (let loop ([lst lst])
     (cond

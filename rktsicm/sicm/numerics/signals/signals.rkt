@@ -10,6 +10,8 @@
 (define-values (assign-operation signals:assign-operations)
   (make-assign-operations 'signals))
 
+;;bdk;; start original file
+
 ;;;; Signal Language, ideas stolen from SHE (Siebert/Abelson/Sussman).
 
 ;;; Signals are objects that can be specified as time functions or

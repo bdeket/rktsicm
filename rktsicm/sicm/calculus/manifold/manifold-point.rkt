@@ -17,6 +17,7 @@
          "../dgutils.rkt"
          )
 
+;;bdk;; insert 1
 (struct manifold-point (spec manifold [coordinate-representations #:mutable]))
 
 (define (make-manifold-point spec manifold coordinate-system coordinate-rep)
@@ -30,7 +31,9 @@
     (manifold-point (manifold-point-spec point)
                     (embedding 'manifold)
                     '())))
+;;bdk;; insert 1 end
 
+;;bdk;; insert 2
 (define (get-coordinates point coordinate-system thunk)
   (let ((entry (assq coordinate-system (manifold-point-coordinate-representations point))))
     (if entry
@@ -41,7 +44,9 @@
            (cons (list coordinate-system val)
                  (manifold-point-coordinate-representations point)))
           val))))
+;;bdk;; insert 2 end
 
+;;bdk;; insert 3
 (define ((constant-manifold-function c) m)
   (assert (manifold-point? m))
   c)
@@ -49,3 +54,4 @@
 (define zero-manifold-function (constant-manifold-function 0))
 
 (define one-manifold-function (constant-manifold-function 1))
+;;bdk;; insert 3 end

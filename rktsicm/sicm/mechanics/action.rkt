@@ -9,6 +9,8 @@
          "../numerics/quadrature/defint.rkt"
          )
 
+;;bdk;; start original file
+
 (define (Lagrangian-action L q t1 t2)
   (definite-integral (compose L (Gamma q))
                      t1 t2))

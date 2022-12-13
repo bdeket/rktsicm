@@ -9,7 +9,10 @@
          "../../simplify/sparse.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Vandermonde solver, from Zippel, section 13.1
+
 
 ;;; Simple Vandermonde systems
 ;;; Given k_i and w_j to find x_i 

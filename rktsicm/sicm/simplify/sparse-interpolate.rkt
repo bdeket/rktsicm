@@ -11,6 +11,8 @@
          "../numerics/linear/lu.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;         Sparse Multivariate Polynomial Interpolation 
 ;;;         a probabilistic method based on Richard Zippel's
 ;;;          "Interpolating Polynomials From Their Values"
@@ -22,6 +24,7 @@
 ;;; arithmetic.  This makes the idea stand out in stark contrast
 ;;; without the confusing complications introduced by those
 ;;; optimizations.
+
 
 ;;; Given a polynomial function f of arity n and maximum degree d, to
 ;;; find a representation for the terms of the polynomial.
@@ -81,7 +84,7 @@
 		 (ws
 		  (let lp ((i (length ks)) (argl ones) (fs '()))
 		    (if (fix:= i 0)
-			(reverse fs);WAS REVERSE!
+			(reverse fs);;bdk;; WAS REVERSE!
 			(lp (fix:- i 1)
 			    (map * argl args)
 			    (cons (apply f argl) fs))))))

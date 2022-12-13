@@ -6,10 +6,13 @@
          "../../kernel-intr.rkt"
          "../../general/assert.rkt")
 
+;;bdk;; start original file
+
 ;;;;      Moments of a Distribution
 
 ;;;   Probably written by Matthew Halfant.
 ;;;   Modified by GJS on 17 December 2012.
+
 
 ;;; First some specific moments of a vector
 

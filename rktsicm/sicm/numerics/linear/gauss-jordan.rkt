@@ -9,7 +9,10 @@
          "singular.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;  Linear System Solver -- Gauss-Jordan
+
 
 ;;; This file contains the following definitions:
 ;;;

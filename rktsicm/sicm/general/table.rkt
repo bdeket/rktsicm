@@ -5,6 +5,8 @@
 (require (only-in "../rkt/glue.rkt" false)
          "sets.rkt")
 
+;;bdk;; start original file
+
 ;;;; Property Tables
 
 ;;; Properties are n-dimensional sparse tables implemented as 
@@ -103,7 +105,6 @@
     (define (show) local-table)
 
     (vector table-name lookup smash! accumulator! remove! show)))
-
 
 (define *no-value* (list '*no-value*))
 

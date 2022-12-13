@@ -8,9 +8,12 @@
          "singular.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;  Linear System Solver -- Full-Pivot
 
 ;;; 13 August 1990 -- Full pivoting linear-equation solver -- GJS & Jacob
+
 
 ;;; This file contains the following definitions:
 ;;;

@@ -14,6 +14,11 @@
          "sparse-gcd.ss"
          )
 
+;;bdk;; start original file
+
+;;;; This is the top level of polynomial gcd stuff.
+
+
 (define (poly:gcd-dispatch u v)
   (cond ((poly:zero? u) v)
 	((poly:zero? v) u)
@@ -43,4 +48,10 @@
 		       poly/one)
 		   (poly/gcd-classical u v)))))))
 
+;;bdk;; moved to pcfpf/pcf-fpf 1
+
 (define poly:gcd poly:gcd-dispatch)
+
+;;bdk;; moved to pcfpf/pcf-fpf 2
+
+

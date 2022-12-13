@@ -1,6 +1,6 @@
 #lang s-exp "../generic.rkt"
 
-(provide (except-out (all-defined-out) assign-operation)
+(provide (except-out (all-defined-out) defhandler)
          (all-from-out "indexed/types.rkt"))
 
 (require (only-in "../rkt/glue.rkt" if every any
@@ -13,37 +13,16 @@
          "manifold.rkt"
          "vector-fields.rkt"
          )
-(define-values (assign-operation indexed:assign-operations)
+(define-values (defhandler indexed:assign-operations)
   (make-assign-operations 'indexed))
+
+;;bdk;; start original file
 
 ;;;;    Minimal support for Indexed Objects
 ;;; e.g. the components of tensors relative to a basis.
 
-#| ;;bdk;; moved to inexed/types
-;;; A minimal interface for multi-index stuff.
 
-(define (argument-types proc)
-  (eq-get proc 'argument-types))
-
-(define has-argument-types? argument-types)
-
-(define (declare-argument-types! proc argument-types)
-  (assert (procedure? proc))
-  (eq-put! proc 'argument-types argument-types))
-
-;;; argument-types are, for example 
-;;;    (list 1form-field? vector-field? vector-field?), 
-;;; for a Christoffel-2: it takes one 1form field and two vector fields.
-
-(define (index-types proc)
-  (eq-get proc 'index-types))
-
-(define has-index-types? index-types)
-
-(define (declare-index-types! proc index-types)
-  (assert (procedure? proc))
-  (eq-put! proc 'index-types index-types))
-|#
+;;bdk;; moved to indexed/types 1
 
 ;;; *index-types* are, for example 
 ;;;    (list up down down), 
@@ -402,18 +381,18 @@
   (or (function-quantity? x)
       (numerical-quantity? x)))
 
-(assign-operation '* (lambda (x y) zero-manifold-function)
+(defhandler '* (lambda (x y) zero-manifold-function)
   zero-manifold-function? manifold-function-cofunction?)
-(assign-operation '* (lambda (x y) zero-manifold-function)
+(defhandler '* (lambda (x y) zero-manifold-function)
   manifold-function-cofunction? zero-manifold-function?)
 
-(assign-operation '* (lambda (x y) y)
+(defhandler '* (lambda (x y) y)
   one-manifold-function? manifold-function-cofunction?)
-(assign-operation '* (lambda (x y) x)
+(defhandler '* (lambda (x y) x)
   manifold-function-cofunction? one-manifold-function?)
 
-(assign-operation '+ (lambda (x y) y)
+(defhandler '+ (lambda (x y) y)
   zero-manifold-function? manifold-function-cofunction?)
-(assign-operation '+ (lambda (x y) x)
+(defhandler '+ (lambda (x y) x)
   manifold-function-cofunction? zero-manifold-function?)
 

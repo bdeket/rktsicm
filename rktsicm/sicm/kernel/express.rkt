@@ -28,9 +28,12 @@
         with-si-units->expression])
 (require 'todo)
 
+;;bdk;; start original file
+
 ;;;;  Utilities for manipulating symbolic expressions
 
-;;bdk;; operator/operands first...-operand moved to cstm
+
+;;bdk;; moved to cstm/express 1
 
 (define (substitute new old expression)
   (define (sloop exp)
@@ -43,9 +46,13 @@
           (else exp)))
   (if (equal? new old) expression (sloop expression)))
 
-;;bdk;; has/get/add!-property moved to cstm
 
-;;bdk;; make-*-literal, make-combination expression-of moved to cstm
+;;; Abstract quantities are represented with a type-tagged property list,
+;;; implemented as an alist.
+
+;;bdk;; moved to cstm/express 2
+
+;;bdk;; moved to cstm/express 3
 
 ;;; In this system, expressions never contain vectors or matrices,
 ;;; they only contain constructions for them.  Thus we need to be able

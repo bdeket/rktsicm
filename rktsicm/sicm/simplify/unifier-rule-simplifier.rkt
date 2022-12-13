@@ -10,7 +10,10 @@
 ;;bdk;; rule-memoize is set to values in load
 (define (rule-memoize x) (warn (format "rule-memoize: not memoizing - ~a" x)) x)
 
+;;bdk;; start original file
+
 ;;;;         Match and Substitution Language Interpreter
+
 
 ;;;   This is a descendent of the infamous 6.001 rule interpreter,
 ;;; originally written by GJS for a lecture in the faculty course held

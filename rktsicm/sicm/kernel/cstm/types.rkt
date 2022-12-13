@@ -4,6 +4,7 @@
 
 (require (only-in "../../rkt/glue.rkt" define-integrable))
 
+;;bdk;; insert 1
 (define-integrable number-type-tag '*number*)
 
 (define-integrable with-units-type-tag '*with-units*)
@@ -43,7 +44,6 @@
 
 (define-integrable series-type-tag '*series*)
 
-
 (define type-tags
   (list number-type-tag
 	unit-type-tag
@@ -78,5 +78,4 @@
 	;;abstract-up-type-tag
 	abstract-down-type-tag
 	abstract-matrix-type-tag))
-
-
+;;bdk;; insert 1 end

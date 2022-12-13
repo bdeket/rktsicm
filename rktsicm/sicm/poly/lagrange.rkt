@@ -8,6 +8,8 @@
          "../enclose/comcon.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;                       LAGRANGE.SCM
 ;;; produces an interpolation polynomial expression for a given
 ;;; set of values at a given set of points.
@@ -21,6 +23,7 @@
 ;;; 
 
 ;;; Edited by GJS 10Jan09
+
 
 ;;; Needs: ENCLOSE/COMCON (for LAMBDAFY, LETIFY utilities)
 ;;;        ENCLOSE/ENCLOSE for LAMBDA->NUMERICAL-PROCEDURE

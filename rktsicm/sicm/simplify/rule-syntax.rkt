@@ -2,7 +2,10 @@
 
 (provide (all-defined-out))
 
+;;bdk;; start original file
+
 ;;;; Compiler for rules.
+
 
 ;;; Rule syntax.
 ;;; Rule does not apply if consequent expression returns #f.

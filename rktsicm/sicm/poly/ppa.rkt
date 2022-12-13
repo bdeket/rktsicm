@@ -9,11 +9,14 @@
          "../numerics/optimize/unimin.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;        PPA:  Piecewise polynomial approximations
 
 ;;; Edited by GJS 10Jan09
 ;;; Smooth versions of PPA added 5/19/89 (mh)
 ;;; bug fix 1/13/88
+
 
 ;;;   To make a piecewise polynomial approximation of a function, f,
 ;;;   we specify the range, [low, high], the maximum order of polynomial 

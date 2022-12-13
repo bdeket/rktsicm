@@ -11,9 +11,15 @@
          )
 
 
+;;bdk;; start original file
+
 ;;;; Numerical construction of Polynomial interpolations
 
 ;;; Edited by GJS 10Jan09
+
+
+;;bdk;; moved to domain 1
+
 
 ;;; Given a list of distinct abscissas xs = (x1 x2 ... xn) and a list
 ;;; of ordinates ys = (y1 y2 ... yn), return the Lagrange interpolation

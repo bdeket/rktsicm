@@ -17,6 +17,8 @@
   (make-assign-operations 'vector-fields))
 
 
+;;bdk;; start original file
+
 ;;; A vector field is an operator that takes a smooth real-valued
 ;;; function of a manifold and produces a new function on the manifold
 ;;; which computes the directional derivative of the given function at
@@ -48,7 +50,7 @@
 	      components)
 	   (coordinate-system '->coords)))
 
-;; (define (components->vector-field components coordinate-system #!optional name)
+;; (define (components->vector-field components coordinate-system #:optional name)
 ;;   (if (default-object? name) (set! name `(vector-field ,components)))
 ;;   (procedure->vector-field
 ;;    (vector-field-procedure components coordinate-system)

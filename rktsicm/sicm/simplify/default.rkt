@@ -2,7 +2,7 @@
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require "../rkt/fixnum.rkt"
+(require (only-in "../rkt/glue.rkt" pathname? fix:= fix:+)
          "../kernel-intr.rkt"
          "../units.rkt"
          "../rkt/undefined.rkt"
@@ -12,16 +12,18 @@
 (define-values (assign-operation simplify:assign-operations)
   (make-assign-operations 'simplify))
 
+;;bdk;; start original file
 
 ;;;; Simplifier interface
 ;;;   g:simplify expects typed expressions. produces untyped expressions
 ;;;   Needs hashtable, record, etc.
 
+
 (define (default-simplify expr)
   (define (bad? expr)
     (or (boolean? expr)
 	(null? expr)
-	(path? expr)
+	(pathname? expr)
 	(undefined-value? expr)
 	(and (pair? expr)
 	     (not (list? expr)))))
@@ -62,7 +64,7 @@
 (assign-operation 'simplify identity symbol?)
 (assign-operation 'simplify identity null?)
 (assign-operation 'simplify identity boolean?)
-(assign-operation 'simplify identity path?)
+(assign-operation 'simplify identity pathname?)
 (assign-operation 'simplify identity undefined-value?)
 
 

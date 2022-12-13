@@ -6,6 +6,8 @@
          "../../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;     Fundamental quad manipulation 
 ;;;        given double arguments.
 

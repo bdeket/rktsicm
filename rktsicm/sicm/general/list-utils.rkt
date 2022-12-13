@@ -13,7 +13,10 @@
          "../rkt/define.rkt"
          racket/list)
 
+;;bdk;; start original file
+
 ;;;; List utilities
+
 
 (define (variable<? x y)
   (symbol<? x y))
@@ -159,7 +162,6 @@
 
 (define ((list:elementwise proc) . lists)
   (apply map proc lists))
-
 
 ;;; MAP-DISTINCT-PAIRS APPLYs a procedure, F, to every distinct pair
 ;;; of values chosen from the list, M, producing a list of the
@@ -345,7 +347,7 @@
 	  (else
 	   (error "%REVERSE: Argument not a list" ol)))))  
 
-(define (%map f ol1 #| #!optional ol2 . rest |#)
+(define (%map f ol1 #| #:optional ol2 . rest |#)
   ;; Important: The circular list hack for multi-argument
   ;; map does not work here.
   (error "TODO")#;

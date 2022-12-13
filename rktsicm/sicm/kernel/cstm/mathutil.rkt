@@ -14,9 +14,12 @@
          "../strutl.rkt"
          )
 
+;;bdk;; insert 1
 (define (g:ref x . selectors)
   (ref-internal x selectors))
+;;bdk;; insert 1 end
 
+;;bdk;; insert 2
 (define (ref-internal x selectors)
   (cond ((null? selectors) x)
 	((procedure? x)
@@ -167,3 +170,4 @@
 	  (if (not (fix:< i n))
 	      (error "Bad index -- REF" i))
 	  i))))
+;;bdk;; insert 2 end

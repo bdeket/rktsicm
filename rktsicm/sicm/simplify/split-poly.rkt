@@ -11,6 +11,8 @@
          "simplify.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Split a polynomial into factors of various multiplicities.
 ;;;    Original code by Mira Wilczek, June 2002.
 ;;;    Redone by GJS, January 2011.

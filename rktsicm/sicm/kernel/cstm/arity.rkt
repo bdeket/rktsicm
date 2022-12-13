@@ -10,20 +10,22 @@
 (module+ test
   (require rackunit))
 
-;;; Arity is important to special case.
 (define (exact-arity n)
   (unless (and (exact-integer? n) (<= 0 n))
     (raise-argument-error 'exact-arity "exact-positive-integer?" n))
   n)
 
+;;bdk;; insert 1
+;;; Arity is important to special case.
+
 (define *at-least-zero* (arity-at-least 0))
-(define *exactly-zero* 0)
+(define *exactly-zero* (exact-arity 0))
 (define *at-least-one* (arity-at-least 1))
-(define *exactly-one* 1)
+(define *exactly-one* (exact-arity 1))
 (define *at-least-two* (arity-at-least 2))
-(define *exactly-two* 2)
+(define *exactly-two* (exact-arity 2))
 (define *at-least-three* (arity-at-least 3))
-(define *exactly-three* 3)
+(define *exactly-three* (exact-arity 3))
 (define *one-or-two*    '(1 2))
 
 (define (exactly-n? arity)
@@ -33,6 +35,7 @@
 (define (any-number? arity)
   (and (arity-at-least? arity)
        (fix:= (arity-at-least-value arity) 0)))
+;;bdk;; insert 1 end
 
 (define (arity-min ar)
   (cond
@@ -40,6 +43,7 @@
     [(arity-at-least? ar) (arity-at-least-value ar)]
     [else (apply min (map arity-min ar))]))
 
+;;bdk;; insert 2
 (define (joint-arity a1 a2)
   (if (and a1 a2)
       (let ()
@@ -98,7 +102,7 @@
              (if (null? l) #f (normalize-arity l))]))
         (cond1 a1 a2))
       #f))
-
+;;bdk;; insert 2 end
 
 
 (define (combine-arity A B)

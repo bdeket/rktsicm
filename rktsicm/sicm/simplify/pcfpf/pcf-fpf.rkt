@@ -13,6 +13,7 @@
 
 ;;;; This is the top level of polynomial gcd stuff.
 
+;;bdk;; insert 1
 (define *gcd-cut-losses* #f)
 ;;;(define *gcd-cut-losses* 1000.0)
 
@@ -36,7 +37,9 @@
 
 
 (define *euclid-breakpoint-arity* 3)
+;;bdk;; insert 1 end
 
+;;bdk;; insert 2
 (define (gcd-check-same-arity u v)
   (let ((au (poly:arity u)))
     (if (not (fix:= au (poly:arity v)))
@@ -100,5 +103,4 @@
 						v
 						(sparse-exponents sterm)))))
 		       s)))))
-
-
+;;bdk;; insert 2 end

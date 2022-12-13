@@ -12,6 +12,8 @@
          "../signals/cph-dsp/flovec.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Bulirsch-Stoer integration: Send bug reports to gjs@mit.edu
 ;;;    Ideas from Jack Wisdom, from Michel Henon, from B&S
 
@@ -112,6 +114,7 @@
 |#
 
 ;(declare (integrate-operator for less-than))
+
 
 (define (for initial test increment to-do)
   ;(declare (integrate initial test increment to-do))

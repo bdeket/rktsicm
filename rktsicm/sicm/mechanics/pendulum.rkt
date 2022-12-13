@@ -9,7 +9,10 @@
          "../numerics/ode/interface.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; THE PENDULUM
+
 
 ;;; definition H = p^2/(2alpha) - beta cos(theta)
 ;;; ASSUME alpha > 0 and beta > 0

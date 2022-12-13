@@ -6,6 +6,9 @@
          (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt")
 
+;;bdk;; start original file
+
+
 ;;; UNIFORM-RANDOM produces an inexact number x,    0 <= x < 1
 
 (define (uniform-random) (random #;1.))

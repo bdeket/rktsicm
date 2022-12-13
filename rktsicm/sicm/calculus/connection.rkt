@@ -11,6 +11,8 @@
          "../mechanics/Hamiltonian.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; A metric induces a torsion-free connection			       
 
 ;;; We reserve *Christoffel* and Christoffel? for Christoffel type 2

@@ -9,6 +9,9 @@
          "qc.rkt"
          )
 
+;;bdk;; start original file
+
+
 ;;; Backwards Euler implicit integrator. 
 
 #|

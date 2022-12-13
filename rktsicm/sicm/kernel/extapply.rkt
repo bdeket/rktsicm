@@ -13,6 +13,8 @@
          "../parameters.rkt"
          "cstm/generic.rkt")
 
+;;bdk;; start original file
+
 ;;;; Scheme evaluator extensions for algebra.
 
 ;;; Extension of Scheme for application of non-procedures in operator position.
@@ -65,6 +67,7 @@
 (once-only! apply-extension-init 'apply-extension-init)
 |#
 
+
 #|
 ;;; Example of the way it should not be done!
 
@@ -82,7 +85,6 @@
 	  (lambda args
 	    (g:apply (inapplicable-object/operator condition) args)))))))
 |#
-
 
 ;;; Extension of Scheme for self-evaluating unbound variables
 

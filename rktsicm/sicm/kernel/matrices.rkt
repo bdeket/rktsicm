@@ -3,9 +3,10 @@
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/matrices.rkt"))
 
-(require (only-in "../rkt/glue.rkt" if default-object default-object? undefined-value
+(require (only-in "../rkt/glue.rkt" if undefined-value
                   make-initialized-vector for-all? iota
                   fix:= fix:< fix:+ fix:- fix:quotient fix:zero?)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
          "../general/assert.rkt"
          "numeric.rkt"
@@ -22,9 +23,12 @@
 (define-values (assign-operation matrices:assign-operations)
   (make-assign-operations 'matrices))
 
+;;bdk;; start original file
+
 ;;;;               Matrices
 
-;;bdk;; m:type etc moved to cstm/matrices
+
+;;bdk;; moved to cstm/matrices 1
 
 #|
   (*matrix* (nrows . ncols) 
@@ -33,7 +37,7 @@
 	       ...))
 |#
 
-;;bdk;; tag-matrix etc moved to cstm/matrices
+;;bdk;; moved to cstm/matrices 2
 
 (define (array->matrix array)
   (assert (and (vector? array) (vector-forall vector? array))
@@ -45,7 +49,7 @@
      "Not all rows have same length -- ARRAY->MATRIX" array)
     (tag-matrix nrows ncols array)))
 
-;;bdk;; m:dimention etc moved to cstm/matrices
+;;bdk;; moved to cstm/matrices 3
 
 ;;; Sometimes Scheme vectors need to be coerced to matrices
 
@@ -179,8 +183,7 @@
   (tag-matrix (m:num-rows A) (m:num-cols A) 
     (vector-with-substituted-coord (matrix->array A) i V)))
 
-;;bdk;; matrix-ref moved to cstm/matrices
-
+;;bdk;; moved to cstm/matrices 4
 
 (define matrix:generate m:generate)
 
@@ -207,7 +210,8 @@
 
 (define matrix:elementwise m:elementwise)
 
-;;bdk;; m:submatrix moved to cstm/matrices
+;;bdk;; moved to cstm/matrices 5
+
 
 ;;; A minor is a submatrix obtained from a given matrix
 ;;;   by dropping a given row and column.
@@ -239,7 +243,7 @@
 		    (collp (fix:+ j 1))
 		    #f)))))))
 
-(define (m:make-zero n [m default-object])
+(define (m:make-zero n #:optional m)
   (let ((m (if (default-object? m) n m)))
     (m:generate n m (lambda (i j) :zero))))
 
@@ -634,9 +638,9 @@
 
 ;;;LU decomposer, etc, must use correct arithmetic
 
-(define matinv-numerical undefined-value)
-(define solve-numerical undefined-value)
-(define determinant-numerical undefined-value)
+(define matinv-numerical)
+(define solve-numerical)
+(define determinant-numerical)
     
 (define numerical? #f)
     
@@ -667,7 +671,7 @@
 (define (m:solve-linear A b)
   (m:rsolve b A))
 
-(define (set-numerical! [matinv default-object] [solve default-object] [determinant default-object])
+(define (set-numerical! #:optional matinv solve determinant)
   (set! numerical? #t)
   (if (not (default-object? matinv)) (set! matinv-numerical matinv))
   (if (not (default-object? solve)) (set! solve-numerical solve))
@@ -825,7 +829,7 @@
     (add-property! z 'one #t)
     z))
 
-(define (make-matrix-combination operator [reverse? default-object])
+(define (make-matrix-combination operator #:optional reverse?)
   (if (default-object? reverse?)
       (lambda operands 
 	(make-combination abstract-matrix-type-tag
@@ -897,17 +901,17 @@
  '* (make-matrix-combination '* 'r) abstract-matrix? scalar?)
 
 (assign-operation
- '/ (make-matrix-combination '/) abstract-matrix? square-abstract-matrix?)
+    '/ (make-matrix-combination '/)    abstract-matrix? square-abstract-matrix?)
 (assign-operation
- '/ (make-matrix-combination '/) matrix?          square-abstract-matrix?)
+   '/ (make-matrix-combination '/)    matrix?          square-abstract-matrix?)
 (assign-operation
- '/ (make-matrix-combination '/) abstract-matrix? square-matrix?)
+    '/ (make-matrix-combination '/)    abstract-matrix? square-matrix?)
 (assign-operation
- '/ (make-matrix-combination '/) scalar?          square-abstract-matrix?)
+    '/ (make-matrix-combination '/)    scalar?          square-abstract-matrix?)
 (assign-operation
- '/ (make-matrix-combination '/) abstract-matrix? scalar?)
+    '/ (make-matrix-combination '/)    abstract-matrix? scalar?)
 (assign-operation
- '/ (make-matrix-combination '/) vector-quantity? square-abstract-matrix?)
+    '/ (make-matrix-combination '/)    vector-quantity? square-abstract-matrix?)
 
 (assign-operation
  'expt (make-matrix-combination 'expt) square-abstract-matrix? exact-integer?)

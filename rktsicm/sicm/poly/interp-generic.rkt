@@ -8,6 +8,8 @@
          "../general/list-utils.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; Given a list of distinct abscissas xs = (x1 x2 ... xn) and a list
 ;;; of ordinates ys = (y1 y2 ... yn), return the Lagrange interpolation
 ;;; polynomial through the points (x1, y1), (x2, y2), ... (xn, yn).

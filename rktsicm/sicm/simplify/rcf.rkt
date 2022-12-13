@@ -11,7 +11,10 @@
          "pcf-fpf.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Rational Forms constructed over polynomials
+
 
 (define rcf-tag '*RCF*)
 
@@ -72,7 +75,7 @@
 		   ((union-sets numbers)
 		    (poly/base-coefficients n)
 		    (poly/base-coefficients d)))))
-	   (let ((c (* (reduce lcm base/one
+	   (let ((c (* (reduce-left lcm base/one
 				    (map denominator
 					 (filter ratnum? b)))
 		       (sgn (poly:leading-base-coefficient d)))))

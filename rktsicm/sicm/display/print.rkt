@@ -23,6 +23,8 @@
        )
 (require 'todo)
 
+;;bdk;; start original file
+
 ;;; Hamiltonians look better if we divide them out.
 
 (define *divide-out-terms* #f)

@@ -6,13 +6,17 @@
                   fix:= fix:+ fix:-)
          (only-in "../../rkt/define.rkt" define lambda default-object?)
          "../../kernel-intr.rkt"
+         (only-in "../../display/print.rkt" simplify)
          "../../enclose/alt-magic.rkt"
          (only-in "../signals/cph-dsp/flovec.rkt" ->flonum)
          "ode-advancer.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; State advancer for parametric system derivatives with
 ;;;    arbitrarily-structured states.
+
 
 ;;; Assumptions:
 ;;;  Integrators never step further than suggested dt.
@@ -323,7 +327,7 @@
 ;;; If no "simplification" is desired 
 ;;;(set! *compiler-simplifier* expression)
 ;;; Default is to use usual simplifier
-(set! *compiler-simplifier* g:simplify)
+(set! *compiler-simplifier* simplify)
 
 ;;; For debugging
 (define *last-expression-to-compiler)

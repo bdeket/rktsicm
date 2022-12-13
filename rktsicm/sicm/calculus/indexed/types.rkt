@@ -9,6 +9,7 @@
 ;;;;    Minimal support for Indexed Objects
 ;;; e.g. the components of tensors relative to a basis.
 
+;;bdk;; insert 1
 ;;; A minimal interface for multi-index stuff.
 
 (define (argument-types proc)
@@ -32,3 +33,4 @@
 (define (declare-index-types! proc index-types)
   (assert (procedure? proc))
   (eq-put! proc 'index-types index-types))
+;;bdk;; insert 1 end

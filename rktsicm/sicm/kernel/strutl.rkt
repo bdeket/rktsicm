@@ -21,7 +21,10 @@
 (define (stream-pair? x) (and (stream? x) (not (stream-empty? x))))
 (define (stream-head s n) (stream->list (stream-take s n)))
 
+;;bdk;; start original file
+
 ;;;; STRUTL.SCM -- Stream utilities
+
 
 (define stream:for-each
  (let ()

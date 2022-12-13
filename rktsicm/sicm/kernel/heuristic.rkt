@@ -8,8 +8,11 @@
          "numeric.rkt"
          "numsymb.rkt")
 
+;;bdk;; start original file
+
 ;;; Some processes, such as finding the roots of a polynomial, can
 ;;; benefit by heuristic rounding of results (to a nearby rational).
+
 
 
 ;;; Heuristic rounding will occur to a rational within 

@@ -18,6 +18,8 @@
          "../ode/interface.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Numerical definite integration system interface.
 ;;;   The integrand is a procedure that computes a function.
 
@@ -47,6 +49,7 @@
 (foo 6)
 ;Value: 719.9999999997759
 |#
+
 
 ;;; Default compile integrand
 (define *compile-integrand? #t)
@@ -129,7 +132,7 @@
 	   (error "No interior point: CHOOSE-INTERIOR-POINT")))))
 
 #|
-(define (definite-integral f t1 t2 #!optional epsilon compile?)
+(define (definite-integral f t1 t2 #:optional epsilon compile?)
   (if (default-object? epsilon)
       (set! epsilon *definite-integral-allowable-error*))
   (if (default-object? compile?)

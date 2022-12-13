@@ -11,15 +11,19 @@
          "../types.rkt"
          "../../parameters.rkt")
 
-;;; Disable intermediate simplification -- wastes time.
-#; ;moved to paramters
-(define incremental-simplifier #f)
-
+;;bdk;; insert 1
 ;;; Enable simplification on construction -- wastes time?
+#; ;moved to parameters
+(define enable-constructor-simplifications? #t)
+
 (define (enable-constructor-simplifications doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
   (clear-memoizer-tables) 
   (enable-constructor-simplifications? doit?))
+
+;;; Disable intermediate simplification -- wastes time.
+#; ;moved to parameters
+(define incremental-simplifier #f)
 
 (define symbolic-operator-table (make-eq-hash-table))
 
@@ -66,3 +70,4 @@
 		(numerical-expression-canonicalizer expr))
 	       (else expr)))
 	(else expr)))
+;;bdk;; insert 1 end

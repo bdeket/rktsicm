@@ -4,7 +4,7 @@
          (all-from-out "cstm/s-operator.rkt"))
 
 (require (only-in racket/list take)
-         "../rkt/default-object.rkt"
+         (only-in "../rkt/define.rkt" define default-object?)
          "../rkt/applyhook.rkt"
          "../general/assert.rkt"
          "../general/sets.rkt"
@@ -20,7 +20,11 @@
 (define-values (assign-operation operator:assign-operations)
   (make-assign-operations 'operator))
 
+;;bdk;; start original file
+
 ;;;; Operators
+
+
 
 (define (o:type o) operator-type-tag)
 
@@ -32,14 +36,16 @@
 
 #|;;; In GENERIC.SCM
 
-(define (make-operator p #!optional name subtype arity #!rest opts)
+(define (make-operator p #:optional name subtype arity . opts)
   (if (default-object? name) (set! name #f))
   (if (default-object? subtype) (set! subtype #f))
   (if (default-object? arity) (set! arity (procedure-arity p)))
   (make-apply-hook p `(,operator-type-tag ,subtype ,name ,arity ,@opts)))
 |#
 
-;;bdk;; make-op etc moved to cstm/s-operator
+;;bdk;; moved to cstm/s-operator 1
+
+;;bdk;; moved to cstm/s-operator 3
 
 (define (simple-operator? op)
   (and (operator? op)
@@ -241,7 +247,7 @@
 ;;;      0)
 ;;; This is (exp (* (expt eps 2) D)) written as a power series in eps.
 
-(define (expn op [exponent default-object])
+(define (expn op #:optional exponent)
   (assert (operator? op))
   (assert (equal? (operator-arity op) *exactly-one*) "o:expn")
   (if (default-object? exponent)
@@ -281,9 +287,9 @@
 (assign-operation '/          o:o/n             operator? numerical-quantity?)
 
 
-(assign-operation 'solve-linear-right o:o/n  operator? numerical-quantity?)
-(assign-operation 'solve-linear-left (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
-(assign-operation 'solve-linear      (lambda (x y) (o:o/n y x)) numerical-quantity? operator?)
+(assign-operation 'solve-linear-right   o:o/n                    operator? numerical-quantity?)
+(assign-operation 'solve-linear-left    (lambda (x y) (o:o/n y x))    numerical-quantity? operator?)
+(assign-operation 'solve-linear         (lambda (x y) (o:o/n y x))    numerical-quantity? operator?)
 
 (assign-operation 'negate     o:negate          operator?)
 (assign-operation 'expt       o:expt            operator? exact-integer?)

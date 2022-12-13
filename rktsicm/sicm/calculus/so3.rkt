@@ -8,6 +8,8 @@
          "../mechanics/rotation.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;  review aspects of SO3
 
 ;;; Euler-angles coordinate system is also defined in manifold.scm

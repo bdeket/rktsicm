@@ -8,13 +8,18 @@
          "../numeric.rkt"
          "../types.rkt")
 
+;;bdk;; insert 1
 (define (v:type v) vector-type-tag)
 (define (v:type-predicate v) vector-quantity?)
+;;bdk;; insert 1 end
 
+;;bdk;; insert 2
 (define-integrable v:generate make-initialized-vector)
 (define-integrable vector:generate make-initialized-vector)
 (define-integrable v:dimension vector-length)
+;;bdk;; insert 2 end
 
+;;bdk;; insert 3
 (define (v:dot-product v1 v2)
   (assert (and (vector? v1) (vector? v2))
 	  "Not vectors -- V:DOT-PRODUCT" (list v1 v2))
@@ -28,7 +33,9 @@
 	      (g:+ ans
 		   (g:* (vector-ref v1 i)
 			(vector-ref v2 i))))))))
+;;bdk;; insert 3 end
 
+;;bdk;; insert 4
 (define (v:cross-product v w)
   (assert (and (fix:= (vector-length v) 3)
 	       (fix:= (vector-length w) 3))
@@ -43,4 +50,5 @@
     (vector (g:- (g:* v1 w2) (g:* v2 w1))
 	    (g:- (g:* v2 w0) (g:* v0 w2))
 	    (g:- (g:* v0 w1) (g:* v1 w0)))))
+;;bdk;; insert 4 end
 

@@ -2,8 +2,9 @@
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require (only-in "../../rkt/glue.rkt" if default-object default-object?
+(require (only-in "../../rkt/glue.rkt" if
                   fix:= fix:< fix:+ fix:- fix:1+ fix:negate fix:quotient)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../../general/assert.rkt"
          "../numeric.rkt"
          "../utils.rkt"
@@ -17,6 +18,7 @@
 
 ;;;; Power-series arithmetic using infinite streams.
 
+;;bdk;; insert 1
 (define (series:type ps) series-type-tag)
 (define (series:type-predicate ps) series?)
 
@@ -47,7 +49,7 @@
 			(map series->stream
 			     series-list)))))
 
-(define (series:generate p [arity default-object])
+(define (series:generate p #:optional arity)
   (make-series (if (default-object? arity)
                    *exactly-one*
                    arity)
@@ -66,9 +68,9 @@
 		 (apply map-streams
 			proc
 			(map series->stream series-list)))))
+;;bdk;; insert 1 end
 
-;;bdk;; series:print is at kernel/pseries
-
+;;bdk;; insert 2
 (define (series:ref series index)
   (stream-ref (series->stream series) index))
 
@@ -103,7 +105,7 @@
 			    (cons-stream :one zero-stream))))
 
 
-(define (constant-series c [arity default-object])
+(define (constant-series c #:optional arity)
   (make-series (if (default-object? arity)
                    *exactly-one*
                    arity)
@@ -329,9 +331,9 @@
   (cons-stream value
 	       (partial-sums-stream (g:+ value (head s))
 				    (tail s))))
+;;bdk;; insert 2 end
 
-;;bdk;; series:sum is at kernel/pseries
-
+;;bdk;; insert 3
 ;;; This procedure produces the result of substituting the argument
 ;;; for the indeterminate in the given power series.  
 
@@ -428,17 +430,17 @@
 (assign-operation '/          series/coefficient   series?        not-series?)
 
 
-(assign-operation 'solve-linear-right       series:div           series?        series?)
-(assign-operation 'solve-linear-right       coefficient/series   not-series?    series?)
-(assign-operation 'solve-linear-right       series/coefficient   series?        not-series?)
+(assign-operation 'solve-linear-right         series:div           series?        series?)
+(assign-operation 'solve-linear-right         coefficient/series   not-series?    series?)
+(assign-operation 'solve-linear-right         series/coefficient   series?        not-series?)
 
-(assign-operation 'solve-linear-left (lambda (x y) (series:div y x))         series?  series?)
-(assign-operation 'solve-linear-left (lambda (x y) (series/coefficient y x)) not-series?  series?)
-(assign-operation 'solve-linear-left (lambda (x y) (coefficient/series y x)) series?      not-series?)
+(assign-operation 'solve-linear-left   (lambda (x y) (series:div y x))           series?        series?)
+(assign-operation 'solve-linear-left   (lambda (x y) (series/coefficient y x))   not-series?    series?)
+(assign-operation 'solve-linear-left   (lambda (x y) (coefficient/series y x))   series?        not-series?)
 
-(assign-operation 'solve-linear (lambda (x y) (series:div y x))         series?     series?)
-(assign-operation 'solve-linear (lambda (x y) (series/coefficient y x)) not-series? series?)
-(assign-operation 'solve-linear (lambda (x y) (coefficient/series y x)) series?     not-series?)
+(assign-operation 'solve-linear   (lambda (x y) (series:div y x))           series?        series?)
+(assign-operation 'solve-linear   (lambda (x y) (series/coefficient y x))   not-series?    series?)
+(assign-operation 'solve-linear   (lambda (x y) (coefficient/series y x))   series?        not-series?)
 
 (assign-operation 'expt       series:expt          series?        exact-integer?)
 
@@ -504,4 +506,4 @@
 		       (atan-helper (+ n 1) (- s)))))
     (make-series *exactly-one*
 		 (atan-helper 0 1))))
-
+;;bdk;; insert 3 end

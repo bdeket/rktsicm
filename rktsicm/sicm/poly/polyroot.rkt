@@ -11,10 +11,10 @@
          "../numerics/statistics/cluster.rkt"
          )
 
-;; (needs "../numerical/cluster")
-;; (to-initialize "poly-env")
+;;bdk;; start original file
 
 ;;; General Polynomial Root Finder
+
 
 (define (complex-random modulus)
   (make-polar modulus (random :2pi)))
@@ -25,6 +25,7 @@
 
 (define (horners-rule p x)
   (poly:horners-rule-with-error p x list))
+
 
 (define (roots->poly roots)
   ;;bdk;; reduce needs tree arguments... maybe a-reduce?

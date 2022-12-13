@@ -5,7 +5,8 @@
 
 (require (for-syntax racket/base
                      racket/syntax)
-         (only-in "../../rkt/glue.rkt" default-object default-object? fix:> fix:+)
+         (only-in "../../rkt/glue.rkt" fix:> fix:+)
+		 (only-in "../../rkt/define.rkt" define default-object?)
          "../ghelper.rkt"
          "../numeric.rkt"
          "s-operator.rkt"
@@ -31,6 +32,7 @@
 
 ;;; Unary Operators 
 
+;;bdk;; insert 1
 (define-g g:type (make-generic-operator 1 'type))
 
 (define-g g:type-predicate (make-generic-operator 1 'type-predicate))
@@ -47,9 +49,9 @@
 (define-g g:one-like
   (make-generic-operator 1 'one-like (lambda (x) :one)))
 
-;;bdk;; from mathutil.scm
+;;bdk;; insert 10 : from ../mathutil
 (define (g:identity x) x)
-
+;;bdk;; insert 10 end
 (define-g g:identity-like
   (make-generic-operator 1 'identity-like (lambda (x) g:identity)))
 
@@ -113,8 +115,12 @@
                                (define ans (apply f args))
                                (printf "trace_~a < ~a\n" j ans))))))
 
-;!!!
-(define generic:transpose (make-generic-operator 1 'transpose))
+;;bdk;; insert 1 end
+
+;;bdk;; insert 2
+;;bdk;; was g:transpose-1arg
+(define generic:transpose
+ (make-generic-operator 1 'transpose))
 
 (define-g g:dimension
   (make-generic-operator 1
@@ -133,7 +139,16 @@
 (define-g g:solve-linear
   (make-generic-operator 2 'solve-linear))
 
-;;bdk;; moved to s-operator
+;;; Duplicate of text in OPERATOR.SCM, except that the explicit type
+;;; tag is here rather than the variable operator-type-tag.  This is
+;;; necessary because of a problem of load order.
+#; ;;bdk;; moved to s-operator
+(define (make-operator p #:optional name subtype arity . opts)
+   (if (default-object? name) (set! name #f))
+   (if (default-object? subtype) (set! subtype #f))
+   (if (default-object? arity) (set! arity (procedure-arity p)))
+   (make-apply-hook p `(*operator* ,subtype ,name ,arity ,@opts)))
+
 
 (define generic:partial-derivative
   (make-generic-operator 2 'partial-derivative))
@@ -152,9 +167,11 @@
    (lambda (f)
      (generic:partial-derivative f varspecs))
    `(partial ,@varspecs)))
+;;bdk;; insert 2 end
 
 ;;; Binary Operators
 
+;;bdk;; insert 3
 (define generic:= (make-generic-operator 2 '= (lambda (x y) #f)))
 
 (define (g:=:bin x y)
@@ -234,7 +251,9 @@
 	(else (generic:/ x y))))
 
 (define generic:expt (make-generic-operator 2 'expt))
+;;bdk;; insert 3 end
 
+;;bdk;; insert 4
 (define g:gcd:bin (make-generic-operator 2 'gcd))
 (define generic:gcd g:gcd:bin)
 
@@ -260,7 +279,7 @@
 
 ;;; Weird operators
 
-(define (g:atan y [x default-object])
+(define (g:atan y #:optional x)
   (if (default-object? x) (g:atan1 y) (g:atan2 y x)))
 
 (define-g g:atan1 (make-generic-operator 1 'atan1))
@@ -467,8 +486,9 @@
 		 ((g:one? ans) ans)
 		 (else
 		  (lp (cdr as) (g:gcd:bin ans (car as)))))))))
+;;bdk;; insert 4 end
 
-;;bdk;; was in mathutil.rkt
+;;bdk;; insert 11 : mathutil
 (define (g:sigma f low high)
   (if (fix:> low high)
       0
@@ -476,7 +496,7 @@
 	(if (fix:> i high)
 	    sum
 	    (lp (fix:+ i 1) (g:+ sum (f i)))))))
-
+;;bdk;; insert 11 end
 
 
 ; was in simplify/simplify

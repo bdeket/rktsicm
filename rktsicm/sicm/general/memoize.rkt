@@ -12,6 +12,8 @@
   (set! *memoizers* (cons M *memoizers*)))
 
 
+;;bdk;; start original file
+
 ;;;; Memoizers
 
 ;;; A weak alist of memoized functions.

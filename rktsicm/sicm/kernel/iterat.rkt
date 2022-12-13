@@ -6,8 +6,10 @@
                   fix:= fix:- fix:+)
          (only-in racket/list split-at))
 
-;*r* copy/adapted from the scmutils library
+;;bdk;; start original file
+
 ;;;; Structure iterators
+
 
 ;;;           Structural Lists
 

@@ -7,7 +7,10 @@
          "../../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Root finding by successive bisection
+
 
 ;;; Simple bisection search 
 ;;;   In IEEE 754 binary floating point I think this will always

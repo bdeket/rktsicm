@@ -13,12 +13,15 @@
 
 (define ->flonum exact->inexact)
 
+;;bdk;; start original file
+
+
 ;;;;    Discrete Fourier Transform -- GJS -- 8 April 1987
 
 ;;; Simple FFT for records whose length is a power of 2.
 ;;;   Data records are represented as lists of (complex) numbers.
 ;;;   All arithmetic is assumed to be complex generic, 
-;;;   unless explicitly noted by "fix" for indices.
+;;;   unless explicitly noted by "fix:" for indices.
 
 #|
 (define (make-transform-pair period)

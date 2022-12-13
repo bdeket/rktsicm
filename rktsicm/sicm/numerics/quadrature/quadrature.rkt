@@ -12,7 +12,12 @@
          "../extrapolate/re.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Interface system for QUADRATURE 
+
+
+;;bdk;; moved to infinities 1
 
 #| 
 ;;; Bugs:

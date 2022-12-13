@@ -10,7 +10,10 @@
          "multimin.ss"
          )
 
+;;bdk;; start original file
+
 ;;;; Top-level optimization defaults
+
 
 (define (minimize f lowx highx)
   (brent-min f lowx highx brent-error))

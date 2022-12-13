@@ -24,7 +24,10 @@
       (weak-cons (car lst) (list->weak-list (cdr lst)))
       lst))
 
+;;bdk;; start original file
+
 ;;;; Weak list utilities
+
 
 ;;; Looks for obj in a weak list.
 

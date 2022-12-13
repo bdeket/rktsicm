@@ -4,7 +4,10 @@
 
 (require (only-in "../rkt/glue.rkt" list-head any))
 
+;;bdk;; start original file
+
 ;;;; Unifier with segment variables -- GJS -- 1 May 2016
+
 
 (define (unify t1 t2)
   (unify:internal t1 t2 '() (lambda (dict) dict)))

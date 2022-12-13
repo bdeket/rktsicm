@@ -13,6 +13,8 @@
          )
 (define real:* *)
 
+;;bdk;; start original file
+
 ;;;; Gear integrators for stiff differential equations
 
 ;;; Assumption: all states have their time as the first component.
@@ -179,6 +181,7 @@
    max-h
    continue
    done))
+
 
 (define (gear-advance-generator f&df dimension lte
                      #:optional convergence-tolerance implicit? spice-mode?)

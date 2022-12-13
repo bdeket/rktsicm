@@ -11,7 +11,10 @@
          "advance.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Quality-controlled adaptive integrators.
+
 
 ;;; QUALITY-CONTROL upgrades a one-step method into an adaptive
 ;;; quality-control method.  Given the one-step method and its "order"
@@ -72,7 +75,7 @@
                          h
                          (lambda (fullstep nf) ;fullstep succeeded
                            (let* ((err (error-measure 2halfsteps fullstep))
-                                  (next-h))
+                                  (next-h ))
                              (if *qc-wallp?
                                  (write-line
                                   `(qc fullstep err: ,err ,nh ,n2h ,nf)))

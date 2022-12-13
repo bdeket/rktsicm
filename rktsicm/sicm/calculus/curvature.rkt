@@ -10,6 +10,8 @@
          (only-in "../mechanics/Hamiltonian.rkt" commutator)
          )
 
+;;bdk;; start original file
+
 ;;; Riemann curvature "tensor" is pretty easy
 
 ;;; Hawking and Ellis equation 2.18, page 35.

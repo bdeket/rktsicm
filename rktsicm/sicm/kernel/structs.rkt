@@ -3,9 +3,10 @@
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/structs.rkt"))
 
-(require (only-in "../rkt/glue.rkt" if default-object default-object?
+(require (only-in "../rkt/glue.rkt" if
                   there-exists? generate-uninterned-symbol every
                   fix:= fix:> fix:< fix:+ fix:-)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/todo.rkt" bkpt)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
@@ -25,9 +26,12 @@
   (make-assign-operations 'structs))
 
 
+;;bdk;; start original file
+
 ;;;;                      Structures
 
-;;bdk;; s:type etc moved to cstm/structs
+
+;;bdk;; moved to cstm/structs 1
 
 #|
 (pe (s:map-chain (up 'a 'b 'c) cons))
@@ -36,6 +40,8 @@
 (pe (s:map-chain (up 'a (down 'b 'c) 'd) cons))
 (up (a 0) (down (b 1 0) (c 1 1)) (d 2))
 |#
+
+;;bdk;; moved to cstm/structs 2
 
 (define (s:arity v) (v:arity (s:->vector v)))
 
@@ -263,7 +269,7 @@
 (assign-operation '*           scalar*structure        scalar?    structure?)
 (assign-operation '*           structure*scalar        structure? scalar?)
 
-(assign-operation '*           scalar*structure        operator?  structure?)
+(assign-operation '*           scalar*structure        operator?    structure?)
 (assign-operation '*           structure*scalar        structure? operator?)
 
 (assign-operation '/           structure/scalar        structure? scalar?)
@@ -301,7 +307,7 @@
     (add-property! z 'zero #t)
     z))
 
-(define (make-up-combination operator [reverse? default-object])
+(define (make-up-combination operator #:optional reverse?)
   (if (default-object? reverse?)
       (lambda operands 
         (make-combination up-type-tag
@@ -310,7 +316,7 @@
         (make-combination up-type-tag
                           operator (reverse operands)))))
 
-(define (make-down-combination operator [reverse? default-object])
+(define (make-down-combination operator #:optional reverse?)
   (if (default-object? reverse?)
       (lambda operands 
         (make-combination abstract-down-type-tag
@@ -330,19 +336,19 @@
 (assign-operation 'zero-like      ar:zero-like       abstract-down?)
 
 (assign-operation
- 'negate (make-up-combination 'negate)     abstract-up?)
+ 'negate     (make-up-combination 'negate)     abstract-up?)
 (assign-operation
- 'negate (make-down-combination 'negate)        abstract-down?)
+ 'negate     (make-down-combination 'negate)        abstract-down?)
 
 (assign-operation
- 'magnitude (make-up-combination 'magnitude)  abstract-up?)
+ 'magnitude  (make-up-combination 'magnitude)  abstract-up?)
 (assign-operation
- 'magnitude (make-down-combination 'magnitude)     abstract-down?)
+ 'magnitude  (make-down-combination 'magnitude)     abstract-down?)
 
 (assign-operation
- 'abs (make-up-combination 'abs)        abstract-up?)
+ 'abs        (make-up-combination 'abs)        abstract-up?)
 (assign-operation
- 'abs (make-down-combination 'abs)           abstract-down?)
+ 'abs        (make-down-combination 'abs)           abstract-down?)
 
 (assign-operation
  'conjugate  (make-up-combination 'conjugate)  abstract-up?)
@@ -394,12 +400,12 @@
  '*  (make-down-combination '* 'r)    abstract-down?    scalar?)
 
 (assign-operation
- '*  (make-up-combination '*)    operator?    abstract-up?)
+   '*  (make-up-combination '*)    operator? abstract-up?)
 (assign-operation
- '*  (make-up-combination '* 'r) abstract-up? operator?)
+   '*  (make-up-combination '* 'r) abstract-up? operator?)
 
 (assign-operation
- '*  (make-down-combination '*)       operator?         abstract-down?)
+   '*  (make-down-combination '*)       operator?    abstract-down?)
 (assign-operation
  '*  (make-down-combination '* 'r)    abstract-down?    operator?)
 
@@ -422,7 +428,7 @@
 ;;; of arguments.  Also, any matrix in the argument list wants to be
 ;;; converted to a down of ups.
 
-;;bdk;; list->up-structure moved to cstm/structs
+;;bdk;; moved to cstm/structs 3
 
 (define (submatrix s lowdown hidown+1 lowcol hicol+1)
   (cond ((structure? s)
@@ -431,7 +437,7 @@
          (m:submatrix s lowdown hidown+1 lowcol hicol+1))
         (else (error "Wrong type submatrix" s))))
 
-;;bdk;; up-structure->list moved to cstm/structs
+;;bdk;; moved to cstm/structs 4
 
 ;;; In the following procedures there are extra arguments, ls and rs.
 ;;; If the input is multiplied by an object of the ls shape on the 

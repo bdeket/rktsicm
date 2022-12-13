@@ -5,8 +5,9 @@
          f:expression)
 
 (require (only-in racket/list make-list)
-         (only-in "../rkt/glue.rkt" if default-object default-object? symbol
+         (only-in "../rkt/glue.rkt" if symbol
                   fix:= fix:+ fix:-)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../rkt/applyhook.rkt"
          "../general/logic-utils.rkt"
          "../parameters.rkt"
@@ -18,6 +19,8 @@
          "numsymb.rkt"
          "structs.rkt"
          )
+
+;;bdk;; start original file
 
 ;;;; Literal function descriptor language.
 ;;;  This file is case sensitive.
@@ -142,7 +145,7 @@
 
 (define Any 'Any)
 
-(define (default-function-type n [type default-object])
+(define (default-function-type n #:optional type)
   (if (= n 1)
       '(-> Real Real)
       (-> (X* Real n) Real)))
@@ -153,12 +156,12 @@
 
 ;;; Some useful types
 
-(define (Lagrangian [n default-object])	;n = #degrees-of-freedom
+(define (Lagrangian #:optional n)	;n = #degrees-of-freedom
   (if (default-object? n)
       (-> (UP Real (UP* Real) (UP* Real)) Real)
       (-> (UP Real (UP* Real n) (UP* Real n)) Real)))
 
-(define (Hamiltonian [n default-object])	;n = #degrees-of-freedom
+(define (Hamiltonian #:optional n)	;n = #degrees-of-freedom
   (if (default-object? n)
       (-> (UP Real (UP* Real) (DOWN* Real)) Real)
       (-> (UP Real (UP* Real n) (DOWN* Real n)) Real)))
@@ -366,13 +369,7 @@
 #; ;moved to parameters
 (define *literal-reconstruction* #f)
 
-#; ;moved to types
-(define (f:expression f)
-  (if (typed-or-abstract-function? f)
-      (if *literal-reconstruction*
-	  (cadddr (cdr (apply-hook-extra f)))
-	  (cadddr (apply-hook-extra f)))
-      #f))
+;;bdk;; moved to types 1
 
 
 (define (typed-function function range-type domain-types)
@@ -394,7 +391,7 @@
   (and (apply-hook? f)
        (eq? (car (apply-hook-extra f)) '*function*)))
 
-(define (literal-function fexp [descriptor default-object])
+(define (literal-function fexp #:optional descriptor)
   (if (default-object? descriptor)
       (set! descriptor (default-function-type 1)))
   (let ((arity (type->arity descriptor))
@@ -445,7 +442,6 @@
       'literal-function)
      (list '*function* domain-types range-type fexp call)))
   apply-hook)
-
 
 (define (literal-apply apply-hook args)
   (if (rexists differential? args)

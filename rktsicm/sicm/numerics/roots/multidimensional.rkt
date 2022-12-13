@@ -8,8 +8,11 @@
          "../linear.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Multidimensional root finder, with secant approximation to derivative.
 ;;;   GJS -- 10 May 2005
+
 
 ;;; f is a vector-valued function of a vector argument
 (define (multidimensional-root f initial-point initial-step min-step)

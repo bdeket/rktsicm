@@ -13,13 +13,15 @@
 ;;; kept in a sorted order, in ascending order. (Order is the number
 ;;; of incrementals.  So dx*dy is higher order than dx or dy.)
 
-(define (make-differential-quantity differential-term-list)
-  (cons differential-type-tag differential-term-list))
-
-;;bdk;; comes from types
+;;bdk;; insert 0 : from types
 (define (differential? obj)
   (and (pair? obj)
        (eq? (car obj) differential-type-tag)))
+;;bdk;; insert 0 end
+
+;;bdk;; insert 1
+(define (make-differential-quantity differential-term-list)
+  (cons differential-type-tag differential-term-list))
 
 (define (differential-term-list diff)
   (assert (differential? diff))
@@ -40,6 +42,7 @@
 	 (differential-coefficient (car terms)))
 	(else
 	 (make-differential-quantity terms))))
+;;bdk;; insert 1 end
 
 ;;; Each differential term has a list of tags.  The tags represent the
 ;;; incrementals.  Roughly, "dx" and "dy" are tags in the terms: 3*dx,
@@ -47,6 +50,7 @@
 ;;; in progress.  Since the only use of a tag is to distinguish
 ;;; unnamed incrementals we use positive integers for the tags.
 
+;;bdk;; insert 2
 (define (make-differential-term tags coefficient)
   (list tags coefficient))
 
@@ -55,10 +59,13 @@
 
 (define (differential-coefficient dterm)
   (cadr dterm))
+;;bdk;; insert 2 end
 
+;;bdk;; insert 3
 (define (differential-of x)
   (let lp ((x x))
     (if (differential? x)
 	(lp (differential-coefficient
 	     (car (differential-term-list x))))
 	x)))
+;;bdk;; insert 3 end

@@ -3,8 +3,8 @@
 (provide (all-defined-out)
          (all-from-out "cstm/numsymb.rkt"))
 
-(require (only-in "../rkt/glue.rkt" any default-object default-object? true for-all?
-                  fix:+)
+(require (only-in "../rkt/glue.rkt" any true for-all? fix:+)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../general/logic-utils.rkt" assume!)
          "numeric.rkt"
          "cstm/express.rkt"
@@ -13,9 +13,14 @@
          "numbers.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;              NUMSYMB.SCM
 
+
 ;;; Algebraic constructors for symbolic experiments.
+
+;;bdk;; moved to cstm/numsymb 1
 
 (define (make-rectangular? exp)
   (and (pair? exp) (eq? (car exp) 'make-rectangular)))
@@ -162,7 +167,7 @@
 
 ;;; This & is for units!
 
-(define (symb:& numexp u1 [u2 default-object])
+(define (symb:& numexp u1 #:optional u2)
   (if (default-object? u2)
       `(& ,numexp ,u1)
       `(& ,numexp ,u1 ,u2)))

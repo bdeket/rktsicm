@@ -12,7 +12,10 @@
 (define-values (assign-operation units:assign-operations)
   (make-assign-operations 'units))
 
+;;bdk;; start original file
+
 ;;;; Manipulation of units
+
 
 ;;; The units of a quantity are represented as a combination of a
 ;;; (labeled) vector of exponents, one for each base unit in a system,

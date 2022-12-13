@@ -1,8 +1,9 @@
 #lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
-(require (only-in "../rkt/glue.rkt" default-object default-object? for-all? there-exists? ignore-errors
+(require (only-in "../rkt/glue.rkt" for-all? there-exists? ignore-errors
                   fix:= fix:+)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/environment.rkt" symbolic-environment)
          (only-in "../rkt/todo.rkt" symbolic-operators condition?)
          "../general/sets.rkt"
@@ -20,6 +21,8 @@
          )
 (define-values (assign-operation numbers:assign-operations)
   (make-assign-operations 'numbers))
+
+;;bdk;; start original file
 
 ;;;; Generic Numerical Arithmetic
 
@@ -223,7 +226,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (define (literal-number symbol)
   (make-literal number-type-tag symbol)) 
 
-(define (make-numerical-combination operator [reverse? default-object])
+(define (make-numerical-combination operator #:optional reverse?)
   (if (default-object? reverse?)
       (lambda operands 
 	(make-numsymb-expression operator operands))

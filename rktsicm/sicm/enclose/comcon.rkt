@@ -5,7 +5,10 @@
 (require (only-in "../rkt/glue.rkt" generate-uninterned-symbol fix:= fix:1+)
          "../kernel-intr.rkt")
 
+;;bdk;; start original file
+
 ;;;;                    COMCON.SCM
+
 
 ;;; Useful utilities for programs that construct SCHEME programs.
 ;;; Needs UTILS.SCM

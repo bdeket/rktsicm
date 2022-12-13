@@ -4,7 +4,7 @@
          (all-from-out "cstm/mathutil.rkt")
          g:identity)
 
-(require "../rkt/default-object.rkt"
+(require (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
          "numeric.rkt"
          "utils.rkt"
@@ -16,6 +16,8 @@
          "types.rkt"
          )
 
+
+;;bdk;; start original file
 
 ;;;;    Derived Generic Operators
 
@@ -83,21 +85,19 @@
     (g:apply f (map g:* xs scales)))
   g)
 
-#; ;;bdk;; moved to cstm/generic
-(define (g:sigma f low high)
-  (if (fix:> low high)
-      0
-      (let lp ((i (fix:+ low 1)) (sum (f low)))
-	(if (fix:> i high)
-	    sum
-	    (lp (fix:+ i 1) (g:+ sum (f i)))))))
+
+;;bdk;; moved to cstm/generic 11
 
 ;;; The generalized selector:
 
-;;bdk;; g:ref & ref-internal moved to cstm/mathutil
+
+;;bdk;; moved to cstm/mathutil 1
 
 (define ((component . selectors) x)
   (ref-internal x selectors))
+
+;;bdk;; moved to cstm/mathutil 2
+
 
 (define (g:size x)
   (cond ((vector? x)      (vector-length x))
@@ -122,7 +122,7 @@
 	 (g:compose-bin (lp (butlast fs))
 			(car (last-pair fs))))))
 
-;;bdk;; g:identity moved to generics
+;;bdk;; moved to cstm/generic 10
 
 (define (g:compose-2 f g)
   (cond ((pair? g)
@@ -191,7 +191,7 @@
 				  (gi x y z))
 				g))))
 		 ((equal? a *one-or-two*)
-		  (lambda (x [y default-object])
+		  (lambda (x #:optional y)
 		    (if (default-object? y)
 			(g:apply f
 			       (map (lambda (gi)
@@ -243,7 +243,7 @@
 		    (g:apply f
 			     (list (g:apply g (list x y z))))))
 		 ((equal? a *one-or-two*)
-		  (lambda (x [y default-object])
+		  (lambda (x #:optional y)
 		    (if (default-object? y)
 			(g:apply f
 				 (list (g:apply g (list x))))

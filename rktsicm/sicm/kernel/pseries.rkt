@@ -8,7 +8,12 @@
          "todo/display-print.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Power-series arithmetic using infinite streams.
+
+
+;;bdk;; moved to cstm/pseries 1
 
 (define (series:print s . optionals)
   (apply series:for-each
@@ -16,6 +21,10 @@
 	 s
 	 optionals))
 
+;;bdk;; moved to cstm/pseries 2
+
 (define (series:sum series order)
   (g:ref (partial-sums series) order))
+
+;;bdk;; moved to cstm/pseries 3
 

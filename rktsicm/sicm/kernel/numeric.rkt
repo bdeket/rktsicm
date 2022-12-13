@@ -5,8 +5,9 @@
          (all-from-out "../general/permute.rkt")
          )
 
-(require (only-in "../rkt/glue.rkt" default-object default-object?
+(require (only-in "../rkt/glue.rkt"
                   int:<= int:= int:- int:+ int:* fix:>)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "../general/memoize.rkt"
          (only-in racket/math conjugate)
@@ -23,7 +24,10 @@
             integer-divide-quotient
             integer-divide-remainder)))
 
+;;bdk;; start original file
+
 ;;;; Extensions to Scheme numbers
+
 
 ;;; Everybody wants to know about these.
 
@@ -208,7 +212,7 @@
 (define (csch x)
   (/ 1 (sinh x)))
 
-#| moved to general/permute
+#; ;;bdk;; using definition from ../general/permute
 (define (factorial n)
   (define (f n)
     (if (= n 0)
@@ -218,22 +222,8 @@
   (f n))
 
 
-(define (exact-quotient n d)
-  (let ((qr (integer-divide n d)))
-    (assert (= 0 (integer-divide-remainder qr)))
-    (integer-divide-quotient qr)))
+;;bdk;; moved to ../general/permute 1
 
-
-(define (binomial-coefficient n m)
-  (assert (and (exact-integer? n) (exact-integer? m) (<= 0 m n)))
-  (let ((d (- n m)))
-    (let ((t (max m d)) (s (min m d)))
-      (define (lp count prod)
-	(if (= count t)
-	    (exact-quotient prod (factorial s))
-	    (lp (- count 1) (* count prod))))
-      (lp n 1))))
-|#
 
 (define (stirling-first-kind n k)
   (assert (and (int:<= 1 k) (int:<= k n)))
@@ -294,11 +284,13 @@
 
 ;;; Zero testing is hard, because of floating-point roundoff.
 
-(define (~0? x [slack 100])
+(define (~0? x #:optional slack)
   (if (exact? x)
       (= x 0)
       (<= (magnitude x)
-          (* slack
+          (* (if (default-object? slack)
+		         100
+				 slack)
              *machine-epsilon*))))
 
 
@@ -310,7 +302,7 @@
 #|
 ;;; When really paranoid, put in a scale factor
 
-(define (close-enuf? h1 h2 #!optional tolerance scale)
+(define (close-enuf? h1 h2 #:optional tolerance scale)
   (if (default-object? tolerance)
       (set! tolerance *machine-epsilon*))
   (if (default-object? scale)
@@ -548,10 +540,11 @@
 (define (quadratic a b c
 		   ;; continuations for each case
 		   two-roots
-		   [complex-roots default-object]
-		   [double-root default-object]
-		   [linear default-object]
-		   [no-solution default-object])
+		   #:optional
+		   complex-roots
+		   double-root
+		   linear
+		   no-solution)
   (if (zero? a)
       (if (zero? b)
 	  (if (default-object? no-solution)

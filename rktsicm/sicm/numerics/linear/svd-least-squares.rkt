@@ -8,6 +8,8 @@
          "svd.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Find a least squares solution to Ax=b using SVD.
 
 ;;; svd-least-squares finds the least-squares best value for the
@@ -26,6 +28,8 @@
 ;;; svd-least-squares returns a list of (x chi^2 dx), the
 ;;;  solved-for unknowns, the overall error, and the standard error
 ;;;  for each unknown.
+
+
 
 (define (svd-least-squares A b #:optional eps db)
   (if (default-object? eps) (set! eps 1e-15))

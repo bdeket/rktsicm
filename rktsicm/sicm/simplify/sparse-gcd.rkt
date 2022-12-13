@@ -18,6 +18,8 @@
          "../numerics/linear/lu.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;             Sparse Multivariate Polynomial GCD 
 ;;;    a probabilistic method inspired by Richard Zippel's thesis
 ;;;      coded and debugged by Gerald Jay Sussman and Dan Zuras  
@@ -28,6 +30,7 @@
 ;;; that arise in the problem.  This makes the idea of using sparse
 ;;; interpolation stand out in stark contrast without the confusing
 ;;; complications introduced by those optimizations.
+
 
 ;;; Given pcfs or fpfs
 (define (poly/gcd-sparse u v)  

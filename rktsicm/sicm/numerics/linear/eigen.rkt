@@ -12,6 +12,8 @@
          "svd.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Simple code to find eigenvalues and eigenvectors of small systems.
 
 

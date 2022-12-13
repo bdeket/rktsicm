@@ -10,7 +10,11 @@
          "fpf.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Sparse flat form support for interpolation and gcd.
+
+
 
 ;;; These algorithms work on the termlists of the flat multivariate
 ;;; polynomial form that is defined in the file fpf.  A flat sparse

@@ -10,6 +10,8 @@
          "vector-fields.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; The following give us dual bases 
 ;;; Basis objects have a dimension, a basis, a dual basis.
 

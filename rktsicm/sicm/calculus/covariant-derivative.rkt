@@ -17,6 +17,8 @@
          )
 
 
+;;bdk;; start original file
+
 ;;;; nabla_X V  =  covariant derivative of V wrt X
 ;;;   V is a vector field, X is a vector field
 
@@ -34,7 +36,7 @@
             (make-Cartan (compose Cartan-forms (differential map))
 			 basis))))))
 
-;; (define (covariant-derivative Cartan #!optional map)
+;; (define (covariant-derivative Cartan #:optional map)
 ;;   (cond ((default-object? map)
 ;; 	 (covariant-derivative-ordinary Cartan))
 ;; 	(else

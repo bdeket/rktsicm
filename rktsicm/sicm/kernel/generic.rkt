@@ -5,22 +5,29 @@
 
 ;;;; Primitive Generic Operation Declarations
 (require "cstm/generic.rkt"
-         "../rkt/default-object.rkt"
+         (only-in "../rkt/define.rkt" define default-object?)
          "structs.rkt"
          "numbers.rkt"
          )
 
+;;bdk;; start original file
+
+;;;; Primitive Generic Operation Declarations 
+
+
 ;;; Unary Operators 
 
-(define (g:transpose thing [shape default-object])
+;;bdk;; moved to cstm/generic 1
+(define (g:transpose thing #:optional shape)
   (if (default-object? shape)
       (generic:transpose thing)
       (s:transpose1 thing shape)))
 
-;moved to calculus/manifold
-#;(assign-operation 'dimension (lambda (x) (coordinate-system-dimension x)))
+;;bdk;; moved to cstm/generic 2
 
 ;;; Binary Operators
+
+;;bdk;; moved to cstm/generic 3
 
 (define (g:expt x y)
   (cond ((and (number? x) (number? y)) (n:expt x y))
@@ -29,4 +36,7 @@
 	((g:zero? y) (g:one-like x))
 	((g:one? y) x)
 	(else (generic:expt x y))))
+
+
+;;bdk;; moved to cstm/generic 4
 

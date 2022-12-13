@@ -10,6 +10,8 @@
 
 
 
+;;bdk;; start original file
+
 ;;; Homoclinic tangles
 
 (define ((unstable-manifold T xe ye dx dy A eps) param)

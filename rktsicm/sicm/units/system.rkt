@@ -15,10 +15,17 @@
          (rename-in "units.rkt" [unit-system u:unit-system])
          "with-units.rkt")
 
+;;bdk;; start original file
+
 ;;;; Unit systems
 
+;;bdk;; new implementation
 (define-syntax (define-unit-system stx)
-  (syntax-case stx ()
+  (syntax-case stx (list quote)
+    [(_ (quote id) (list (quote u-id) u-name u-type) ...)
+     (syntax/loc
+         stx
+       (define-unit-system id (u-id u-name u-type) ...))]
     [(_ id (u-id u-name u-type) ...)
      (let ([len (length (syntax->list #'(u-name ...)))])
        (with-syntax
@@ -37,7 +44,8 @@
                 values
                 (make-unit-system 'id base-spec '() '())
                 units)))))))]))
-#;(define (define-unit-system system-name #:optional base-units)
+#;
+(define (define-unit-system system-name . base-units)
   (if (environment-bound? scmutils-base-environment system-name)
     (write-line `(clobbering ,system-name)))
   (let ((n (length base-units)))    
@@ -94,7 +102,9 @@
 ;;; Data may be entered and results may be presented in derived units.
 
 (define-syntax (define-derived-unit stx)
-  (syntax-case stx ()
+  (syntax-case stx (quote)
+    [(_ system (quote unit-name) tex description content)
+     (syntax/loc stx (define-derived-unit system unit-name tex description content 1))]
     [(_ system unit-name tex description content)
      (syntax/loc stx (define-derived-unit system unit-name tex description content 1))]
     [(_ system unit-name tex description content scale-factor)
@@ -136,7 +146,11 @@
 ;;; presented in additional units.
 
 (define-syntax (define-additional-unit stx)
-  (syntax-case stx ()
+  (syntax-case stx (quote)
+    [(_ system (quote unit-name) tex description content)
+     (syntax/loc stx (define-derived-unit system unit-name tex description content 1))]
+    [(_ system (quote unit-name) tex description content scale)
+     (syntax/loc stx (define-derived-unit system unit-name tex description content scale))]
     [(_ system unit-name tex description content)
      (syntax/loc stx (define-derived-unit system unit-name tex description content 1))]
     [(_ system unit-name tex description content scale-factor)
@@ -179,13 +193,17 @@
   (set! *multiplier-names*
         (cons mult *multiplier-names*)))
 
-(define-syntax define-multiplier
-  (syntax-rules ()
+(define-syntax (define-multiplier stx)
+  (syntax-case stx (quote)
+    [(_ (quote name) tex-string log-value)
+     (syntax/loc stx (define-multiplier name tex-string log-value))]
     [(_ name tex-string log-value)
-     (define name
-       (begin
-         (add-multiplier (list 'name tex-string log-value))
-         (expt 10 log-value)))]))
+     (syntax/loc
+         stx
+       (define name
+         (begin
+           (add-multiplier (list 'name tex-string log-value))
+           (expt 10 log-value))))]))
 #;
 (define (define-multiplier name tex-string log-value)
   (if (environment-bound? scmutils-base-environment name)

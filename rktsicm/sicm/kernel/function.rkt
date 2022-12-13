@@ -17,7 +17,10 @@
   (procedure-rename fct (string->symbol (format "f:~a" c))))
 
 
+;;bdk;; start original file
+
 ;;;;            Functions
+
 
 (define (f:type f) function-type-tag)
 (define (f:type-predicate f) function-quantity?)
@@ -170,11 +173,11 @@
 (assign-operation 'atan2              (f:binary g:atan)          function? cofunction?)
 (assign-operation 'atan2              (f:binary g:atan)          cofunction? function?)
 
-(assign-operation 'solve-linear-right (f:binary g:solve-linear-right)  function? cofunction?)
-(assign-operation 'solve-linear-right (f:binary g:solve-linear-right)  cofunction? function?)
+(assign-operation 'solve-linear-right      (f:binary g:solve-linear-right)  function? cofunction?)
+(assign-operation 'solve-linear-right      (f:binary g:solve-linear-right)  cofunction? function?)
 
-(assign-operation 'solve-linear-left  (f:binary g:solve-linear-left)  cofunction? function?)
-(assign-operation 'solve-linear-left  (f:binary g:solve-linear-left)  function? cofunction?)
+(assign-operation 'solve-linear-left      (f:binary g:solve-linear-left)  cofunction? function?)
+(assign-operation 'solve-linear-left      (f:binary g:solve-linear-left)  function? cofunction?)
 
 (assign-operation 'solve-linear      (f:binary g:solve-linear)  cofunction? function?)
 (assign-operation 'solve-linear      (f:binary g:solve-linear)  function? cofunction?)

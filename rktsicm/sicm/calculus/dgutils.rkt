@@ -7,6 +7,8 @@
          "../general/hashcons.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; For symbolic expressions in operators.
 
 (define (diffop-name form)

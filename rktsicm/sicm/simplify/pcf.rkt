@@ -3,7 +3,7 @@
 (provide (all-defined-out)
          (all-from-out "pcfpf/pcf.rkt"))
 
-(require "../rkt/default-object.rkt"
+(require (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
          "../general/sets.rkt"
          "pcfpf/pcf.rkt"
@@ -12,7 +12,11 @@
          )
 
 
-(define (pcf:expression-> expr cont [less? default-object])
+;;bdk;; start original file
+
+;;bdk;; moved to pcfpf/pcf 1
+
+(define (pcf:expression-> expr cont #:optional less?)
   ;; cont = (lambda (poly vars) ... )
   (let ((evars
 	 (sort (list-difference (variables-in expr)
@@ -24,6 +28,8 @@
 		     pcf:operator-table))
 	   expr)
 	  evars)))
+
+;;bdk;; moved to pcfpf/pcf 2
 
 (define pcf:operator-table
   `((+        ,+$poly)

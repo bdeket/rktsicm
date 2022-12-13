@@ -2,16 +2,20 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../rkt/glue.rkt" if default-object default-object? make-initialized-list
+(require (only-in "../rkt/glue.rkt" if make-initialized-list
                   fix:= fix:> fix:< fix:+
                   int:zero? int:quotient int:-)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          "../general/sets.rkt"
          "../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;;      Flat Polynomial Form, for Commutative Rings
+
 
 (define fpf:coeff? number?)
 (define fpf:coeff-zero? zero?)
@@ -262,7 +266,7 @@
 	(else
 	 (expt-iter base exponent :one))))
 
-(define (fpf:divide x y [continue default-object])
+(define (fpf:divide x y #:optional continue)
   (let ((cont
 	 (if (default-object? continue)
 	     (lambda (q r) (list (fpf:make q) (fpf:make r)))
@@ -283,7 +287,7 @@
 	       (fpf:divide-terms (fpf:terms x) (fpf:terms y) cont))
 	      (else (error "Bad arguments -- FPF:DIVIDE" x y))))))
 
-(define (fpf:divide-terms termlist1 termlist2 [continue default-object])
+(define (fpf:divide-terms termlist1 termlist2 #:optional continue)
   (if (default-object? continue) (set! continue list))
   (fpf:divide-terms-general termlist1 termlist2
     fpf:coeff-add fpf:coeff-mul fpf:coeff-div fpf:coeff-negate continue))
@@ -361,7 +365,7 @@
 	 (error "Bad fpf -- ->EXPRESSION" p vars))))
 
 
-(define (fpf:expression-> expr cont [less? default-object])
+(define (fpf:expression-> expr cont #:optional less?)
   ;; cont = (lambda (poly vars) ... )
   (let ((evars
 	 (sort (list-difference (variables-in expr)

@@ -10,8 +10,11 @@
          "../extrapolate/re.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; MULTIMIN.SCM -- n-dimensional minimization routines
 ;;; 9/22/89 (gjs) reduce->a-reduce
+
 
 ;;; Nelder-Mead downhill simplex algorithm.
 

@@ -7,7 +7,10 @@
          "../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Symbolic environment for simplification
+
 
 (define (symbolic-operator operator-symbol)
   (let ((v (hash-table/get symbolic-operator-table operator-symbol #f)))

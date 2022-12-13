@@ -13,6 +13,8 @@
          "../general/eq-properties.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Simple catch-as-catch-can solver #42.  
 ;;;  By GJS, November 2003.  For use with SCMUTILS.
 ;;;  Updated by GJS, 7 April 2008.
@@ -21,6 +23,7 @@
 ;;;  Improved by GJS, 10 April 2014: if progress, hopeless->residual.
 ;;;  New version by GJS 26 Nov 2016: improved, added quadratic
 ;;;  New version by GJS December 2017: root premises
+
 
 ;;; Must be loaded before handler.scm if used in constraint propagator.
 ;;; Assumes standardized equations, as produced below.
@@ -50,7 +53,7 @@
 (define (equation-expression eqn) ...)
 (define (equation-justifications eqn) ...)
 
-(define (simple-solve struct unknowns #!optional knowns show-eqns?)
+(define (simple-solve struct unknowns #:optional knowns show-eqns?)
   ...)
 
 ;;; Examples are given in comments.

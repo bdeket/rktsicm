@@ -10,6 +10,8 @@
 (define-values (assign-operation sigfun:assign-operations)
   (make-assign-operations 'sigfun))
 
+;;bdk;; start original file
+
 ;;; A signal function has a span, the domain over which it may be
 ;;; nonzero.  The spans are ordered pairs of numbers.
 

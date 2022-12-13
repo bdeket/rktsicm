@@ -3,8 +3,8 @@
 (provide (except-out (all-defined-out) assign-operation)
          (all-from-out "cstm/vectors.rkt"))
 
-(require (only-in "../rkt/glue.rkt" if for-all? default-object default-object?
-                  fix:= fix:+)
+(require (only-in "../rkt/glue.rkt" if for-all? fix:= fix:+)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "numeric.rkt"
          "utils.rkt"
@@ -18,10 +18,12 @@
 (define-values (assign-operation vectors:assign-operations)
   (make-assign-operations 'vectors))
 
+;;bdk;; start original file
+
 ;;;;            Vectors
 
 
-;;bdk;; v:type -predicate moved to cstm/vectors
+;;bdk;; moved to cstm/vectors 1
 
 ;;; This file makes the identification of the Scheme VECTOR data
 ;;; type with mathematical n-dimensional vectors.  These are 
@@ -33,7 +35,7 @@
 ;;; We also get the iterator MAKE-INITIALIZED-VECTOR, 
 ;;; and the predicate VECTOR?
 
-;;bdk;; v:generate moved to cstm/vectors
+;;bdk;; moved to cstm/vectors 2
 
 (define ((v:elementwise f) . vectors)
   (assert (and (not (null? vectors))
@@ -140,8 +142,9 @@
 		   (g:* (g:conjugate (vector-ref v1 i))
 			(vector-ref v2 i))))))))
 
-;;bdk;; v:inner-product moved to cstm/vectors
-    
+;;bdk;; moved to cstm/vectors 3
+
+
 (define (v:square v)
   (v:dot-product v v))
 
@@ -169,7 +172,7 @@
 (define (v:conjugate v)
   ((v:elementwise g:conjugate) v))
 
-;;bdk;; v:cross-product moved to cstm/vectors
+;;bdk;; moved to cstm/vectors 4
 
 (define (general-inner-product addition multiplication :zero)
   (define (ip v1 v2)
@@ -277,7 +280,7 @@
     (add-property! z 'zero #t)
     z))
 
-(define (make-vector-combination operator [reverse? default-object])
+(define (make-vector-combination operator #:optional reverse?)
   (if (default-object? reverse?)
       (lambda operands 
 	(make-combination vector-type-tag

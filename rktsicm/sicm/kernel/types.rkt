@@ -13,7 +13,10 @@
          "cstm/diff.rkt"
          "cstm/generic.rkt")
 
+;;bdk;; start original file
+
 ;;;; This is needed to load particular types
+
 
 (define (make-type type-tag abstract-type-tag
 		   quantity-predicate concrete-predicate abstract-predicate)
@@ -35,7 +38,8 @@
 (define (abstract-predicate type)
   (car (cddddr type)))
 
-;;bdk;; part moved to cstm/types
+
+;;bdk;; moved to cstm/types 1
 
 (define (abstract-quantity? x)
   (memq (g:type x) abstract-type-tags))
@@ -55,6 +59,7 @@
   (and (literal-number? x)
        ((has-property? 'real) x)))
 
+;;bdk;; make units responsible for installing as numerical quantity
 (define-values (numerical-quantity? add-to-numerical-quantity?)
   (let ([tests (list number?
                      abstract-number?
@@ -201,11 +206,8 @@
        (eq? (car matrix) abstract-matrix-type-tag)
        ((has-property? 'square) matrix)))
 
-#; ;;bdk;; moved to cstm/s-operator
-(define (operator? x)
-  (and (apply-hook? x)
-       (eq? (car (apply-hook-extra x))
-	    operator-type-tag)))
+
+;;bdk;; moved to cstm/s-operator 2
 
 (define (not-operator? x)
   (not (operator? x)))
@@ -233,23 +235,21 @@
        (eq? (car (apply-hook-extra f))
 	    function-type-tag)))
 
-;> originally in litfun.scm
+;;bdk;; insert 1 : from litfun
 (define (f:expression f)
   (if (typed-or-abstract-function? f)
       (if (*literal-reconstruction*)
 	  (cadddr (cdr (apply-hook-extra f)))
 	  (cadddr (apply-hook-extra f)))
       #f))
-
+;;bdk;; insert 1 end
 (define *function*
   (make-type function-type-tag
 	     abstract-function-type-tag
 	     function-quantity? function? abstract-function?))
 
-#; ;;bdk;; moved to cstm/diff
-(define (differential? obj)
-  (and (pair? obj)
-       (eq? (car obj) differential-type-tag)))
+
+;;bdk;; moved to cstm/diff 0
 
 (define (not-differential? obj)
   (not (differential? obj)))

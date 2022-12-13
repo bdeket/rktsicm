@@ -6,6 +6,8 @@
          "gamma-bar.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; Coordinate Transformation to State Transformation
 
 #|

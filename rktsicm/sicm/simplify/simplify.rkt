@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../rkt/glue.rkt" undefined-value generate-uninterned-symbol true false
+(require (only-in "../rkt/glue.rkt" let generate-uninterned-symbol true false
                   hash-table->alist hash-table/get hash-table/put!)
          "../general/list-utils.rkt"
          (only-in "../general/memoize.rkt" hash-memoize-1arg)
@@ -13,6 +13,8 @@
          "pcf.rkt"
          "rcf.rkt"
          )
+
+;;bdk;; start original file
 
 ;;;;       General Recursive Simplifier Maker
 
@@ -36,16 +38,14 @@
 ;;; is not expressible in terms of those operations.
 
 
+
 ;;; Exponential expressions with non-integer exponents must become
 ;;; kernels, because they cannot become polynomial exponentials.
 
 (define *inhibit-expt-simplify* #t)
 
 (define (make-analyzer ->expression expression-> known-operators)
-  (let ((auxiliary-variable-table undefined-value)
-        (reverse-table undefined-value)
-        (uorder undefined-value)
-        (priority undefined-value))
+  (let ((auxiliary-variable-table) (reverse-table) (uorder) (priority))
 
     ;; Default simplifier
     (define (simplify expr)
@@ -215,6 +215,7 @@
   (hash-memoize-1arg
    (compose canonical-copy
 	    (expression-simplifier pcf:analyzer))))
+
 
 (define rcf:analyzer
   (make-analyzer rcf:->expression rcf:expression-> rcf:operators-known))

@@ -6,8 +6,11 @@
          (only-in "../../rkt/define.rkt" define default-object?)
          "../../kernel-intr.rkt")
 
+;;bdk;; start original file
+
 ;;;; Finds roots of function f in domain from x1 to x2.
 ;;;   From Numerical Recipes, 2nd Edition, Press, et.al.
+
 
 ;;; Given a real continuous function f of one real variable, two
 ;;; distinct argument values x1 and x2 satisfying f(x1) X f(x2) <= 0,

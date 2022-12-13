@@ -7,6 +7,8 @@
          "../general/eq-properties.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; System code for making frames
 
 ;;; Every frame has a name, and a frame that it is built on (which may be #f).

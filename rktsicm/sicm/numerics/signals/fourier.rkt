@@ -11,6 +11,8 @@
          "sigfun.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Fourier transform, approximated as DFT
 
 #|

@@ -9,6 +9,8 @@
          "wedge.rkt"
          )
 
+;;bdk;; start original file
+
 (define (interior-product X)
   (assert (vector-field? X) "X not a vector field: interior-product")  
   (define (ix alpha)

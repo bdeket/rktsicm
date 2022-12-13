@@ -9,6 +9,9 @@
          )
 
 
+;;bdk;; start original file
+
+
 (define (canonical? C H Hprime)
   (- (compose (Hamiltonian->state-derivative H) C)
      (* (D C) (Hamiltonian->state-derivative Hprime))))

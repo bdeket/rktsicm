@@ -13,6 +13,8 @@
          "gram-schmidt.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Hodge-star dual
 
 ;;; spec may be a coordinate system with an orthonormal basis

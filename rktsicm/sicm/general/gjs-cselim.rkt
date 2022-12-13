@@ -9,6 +9,8 @@
 
 (struct entry (expr name cntr) #:mutable)
 
+;;bdk;; start original file
+
 ;;;; Simple-minded common-subexpression eliminator.  
 ;;;    GJS: 9 December 2005, 23 December 2019
 

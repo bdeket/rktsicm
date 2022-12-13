@@ -3,10 +3,12 @@
 (provide (all-defined-out))
 
 (require "../rkt/fixnum.rkt"
-         "../kernel-gnrc.rkt"
+         "../kernel-intr.rkt"
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          )
+
+;;bdk;; start original file
 
 ;;; Given a list of distinct abscissas xs = (x1 x2 ... xn) and a list
 ;;; of ordinates ys = (y1 y2 ... yn), return the Lagrange interpolation
@@ -17,6 +19,7 @@
 ;;; This version, in the file interp.scm, is numerical.  
 ;;; It is loaded into scmutils-base-environment.
 ;;; There is also a generic version in the file interp-generic.scm.
+
 (define (lagrange-interpolation-function ys xs)
   (let ((n (length ys)))
     (assert (fix:= (length xs) n))

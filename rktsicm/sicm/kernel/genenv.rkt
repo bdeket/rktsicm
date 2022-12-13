@@ -9,6 +9,8 @@
          "mathutil.rkt")
 
 
+;;bdk;; start original file
+
 (define (generic-environment-maker new [base scmutils-base-environment])
   (let ((e (extend-environment new base)))
     (let ((d (lambda (name value)
@@ -139,9 +141,10 @@
 	)
     e))
 
-#;;;bdk;; slightly differen
+#;;;bdk;; slightly different
 (void (generic-environment-maker generic-environment))
 
+;;bdk;; moved to cstm/genenv 1
 
 #|
 (let ((numerical-environment

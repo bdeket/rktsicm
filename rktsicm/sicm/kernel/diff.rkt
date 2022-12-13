@@ -24,7 +24,10 @@
 (define-values (assign-operation diff:assign-operations)
   (make-assign-operations 'diff))
 
+;;bdk;; start original file
+
 ;;;            Calculus of Infinitesimals
+
 
 ;;; The idea is that we compute derivatives by passing special
 ;;; "differential objects" [x,dx] through functions.  A first
@@ -68,7 +71,8 @@
 ;;; kept in a sorted order, in ascending order. (Order is the number
 ;;; of incrementals.  So dx*dy is higher order than dx or dy.)
 
-;;bdk;; moved to cstm/diff
+;;bdk;; moved to cstm/diff 1
+
 
 ;;; Each differential term has a list of tags.  The tags represent the
 ;;; incrementals.  Roughly, "dx" and "dy" are tags in the terms: 3*dx,
@@ -76,13 +80,14 @@
 ;;; in progress.  Since the only use of a tag is to distinguish
 ;;; unnamed incrementals we use positive integers for the tags.
 
-;;bdk;; moved to cstm/diff
+;;bdk;; moved to cstm/diff 2
 
 (define (terms->differential-collapse terms)
   (terms->differential
    (reduce dtl:+ '() (map list terms))))
 
-;;bdk;; moved to cstm/diff
+
+;;bdk;; moved to cstm/diff 3
 
 (define (diff:arity x)
   (let lp ((x x))

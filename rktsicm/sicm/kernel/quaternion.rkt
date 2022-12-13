@@ -2,8 +2,8 @@
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require (only-in "../rkt/glue.rkt" vector-tail make-initialized-vector
-                  default-object default-object? fix:=)
+(require (only-in "../rkt/glue.rkt" vector-tail make-initialized-vector fix:=)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/logic-utils.rkt"
          "utils.rkt"
          "generic.rkt"
@@ -16,9 +16,13 @@
   (make-assign-operations 'quaternion))
 
 
+;;bdk;; start original file
+
 ;;;;        Quaternions
 ;;; 13 August 1998 -- rfrankel, gjs
 ;;; 12 June 2013 -- gjs
+
+
 
 (define (q:type v) quaternion-type-tag)
 
@@ -285,7 +289,7 @@
 
 ;;; Problem: this is singular if the vector part is zero.
 
-(define (quaternion->angle-axis q [continue default-object])
+(define (quaternion->angle-axis q #:optional continue)
   (assert (quaternion? q))
   (let ((continue
          (if (default-object? continue) list continue)))
@@ -578,8 +582,8 @@
 (assign-operation 'solve-linear-right     quaternion/scalar         quaternion? scalar?)
 (assign-operation 'solve-linear-right     quaternion/quaternion     quaternion? quaternion?)
 
-(assign-operation 'solve-linear-left (lambda (x y) (quaternion/scalar y x))     scalar?     quaternion?)
-(assign-operation 'solve-linear-left (lambda (x y) (quaternion/quaternion y x)) quaternion? quaternion?)
+(assign-operation 'solve-linear-left  (lambda (x y) (quaternion/scalar y x))         scalar? quaternion?)
+(assign-operation 'solve-linear-left  (lambda (x y) (quaternion/quaternion y x))     quaternion? quaternion?)
 
-(assign-operation 'solve-linear (lambda (x y) (quaternion/scalar y x))     scalar?     quaternion?)
-(assign-operation 'solve-linear (lambda (x y) (quaternion/quaternion y x)) quaternion? quaternion?)
+(assign-operation 'solve-linear  (lambda (x y) (quaternion/scalar y x))         scalar? quaternion?)
+(assign-operation 'solve-linear  (lambda (x y) (quaternion/quaternion y x))     quaternion? quaternion?)

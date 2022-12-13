@@ -7,6 +7,8 @@
          "../general/list-utils.rkt"
          "solve.rkt")
 
+;;bdk;; start original file
+
 ;;;; Utilities for interpreting solver results
 
 ;;; These global variables are used to collect information about

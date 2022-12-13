@@ -6,6 +6,8 @@
          "../general/permute.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; Gram-Schmidt orthonormalization process...
 
 (define (Gram-Schmidt vector-basis metric)

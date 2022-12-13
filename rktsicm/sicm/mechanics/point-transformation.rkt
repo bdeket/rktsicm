@@ -5,6 +5,8 @@
 (require "Lagrangian.rkt"
          "Hamiltonian.rkt"
          )
+;;bdk;; start original file
+
 ;;; Makes a canonical point transformation from a 
 ;;;  time-invariant coordinate transformation T(q)
 

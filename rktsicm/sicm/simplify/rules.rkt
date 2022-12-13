@@ -15,6 +15,8 @@
          "split-poly.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Rule systems for simplification.
 ;;;  Written by GJS in the 1980s, edited by Mira Wilczek in summer 2002.
 ;;;  Edited for a new version in january 2005.
@@ -39,8 +41,7 @@
 ;;;   This is hard to work with, but we usually want to 
 ;;;   allow (sqrt (square x)) => x, but this is
 ;;;   not necessarily good if x is negative.
-#; ;;bdk;; moved to /kernel/cstm/sym-rules
-(define sqrt-expt-simplify? true)
+;;bdk;; moved to ../kernel/cstm/sym-rules 1
 
 ;;; If x, y are real non-negative then
 ;;; (* (sqrt x) (sqrt y)) = (sqrt (* x y))
@@ -98,11 +99,7 @@
   (clear-memoizer-tables)
   (set! ^1/2->sqrt? doit?))
 
-#; ;;bdk;; moved to /kernel/cstm/sym-rules
-(define (sqrt-expt-simplify doit?)
-  (assert (boolean? doit?) "argument must be a boolean.")
-  (clear-memoizer-tables)
-  (set! sqrt-expt-simplify? doit?))
+;;bdk;; moved to ../kernel/cstm/sym-rules 2
 
 (define (sqrt-factor-simplify doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
@@ -1280,7 +1277,7 @@
      (: x) )
    ( (imag-part (make-rectangular (? x) (? y)))
      none
-     (: x) )
+     (: y) )
 
    ( (magnitude (make-rectangular (? x) (? y)))
      none

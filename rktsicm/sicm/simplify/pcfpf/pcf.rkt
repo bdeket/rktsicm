@@ -14,6 +14,7 @@
          "../../kernel-intr.rkt"
          )
 
+;;bdk;; insert 1
 ;;;;         Multivariate Polynomial Functions -- GJS
 
 ;;; Polynomial functions are used to implement rational functions.
@@ -23,6 +24,7 @@
 ;;; indeterminates.  In fact, they are true functions -- they take
 ;;; arguments by position, without any presumed name for each
 ;;; argument. 
+
 
 ;;; The following procedures are mapped for coefficient arithmetic.
 ;;; Other implementation of coefficient arithmetic may be constructed
@@ -1428,7 +1430,9 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 		    (hh p (car args)
 			(lambda (c)
 			  (lp c (cdr args))))))))))))
+;;bdk;; insert 1 end
 
+;;bdk;; insert 2
 (define (poly:->lambda p)
   (let* ((n (poly/arity p))
 	 (vars (generate-list-of-symbols 'x n))
@@ -1441,3 +1445,4 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
   (inverse-accumulation poly/sub poly/add poly/negate poly/zero))
 (define *$poly
   (accumulation poly/mul poly/one))
+;;bdk;; insert 2 end

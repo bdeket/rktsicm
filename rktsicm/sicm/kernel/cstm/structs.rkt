@@ -12,6 +12,7 @@
          "matrices.rkt"
          )
 
+;;bdk;; insert 1
 ;;; Structures are primitive tensor-like objects.  They are
 ;;; represented as recursive combinations of down vectors and up
 ;;; vectors, useful for dealing with derivatives of things with
@@ -182,8 +183,9 @@
                             (cons i rev-chain))))
         (proc s (reverse rev-chain))))
   (walk s '()))
+;;bdk;; insert 1 end
 
-
+;;bdk;; insert 2
 ;;; S:FRINGE recursively traverses a structure, making up a list of
 ;;; the terminal elements.
 
@@ -236,6 +238,7 @@
                            (map (lambda (s) (s:ref s i))
                                 structures))))
       (apply proc structures)))
+
 (define ((s:elementwise proc) . structures)
   (s:map/l proc structures))
 
@@ -272,8 +275,9 @@
                   (or (tlp (car thing))
                       (tlp (cdr thing))))))
           (else #f))))
+;;bdk;; insert 2 end
 
-
+;;bdk;; insert 3
 (define (list->up-structure lst)
   (vector->up
    (list->vector (map matrix->structure lst))))
@@ -288,6 +292,9 @@
                                    (lambda (i)
                                      (matrix-ref mat i j))))))
         (else mat)))
+;;bdk;; insert 3 end
 
+;;bdk;; insert 4
 (define (up-structure->list s)
   (vector->list (up->vector s)))
+;;bdk;; insert 4 end

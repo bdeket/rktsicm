@@ -9,7 +9,10 @@
          "../statistics/gauss.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; JW & GJS
+
 
 ;;; *INTEGRATE-N* is the number of step sizes used before aborting
 ;;;   to smaller intervals.  n = 10 seems to work well.

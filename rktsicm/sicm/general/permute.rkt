@@ -10,6 +10,9 @@
          "assert.rkt"
          )
 
+;;bdk;; start original file
+
+
 ;;; Generates a list of all permutations of a list of distinct elements.
 
 (define (permutations lst)
@@ -176,13 +179,13 @@ computation is slow. Also big inputs can exceed recursion depth:
 
 GJS: Done!  Binomial coefficient was defined in kernel/numeric.scm
 |#
-;;bdk;; originally in kernel/numeric
+;;bdk;; insert 1
 (define (exact-quotient n d)
   (define-values (q r) (quotient/remainder n d))
   (assert (= 0 r))
   q)
 
-;;bdk;; originally in kernel/numeric
+
 (define (binomial-coefficient n m)
   (assert (and (exact-integer? n) (exact-integer? m) (<= 0 m n)))
   (let ((d (- n m)))
@@ -192,6 +195,7 @@ GJS: Done!  Binomial coefficient was defined in kernel/numeric.scm
 	    (exact-quotient prod (factorial s))
 	    (lp (- count 1) (* count prod))))
       (lp n 1))))
+;;bdk;; insert 1 end
 
 (define (number-of-combinations n k)
   (cond ((< k 1) 1)

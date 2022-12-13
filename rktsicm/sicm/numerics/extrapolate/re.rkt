@@ -9,7 +9,10 @@
          "../../general/list-utils.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Richardson Extrapolation of a sequence, represented as a stream.
+
 
 
 ;;; Assumption: The sequence is the values of a function at successive

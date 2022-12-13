@@ -2,7 +2,8 @@
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require (only-in "../rkt/glue.rkt" default-object default-object? cons*)
+(require (only-in "../rkt/glue.rkt" cons*)
+         (only-in "../rkt/define.rkt" lambda default-object?)
          "../general/logic-utils.rkt"
          "diff.rkt"
          "generic.rkt"
@@ -15,7 +16,10 @@
 (define-values (assign-operation deriv:assign-operations)
   (make-assign-operations 'deriv))
 
+;;bdk;; start original file
+
 ;;;;                 General Derivative Procedures
+
 
 ;;;     In DIFF.SCM we define the primitive mechanism extending the
 ;;; generic operators for differential quantities.  We also defined
@@ -151,7 +155,7 @@
 	     ((d (lambda (s) (g:apply f (up-structure->list s))))
 	      (list->up-structure (list x y z)))))
 	  ((equal? a *one-or-two*)
-	   (lambda (x [y default-object])
+	   (lambda (x #:optional y)
 	     (if (default-object? y)
 		 ((d f) x)
 		 ((d (lambda (s)

@@ -13,6 +13,8 @@
          "../kernel/cstm/express.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; In Scheme system: runtime/boole.scm
 (define (false? x) (eq? x #f))
 
@@ -21,8 +23,8 @@
 
 ;;; Debugging aids
 
-#| moved to assert.rkt
-(define (assert p #!optional error-comment irritant)
+#; ; moved to assert.rkt
+(define (assert p #:optional error-comment irritant)
   (if (not p)
       (begin
 	(if (not (default-object? irritant))
@@ -30,7 +32,6 @@
 	(error (if (default-object? error-comment)
 		   "Failed assertion"
 		   error-comment)))))
-|#
 
 (define (with-protection protected-value-thunk untrusted-thunk
           #:optional violation-thunk)

@@ -8,8 +8,12 @@
          racket/flonum
          "flovec.rkt" (only-in (submod "flovec.rkt" flo:vector) flo:vector-cons)
          )
+(define truncate->exact flo:truncate->exact)
+
+;;bdk;; start original file
 
 ;;;; White Noise Generation
+
 
 (define (make-noise-vector method state length)
   (let ((v (flo:vector-cons length)))
@@ -163,7 +167,7 @@
   (make-initialized-vector (* h 3)
     (let ((hv (* h v)))
       (lambda (j)
-	(/ (flo:truncate->exact (* v (f (/ (+ j 1) h)))) hv)))))
+	(/ (truncate->exact (* v (f (/ (+ j 1) h)))) hv)))))
 
 (define (mm-pj+3h f h pj)
   (make-initialized-vector (* h 3)

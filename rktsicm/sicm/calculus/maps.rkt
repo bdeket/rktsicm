@@ -11,6 +11,8 @@
          "wedge.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Maps between manifolds.
 
 ;;; If we have a function on a manifold M and a map from manifold N to

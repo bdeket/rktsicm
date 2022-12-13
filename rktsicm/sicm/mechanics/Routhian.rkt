@@ -8,6 +8,8 @@
          "universal.rkt"
          )
 
+;;bdk;; start original file
+
 #|
 
 SICM2 p.233...
@@ -225,7 +227,7 @@ Lagrange's equations for vx, x.
 
 
 ;;; good except for redundant calculation of pyd
-(define (Routhian->state-derivative R #!optional dissipation-function)
+(define (Routhian->state-derivative R #:optional dissipation-function)
   (if (default-object? dissipation-function)
       (let ((acc (Routhian->acceleration R)))
 	(lambda (s)

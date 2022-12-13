@@ -6,6 +6,8 @@
          "../simplify/pcf.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; LEGENDRE.SCM -- the Legendre Polynomials returned as a stream or singly
 
 ;;; Edited by GJS 10Jan09

@@ -6,12 +6,16 @@
          "fft.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Chirp z-transform
 ;;;   from  Rabiner, Schaffer, Rader, BSTJ, May-June 1969
 
 ;;; Gives the z-transform of N samples of data (given as a list) 
 ;;;   at M points in the z-plane, starting at z=A.  
 ;;;   Subsequent points are at z=A*W^{-k}, for k=0,1,...,M-1.
+
+
 
 ;;; The chirp z-transform can be used to develop a segment of the
 ;;;   spectrum expanded from frequencies f0 to f1 in M steps.

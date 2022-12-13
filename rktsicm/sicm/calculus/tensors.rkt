@@ -8,6 +8,8 @@
          "vector-fields.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Testing a function for being a tensor field.
 
 ;;; To be a tensor field a function must be linear

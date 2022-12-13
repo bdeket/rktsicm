@@ -8,6 +8,8 @@
          "../general/assert.rkt"
          "universal.rkt")
 
+;;bdk;; start original file
+
 ;;;;           Variational Mechanics
   
 ;;; Caution... This file is case sensitive!
@@ -129,7 +131,7 @@
 #|
 ;;; Another way to make Gamma
 
-(define ((path->state-path q #!optional n) t)
+(define ((path->state-path q #:optional n) t)
   (if (default-object? n) (set! n 3))
   (list->vector
    (stream-head
@@ -503,7 +505,7 @@
 #|
 ;;; Note: the inverse may have a determinant of zero.
 
-(define ((Lagrangian->acceleration L #!optional dissipation-function) state)
+(define ((Lagrangian->acceleration L #:optional dissipation-function) state)
   (if (default-object? dissipation-function)
       (let ((P ((partial 2) L))
 	    (F ((partial 1) L)))
@@ -525,7 +527,7 @@
 		  (* ((partial 1) P) velocity)))
 	    state)))))
 
-(define ((Lagrangian->acceleration L #!optional dissipation-function) state)
+(define ((Lagrangian->acceleration L #:optional dissipation-function) state)
   (if (default-object? dissipation-function)
       (let ((P ((partial 2) L))
 	    (F ((partial 1) L)))

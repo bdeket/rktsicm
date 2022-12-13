@@ -5,6 +5,7 @@
 (require "../../rkt/fixnum.rkt"
          "../../kernel-gnrc.rkt")
 
+;;bdk;; insert 1
 (define (c:generate n type proc)
   (if (fix:= n 1)
       (proc 0)
@@ -18,3 +19,4 @@
                  (up->vector struct)
                  (down->vector struct))))
       struct))
+;;bdk;; insert 1 end

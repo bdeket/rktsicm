@@ -23,32 +23,11 @@
   (make-assign-operations 'manifold))
 
 
+;;bdk;; start original file
+
 ;;;;  Manifolds are built here.
 
-#| ;;bdk;; moved to manifold/manifold-point p1
-(define-record-type <manifold-point>
-    (%make-manifold-point spec manifold)
-    manifold-point?
-  (spec manifold-point-representation)
-  (manifold point->manifold)
-  (coordinate-representations coordinate-reps set-coordinate-reps!))
-
-(define (make-manifold-point spec manifold coordinate-system coordinate-rep)
-  (let ((m (%make-manifold-point spec manifold)))
-    (set-coordinate-reps! m (list (list coordinate-system coordinate-rep)))
-    m))
-
-(define (transfer-point embedded embedding)
-  (lambda (point)
-    (assert (eq? (embedded 'manifold) (point->manifold point)))
-    (assert (= ((embedded 'manifold) 'embedding-dimension)
-	       ((embedding 'manifold) 'embedding-dimension)))		 
-    (let ((m (%make-manifold-point
-	      (manifold-point-representation point)
-	      (embedding 'manifold))))
-      (set-coordinate-reps! m '())
-      m)))
-|#
+;;bdk;; moved to manifold/manifold-point 1
 
 ;;; A Kludge.
 (define (get-coordinate-rep point)
@@ -61,17 +40,7 @@
     (assert rep)
     (cadr rep)))
 
-#| ;;bdk;; moved to manifold/manifold-point p2
-(define (get-coordinates point coordinate-system thunk)
-  (let ((entry (assq coordinate-system (coordinate-reps point))))
-    (if entry
-	(cadr entry)
-	(let ((val (s:map/r simplify-numerical-expression (thunk))))
-	  (set-coordinate-reps! point
-				(cons (list coordinate-system val)
-				      (coordinate-reps point)))
-	  val))))
-|#
+;;bdk;; moved to manifold/manifold-point 2
 
 (define (my-manifold-point? point manifold)
   (and (manifold-point? point)
@@ -81,21 +50,7 @@
 ;;; There is a kludge in this system... A single coordinate is just
 ;;; the number:
 
-#| ;;bdk;; moved to manifold/helper
-(define (c:generate n type proc)
-  (if (fix:= n 1)
-      (proc 0)
-      (s:generate n type proc)))
-
-(define (c:lookup m struct)
-  (if (structure? struct)
-      (assq m
-	    (vector->list
-	     (if (up? struct)
-		(up->vector struct)
-		(down->vector struct))))
-      struct))
-|#
+;;bdk;; moved to manifold/helper 1
 
 (define (specify-manifold manifold-name #:optional type)
   (if (default-object? type) (set! type Real))
@@ -1567,19 +1522,8 @@
 
 (define literal-manifold-function literal-scalar-field)
 
-#| ;;bdk;; moved to manifold/manifold-point
-(define (zero-manifold-function m)
-  (assert (manifold-point? m))
-  0)
+;;bdk;; moved to manifold/manifold-point 3
 
-(define (one-manifold-function m)
-  (assert (manifold-point? m))
-  1)
-
-(define ((constant-manifold-function c) m)
-  (assert (manifold-point? m))
-  c)
-|#
 
 #|
 ;;; A scalar field can be defined by combining coordinate functions:

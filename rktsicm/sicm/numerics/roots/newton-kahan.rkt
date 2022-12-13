@@ -7,9 +7,12 @@
          "zeros.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; In simple cases, if one knows the function and its derivative,
 ;;;  Newton's method is a quick-and-dirty way to find a root.  
 ;;;  However, one must start close to the root to get it to converge.
+
 
 (define (newton-search f&df x0 eps) 
   (define (newton-improve xn)

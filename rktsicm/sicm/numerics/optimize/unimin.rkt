@@ -6,11 +6,15 @@
          "../../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; 6/1/89 (mh) added EXTREMAL-ARG and EXTREMAL-VALUE
 ;;; modified by mh 12/6/87
 ;;; $Header: unimin.scm,v 1.4 88/01/26 07:45:38 GMT gjs Exp $
 ;;; 7/5/87 UNIMIN.SCM -- first compilation of routines for univariate
 ;;;			 optimization.
+#|
+|#
 
 ;;; The following univariate optimization routines typically return
 ;;; a list (x fx ...) where x is the argmument at which the extremal

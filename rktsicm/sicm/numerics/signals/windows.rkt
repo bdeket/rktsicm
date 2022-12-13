@@ -6,6 +6,9 @@
          "sigfun.rkt"
          )
 
+;;bdk;; start original file
+
+
 (define ((hanning n) f)
   (let* ((span (sigfun:span f))
 	 (tmin (sigfun:min span))

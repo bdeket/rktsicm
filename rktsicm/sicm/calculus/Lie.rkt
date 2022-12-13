@@ -11,6 +11,8 @@
          "../mechanics/Hamiltonian.rkt"
          )
 
+;;bdk;; start original file
+
 #|
 ;;; Generalize to rank k.
 (define ((Lie-derivative X) Y)

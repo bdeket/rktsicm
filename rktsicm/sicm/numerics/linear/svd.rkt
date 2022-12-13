@@ -8,6 +8,8 @@
          "../../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;;; Linear System Solver -- SVD -- Singular-Value Decomposition
 
 ;;; This file contains the following definitions:
@@ -35,6 +37,7 @@
 ;;; Note: the following moved.
 ;;; (svd-solve-linear-system A-matrix b-vector) => x-vector
 ;;;   This is now in the file svd-solve-linear-system.scm
+
 
 (define (svd a continue)
   (svd-internal (matrix->array a)
@@ -66,7 +69,7 @@
 
 #|
 ;;; See svd-least-squares.scm 
-(define (svd-least-squares a b #!optional eps)
+(define (svd-least-squares a b #:optional eps)
   (if (default-object? eps) (set! eps 1e-15))
   (svd a
        (lambda (u sigma v w)
@@ -554,7 +557,7 @@
 		     (map vector->list 
 			  (vector->list (matrix->array a)))))))
 
-(define (test n #!optional m)
+(define (test n #:optional m)
   (if (default-object? m)
       (set! m 100))
   (let ((h (hilbert n)))

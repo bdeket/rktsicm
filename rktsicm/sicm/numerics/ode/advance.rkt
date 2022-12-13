@@ -11,9 +11,12 @@
          "../../kernel-intr.rkt"
          )
 
+;;bdk;; start original file
+
 ;;; The advance-generator is used with 1-step adaptive integrators to
 ;;;  to advance a state by a given increment in the independent
 ;;;  variable, in the face of variable-stepsize advancers.
+
 
 #| For examples
 

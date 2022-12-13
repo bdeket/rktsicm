@@ -6,9 +6,12 @@
          "../kernel-gnrc.rkt"
          "../simplify/pcf.rkt")
 
+;;bdk;; start original file
+
 ;;;; Hermite interpolation 6/1/89 (mh)
 
 ;;; Edited by GJS 10Jan09
+
 
 ;;; This is currently configured to work for polynomials with only
 ;;; numerical coefficients. (gjs)

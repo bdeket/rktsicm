@@ -8,6 +8,8 @@
 (void 'INSTALL-GENERICS
       (simplify:assign-operations #t))
 
+;;bdk;; start original file
+
 ;;;; Numerical constants
 
 (define-constant ':pi "\\pi" "Pi"
@@ -394,3 +396,5 @@
 (define GMsun				;=(* gravitational-constant sun-mass)	
   (& 1.32712497e20
      (/ (* &newton (expt &meter 2)) &kilogram)))
+
+

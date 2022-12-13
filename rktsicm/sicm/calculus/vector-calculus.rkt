@@ -9,6 +9,8 @@
          (only-in "exterior-derivative.rkt" d)
          )
 
+;;bdk;; start original file
+
 ;;;; Traditional vector calculus operators
 
 (define (gradient metric basis)

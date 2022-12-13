@@ -10,6 +10,8 @@
          "universal.rkt"
          )
 
+;;bdk;; start original file
+
 (define ((Gamma-bar f) local)
   ((f (osculating-path local)) (time local)))
 

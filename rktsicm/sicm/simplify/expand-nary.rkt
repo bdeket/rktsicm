@@ -7,6 +7,8 @@
          "syntax.rkt"
          "rule-syntax.rkt")
 
+;;bdk;; start original file
+
 #|
 ;;; The logical ordering
 (define expand-nary

@@ -5,6 +5,8 @@
 (require (only-in "../mechanics/universal.rkt" D)
          )
 
+;;bdk;; start original file
+
 #|
 ;;; Let (sigma t) be the state of a system at time t.  Let the
 ;;; (first-order) system of differential equations governing the
