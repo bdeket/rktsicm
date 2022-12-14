@@ -5,11 +5,11 @@
          "cstm/ghelper.rkt"
          "cstm/arity.rkt"
          "cstm/types.rkt"
-         "cstm/genenv.rkt")
+         "cstm/genenv.rkt"
+         "cstm/make-plain-procedure.rkt"
+         )
 
 (provide make-generic-operator)
-
-(module+ test (require rackunit))
 
 ;;bdk;; start original file
 
@@ -29,10 +29,12 @@
 ;***************************************************************************************************
 ;*                                                                                                 *
 ;***************************************************************************************************
-(define (make-generic-operator arity [name* #f] [default-operation* #f])
+(define (make-generic-operator A [name* #f] [default-operation* #f])
 
-  (unless (procedure-arity? arity)
-    (raise-argument-error 'make-generic-operator "procedure-arity?" arity))
+  (define arity
+    (if (procedure-arity? A)
+        (normalize-arity A)
+        (raise-argument-error 'make-generic-operator "procedure-arity?" arity)))
 
   (define name
     (cond
@@ -82,10 +84,7 @@
           ((find-branch TREE arg1 (λ (branch) (find-branch branch arg2 tree-han)))
            arg1 arg2))]
        [else
-     (λ arguments
-       (unless (arity-includes? arity (length arguments))
-         (raise-arity-error operator arity arguments))
-       (apply (general-find-handler arguments) arguments))])
+        (make-plain-procedure (λ x (apply (general-find-handler x) x)) arity)])
      (string->symbol (format "_~a_" name))))
 
   (set-operator-record! operator record)
@@ -128,77 +127,3 @@
         [else
          argument])
       argument))
-
-(module+ test
-  (define (any? _) #t)
-  (define (nvr? _) #f)
-  (require rackunit)
-  (define (foo-default x y z) 'foo-default)
-  (define foo (make-generic-operator 3 'foo foo-default))
-  (check-equal? (get-operator-record foo) (operator-record 'foo 3 (tree '() #t foo-default)))
-
-  (check-exn #px"argument arity intersecting with operator arity"
-             (λ () (assign-operation foo (λ (a b) 'a) any? any?)))
-  (check-exn #px"argument arity intersecting with operator arity"
-             (λ () (assign-operation foo (λ (a b c) 'a) any? any?)))
-  (check-exn #px"argument arity intersecting with handler arity"
-             (λ () (assign-operation foo (λ (a b) 'a) any? any? any?)))
-  (check-exn #px"handler is within operator arity"
-             (λ () (assign-operation foo (λ (a [b 1]) 'a) any? #:rest any?)))
-  (check-equal? (get-operator-record foo) (operator-record 'foo 3 (tree '() #t foo-default)))
-
-  (define (foo-handler1 a b c) 1)
-  (define (a? m) (eq? m 'a))(define (b? m) (eq? m 'b))(define (c? m) (eq? m 'c))
-  (assign-operation foo foo-handler1 a? b? #:rest #t)
-  (check-equal? (get-operator-record foo)
-                (operator-record 'foo 3 (tree (list (cons a? (tree (list (cons b? (tree '() #t foo-handler1))) #f #f)))
-                                              #t foo-default)))
-  (define (foo-handler2 a b c) 2)
-  (assign-operation foo foo-handler2 a? c? #:rest #t)
-  (check-equal? (get-operator-record foo)
-                (operator-record 'foo 3 (tree (list (cons a? (tree (list (cons c? (tree '() #t foo-handler2))
-                                                                         (cons b? (tree '() #t foo-handler1)))
-                                                                   #f #f)))
-                                              #t foo-default)))
-
-  (define (foo-handler3 a b c) 3)
-  (assign-operation foo foo-handler3 b? c? #:rest #t)
-  (check-equal? (get-operator-record foo)
-                (operator-record 'foo 3 (tree (list (cons b? (tree (list (cons c? (tree '() #t foo-handler3)))
-                                                                   #f #f))
-                                                    (cons a? (tree (list (cons c? (tree '() #t foo-handler2))
-                                                                         (cons b? (tree '() #t foo-handler1)))
-                                                                   #f #f)))
-                                              #t foo-default)))
-
-  (define (foo-handler4 a b c) 4)
-  (assign-operation foo foo-handler4 b? #:rest #t)
-  (check-equal? (get-operator-record foo)
-                (operator-record 'foo 3 (tree (list (cons b? (tree (list (cons c? (tree '() #t foo-handler3)))
-                                                                   #t foo-handler4))
-                                                    (cons a? (tree (list (cons c? (tree '() #t foo-handler2))
-                                                                         (cons b? (tree '() #t foo-handler1)))
-                                                                   #f #f)))
-                                              #t foo-default)))
-
-  (define (foo-handler5 a b c) 5)
-  (assign-operation foo foo-handler5 b? #:rest #t)
-  (check-equal? (get-operator-record foo)
-                (operator-record 'foo 3 (tree (list (cons b? (tree (list (cons c? (tree '() #t foo-handler3)))
-                                                                   #t foo-handler5))
-                                                    (cons a? (tree (list (cons c? (tree '() #t foo-handler2))
-                                                                         (cons b? (tree '() #t foo-handler1)))
-                                                                   #f #f)))
-                                              #t foo-default)))
-
-  (check-equal? (foo 'a 'b 'b) 1)
-  (check-equal? (foo 'a 'c 'c) 2)
-  (check-equal? (foo 'b 'c 'c) 3)
-  (check-equal? (foo 'b 'b 'b) 5)
-  (check-equal? (foo 'b 'any 'any) 5)
-  ;; ^^ this is different from ghelper-class (in in line with scim)
-  ;; in practice it seems the #:rest is only ever used for the top tree (which doesn't have a pred?)
-  (check-equal? (foo 'c 'c 'c) 'foo-default)
-  (check-equal? (foo 'a 'a 'c) 'foo-default)
-  
-  )

@@ -32,22 +32,22 @@
 
   (check-equal?
    (simplify ((D q) 't))
-   '(up (((partial 0) x) t)
-        (((partial 0) y) t)
-        (((partial 0) z) t)))
+   '(up ((D x) t)
+        ((D y) t)
+        ((D z) t)))
 
   (check-equal?
    (simplify ((Gamma q) 't))
    '(up t
         (up (x t) (y t) (z t))
-        (up (((partial 0) x) t) (((partial 0) y) t) (((partial 0) z) t))))
+        (up ((D x) t) ((D y) t) ((D z) t))))
 
   (check-equal?
    (simplify ((compose (L-free-particle 'm) (Gamma q)) 't))
    '(+
-     (* 1/2 m (expt (((partial 0) x) t) 2))
-     (* 1/2 m (expt (((partial 0) y) t) 2))
-     (* 1/2 m (expt (((partial 0) z) t) 2))))
+     (* 1/2 m (expt ((D x) t) 2))
+     (* 1/2 m (expt ((D y) t) 2))
+     (* 1/2 m (expt ((D z) t) 2))))
 
   (define (Lagrangian-action L q t1 t2)
     (definite-integral (compose L (Gamma q)) t1 t2))
@@ -196,7 +196,7 @@
     (((Lagrange-equations (L-free-particle 'm))
       (literal-function 'x))
      't))
-   '(* m (((expt (partial 0) 2) x) t)))
+   '(* m (((expt D 2) x) t)))
 
   (define (proposed-solution t)
     (* 'A (cos (+ (* 'omega t) 'phi))))

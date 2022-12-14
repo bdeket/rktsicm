@@ -1,9 +1,12 @@
 #lang info
 
 (define collection "sicm")
+(define deps '("base"))
+
 (define compile-omit-paths '("tests"))
 (define test-omit-paths '(#rx"sicm[/|\\\\]calculus"
                           #rx"sicm[/|\\\\]display"
+                          #rx"sicm[/|\\\\]doc"
                           #rx"sicm[/|\\\\]enclose"
                           #rx"sicm[/|\\\\]general"
                           #rx"sicm[/|\\\\]info"
@@ -19,9 +22,11 @@
                           #rx"sicm[/|\\\\]units"
                           "tests/0course"
                           ;#rx"compiled"
-                          ;#rx".*\\.bak"
+                          #rx".*\\.bak"
                           ))
-(define test-include-paths '("test"))
+(define test-include-paths '("tests"))
 
 (define primary-file "main.rkt")
-(define categories '(math))
+
+(define categories '(scientific))
+(define pkg-desc "Port of scmutils to racket")

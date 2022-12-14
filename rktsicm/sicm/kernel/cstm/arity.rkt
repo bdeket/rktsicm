@@ -7,9 +7,6 @@
 (require (only-in racket/function arity-includes? normalize-arity)
          "../../rkt/fixnum.rkt")
 
-(module+ test
-  (require rackunit))
-
 (define (exact-arity n)
   (unless (and (exact-integer? n) (<= 0 n))
     (raise-argument-error 'exact-arity "exact-positive-integer?" n))
