@@ -6,6 +6,7 @@
 
 (require (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
+         "cstm/make-plain-procedure.rkt"
          "numeric.rkt"
          "utils.rkt"
          "generic.rkt"
@@ -140,6 +141,13 @@
 	 (let ((a
 		(a-reduce joint-arity
 			  (map g:arity g))))
+           (make-plain-procedure (λ x (g:apply f (map (λ (gi) (g:apply gi x)) g))) a)
+           #;(make-plain-procedure-stx (λ (xs rst)
+                                       (if rst
+                                           #`(g:apply #,f (map (λ (gi) (g:apply gi (cons* #,@xs #,rst))) #,g))
+                                           #`(g:apply #,f (map (λ (gi) (g:apply gi (list #,@xs))) #,g))))
+                                     a)
+           #;
 	   (cond ((equal? a *at-least-zero*)
 		  (lambda x
 		    (g:apply f
@@ -210,6 +218,13 @@
 			    g)))))))
 	(else
 	 (let ((a (g:arity g)))
+           (make-plain-procedure (λ x (g:apply f (list (g:apply g x)))) a)
+           #;(make-plain-procedure-stx (λ (xs rst)
+                                       (if rst
+                                           #`(g:apply #,f (list (g:apply #,g (cons* #,@xs #,rst))))
+                                           #`(g:apply #,f (list (g:apply #,g (list #,@xs))))))
+                                     a)
+           #;
 	   (cond ((equal? a *at-least-zero*)
 		  (lambda x
 		    (g:apply f

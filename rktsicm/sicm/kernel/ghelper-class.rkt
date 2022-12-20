@@ -88,7 +88,10 @@
     
   (define operator
     (procedure-rename
-     (make-plain-procedure (λ x (apply (find-handler x) x)) arity)
+     (make-plain-procedure-stx (λ (xs rst) (if rst
+                                             #`(apply (#,find-handler (list* #,@xs #,rst)) #,@xs #,rst)
+                                             #`((#,find-handler #,(cons list xs)) #,@xs)))
+                               arity)
      (string->symbol (format "_~a_" name))))
 
   (set-operator-record! operator record)

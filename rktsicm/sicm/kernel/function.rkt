@@ -1,18 +1,19 @@
-#lang s-exp "extapply.rkt"
+#lang racket/base
 
 (provide (except-out (all-defined-out) assign-operation))
 
-(require (only-in "../rkt/glue.rkt" if default-object default-object?)
+(require (only-in "../rkt/glue.rkt" if default-object default-object? cons*)
          "generic.rkt"
          "types.rkt"
          "utils.rkt"
+         "cstm/make-plain-procedure.rkt"
          )
 (define-values (assign-operation function:assign-operations)
   (make-assign-operations 'function))
 
 (define (p-rename op fct)
   (define a (regexp-replace #px"#<procedure:(.*)>" (format "~a" op) "\\1"))
-  (define b (regexp-replace #px"$g:" a ""))
+  (define b (regexp-replace #px"^g:" a ""))
   (define c (regexp-replace #px"^_(.*)_$" b "\\1"))
   (procedure-rename fct (string->symbol (format "f:~a" c))))
 
@@ -31,44 +32,63 @@
   (p-rename operator (compose-bin operator f)))
 
 (define ((f:binary operator) f1 f2)
+  (define (mk f)
+    (cond
+      [(function? f)           (values (λ (xs rst) #`(apply #,f #,@xs #,rst))
+                                       (λ (xs)     #`(#,f #,@xs))
+                                       (g:arity f1))]
+      [(numerical-quantity? f) (values (λ (xs rst) #`'#,f)
+                                       (λ (xs)     #`'#,f)
+                                       *at-least-zero*)]
+      [else                    (values (λ (xs rst) #`(g:apply '#,f (cons* #,@xs #,rst)))
+                                       (λ (xs)     #`(g:apply '#,f (list #,@xs)))
+                                       *at-least-zero*)]))
+  (let-values ([(F1+ F1 a1) (mk f1)]
+               [(F2+ F2 a2) (mk f2)])
+    (p-rename operator
+     (make-plain-procedure-stx (λ (xs rst)
+                                 (if rst
+                                     #`(#,operator #,(F1+ xs rst) #,(F2+ xs rst))
+                                     #`(#,operator #,(F1 xs) #,(F2 xs))))
+                               (joint-arity a1 a2))))
+  #;
   (let ((f1 (if (function? f1) f1 (coerce-to-function f1)))
-	(f2 (if (function? f2) f2 (coerce-to-function f2))))	
+        (f2 (if (function? f2) f2 (coerce-to-function f2))))	
     (let ((a (joint-arity (g:arity f1) (g:arity f2))))
       (if (not a)
-	  (error "Functions have different arities" f1 f2))
-      (p-rename operator
-       (cond ((equal? a *at-least-zero*)
-              (lambda x
-                (operator (apply f1 x) (apply f2 x))))
-             ((equal? a *exactly-zero*)
-              (lambda ()
-                (operator (f1) (f2))))
-             ((equal? a *at-least-one*)
-              (lambda (x . y)
-                (operator (apply f1 x y) (apply f2 x y))))
-             ((equal? a *exactly-one*)
-              (lambda (x)
-                (operator (f1 x) (f2 x))))
-             ((equal? a *at-least-two*)
-              (lambda (x y . z)
-                (operator (apply f1 x y z) (apply f2 x y z))))
-             ((equal? a *exactly-two*)
-              (lambda (x y)
-                (operator (f1 x y) (f2 x y))))
-             ((equal? a *at-least-three*)
-              (lambda (u x y . z)
-                (operator (apply f1 u x y z) (apply f2 u x y z))))
-             ((equal? a *exactly-three*)
-              (lambda (x y z)
-                (operator (f1 x y z) (f2 x y z))))
-             ((equal? a *one-or-two*)
-              (lambda (x [y default-object])
-                (if (default-object? y)
-                    (operator (f1 x) (f2 x))
-                    (operator (f1 x y) (f2 x y)))))
-             (else
-              (lambda x
-                (operator (apply f1 x) (apply f2 x)))))))))
+          (error "Functions have different arities" f1 f2))
+      (cond ((equal? a *at-least-zero*)
+             (lambda x
+               (operator (apply f1 x) (apply f2 x))))
+            ((equal? a *exactly-zero*)
+             (lambda ()
+               (operator (f1) (f2))))
+            ((equal? a *at-least-one*)
+             (lambda (x . y)
+               (operator (apply f1 x y) (apply f2 x y))))
+            ((equal? a *exactly-one*)
+             (lambda (x)
+               (operator (f1 x) (f2 x))))
+            ((equal? a *at-least-two*)
+             (lambda (x y . z)
+               (operator (apply f1 x y z) (apply f2 x y z))))
+            ((equal? a *exactly-two*)
+             (lambda (x y)
+               (operator (f1 x y) (f2 x y))))
+            ((equal? a *at-least-three*)
+             (lambda (u x y . z)
+               (operator (apply f1 u x y z) (apply f2 u x y z))))
+            ((equal? a *exactly-three*)
+             (lambda (x y z)
+               (operator (f1 x y z) (f2 x y z))))
+            ((equal? a *one-or-two*)
+             (lambda (x [y default-object])
+               (if (default-object? y)
+                   (operator (f1 x) (f2 x))
+                   (operator (f1 x y) (f2 x y)))))
+            (else
+             (lambda x
+               (operator (apply f1 x) (apply f2 x))))))))
 
 (define ((coerce-to-function g) . x)
   (if (numerical-quantity? g)

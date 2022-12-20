@@ -9,7 +9,8 @@
          (only-in "../rkt/todo.rkt" pp)
          "../general/list-utils.rkt"
          "../general/eq-properties.rkt"
-         "cstm/arity.rkt")
+         "cstm/arity.rkt"
+         "cstm/make-plain-procedure.rkt")
 
 ;;bdk;; start original file
 
@@ -156,6 +157,13 @@
 	 (let ((a
 		(a-reduce joint-arity
 			  (map procedure-arity g))))
+           #;(make-plain-procedure (λ x (apply f (map (λ (gi) (apply gi x)) g))) a)
+           (make-plain-procedure-stx (λ (xs rst)
+                                       (if rst
+                                           #`(apply #,f (map (λ (gi) (apply gi #,@xs #,rst)) #,g))
+                                           #`(apply #,f (map (λ (gi) (gi #,@xs)) #,g))))
+                                     a)
+           #;
 	   (cond ((equal? a *at-least-zero*)
 		  (lambda x
 		    (apply f
@@ -227,6 +235,13 @@
 			    g)))))))
 	(else
 	 (let ((a (procedure-arity g)))
+	   #;(make-plain-procedure (λ x (f (apply g x))) a)
+           (make-plain-procedure-stx (λ (xs rst)
+                                       (if rst
+                                           #`(#,f (apply #,g #,@xs #,rst))
+                                           #`(#,f (#,g #,@xs))))
+                                     a)
+           #;
 	   (cond ((equal? a *at-least-zero*)
 		  (lambda x
 		    (f (apply g x))))
