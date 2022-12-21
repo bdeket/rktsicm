@@ -7,6 +7,7 @@
                   fix:= fix:< fix:+ fix:- if undefined-value true)
          (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/todo.rkt" pp)
+         (only-in racket/syntax format-id)
          "../general/list-utils.rkt"
          "../general/eq-properties.rkt"
          "cstm/arity.rkt"
@@ -152,19 +153,13 @@
 	   (f (apply g x))))))
 
 
+#;
 (define (compose-bin f g)
   (cond ((pair? g)
 	 (let ((a
 		(a-reduce joint-arity
 			  (map procedure-arity g))))
-           #;(make-plain-procedure (λ x (apply f (map (λ (gi) (apply gi x)) g))) a)
-           (make-plain-procedure-stx (λ (xs rst)
-                                       (if rst
-                                           #`(apply #,f (map (λ (gi) (apply gi #,@xs #,rst)) #,g))
-                                           #`(apply #,f (map (λ (gi) (gi #,@xs)) #,g))))
-                                     a)
-           #;
-	   (cond ((equal? a *at-least-zero*)
+           (cond ((equal? a *at-least-zero*)
 		  (lambda x
 		    (apply f
 			   (map
@@ -235,14 +230,7 @@
 			    g)))))))
 	(else
 	 (let ((a (procedure-arity g)))
-	   #;(make-plain-procedure (λ x (f (apply g x))) a)
-           (make-plain-procedure-stx (λ (xs rst)
-                                       (if rst
-                                           #`(#,f (apply #,g #,@xs #,rst))
-                                           #`(#,f (#,g #,@xs))))
-                                     a)
-           #;
-	   (cond ((equal? a *at-least-zero*)
+           (cond ((equal? a *at-least-zero*)
 		  (lambda x
 		    (f (apply g x))))
 		 ((equal? a *exactly-zero*)
@@ -504,3 +492,45 @@
                 (if sig (pp sig))))
             *last-notes*)
   (display "|#"))
+
+(define compose-bin
+  (with-syntax ([f (format-id #f "f")]
+                [g (format-id #f "g")]
+                [a (format-id #f "a")])
+    (define (mk1 xs rst)
+      (if rst
+          #`(apply f (map (λ (gi) (apply gi #,@xs #,rst)) g))
+          #`(apply f (map (λ (gi) (gi #,@xs)) g))))
+    (define (mk2 xs rst)
+      (if rst
+          #`(f (apply g #,@xs #,rst))
+          #`(f (g #,@xs))))
+    (make-plain-procedure-slct
+     'compose-bin
+     (λ (stx)
+       #`(λ (f g)
+           (cond
+             [(pair? g)
+              (let ([a (#,a-reduce joint-arity (map procedure-arity g))])
+                #,(stx mk1
+                       #`(make-plain-procedure-stx
+                          'compose-bin
+                          (let ([F f][G g])
+                            (λ (xs rst)
+                              (if rst
+                                  #`(apply #,F (map (λ (gi) (apply gi #,@xs #,rst)) '#,G))
+                                  #`(apply #,F (map (λ (gi) (gi #,@xs)) '#,G)))))
+                          a)
+                       #'a))]
+             [else
+              (let ([a (procedure-arity g)])
+                #,(stx mk2
+                       #`(make-plain-procedure-stx
+                          'compose-bin
+                          (let ([F f][G g])
+                            (λ (xs rst)
+                              (if rst
+                                  #`(#,F (apply #,G #,@xs #,rst))
+                                  #`(#,F (#,G #,@xs)))))
+                          a)
+                       #'a))]))))))

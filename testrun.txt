@@ -1,28 +1,10 @@
-
-F:\Documents\prog\rac-dis\rktsicm\rktsicm>call F:\PortableApps\Racket\Data\Setup\setall.bat 
-
-F:\Documents\prog\rac-dis\rktsicm\rktsicm>SET PLTCOLLECTS=;F:\PortableApps\Racket\Data\Setup\..\..\..\..\documents\prog\racket\;F:\PortableApps\Racket\Data\Setup\..\..\..\..\documents\prog\rac-dis\ 
-
-F:\Documents\prog\rac-dis\rktsicm\rktsicm>call F:\PortableApps\Racket\Data\Setup\setenv.bat  
-
-F:\Documents\prog\rac-dis\rktsicm\rktsicm>SET PLTUSERHOME=F:\PortableApps\Racket\Data\Setup\..\ 
-
-F:\Documents\prog\rac-dis\rktsicm\rktsicm>IF NOT [] == [] (F:\PortableApps\Racket\Data\Setup\..\..\App\Racket\racket.exe F:\PortableApps\Racket\Data\Setup\setpath.rkt F:\PortableApps\Racket\Data\Setup\..\  ) 
-
-F:\Documents\prog\rac-dis\rktsicm\rktsicm>F:\PortableApps\Racket\App\Racket\raco.exe test .\sicm\ 
 raco test: ".\\sicm\\generic.rkt"
 raco test: ".\\sicm\\main.rkt"
 raco test: (submod ".\\sicm\\tests\\calculus\\Lie.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\SR-boost.rkt" test)
-F:\PortableApps\Racket\raco.bat : --------------------
-At line:1 char:1
-+ F:\PortableApps\Racket\raco.bat test .\sicm\ 2>&1 > ..\testrun.txt
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (--------------------:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
+--------------------
 calculus/SR-boost > Unnamed test
 FAILURE
 name:       check-simplified?
@@ -45,7 +27,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 72391 real time: 72380 gc time: 3126
+cpu time: 8375 real time: 8382 gc time: 247
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -70,9 +52,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 53765 real time: 53766 gc time: 954
-cpu time: 36953 real time: 36958 gc time: 217
-cpu time: 4687 real time: 4685 gc time: 16
+cpu time: 48843 real time: 48827 gc time: 1047
+cpu time: 31703 real time: 31740 gc time: 110
+cpu time: 3938 real time: 3944 gc time: 47
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -124,7 +106,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 297 real time: 282 gc time: 0
+cpu time: 281 real time: 279 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -304,15 +286,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 3140 real time: 3141 gc time: 311
-cpu time: 17828 real time: 17829 gc time: 563
-cpu time: 2953 real time: 2952 gc time: 62
-cpu time: 250 real time: 260 gc time: 16
-cpu time: 63 real time: 56 gc time: 0
-cpu time: 12125 real time: 12129 gc time: 266
+cpu time: 2765 real time: 2751 gc time: 95
+cpu time: 17219 real time: 17204 gc time: 483
+cpu time: 2859 real time: 2860 gc time: 94
+cpu time: 235 real time: 242 gc time: 31
+cpu time: 62 real time: 57 gc time: 16
+cpu time: 12297 real time: 12306 gc time: 941
 cpu time: 16 real time: 3 gc time: 0
-cpu time: 31 real time: 32 gc time: 15
-cpu time: 112015 real time: 112013 gc time: 2424
+cpu time: 31 real time: 32 gc time: 0
+cpu time: 105062 real time: 105064 gc time: 2217
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -343,9 +325,10 @@ raco test: (submod ".\\sicm\\tests\\solve\\solve-utils.rkt" test)
 23 success(es) 0 failure(s) 0 error(s) 23 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x499) (* -1 x500)) (eq:0) (x500 x499)) ((+ -7 (* 3 x499) x500) (eq:1) (x500 x499)))
-'(((+ -5 (* 3 x507) (* -1 x508)) (eq:0) (x508 x507)) ((+ k509 (* 3 x507) x508) (eq:1) (x508 x507 k509)))
+'(((+ -5 (* 3 x5197) (* -1 x5198)) (eq:0) (x5198 x5197)) ((+ -7 (* 3 x5197) x5198) (eq:1) (x5198 x5197)))
+'(((+ -5 (* 3 x5205) (* -1 x5206)) (eq:0) (x5206 x5205)) ((+ k5207 (* 3 x5205) x5206) (eq:1) (x5206 x5205 k5207)))
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 2/568 test failures
+72.4

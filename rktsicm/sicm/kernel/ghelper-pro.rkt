@@ -84,7 +84,9 @@
           ((find-branch TREE arg1 (λ (branch) (find-branch branch arg2 tree-han)))
            arg1 arg2))]
        [else
-        (make-plain-procedure (λ x (apply (general-find-handler x) x)) arity)])
+        (make-plain-procedure 'make-generic-operator
+                              (λ x (apply (general-find-handler x) x))
+                              arity)])
      (string->symbol (format "_~a_" name))))
 
   (set-operator-record! operator record)
