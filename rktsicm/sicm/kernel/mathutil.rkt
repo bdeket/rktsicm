@@ -4,7 +4,8 @@
          (all-from-out "cstm/mathutil.rkt")
          g:identity)
 
-(require (only-in "../rkt/define.rkt" define default-object?)
+(require (only-in "../rkt/glue.rkt" cons*)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in racket/syntax format-id)
          "../general/list-utils.rkt"
          "cstm/make-plain-procedure.rkt"
@@ -137,45 +138,24 @@
 	 (lambda x
 	   (f (g:apply g x))))))
 
-(define g:compose-bin
-  (with-syntax ([f (format-id #f "f")]
-                [g (format-id #f "g")]
-                [a (format-id #f "a")])
-    (make-plain-procedure-slct
-     'g:compose-bin
-     (λ (stx)
-       #`(λ (f g)
-           (cond
-             [(and (pair? g) (not (structure? g)))
-              (let ([a (a-reduce joint-arity (map g:arity g))])
-                #,(stx (λ (xs rst)
-                         (if rst
-                             #`(g:apply f (map (λ (gi) (g:apply gi (cons* #,@xs #,rst))) g))
-                             #`(g:apply f (map (λ (gi) (g:apply gi (list #,@xs))) g))))
-                       #`(make-plain-procedure-stx
-                          'g:compose-bin
-                          (let ([F f][G g])
-                            (λ (xs rst)
-                              (if rst
-                                  #`(g:apply #,F (map (λ (gi) (g:apply gi (cons* #,@xs #,rst))) '#,G))
-                                  #`(g:apply #,F (map (λ (gi) (g:apply gi (list #,@xs))) '#,G)))))
-                          a)
-                       #'a))]
-             [else
-              (let ([a (g:arity g)])
-                #,(stx (λ (xs rst)
-                         (if rst
-                             #`(g:apply f (list (g:apply g (cons* #,@xs #,rst))))
-                             #`(g:apply f (list (g:apply g (list #,@xs))))))
-                       #`(make-plain-procedure-stx
-                          'g:compose-bin
-                          (let ([F f][G g])
-                            (λ (xs rst)
-                              (if rst
-                                  #`(g:apply #,F (g:apply #,G (cons* #,@xs #,rst)))
-                                  #`(g:apply #,F (g:apply #,G (list #,@xs))))))
-                          a)
-                       #'a))]))))))
+(define (g:compose-bin f g)
+  (cond
+    [(and (pair? g) (not (structure? g)))
+     (define a (a-reduce joint-arity (map g:arity g)))
+     (make-plain-procedure-slct 'g:compose-bin+n
+                                a
+                                (λ (xs) #`(g:apply f (map (λ (gi) (g:apply gi (list #,@xs))) g)))
+                                (λ (xs rst) #`(g:apply f (map (λ (gi) (g:apply gi (cons* #,@xs #,rst))) g)))
+                                (λ (xs) #`(g:apply #,f (map (λ (gi) (g:apply gi (list #,@xs))) '#,g)))
+                                (λ (xs rst) #`(g:apply #,f (map (λ (gi) (g:apply gi (cons* #,@xs #,rst))) '#,g))))]
+    [else
+     (define a (g:arity g))
+     (make-plain-procedure-slct 'compose-bin+1
+                                a
+                                (λ (xs) #`(g:apply f (list (g:apply g (list #,@xs)))))
+                                (λ (xs rst) #`(g:apply f (list (g:apply g (cons* #,@xs #,rst)))))
+                                (λ (xs) #`(g:apply #,f (list (g:apply #,g (list #,@xs)))))
+                                (λ (xs rst) #`(g:apply #,f (list (g:apply #,g (cons* #,@xs #,rst))))))]))
 #;
 (define (g:compose-bin f g)
   (cond ((and (pair? g) (not (structure? g)))

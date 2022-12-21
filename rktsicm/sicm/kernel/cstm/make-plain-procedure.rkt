@@ -1,10 +1,13 @@
 #lang racket/base
 
-(require (only-in racket/syntax format-id)
+(require (for-syntax racket/base
+                     (only-in racket/syntax format-id))
+         (only-in racket/syntax format-id)
          (only-in racket/list last take)
          "arity.rkt")
 
-(provide make-plain-procedure make-plain-procedure-stx make-plain-procedure-slct)
+(provide make-plain-procedure make-plain-procedure-stx make-plain-procedure-slct make-plain-procedure-slct+
+         (for-syntax λ quasisyntax unsyntax-splicing unsyntax))
 
 #; ;waaaay to slow
 (define (rest-app f . rst)
@@ -57,7 +60,7 @@
   (eval-syntax stx))
 
 ;; slow construction, fast execution
-(define (make-plain-procedure-stx name f A)
+(define (make-plain-procedure-stx name o r A)
   (define arity (if (procedure-arity? A)
                     (normalize-arity A)
                     (raise-argument-error name "procedure-arity?" A)))
@@ -67,13 +70,13 @@
        (with-syntax ([(x ...) (build-list arity
                                           (λ (i) (format-id #f "x~a" i)))])
          #`(λ (x ...)
-             #,(f #'(x ...) #f)))]
+             #,(o #'(x ...))))]
       [(arity-at-least? arity)
        (with-syntax ([(x ...) (build-list (arity-at-least-value arity)
                                           (λ (i) (format-id #f "x~a" i)))]
                      [y (format-id #f "y")])
          #`(λ (x ... . y)
-             #,(f #'(x ...) #'y)))]
+             #,(r #'(x ...) #'y)))]
       [else
        (define END (last arity))
        (define LEN (length arity))
@@ -82,7 +85,7 @@
           (with-syntax ([((Xs ...)...)
                          (map (λ (x) (build-list x (λ (i) (format-id #f "x~a" i))))
                               arity)])
-            #`(case-lambda #,@(map (λ (xs) #`[#,xs #,(f xs #f)]) (syntax->list #'((Xs ...) ...)))))]
+            #`(case-lambda #,@(map (λ (xs) #`[#,xs #,(o xs)]) (syntax->list #'((Xs ...) ...)))))]
          [else
           (with-syntax ([((Xs ...)...)
                          (map (λ (x) (build-list x (λ (i) (format-id #f "x~a" i))))
@@ -90,8 +93,8 @@
                         [(Ys ...) (build-list (arity-at-least-value END)
                                               (λ (i) (format-id #f "x~a" i)))]
                         [y (format-id #f "y")])
-            #`(case-lambda #,@(map (λ (xs) #`[#,xs #,(f xs #f)]) (syntax->list #'((Xs ...) ...)))
-                           [(Ys ... . y) #,(f #'(Ys ...) #'y)]))])]))
+            #`(case-lambda #,@(map (λ (xs) #`[#,xs #,(o xs)]) (syntax->list #'((Xs ...) ...)))
+                           [(Ys ... . y) #,(r #'(Ys ...) #'y)]))])]))
   ;(println stx)
   (eval-syntax stx))
 
@@ -113,7 +116,7 @@
                                                   [(x y) (f x y)])]
     [else                            (make-plain-procedure f arity)]))
 
-(define (make-plain-procedure-slct name wrp)
+(define (make-plain-procedure-slct+ name wrp)
   (define (stx f e arity)
     #`(cond
         [(equal? #,arity *exactly-zero*)
@@ -154,6 +157,49 @@
          #,e]))
   ;(displayln (wrp stx))
   (eval-syntax (wrp stx)))
+
+(define-syntax (make-plain-procedure-slct stx)
+  (syntax-case stx ()
+    [(_ n a o r oo rr)
+     (let ([O (eval-syntax #'o)]
+           [R (eval-syntax #'r)])
+       #`(cond
+           [(equal? a *exactly-zero*)
+            #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))])
+                #`(λ (x ...) #,(O #'(x ...))))]
+           [(equal? a *exactly-one*)
+            #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
+                #`(λ (x ...) #,(O #'(x ...))))]
+           [(equal? a *exactly-two*)
+            #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))])
+                #`(λ (x ...) #,(O #'(x ...))))]
+           [(equal? a *exactly-three*)
+            #,(with-syntax ([(x ...) (build-list 3 (λ (i) (format-id #f "x~a" i)))])
+                #`(λ (x ...) #,(O #'(x ...))))]
+           [(equal? a *at-least-three*)
+            #,(with-syntax ([(x ...) (build-list 3 (λ (i) (format-id #f "x~a" i)))]
+                            [y       (format-id #f "y")])
+                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+           [(equal? a *at-least-two*)
+            #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))]
+                            [y       (format-id #f "y")])
+                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+           [(equal? a *at-least-one*)
+            #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))]
+                            [y       (format-id #f "y")])
+                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+           [(equal? a *at-least-zero*)
+            #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))]
+                            [y       (format-id #f "y")])
+                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+           [(equal? a *one-or-two*)
+            (case-lambda #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
+                             #`[(x ...) #,(O #'(x ...))])
+                         #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))])
+                             #`[(x ...) #,(O #'(x ...))]))]
+           [else
+            ;(println (list 'falback 'make-plain-procedure-stx #,arity '#,name))
+            (make-plain-procedure-stx n oo rr a)]))]))
 
 
 #;

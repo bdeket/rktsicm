@@ -33,126 +33,62 @@
   (p-rename operator (compose-bin operator f)))
 
 (define (f:binary operator)
-  (with-syntax ([f1 (format-id #f "f1")]
-                [f2 (format-id #f "f2")]
-                [arity (format-id #f "arity")])
-    (make-plain-procedure-slct
-     'f:binary
-     (λ (stx)
-       #`(λ (f1 f2)
-           (cond
-             [(function? f1)
-              (cond
-                [(function? f2)
-                 (define arity (joint-arity (g:arity f1) (g:arity f2)))
-                 #,(stx (λ (xs rst)
-                          (if rst
-                              #`(#,operator (apply f1 #,@xs #,rst) (apply f2 #,@xs #,rst))
-                              #`(#,operator (f1 #,@xs) (f2 #,@xs))))
-                        #`(make-plain-procedure-stx
-                           'f:binary-ff
-                           (let ([F1 f1][F2 f2])
-                             (λ (xs rst)
-                               (if rst
-                                   #`(#,#,operator (apply #,F1 #,@xs #,rst) (apply #,F2 #,@xs #,rst))
-                                   #`(#,#,operator (#,F1 #,@xs) (#,F2 #,@xs)))))
-                           arity)
-                        #'arity)]
-                [(numerical-quantity? f2)
-                 (define arity (g:arity f1))
-                 #,(stx (λ (xs rst)
-                          (if rst
-                              #`(#,operator (apply f1 #,@xs #,rst) f2)
-                              #`(#,operator (f1 #,@xs) f2)))
-                        #`(make-plain-procedure-stx
-                           'f:binary-fn
-                           (let ([F1 f1][F2 f2])
-                             (λ (xs rst)
-                               (if rst
-                                   #`(#,#,operator (apply #,F1 #,@xs #,rst) #,F2)
-                                   #`(#,#,operator (#,F1 #,@xs) #,F2))))
-                           arity)
-                        #'arity)]
-                [else
-                 (define arity (g:arity f1))
-                 #,(stx (λ (xs rst)
-                          (if rst
-                              #`(#,operator (apply f1 #,@xs #,rst) (g:apply f2 (cons* #,@xs #,rst)))
-                              #`(#,operator (f1 #,@xs) (g:apply f2 (list #,@xs)))))
-                        #`(make-plain-procedure-stx
-                           'f:binary-fS
-                           (let ([F1 f1][F2 f2])
-                             (λ (xs rst)
-                               (if rst
-                                   #`(#,#,operator (apply #,F1 #,@xs #,rst) (g:apply #,F2 (cons* #,@xs #,rst)))
-                                   #`(#,#,operator (#,F1 #,@xs) (g:apply #,F2 (list #,@xs))))))
-                           arity)
-                        #'arity)])]
-             [(numerical-quantity? f1)
-              (cond
-                [(function? f2)
-                 (define arity (g:arity f2))
-                 #,(stx (λ (xs rst)
-                          (if rst
-                              #`(#,operator f1 (apply f2 #,@xs #,rst))
-                              #`(#,operator f1 (f2 #,@xs))))
-                        #`(make-plain-procedure-stx
-                           'f:binary-nf
-                           (let ([F1 f1][F2 f2])
-                             (λ (xs rst)
-                               (if rst
-                                   #`(#,#,operator #,F1 (apply #,F2 #,@xs #,rst))
-                                   #`(#,#,operator #,F1 (#,F2 #,@xs)))))
-                           arity)
-                        #'arity)]
-                [(numerical-quantity? f2)
-                 (error 'f:binary-nn "not possible?")]
-                [else
-                 (error 'f:binary-nS "not possible?")])]
-             [else
-              (cond
-                [(function? f2)
-                 (define arity (g:arity f2))
-                 #,(stx (λ (xs rst)
-                          (if rst
-                              #`(#,operator (g:apply f1 (cons* #,@xs #,rst)) (apply f2 #,@xs #,rst))
-                              #`(#,operator (g:apply f1 (list #,@xs)) (f2 #,@xs))))
-                        #`(make-plain-procedure-stx
-                           'f:binary-Sf
-                           (let ([F1 f1][F2 f2])
-                             (λ (xs rst)
-                               (if rst
-                                   #`(#,#,operator (g:apply #,F1 (cons* #,@xs #,rst)) (apply #,F2 #,@xs #,rst))
-                                   #`(#,#,operator (g:apply #,F1 (list #,@xs)) (#,F2 #,@xs)))))
-                           arity)
-                        #'arity)]
-                [(numerical-quantity? f2)
-                 (error 'f:binary-Sn "not possible?")]
-                [else
-                 (error 'f:binary-SS "not possible?")])])))
-     )))
-#; ;7x slower due to syntax-eval in operation
-(define (f:binary operator)
-  (define (mk f)
-    (cond
-      [(function? f)           (values (λ (xs rst) #`(apply #,f #,@xs #,rst))
-                                       (λ (xs)     #`(#,f #,@xs))
-                                       (g:arity f))]
-      [(numerical-quantity? f) (values (λ (xs rst) #`'#,f)
-                                       (λ (xs)     #`'#,f)
-                                       *at-least-zero*)]
-      [else                    (values (λ (xs rst) #`(g:apply '#,f (cons* #,@xs #,rst)))
-                                       (λ (xs)     #`(g:apply '#,f (list #,@xs)))
-                                       *at-least-zero*)]))
   (λ (f1 f2)
-    (let-values ([(F1+ F1 a1) (mk f1)]
-               [(F2+ F2 a2) (mk f2)])
-    (p-rename operator
-     (make-plain-procedure-stx (λ (xs rst)
-                                 (if rst
-                                     #`(#,operator #,(F1+ xs rst) #,(F2+ xs rst))
-                                     #`(#,operator #,(F1 xs) #,(F2 xs))))
-                               (joint-arity a1 a2))))))
+    (cond
+      [(function? f1)
+       (cond
+         [(function? f2)
+          (define arity (joint-arity (g:arity f1) (g:arity f2)))
+          (make-plain-procedure-slct 'f:binary-ff
+                                     arity
+                                     (λ (xs) #`(operator (f1 #,@xs) (f2 #,@xs)))
+                                     (λ (xs rst) #`(operator (apply f1 #,@xs #,rst) (apply f2 #,@xs #,rst)))
+                                     (λ (xs) #`(#,operator (#,f1 #,@xs) (#,f2 #,@xs)))
+                                     (λ (xs rst) #`(#,operator (apply #,f1 #,@xs #,rst) (apply #,f2 #,@xs #,rst))))]
+         [(numerical-quantity? f2)
+          (define arity (g:arity f1))
+          (make-plain-procedure-slct 'f:binary-fn
+                                     arity
+                                     (λ (xs) #`(operator (f1 #,@xs) f2))
+                                     (λ (xs rst) #`(operator (apply f1 #,@xs #,rst) f2))
+                                     (λ (xs) #`(#,operator (#,f1 #,@xs) #,f2))
+                                     (λ (xs rst) #`(#,operator (apply #,f1 #,@xs #,rst) #,f2)))]
+         [else
+          (define arity (g:arity f1))
+          (make-plain-procedure-slct 'f:binary-fS
+                                     arity
+                                     (λ (xs) #`(operator (f1 #,@xs) (g:apply f2 (list #,@xs))))
+                                     (λ (xs rst) #`(operator (apply f1 #,@xs #,rst) (g:apply f2 (cons* #,@xs #,rst))))
+                                     (λ (xs) #`(#,operator (#,f1 #,@xs) (g:apply #,f2 (list #,@xs))))
+                                     (λ (xs rst) #`(#,operator (apply #,f1 #,@xs #,rst) (g:apply #,f2 (cons* #,@xs #,rst)))))])]
+      [(numerical-quantity? f1)
+       (cond
+         [(function? f2)
+          (define arity (g:arity f2))
+          (make-plain-procedure-slct 'f:binary-nf
+                                     arity
+                                     (λ (xs) #`(operator f1 (f2 #,@xs)))
+                                     (λ (xs rst) #`(operator f1 (apply f2 #,@xs #,rst)))
+                                     (λ (xs) #`(#,operator #,f1 (#,f2 #,@xs)))
+                                     (λ (xs rst) #`(#,operator #,f1 (apply #,f2 #,@xs #,rst))))]
+         [(numerical-quantity? f2)
+          (error 'f:binary-nn "not possible?")]
+         [else
+          (error 'f:binary-nS "not possible?")])]
+      [else
+       (cond
+         [(function? f2)
+          (define arity (g:arity f2))
+          (make-plain-procedure-slct 'f:binary-Sf
+                                     arity
+                                     (λ (xs) #`(operator (g:apply f1 (list #,@xs)) (f2 #,@xs)))
+                                     (λ (xs rst) #`(operator (g:apply f1 (cons* #,@xs #,rst)) (apply f2 #,@xs #,rst)))
+                                     (λ (xs) #`(#,operator (g:apply #,f1 (list #,@xs)) (#,f2 #,@xs)))
+                                     (λ (xs rst) #`(#,operator (g:apply #,f1 (cons* #,@xs #,rst)) (apply #,f2 #,@xs #,rst))))]
+         [(numerical-quantity? f2)
+          (error 'f:binary-Sn "not possible?")]
+         [else
+          (error 'f:binary-SS "not possible?")])])))
 #; ;original, doesn't keep arity for a > 3
 (define ((f:binary operator) f1 f2)
   (let ((f1 (if (function? f1) f1 (coerce-to-function f1)))
