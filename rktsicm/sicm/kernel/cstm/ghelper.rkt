@@ -72,7 +72,7 @@
 
 (define (assign-name record) (string->symbol (format "assign-operation:~a" (operator-record-name record))))
 
-(define (assign-operation operator handler #:rest [pred? default-object] . argument-predicates)
+(define (assign-operation operator handler #:rest [pred? default-object] #:end? [end? #f]. argument-predicates)
   (if (default-object? pred?) (set! pred? (null? argument-predicates)))
   (let ([record (get-operator-record operator)]
         [arity ((if pred? arity-at-least values)
@@ -106,13 +106,14 @@
     (bind-in-tree record
                   argument-predicates
                   pred?
-                  handler))
+                  handler
+                  end?))
   (void))
 
 ;***************************************************************************************************
 ;*                                                                                                 *
 ;***************************************************************************************************
-(define (bind-in-tree record keys rest? handler)
+(define (bind-in-tree record keys rest? handler end?)
   (let loop ([tree (operator-record-tree record)]
              [keys keys])
     (cond
@@ -127,6 +128,10 @@
        (λ (stem) (loop (cdr stem) (cdr keys)))]
       [else
        (define sub (make-tree))
-       (set-tree-branch! tree (cons (cons (car keys) sub)
-                                    (tree-branch tree)))
+       (set-tree-branch! tree
+                         (if end?
+                             `(,@(tree-branch tree)
+                               ,(cons (car keys) sub))
+                             `(,(cons (car keys) sub)
+                               ,@(tree-branch tree))))
        (loop sub (cdr keys))])))

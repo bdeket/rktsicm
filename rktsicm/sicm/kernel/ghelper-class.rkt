@@ -40,7 +40,7 @@
   (define arity
     (if (procedure-arity? A)
         (normalize-arity A)
-        (raise-argument-error 'make-generic-operator "procedure-arity?" arity)))
+        (raise-argument-error 'make-generic-operator "procedure-arity?" A)))
 
   (define name
     (cond

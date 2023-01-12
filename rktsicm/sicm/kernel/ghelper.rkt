@@ -12,10 +12,11 @@
 
 (define (make-assign-operations name)
   (let ([tmp '()])
-    (values (λ (op hndl #:rest [pred? default-object] . argpreds)
+    (values (λ (op hndl #:rest [pred? default-object] #:end? [end? #f] . argpreds)
               (cond
                 [tmp (set! tmp (cons (list* op hndl
                                             (if (default-object? pred?) (null? argpreds) pred?)
+                                            end?
                                             argpreds)
                                      tmp))]
                 [else (error (format "add: operations for ~a already assigned" name))]))
@@ -23,7 +24,7 @@
               (cond
                 [(list? tmp)
                  (for ([l (in-list (reverse tmp))])
-                   (apply assign-operation (car l) (cadr l) #:rest (caddr l) (cdddr l)))
+                   (apply assign-operation (car l) (cadr l) #:rest (caddr l) #:end? (cadddr l) (cddddr l)))
                  (set! tmp #f)]
                 [ignore? (void)]
                 [else
