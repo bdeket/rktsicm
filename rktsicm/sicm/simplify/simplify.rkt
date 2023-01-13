@@ -45,7 +45,10 @@
 (define *inhibit-expt-simplify* #t)
 
 (define (make-analyzer ->expression expression-> known-operators)
-  (let ((auxiliary-variable-table) (reverse-table) (uorder) (priority))
+  (let ((auxiliary-variable-table (make-parameter (make-hash)))
+        (reverse-table (make-parameter (make-weak-hasheq)))
+        (uorder (make-parameter '()))
+        (priority (make-parameter '())))
 
     ;; Default simplifier
     (define (simplify expr)
@@ -66,36 +69,36 @@
 
     ;; Set up new analysis
     (define (new-analysis)		
-      (set! auxiliary-variable-table (make-hash))
-      (set! reverse-table (make-weak-hasheq))
+      (auxiliary-variable-table (make-hash))
+      (reverse-table (make-weak-hasheq))
       #|
       (set! auxiliary-variable-table
 	    ((weak-hash-table/constructor equal-hash-mod equal? #t)))
       (set! reverse-table (make-eq-hash-table))
       |#
-      (set! uorder '())
-      (set! priority '())
+      (uorder '())
+      (priority '())
       'done)
 
 
     ;; Define ordering of variables
     (define (set-priority! . exprs)
-      (set! priority (map add-symbol! exprs))
-      priority)
+      (priority (map add-symbol! exprs))
+      (priority))
 
 
     ;; Get kernel table
     (define (get-auxiliary-variable-defs)
       (map (lambda (entry)
 	     (list (cdr entry) (car entry)))
-	   (hash-table->alist auxiliary-variable-table)))
+	   (hash-table->alist (auxiliary-variable-table))))
 
     ;; Implementation -----------------------
 
     (define (analyze expr)
       (let ((vars (sort (variables-in expr) variable<?)))
-	(set! uorder
-	      (append (map add-symbol! priority)
+	(uorder
+	      (append (map add-symbol! (priority))
 		      vars)))
       (ianalyze expr))
 
@@ -137,7 +140,7 @@
 	(lambda (expr)
 	  (cond ((pair? expr) (map lp expr))
 		((symbol? expr)
-		 (let ((v (hash-table/get reverse-table expr #f)))
+		 (let ((v (hash-table/get (reverse-table) expr #f)))
 		   (if v (lp v) expr)))
 		(else expr))))
       (lp expr))
@@ -153,22 +156,22 @@
 		as-seen
 		(let ((newvar
 		       (generate-uninterned-symbol "kernel")))
-		  (hash-table/put! auxiliary-variable-table expr newvar)
-		  (hash-table/put! reverse-table newvar expr)
+		  (hash-table/put! (auxiliary-variable-table) expr newvar)
+		  (hash-table/put! (reverse-table) newvar expr)
 		  newvar)))
 	  expr))
 
     (define (expression-seen expr)
-      (hash-table/get auxiliary-variable-table expr #f))
+      (hash-table/get (auxiliary-variable-table) expr #f))
 
 
     (define (vless? var1 var2)
-      (let ((in (memq var1 uorder)))
+      (let ((in (memq var1 (uorder))))
 	(cond (in
 	       (cond ((memq var2 in) true)
-		     ((memq var2 uorder) false)
+		     ((memq var2 (uorder)) false)
 		     (else true)))
-	      ((memq var2 uorder) false)
+	      ((memq var2 (uorder)) false)
 	      (else
 	       (variable<? var1 var2)))))
 
