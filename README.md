@@ -33,3 +33,7 @@ or `(require sicm)`
 racket libraries with a similar goal
 * [soegaard/racket-cas](https://github.com/soegaard/racket-cas)
 * [Metaxal/rascas](https://github.com/Metaxal/rascas)
+
+Other scheme implementations of scmutils
+* clojure: [sicmutils/sicmutils](https://github.com/sicmutils/sicmutils)
+* guile: [guile-scmutils](https://www.cs.rochester.edu/~gildea/guile-scmutils/)
