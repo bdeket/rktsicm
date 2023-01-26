@@ -45,21 +45,29 @@
   (define tree (operator-record-tree (get-operator-record operator)))
   `(,@(let lp ([args args]
                [tree tree])
+        (define branch (tree-branch tree))
         (cond
-         [(null? args) (list (list (tree-han tree)))]
-         [else
-          (apply
-           append
-           (for/list ([p&b (in-list (tree-branch tree))])
-             (define pred? (car p&b))
-             (define branch (cdr p&b))
-             (cond
-               [(and (tree-rst? branch) (andmap pred? args))
-                (list (list pred? '... (tree-han branch)))]
-               [(pred? (car args))
-                (map (λ (l) (cons pred? l)) (lp (cdr args) branch))]
-               [else '()])))]))
-    (any/c? ... ,(tree-han tree))))
+          [(null? branch)
+           (list (list '-> (tree-han tree)))]
+          [else
+           (apply
+            append
+            (for/list ([p&b (in-list branch)])
+              (define pred? (car p&b))
+              (define branch (cdr p&b))
+              (cond
+                [(null? args)
+                 `(,@(if (tree-rst? branch)
+                         (list (list pred? '... '-> (tree-han branch)))
+                         '())
+                   ,@(map (λ (l) (cons pred? l)) (lp args branch)))]
+                [(pred? (car args))
+                 `(,@(if (and (tree-rst? branch) (andmap pred? args))
+                         (list (list pred? '... '-> (tree-han branch)))
+                         '())
+                   ,@(map (λ (l) (cons pred? l)) (lp (cdr args) branch)))]
+                [else '()])))]))
+    (any/c? ... -> ,(tree-han tree))))
 
 ;***************************************************************************************************
 ;*                                                                                                 *
