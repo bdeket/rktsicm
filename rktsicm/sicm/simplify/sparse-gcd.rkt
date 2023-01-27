@@ -60,9 +60,9 @@
     (lambda (P Q win lose)
       (let ((n (length (sparse-exponents (car P))))
 	    (dPs (map (lambda (l) (apply max l))
-		      (list-transpose (map car P))))
+		      (list-transpose (map sparse-exponents P))))
 	    (dQs (map (lambda (l) (apply max l))
-		      (list-transpose (map car Q)))))
+		      (list-transpose (map sparse-exponents Q)))))
 	(let ((ds (map min dPs dQs)))
 	  ;; ds is the list of the maximum possible degree for each
 	  ;; variable in any possible gcd of P and Q.

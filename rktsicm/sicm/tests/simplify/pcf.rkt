@@ -34,12 +34,17 @@
     (define p4 (poly/mul (poly/expt p1 3) (poly/mul p2 p3)))
     (define p5 (poly/mul p1 (poly/expt p3 2)))
     (check-equal? (poly/gcd-euclid p4 p5)
-                  '(*dense* 1 5 8 10 5 2))
+                  (poly/make-from-dense 1 '(5 8 10 5 2)))
     (check-equal? (poly/mul p1 p3)
-                  '(*dense* 1 5 8 10 5 2))
+                  (poly/make-from-dense 1 '(5 8 10 5 2)))
     (define p6 (poly/mul (poly/expt p1 2) (poly/expt p3 2)))
     (check-equal? (poly/gcd-euclid p4 p6)
-                  '(*dense* 1 5 13 23 23 17 7 2)))
+                  (poly/make-from-dense 1 '(5 13 23 23 17 7 2))))
+   (test-case
+    "derivative-partial"
+    (let-values ([(P V) (pcf:expression-> '(+ (* x y z) (* x x z) (* y y)) values)])
+      (check-equal? (pcf:->expression (poly/derivative-partial P 2) V)
+                    '(+ (* z x) (* 2 y)))))
 ;;;(->expression
 ;;; (poly/derivative-partial
 ;;;  (->poly '(+ (* x y z) (* x x z) (* y y))

@@ -25,10 +25,9 @@
 ;;; work with the independent mechanism this way.
 
 
-(define (sparse-exponents term) (car term))
-(define (sparse-coefficient term) (cdr term))
-(define (sparse-term exponents coefficient)
-  (cons exponents coefficient))
+(define sparse-exponents fpf:exponents)
+(define sparse-coefficient fpf:coefficient)
+(define sparse-term fpf:make-term)
 
 (define (sparse-constant-term? term)
   (for-all? (sparse-exponents term) zero?))
