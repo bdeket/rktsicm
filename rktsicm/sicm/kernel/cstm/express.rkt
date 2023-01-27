@@ -24,11 +24,12 @@
 (define ((has-property? property-name) abstract-quantity)
   (cond
     [(pair? abstract-quantity)
-     (and (hash? abstract-quantity)
-          (hash-ref property-name (cdr abstract-quantity) #f))]
+     (if (hash? (cdr abstract-quantity))
+         (hash-ref (cdr abstract-quantity) property-name #f)
+         (error "Malformed abstract-quantity" abstract-quantity))]
     [(symbol? abstract-quantity)
      (if (eq? property-name 'expression)
-         (list 'expression abstract-quantity)
+         abstract-quantity
          (error "Symbols have only EXPRESSION properties"))]
     [else
      (error "Bad abstract quantity")]))

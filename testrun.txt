@@ -27,7 +27,7 @@ raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
-cpu time: 8484 real time: 8473 gc time: 171
+cpu time: 7578 real time: 7584 gc time: 230
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
@@ -52,9 +52,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 53156 real time: 53136 gc time: 651
-cpu time: 35016 real time: 35017 gc time: 138
-cpu time: 4875 real time: 4872 gc time: 0
+cpu time: 45891 real time: 45911 gc time: 561
+cpu time: 30234 real time: 30286 gc time: 217
+cpu time: 3813 real time: 3811 gc time: 15
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -106,7 +106,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 265 real time: 273 gc time: 0
+cpu time: 250 real time: 244 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -129,6 +129,9 @@ raco test: (submod ".\\sicm\\tests\\kernel\\diff.rkt" test)
 0
 raco test: (submod ".\\sicm\\tests\\kernel\\diffbug\\derivative-test.rkt" test)
 32 success(es) 0 failure(s) 0 error(s) 32 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\kernel\\express.rkt" test)
+1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\kernel\\extapply.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
@@ -286,22 +289,22 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2656 real time: 2649 gc time: 110
-cpu time: 16625 real time: 16628 gc time: 485
-cpu time: 2844 real time: 2839 gc time: 124
-cpu time: 219 real time: 224 gc time: 31
-cpu time: 62 real time: 51 gc time: 0
-cpu time: 11875 real time: 11883 gc time: 374
+cpu time: 2578 real time: 2574 gc time: 218
+cpu time: 16265 real time: 16264 gc time: 468
+cpu time: 2688 real time: 2685 gc time: 96
+cpu time: 203 real time: 212 gc time: 31
+cpu time: 62 real time: 49 gc time: 0
+cpu time: 10422 real time: 10428 gc time: 266
 cpu time: 0 real time: 3 gc time: 0
-cpu time: 47 real time: 32 gc time: 0
-cpu time: 101828 real time: 101836 gc time: 2436
+cpu time: 32 real time: 28 gc time: 0
+cpu time: 101765 real time: 101873 gc time: 2162
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
 8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\pcf.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\rz-test-cases.rkt" test)
 7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
@@ -325,10 +328,11 @@ raco test: (submod ".\\sicm\\tests\\solve\\solve-utils.rkt" test)
 23 success(es) 0 failure(s) 0 error(s) 23 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x901) (* -1 x902)) (eq:0) (x902 x901)) ((+ -7 (* 3 x901) x902) (eq:1) (x902 x901)))
-'(((+ -5 (* 3 x909) (* -1 x910)) (eq:0) (x910 x909)) ((+ k911 (* 3 x909) x910) (eq:1) (x910 x909 k911)))
+'(((+ -5 (* 3 x451) (* -1 x452)) (eq:0) (x452 x451)) ((+ -7 (* 3 x451) x452) (eq:1) (x452 x451)))
+'(((+ -5 (* 3 x459) (* -1 x460)) (eq:0) (x460 x459)) ((+ k461 (* 3 x459) x460) (eq:1) (x460 x459 k461)))
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-2/568 test failures
-34.7
+2/570 test failures
+runtime: 32.65m 
+Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz    6-cores  2592MHz 
