@@ -37,8 +37,8 @@
   (syntax-case stx ()
     [(_ (id . margs) body ...)
      (if (list? (syntax-e #'id))
-         (syntax/loc stx (mydefine id (mylambda margs body ...)))
-         (syntax/loc stx (define id (mylambda margs body ...))))]
+         (quasisyntax/loc stx (mydefine id #,(quasisyntax/loc stx (mylambda margs body ...))))
+         (quasisyntax/loc stx (define id #,(quasisyntax/loc stx (mylambda margs body ...)))))]
     [(_ id expr)
      (syntax/loc stx (define id expr))]
     [(_ id)

@@ -166,40 +166,40 @@
        #`(cond
            [(equal? a *exactly-zero*)
             #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))])
-                #`(λ (x ...) #,(O #'(x ...))))]
+                (quasisyntax/loc #'o (λ (x ...) #,(O #'(x ...)))))]
            [(equal? a *exactly-one*)
             #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
-                #`(λ (x ...) #,(O #'(x ...))))]
+                (quasisyntax/loc #'o (λ (x ...) #,(O #'(x ...)))))]
            [(equal? a *exactly-two*)
             #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))])
-                #`(λ (x ...) #,(O #'(x ...))))]
+                (quasisyntax/loc #'o (λ (x ...) #,(O #'(x ...)))))]
            [(equal? a *exactly-three*)
             #,(with-syntax ([(x ...) (build-list 3 (λ (i) (format-id #f "x~a" i)))])
-                #`(λ (x ...) #,(O #'(x ...))))]
+                (quasisyntax/loc #'o (λ (x ...) #,(O #'(x ...)))))]
            [(equal? a *at-least-three*)
             #,(with-syntax ([(x ...) (build-list 3 (λ (i) (format-id #f "x~a" i)))]
                             [y       (format-id #f "y")])
-                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+                (quasisyntax/loc #'r (λ (x ... . y) #,(R #'(x ...) #'y))))]
            [(equal? a *at-least-two*)
             #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))]
                             [y       (format-id #f "y")])
-                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+                (quasisyntax/loc #'r (λ (x ... . y) #,(R #'(x ...) #'y))))]
            [(equal? a *at-least-one*)
             #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))]
                             [y       (format-id #f "y")])
-                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+                (quasisyntax/loc #'r (λ (x ... . y) #,(R #'(x ...) #'y))))]
            [(equal? a *at-least-zero*)
             #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))]
                             [y       (format-id #f "y")])
-                #`(λ (x ... . y) #,(R #'(x ...) #'y)))]
+                (quasisyntax/loc #'r (λ (x ... . y) #,(R #'(x ...) #'y))))]
            [(equal? a *one-or-two*)
             (case-lambda #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
-                             #`[(x ...) #,(O #'(x ...))])
+                             (quasisyntax/loc #'o [(x ...) #,(O #'(x ...))]))
                          #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))])
-                             #`[(x ...) #,(O #'(x ...))]))]
+                             (quasisyntax/loc #'o [(x ...) #,(O #'(x ...))])))]
            [else
             ;(println (list 'falback 'make-plain-procedure-stx #,arity '#,name))
-            (make-plain-procedure-stx n oo rr a)]))]))
+            #,(quasisyntax/loc stx (make-plain-procedure-stx n oo rr a))]))]))
 
 
 #;
