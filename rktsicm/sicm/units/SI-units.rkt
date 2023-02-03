@@ -8,6 +8,7 @@
          "../kernel-gnrc.rkt" ;using generic + - * etc...
          )
 (void 'INSTALL-GENERICS
+      (kernel:assign-operations #t)
       (units:assign-operations #t)
       (with-units:assign-operations #t))
 

@@ -35,7 +35,7 @@
          "kernel/genenv.rkt")
 (define-namespace-anchor anker)
 (void 'INSTALL-GENERICS-&-SETUP-ENVIRONMENT
-      (kernel:assign-operations)
+      (kernel:assign-operations #t)
       (extend-environment scmutils-base-environment (namespace-anchor->namespace anker))
       (namespace-undefine-variable! 'anker scmutils-base-environment)
       (namespace-undefine-variable! 'provide-except-renamed-out scmutils-base-environment)
