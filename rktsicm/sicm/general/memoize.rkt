@@ -458,16 +458,20 @@
       (set! hits 0)
       (set! misses 0))
 
-    (define (the-memoized-procedure . args)
-      (let ((seen ((memory 'fetch) args)))
-        (if (not-found? seen)
-            (let ((val (apply procedure args)))
-              (store! val args)
-              (set! misses (+ misses 1))
-              val)
-            (begin
-              (set! hits (+ hits 1))
-              seen))))
+    (define the-memoized-procedure
+      (procedure-rename
+       (λ args
+         (let ((seen ((memory 'fetch) args)))
+           (if (not-found? seen)
+               (let ((val (apply procedure args)))
+                 (store! val args)
+                 (set! misses (+ misses 1))
+                 val)
+               (begin
+                 (set! hits (+ hits 1))
+                 seen))))
+       (string->symbol (let ([x (object-name procedure)])
+                         (if x (format "mem:~a" x) 'the-memoized-procedure)))))
 
     (define (me m)
       (case m

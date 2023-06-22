@@ -620,8 +620,9 @@
 	    (newline)
 	    (pe `(,alpha ,beta ,gamma ,delta))
 	    (pe (((Riemann
-		   (Christoffel->Cartan
-		    (orthonormal-spherical-Lorentz-second-connection 'c^2)))
+                   (covariant-derivative
+		    (Christoffel->Cartan
+		     (orthonormal-spherical-Lorentz-second-connection 'c^2))))
 		  alpha beta gamma delta)
 		 spherical-Lorentz-point)))
 	  (list d/dt d/dr d/dtheta d/dphi)))

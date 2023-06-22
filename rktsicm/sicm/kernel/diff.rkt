@@ -514,6 +514,7 @@
 (define diff:cosh
   (diff:unary-op g:cosh g:sinh))
 
+
 ;;; Improved by suggestion from Sam Ritchie on 4Jan2020.
 
 (define (diff:abs x)

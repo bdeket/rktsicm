@@ -1,6 +1,6 @@
 ## rktSICM
 
-a racket port of scmutils (v 20220515 as found [here](http://groups.csail.mit.edu/mac/users/gjs/6946/linux-install.htm))
+a racket port of scmutils (v 20230125 as found [here](http://groups.csail.mit.edu/mac/users/gjs/6946/linux-install.htm))
 
 Original documentation: [&lt;as text&gt;](http://groups.csail.mit.edu/mac/users/gjs/6946/refman.txt) or [&lt;as pdf&gt;](http://groups.csail.mit.edu/mac/users/gjs/6946/refman.pdf)
 

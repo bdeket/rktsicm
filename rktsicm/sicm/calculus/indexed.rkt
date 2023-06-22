@@ -43,7 +43,7 @@
 	(vector-basis (basis->vector-basis basis))
 	(1form-basis (basis->1form-basis basis)))
     (assert (and arg-types
-		 (every  (lambda (arg-type)
+		 (every (lambda (arg-type)
 			  (or (eq? arg-type 1form-field?)
 			      (eq? arg-type vector-field?)))
 			arg-types)

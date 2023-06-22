@@ -90,6 +90,7 @@
 ;;; To get started... Type expressions are self-evaluating
 
 (define Real 'Real)
+(define Complex 'Complex)
 
 (define (X . types)
   (cond ((null? types) (error "Null type argument -- X"))
@@ -312,6 +313,7 @@
 	   ((->) function?)
 	   (else (error "Unknown type combinator" type-expression))))
 	((eq? type-expression Real) numerical-quantity?)
+        ((eq? type-expression Complex) numerical-quantity?)
 	((eq? type-expression Any) any?)
 	(else (error "Unknown primitive type" type-expression))))
 
@@ -337,8 +339,8 @@
 		  ((->) *function*)
 		  (else
 		   (error "Unknown type combinator" type-expression))))
-	       ((eq? type-expression Real)
-		*number*)
+	       ((eq? type-expression Real) *number*)
+               ((eq? type-expression Complex) *number*)
 	       (else
 		(error "Unknown primitive type" type-expression)))))
     (abstract-type-tag type)))
@@ -397,6 +399,7 @@
   (let ((arity (type->arity descriptor))
 	(range-type (type->range-type descriptor)))
     (cond ((or (eq? Real range-type)
+               (eq? Complex range-type)
 	       (eq? '*function* (type-expression->type-tag range-type)))
 	   (litfun fexp arity range-type (type->domain-types descriptor)
 		   `(literal-function ',fexp ,descriptor)))

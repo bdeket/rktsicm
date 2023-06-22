@@ -298,6 +298,60 @@
                (ref foo 3 3 1)
                '(/ -1 r))
 
+              (define (orthonormal-spherical-Lorentz-second-connection c^2)
+                (make-Christoffel
+                 (let ((zero (lambda (point) 0)))
+                   (down
+                    (down (up zero zero zero zero)
+                          (up zero zero zero zero)
+                          (up zero zero zero zero)
+                          (up zero zero zero zero))
+                    (down (up zero zero zero zero)
+                          (up zero zero zero zero)
+                          (up zero zero zero zero)
+                          (up zero zero zero zero))
+                    (down (up zero zero zero zero)
+                          (up zero zero (/ 1 r) zero)
+                          (up zero (/ -1 r) zero zero)
+                          (up zero zero zero zero))
+                    (down (up zero zero zero zero)
+                          (up zero zero zero (/ 1 r))
+                          (up zero zero zero (/ (cos theta) (* r (sin theta))))
+                          (up zero
+                              (/ -1 r)
+                              (/ (* -1 (cos theta)) (* r (sin theta)))
+                              zero))))
+                 (orthonormal-spherical-Lorentz-basis c^2)))
+
+              ;;; Look at curvature
+              ;; TODO: works, but slow (original is also slow but at least 2× faster)
+              (check-simplified?
+               (accumulate acc
+                           (for-each
+                            (lambda (alpha)
+                              (for-each
+                               (lambda (beta)
+                                 (for-each
+                                  (lambda (gamma)
+                                    (for-each
+                                     (lambda (delta)
+                                       ;(newline)
+                                       ;(pe `(,alpha ,beta ,gamma ,delta))
+                                       (acc
+                                        (simplify
+                                         (((Riemann
+                                            (covariant-derivative
+                                             (Christoffel->Cartan
+                                              (orthonormal-spherical-Lorentz-second-connection 'c^2))))
+                                           alpha beta gamma delta)
+                                          spherical-Lorentz-point))))
+                                     (list d/dt d/dr d/dtheta d/dphi)))
+                                  (list d/dt d/dr d/dtheta d/dphi)))
+                               (list d/dt d/dr d/dtheta d/dphi)))
+                            (list dt dr dtheta dphi)))
+               ;;; 256 zeros
+               (build-list 256 (λ _ 0))
+               #:timeout 3)
               )
 
    ))

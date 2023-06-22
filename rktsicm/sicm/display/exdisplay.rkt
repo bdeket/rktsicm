@@ -3,10 +3,9 @@
 (provide (all-defined-out))
 
 (require racket/system
-         (only-in racket/math exact-floor)
          racket/port
+         (only-in "../rkt/glue.rkt" floor->exact undefined-value)
          "../kernel-intr.rkt"
-         "../rkt/undefined.rkt"
          "../general/list-utils.rkt"
          )
 
@@ -348,7 +347,7 @@
 
 (define (pad-box-centered-to-width width box)
   (let* ((extra (- width (box-width box)))
-	 (extra-left (exact-floor (/ extra 2)))
+	 (extra-left (floor->exact (/ extra 2)))
 	 (extra-right (- extra extra-left))
 	 (pad-left (make-blank-line-elts extra-left))
 	 (pad-right (make-blank-line-elts extra-right)))
@@ -370,7 +369,7 @@
 
 (define (pad-box-centered-to-height height box)
   (let* ((extra (- height (box-nlines box)))
-	 (extra-top (exact-floor (/ extra 2)))
+	 (extra-top (floor->exact (/ extra 2)))
 	 (extra-bottom (- extra extra-top))
 	 (width (box-width box)))
     (let ((padded-box
@@ -460,6 +459,7 @@
 ;;;                                      exponent of exponentiation 100
 ;;;                                      term in sum 100
 ;;; negation                   99
+;;; equality                   90
 
 (define max-bp 200)
 
@@ -516,6 +516,10 @@
 			    (if (null? (cdr args))
 				""
 				(glue-horiz (interpolate ", " (cdr args)))))))))
+
+(define (unparse-equality uptable args)
+  (let ((args (map (lambda (a) (insure-bp uptable 100 a)) args)))
+    (make-box-with-bp 100 (glue-horiz (interpolate " = " args)))))
 
 (define (unparse-sum uptable args)
   (let ((args (map (lambda (a) (insure-bp uptable 100 a)) args)))
@@ -849,7 +853,7 @@
 				(make-list (box-nlines all-elts) "]"))))))
     ;;center matrix vertically
     (shift-top-to
-     (exact-floor (/ (box-nlines with-brackets) 2))
+     (floor->exact (/ (box-nlines with-brackets) 2))
      with-brackets)))
 	 
 (define (tex:unparse-matrix uptable matrix-list)
@@ -916,6 +920,7 @@
 (define 2d:unparse-table
   `((parenthesize ,2d:parenthesize)
     (default ,unparse-default)
+    (= ,unparse-equality)
     (+ ,unparse-sum)
     ;;need sum (in addition to +) as an internal hook for 
     ;;process-sum
@@ -952,6 +957,7 @@
 (define tex:unparse-table
   `((parenthesize ,tex:parenthesize)
     (default ,unparse-default)
+    (= ,unparse-equality)
     (+ ,unparse-sum)
     ;;need sum (in addition to +) as an internal hook for 
     ;;process-sum

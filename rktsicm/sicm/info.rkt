@@ -1,7 +1,6 @@
 #lang info
 
 (define collection "sicm")
-(define deps '("base"))
 
 (define compile-omit-paths '("tests"))
 (define test-omit-paths '(#rx"sicm[/|\\\\]calculus"

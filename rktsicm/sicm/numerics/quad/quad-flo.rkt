@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../../rkt/flonum.rkt"
+(require (only-in "../../rkt/glue.rkt" write-line
+                  flo:+ flo:- flo:* flo:/ flo:abs)
          "../../kernel-intr.rkt"
          )
 
@@ -244,7 +245,7 @@
 
 (define (compute-quad:pi)
   (let lp ((guess (->quad pi)))
-    (println guess)
+    (write-line guess)
     (let ((new-guess (quad:+ guess (quad:sin guess))))
       (if (< (abs (quad:high (quad:- new-guess guess))) *quad-epsilon*)
 	  new-guess

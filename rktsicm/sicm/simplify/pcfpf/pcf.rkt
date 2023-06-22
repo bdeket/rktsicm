@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require (only-in "../../rkt/glue.rkt" if define-integrable false list-head
-                  make-initialized-vector make-initialized-list
+                  make-initialized-vector make-initialized-list error:wrong-type-argument
                   fix:< fix:= fix:> fix:+ fix:- fix:zero? fix:>= fix:fixnum?
                   int:zero? int:quotient int:-)
          (only-in "../../rkt/todo.rkt" pp)
@@ -963,7 +963,11 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 			  (np (+ (* z^n p) (poly/leading-coefficient a)))
 			  (nq (+ (* z^n q) (* 2 (* z p))))
 			  (nr (+ (* z^n r) (* 2 z q) p))
-			  (ne (+ (* az^n (+ e p)) (magnitude np))))
+			  (ne
+                           (+ (* az^n
+                                 (+ e
+                                    (magnitude p)))
+                              (magnitude np))))
 		     (finish np nq nr ne)))
 		  (else
 		   (let* ((z^n-2 (expt z (fix:- n 2)))
@@ -977,7 +981,10 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 			  (nr (+ (* z^n r)
 				 (* n z^n-1 q)
 				 (* 1/2 n (fix:- n 1) z^n-2 p)))
-			  (ne (+ (* az^n (+ e (* (fix:- n 1) p)))
+			  (ne (+ (* az^n
+                                    (+ e
+                                       (* (fix:- n 1)
+                                          (magnitude p))))
 				 (magnitude np))))
 		     (finish np nq nr ne)))))))))
 
@@ -1209,7 +1216,8 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 
 (define (poly/sparse/coefficient p d)
   (if (not (and (fix:fixnum? d) (fix:>= d 0)))
-      (raise-argument-error 'POLY/SPARSE/COEFFICIENT "nonnegative fixnum" d))
+      (error:wrong-type-argument d "nonnegative fixnum"
+                                 'POLY/SPARSE/COEFFICIENT))
   (let lp ((terms p))
     (cond ((null? terms) base/zero)
 	  ((fix:= (caar terms) d) (cdar terms))
@@ -1278,7 +1286,8 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 
 (define (poly/dense/coefficient p d)
   (if (not (and (fix:fixnum? d) (fix:>= d 0)))
-      (raise-argument-error 'POLY/DENSE/COEFFICIENT "nonnegative fixnum" d))
+      (error:wrong-type-argument d "nonnegative fixnum"
+                                 'POLY/DENSE/COEFFICIENT))
   (list-ref p (fix:- (fix:- (length p) 1) d)))
 
 (define (poly/dense/principal-reverse p)
