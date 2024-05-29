@@ -5,8 +5,6 @@
 (require (only-in "../rkt/glue.rkt" hash-table/get hash-table/put! delq)
          "list-utils.rkt")
 
-;;bdk;; start original file
-
 (define (assoc-del itm lst [is-equal? equal?])
   (let loop ([lst lst])
     (cond
@@ -39,9 +37,11 @@
   (if done lst+
       (cons set lst)))
 (define (assq-set lst itm val) (assoc-set lst itm val eq?))
+;;bdk;; start original file
 
-;;;; Traditional LISP property lists
+;;;;     Traditional LISP property lists
 ;;; extended to work on any kind of eq? data structure.
+
 
 ;;; Property lists are a way of creating data that looks
 ;;; like a record structure without commiting to the fields

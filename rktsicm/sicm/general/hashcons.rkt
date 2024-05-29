@@ -23,21 +23,23 @@
 ;;; returns the same pair it returned the first
 ;;; time.
 
+
 ;;; HashCONS needs a fancy key-ephemeral hash table!
 
-#;
+#;#;#;#;
 (define (pair-eqv? u v)
   (and (eqv? (car u) (car v))
        (eqv? (cdr u) (cdr v))))
 
-#;
 (define (pair-eqv-hash-mod key modulus)
   (fix:remainder
    (fix:xor (eqv-hash-mod (car key) modulus)
             (eqv-hash-mod (cdr key) modulus))
    modulus))
 
-#;
+
+;;; Now we can make the table.
+
 (define the-cons-table
   ((hash-table-constructor
     (make-hash-table-type
@@ -47,7 +49,6 @@
      hash-table-entry-type:key-ephemeral ;entry-type
      ))))
 
-#;
 (define cons-unique
     (let* ((cons                    ;the REAL cons
           (access cons system-global-environment))

@@ -13,14 +13,6 @@
          "../rkt/define.rkt"
          racket/list)
 
-;;bdk;; start original file
-
-;;;; List utilities
-
-
-(define (variable<? x y)
-  (symbol<? x y))
-
 #; ;;bdk;; this changes order, I don't thrust this: (* A B C) <> (* C (* B A)) for matrices...
 (define (reduce fct in lst)
   (cond
@@ -54,38 +46,6 @@
 ;(reduce-right list '() '(1 2 3 4)) => (1 (2 (3 4)))
 
 (define (sublist lst start end) (take (drop lst start) (- end start)))
-
-;;; Ok to pass it an improper list
-(define (safe-map f pairs)
-  (cond ((null? pairs) '())
-	((pair? pairs)
-	 (cons (f (car pairs))
-	       (safe-map f (cdr pairs))))
-	(else (f pairs))))
-
-(define (count-elements p? l)
-  (let loop ((count 0) (l l))
-    (cond ((null? l) count)
-          ((p? (car l)) (loop (fix:+ count 1) (cdr l)))
-          (else (loop count (cdr l))))))
-
-(define (find-first pred lst)
-  (cond ((null? lst) #f)
-	((pred (car lst)) (car lst))
-	(else (find-first pred (cdr lst)))))
-
-(define (countsymbols exp)
-  (cond ((pair? exp)
-	 (fix:+ (countsymbols (car exp))
-		(countsymbols (cdr exp))))
-	((symbol? exp) 1)
-	(else 0)))
-
-(define (butlast l)
-  (if (null? (cdr l)) 
-      '()
-      (cons (car l)
-            (butlast (cdr l)))))
 
 (define (last-pair lst)
   (if (and (pair? lst) (pair? (cdr lst)))
@@ -141,6 +101,46 @@
 
 (define (lset-intersection comp? s1 s2)
   (remove* (remove* s2 s1 comp?) s1 comp?))
+
+;;bdk;; start original file
+
+;;;; List utilities
+
+
+(define (variable<? x y)
+  (symbol<? x y))
+
+;;; Ok to pass it an improper list
+(define (safe-map f pairs)
+  (cond ((null? pairs) '())
+	((pair? pairs)
+	 (cons (f (car pairs))
+	       (safe-map f (cdr pairs))))
+	(else (f pairs))))
+
+(define (count-elements p? l)
+  (let loop ((count 0) (l l))
+    (cond ((null? l) count)
+          ((p? (car l)) (loop (fix:+ count 1) (cdr l)))
+          (else (loop count (cdr l))))))
+
+(define (find-first pred lst)
+  (cond ((null? lst) #f)
+	((pred (car lst)) (car lst))
+	(else (find-first pred (cdr lst)))))
+
+(define (countsymbols exp)
+  (cond ((pair? exp)
+	 (fix:+ (countsymbols (car exp))
+		(countsymbols (cdr exp))))
+	((symbol? exp) 1)
+	(else 0)))
+
+(define (butlast l)
+  (if (null? (cdr l)) 
+      '()
+      (cons (car l)
+            (butlast (cdr l)))))
 
 (define (last l)
   (car (last-pair l)))

@@ -262,7 +262,7 @@
                 #:when (if (file-exists? s1) #t
                            (begin
                              (when (member RKT-START (file->lines d) string=?)
-                               (error "Could not find scm file for file with startline:" d))
+                               (error (format "Could not find scm file for file with startline:\n  rkt: ~a\n  scm: ~a" d s1)))
                              (displayln (format "could not find: ~a" s1)) #f))
                 [ds (in-value (make-diff (->scm-lines s1) (->rkt-lines s0)))]
                 #:unless (null? ds))
@@ -271,7 +271,7 @@
       )
     ;(sort _ < #:key car)
     (map (λ (x)
-           (displayln (format "~a difference(s) found in ~a" (car x) (cdr x)))
+           (displayln (format "~a difference(s) found in ~a" (~r (car x) #:min-width 2) (regexp-replace* #px"\\\\" (cdr x) "/")))
            #;(scm-show-diff (cdr x)))
          _)
     (void))

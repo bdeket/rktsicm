@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require "../rkt/glue.rkt"
+(require (except-in "../rkt/glue.rkt" default-object?)
+         (only-in "../rkt/define.rkt" define default-object?)
          "weak.rkt"
          "eq-properties.rkt"
          )
@@ -16,6 +17,7 @@
 
 ;;;; Memoizers
 
+
 ;;; A weak alist of memoized functions.
 
 (define *memoizers* '())
@@ -27,11 +29,10 @@
 
 ;(add-gc-daemon! memoizer-gc-daemon)
 
-
 ;;;(define *auditing-memoizers* #f)
 (define *auditing-memoizers* #t)
 
-#;
+#;#;
 (define (show-memoizer-statistics)
   (for-each (lambda (m)
               (let ((f (weak-car m)) (s ((cadr (weak-cdr m)))))
@@ -43,7 +44,6 @@
             *memoizers*)
   'done)
 
-#;
 (define (function-expression f memo-f)
   (or (object-name memo-f
                    generic-environment
@@ -61,12 +61,10 @@
             *memoizers*)
   'done)
 
-
 ;;; Single-argument linear memoizer.  Can use weak alists for
 ;;; single-argument keys.
 
-
-(define (linear-memoize-1arg f [max-table-size default-object] [finder default-object])
+(define (linear-memoize-1arg f #:optional max-table-size finder)
   (let ((max-table-size			;set to 0 for no limit
 	 (if (default-object? max-table-size)
 	     12
@@ -109,7 +107,7 @@
 ;;; the alist structure here.  However, we can use weak lists as
 ;;; arglists.
 
-(define (linear-memoize f [max-table-size default-object][finder default-object])
+(define (linear-memoize f #:optional max-table-size finder)
   (let ((max-table-size			;set to 0 for no limit
 	 (if (default-object? max-table-size)
 	     12
@@ -187,9 +185,7 @@
 ;;; Single argument hash memoizer.  Can use weak table here.
 
 (define (hash-memoize-1arg f)
-  (let ((table undefined-value)
-        (memo-hits undefined-value)
-        (memo-misses undefined-value))
+  (let ((table) (memo-hits) (memo-misses))
     (let ((info
            (lambda ()
              (list memo-hits memo-misses table)))
@@ -216,14 +212,11 @@
                   *memoizers*))
       memo-f)))
 
-
 ;;; A general hash memoizer for functions.  In this case the arg lists
 ;;; are ALWAYS unprotected, so we cannot use a weak table here.
 
 (define (hash-memoize f)
-  (let ((table undefined-value)
-        (memo-hits undefined-value)
-        (memo-misses undefined-value))
+  (let ((table) (memo-hits) (memo-misses))
     (let ((info
            (lambda ()
              (list memo-hits memo-misses table)))
@@ -251,11 +244,10 @@
       memo-f)))
 
 
-
 ;;; To install and remove memoizers on named procedures
 
-#;
-(define (memoize-procedure! name [memo-type default-object] [environment default-object])
+#;#;
+(define (memoize-procedure! name #:optional memo-type environment)
   (assert (symbol? name))
   (if (default-object? environment)
       (set! environment (nearest-repl/environment))
@@ -273,7 +265,7 @@
     (let ((arity (procedure-arity proc)))
       (let ((memoized-procedure
              (cond ((equal? arity '(0 . 0))
-                    (let ((ran? #f) (value undefined-value))
+                    (let ((ran? #f) (value))
                       (lambda ()
                         (if ran?
                             value
@@ -304,8 +296,7 @@
                              memoized-procedure)
         'done))))
 
-#;
-(define (unmemoize-procedure! name [environment default-object])
+(define (unmemoize-procedure! name #:optional environment)
   (assert (symbol? name))
   (if (default-object? environment)
       (set! environment (nearest-repl/environment))
@@ -440,12 +431,8 @@
 ;;   me)
 
 (define (memoize-multi-arg-eq procedure)
-  (let* ((memory undefined-value)
-         (lookup undefined-value)
-         (not-found? undefined-value)
-         (store! undefined-value)
-         (hits undefined-value)
-         (misses undefined-value))
+  (let* ((memory) (lookup) (not-found?) (store!)
+         (hits) (misses))
 
     (define (info)
       (list hits misses memory))

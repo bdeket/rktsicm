@@ -14,94 +14,94 @@ could not find: ../../racket/test/sicm/scmutils-20230125/numerics\signals\cph-ds
 could not find: ../../racket/test/sicm/scmutils-20230125/numerics\signals.scm
 could not find: ../../racket/test/sicm/scmutils-20230125/numerics\statistics.scm
 could not find: ../../racket/test/sicm/scmutils-20230125/poly\domain.scm
-1 difference(s) found in calculus\SR-frames
-3 difference(s) found in calculus\coord
-1 difference(s) found in calculus\dgutils
-1 difference(s) found in calculus\exterior-derivative
-2 difference(s) found in calculus\form-fields
-3 difference(s) found in calculus\indexed
-20 difference(s) found in calculus\manifold
-2 difference(s) found in calculus\so3
-1 difference(s) found in calculus\tensors
-1 difference(s) found in calculus\vector-fields
-5 difference(s) found in calculus\wedge
-12 difference(s) found in display\exdisplay
-7 difference(s) found in display\print
-8 difference(s) found in display\suppress-args
-7 difference(s) found in general\eq-properties
-10 difference(s) found in general\gjs-cselim
-6 difference(s) found in general\hashcons
-4 difference(s) found in general\list-utils
-4 difference(s) found in general\logic-utils
-21 difference(s) found in general\memoize
-1 difference(s) found in general\permute
-2 difference(s) found in general\resource-limit
-5 difference(s) found in general\stack-queue
-7 difference(s) found in general\table
-3 difference(s) found in general\weak
-1 difference(s) found in kernel\diff
-11 difference(s) found in kernel\express
-7 difference(s) found in kernel\extapply
-3 difference(s) found in kernel\function
-3 difference(s) found in kernel\genenv
-46 difference(s) found in kernel\generic
-11 difference(s) found in kernel\ghelper-class
-19 difference(s) found in kernel\ghelper-pro
-2 difference(s) found in kernel\iterat
-8 difference(s) found in kernel\litfun
-2 difference(s) found in kernel\mathutil
-1 difference(s) found in kernel\matrices
-5 difference(s) found in kernel\numbers
-3 difference(s) found in kernel\numeric
-3 difference(s) found in kernel\numsymb
-1 difference(s) found in kernel\operator
-5 difference(s) found in kernel\strutl
-3 difference(s) found in kernel\types
-13 difference(s) found in kernel\utils
-1 difference(s) found in mechanics\Hamiltonian
-1 difference(s) found in mechanics\Noether
-1 difference(s) found in mechanics\qualitative
-2 difference(s) found in numerics\linear\gauss-jordan
-1 difference(s) found in numerics\linear\lu
-4 difference(s) found in numerics\linear\singular
-1 difference(s) found in numerics\ode\advance
-18 difference(s) found in numerics\ode\bulirsch-stoer
-1 difference(s) found in numerics\ode\gear
-1 difference(s) found in numerics\ode\interface
-1 difference(s) found in numerics\ode\ode-advancer
-1 difference(s) found in numerics\optimize\unimin
-1 difference(s) found in numerics\quad\quad-flo
-1 difference(s) found in numerics\quadrature\defint
-3 difference(s) found in numerics\quadrature\quadrature
-1 difference(s) found in numerics\quadrature\rational
-1 difference(s) found in numerics\roots\bisect
-1 difference(s) found in numerics\signals\cph-dsp\fft
-1 difference(s) found in numerics\signals\cph-dsp\flovec
-1 difference(s) found in numerics\signals\cph-dsp\mathutil
-2 difference(s) found in numerics\signals\cph-dsp\white
-2 difference(s) found in numerics\signals\fft
-2 difference(s) found in numerics\signals\fourier
-2 difference(s) found in numerics\signals\sigfun
-1 difference(s) found in numerics\statistics\gauss
-4 difference(s) found in poly\interp-generic
-1 difference(s) found in poly\polyinterp
-1 difference(s) found in poly\polyroot
-2 difference(s) found in simplify\default
-1 difference(s) found in simplify\fpf
-3 difference(s) found in simplify\matcher
-1 difference(s) found in simplify\pcf-fpf
-2 difference(s) found in simplify\pcf
-2 difference(s) found in simplify\rcf
-1 difference(s) found in simplify\rules
-14 difference(s) found in simplify\simplify
-4 difference(s) found in simplify\sparse-gcd
-1 difference(s) found in simplify\sparse-interpolate
-1 difference(s) found in simplify\sparse
-1 difference(s) found in simplify\split-poly
-2 difference(s) found in simplify\symbenv
-1 difference(s) found in simplify\syntax
-9 difference(s) found in solve\solve-utils
-7 difference(s) found in solve\solve
-3 difference(s) found in units\SI-units
-13 difference(s) found in units\system
-2 difference(s) found in units\with-units
+ 1 difference(s) found in calculus/SR-frames
+ 3 difference(s) found in calculus/coord
+ 1 difference(s) found in calculus/dgutils
+ 1 difference(s) found in calculus/exterior-derivative
+ 2 difference(s) found in calculus/form-fields
+ 3 difference(s) found in calculus/indexed
+20 difference(s) found in calculus/manifold
+ 2 difference(s) found in calculus/so3
+ 1 difference(s) found in calculus/tensors
+ 1 difference(s) found in calculus/vector-fields
+ 5 difference(s) found in calculus/wedge
+12 difference(s) found in display/exdisplay
+ 7 difference(s) found in display/print
+ 8 difference(s) found in display/suppress-args
+ 4 difference(s) found in general/eq-properties
+10 difference(s) found in general/gjs-cselim
+ 2 difference(s) found in general/hashcons
+ 2 difference(s) found in general/list-utils
+ 4 difference(s) found in general/logic-utils
+ 8 difference(s) found in general/memoize
+ 1 difference(s) found in general/permute
+ 2 difference(s) found in general/resource-limit
+ 5 difference(s) found in general/stack-queue
+ 7 difference(s) found in general/table
+ 3 difference(s) found in general/weak
+ 1 difference(s) found in kernel/diff
+11 difference(s) found in kernel/express
+ 7 difference(s) found in kernel/extapply
+ 3 difference(s) found in kernel/function
+ 3 difference(s) found in kernel/genenv
+46 difference(s) found in kernel/generic
+11 difference(s) found in kernel/ghelper-class
+19 difference(s) found in kernel/ghelper-pro
+ 2 difference(s) found in kernel/iterat
+ 8 difference(s) found in kernel/litfun
+ 2 difference(s) found in kernel/mathutil
+ 1 difference(s) found in kernel/matrices
+ 5 difference(s) found in kernel/numbers
+ 3 difference(s) found in kernel/numeric
+ 3 difference(s) found in kernel/numsymb
+ 1 difference(s) found in kernel/operator
+ 5 difference(s) found in kernel/strutl
+ 3 difference(s) found in kernel/types
+13 difference(s) found in kernel/utils
+ 1 difference(s) found in mechanics/Hamiltonian
+ 1 difference(s) found in mechanics/Noether
+ 1 difference(s) found in mechanics/qualitative
+ 2 difference(s) found in numerics/linear/gauss-jordan
+ 1 difference(s) found in numerics/linear/lu
+ 4 difference(s) found in numerics/linear/singular
+ 1 difference(s) found in numerics/ode/advance
+18 difference(s) found in numerics/ode/bulirsch-stoer
+ 1 difference(s) found in numerics/ode/gear
+ 1 difference(s) found in numerics/ode/interface
+ 1 difference(s) found in numerics/ode/ode-advancer
+ 1 difference(s) found in numerics/optimize/unimin
+ 1 difference(s) found in numerics/quad/quad-flo
+ 1 difference(s) found in numerics/quadrature/defint
+ 3 difference(s) found in numerics/quadrature/quadrature
+ 1 difference(s) found in numerics/quadrature/rational
+ 1 difference(s) found in numerics/roots/bisect
+ 1 difference(s) found in numerics/signals/cph-dsp/fft
+ 1 difference(s) found in numerics/signals/cph-dsp/flovec
+ 1 difference(s) found in numerics/signals/cph-dsp/mathutil
+ 2 difference(s) found in numerics/signals/cph-dsp/white
+ 2 difference(s) found in numerics/signals/fft
+ 2 difference(s) found in numerics/signals/fourier
+ 2 difference(s) found in numerics/signals/sigfun
+ 1 difference(s) found in numerics/statistics/gauss
+ 4 difference(s) found in poly/interp-generic
+ 1 difference(s) found in poly/polyinterp
+ 1 difference(s) found in poly/polyroot
+ 2 difference(s) found in simplify/default
+ 1 difference(s) found in simplify/fpf
+ 3 difference(s) found in simplify/matcher
+ 1 difference(s) found in simplify/pcf-fpf
+ 2 difference(s) found in simplify/pcf
+ 2 difference(s) found in simplify/rcf
+ 1 difference(s) found in simplify/rules
+14 difference(s) found in simplify/simplify
+ 4 difference(s) found in simplify/sparse-gcd
+ 1 difference(s) found in simplify/sparse-interpolate
+ 1 difference(s) found in simplify/sparse
+ 1 difference(s) found in simplify/split-poly
+ 2 difference(s) found in simplify/symbenv
+ 1 difference(s) found in simplify/syntax
+ 9 difference(s) found in solve/solve-utils
+ 7 difference(s) found in solve/solve
+ 3 difference(s) found in units/SI-units
+13 difference(s) found in units/system
+ 2 difference(s) found in units/with-units
