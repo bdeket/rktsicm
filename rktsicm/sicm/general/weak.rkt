@@ -1,12 +1,17 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) clean-weak-alist clean-subtable-alist clean-alist)
+         (rename-out [ALT-CLEAN-WEAK-ALIST clean-weak-alist]))
 
 (require "../rkt/fixnum.rkt"
          "../rkt/if.rkt"
-         (only-in "../rkt/todo.rkt" todo set-car! set-cdr!))
+         (only-in "../rkt/todo.rkt" todo set-cdr!))
 
 (todo clean-expression-table "canonicalizer")
+(define (ALT-CLEAN-WEAK-ALIST W) (purge-list W 0))
+
+;; set-car! is only used to invalidate pairs -> this is solved in purge-list by rechecking
+(define set-car! void)
 
 (define gc-reclaimed-object (gensym))
 (define (gc-reclaimed-object? v) (eq? gc-reclaimed-object v))
@@ -23,6 +28,10 @@
   (if (pair? lst)
       (weak-cons (car lst) (list->weak-list (cdr lst)))
       lst))
+(define (weak-list-intact? L)
+  (if (weak-pair? L)
+      (and (weak-pair/car? L) (weak-list-intact? (weak-cdr L)))
+      #t))
 
 ;;bdk;; start original file
 
@@ -103,12 +112,23 @@
 ;;; must be a positive integer larger than 1.
 
 (define (purge-list lst max-size)
-  (cond
-    [(null? lst) lst]
-    [(= 0 max-size) '()]
-    [(weak-car (car lst))
-     (cons (car lst) (purge-list (cdr lst) (- max-size 1)))]
-    [else (purge-list (cdr lst) max-size)]))
+  ;;bdk;; purge-list is only called from within memoize, it is always called with
+  ;;bdk;; a (Listof A=(U B=(weak-cons Any Any) C=(cons (weak-list ...) Any))
+  ;;bdk;; weak-finder should set-car! to #f any weak link that is gc-ed, but
+  ;;bdk;; this only works for A of type B. The other is treated as normal pair
+  ;;bdk;; and never set-car!ed to #f so purge can not remove it
+  ;;bdk;; instead of relaying on weak-finder to invalidate gc-ed items
+  ;;bdk;; purge will retraverse everything
+  (let loop ([lst lst][max-size (if (<= max-size 0) +inf.0 max-size)])
+    (cond
+      [(or (null? lst) (<= max-size 0)) '()]
+      [else
+       (define A (car lst))
+       ((if (if (weak-pair? A)
+                (weak-pair/car? A) ;; type B
+                (weak-list-intact? (car A))) ;; type C
+            (λ (l) (cons A l)) values )
+        (loop (cdr lst) (- max-size 1)))])))
 
 ;;; Weak list cleanups
 

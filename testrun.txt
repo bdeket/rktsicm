@@ -59,10 +59,10 @@ params:
        (list d/dt d/dr d/dtheta d/dphi)))
     (list dt dr dtheta dphi))))
 message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   connection.rkt:327:14
+location:   connection.rkt:328:14
 --------------------
 6 success(es) 1 failure(s) 0 error(s) 7 test(s) run
-cpu time: 9625 real time: 9637 gc time: 309
+cpu time: 8938 real time: 8940 gc time: 158
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -86,9 +86,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 53265 real time: 53258 gc time: 685
-cpu time: 35344 real time: 35344 gc time: 251
-cpu time: 4515 real time: 4517 gc time: 0
+cpu time: 50500 real time: 50499 gc time: 718
+cpu time: 33062 real time: 33063 gc time: 142
+cpu time: 4188 real time: 4175 gc time: 31
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -140,7 +140,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 437 real time: 439 gc time: 0
+cpu time: 297 real time: 302 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -150,6 +150,9 @@ raco test: (submod ".\\sicm\\tests\\general\\permute.rkt" test)
 0
 raco test: (submod ".\\sicm\\tests\\general\\sets.rkt" test)
 1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\general\\weak.rkt" test)
+8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\helper.rkt" test)
 raco test: (submod ".\\sicm\\tests\\kernel\\arity.rkt" test)
@@ -323,15 +326,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2985 real time: 2984 gc time: 155
-cpu time: 984 real time: 996 gc time: 235
-cpu time: 1203 real time: 1189 gc time: 77
-cpu time: 266 real time: 276 gc time: 47
-cpu time: 62 real time: 58 gc time: 0
-cpu time: 13266 real time: 13270 gc time: 579
-cpu time: 15 real time: 4 gc time: 0
-cpu time: 32 real time: 42 gc time: 0
-cpu time: 17625 real time: 17617 gc time: 1486
+cpu time: 2984 real time: 2984 gc time: 78
+cpu time: 1063 real time: 1051 gc time: 234
+cpu time: 1344 real time: 1353 gc time: 94
+cpu time: 375 real time: 374 gc time: 16
+cpu time: 78 real time: 69 gc time: 0
+cpu time: 13031 real time: 13044 gc time: 705
+cpu time: 0 real time: 4 gc time: 0
+cpu time: 31 real time: 38 gc time: 0
+cpu time: 16297 real time: 16294 gc time: 1373
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -362,11 +365,11 @@ raco test: (submod ".\\sicm\\tests\\solve\\solve-utils.rkt" test)
 23 success(es) 0 failure(s) 0 error(s) 23 test(s) run
 0
 raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x450) (* -1 x451)) (eq:0) (x451 x450)) ((+ -7 (* 3 x450) x451) (eq:1) (x451 x450)))
-'(((+ -5 (* 3 x458) (* -1 x459)) (eq:0) (x459 x458)) ((+ k460 (* 3 x458) x459) (eq:1) (x459 x458 k460)))
+'(((+ -5 (* 3 x484) (* -1 x485)) (eq:0) (x485 x484)) ((+ -7 (* 3 x484) x485) (eq:1) (x485 x484)))
+'(((+ -5 (* 3 x492) (* -1 x493)) (eq:0) (x493 x492)) ((+ k494 (* 3 x492) x493) (eq:1) (x493 x492 k494)))
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-3/570 test failures
-runtime: 27.65m 
+3/578 test failures
+runtime: 25.183333333333334m 
 Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
