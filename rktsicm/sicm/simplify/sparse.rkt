@@ -6,6 +6,7 @@
                   fix:= fix:> fix:< fix:+)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
+         "../general/equals.rkt"
          "../kernel-gnrc.rkt"
          "fpf.rkt"
          )
@@ -138,7 +139,7 @@
 	  (else
 	   (let ((e1 (sparse-exponents (car xlist)))
 		 (e2 (sparse-exponents (car ylist))))
-	     (cond ((equal? e1 e2)
+	     (cond ((simple:equal? e1 e2)
 		    (let ((ncoeff (+ (sparse-coefficient (car xlist))
 				     (sparse-coefficient (car ylist)))))
 		      (if (= ncoeff 0)
@@ -260,7 +261,7 @@
 	(sparse-divide sn sd
 		       (lambda (q r)
 			 (pp `((sn ,sn) = (q ,q) * (d ,sd) + (r ,r)))
-			 (if (and (equal? q sq) (equal? r sr))
+			 (if (and (simple:equal? q sq) (simple:equal? r sr))
 			     (pp #t)
 			     (pp `((sq ,sq) (sr ,sr))))))))))
 |#
@@ -344,8 +345,8 @@
 	 (if (= (sparse-coefficient (car terms)) 0)
 	     '()
 	     terms))
-	((equal? (sparse-exponents (car terms))
-		 (sparse-exponents (cadr terms)))
+        ((simple:equal? (sparse-exponents (car terms))
+                        (sparse-exponents (cadr terms)))
 	 (let ((coeff (+ (sparse-coefficient (car terms))
 			 (sparse-coefficient (cadr terms)))))
 	   (if (= coeff 0)

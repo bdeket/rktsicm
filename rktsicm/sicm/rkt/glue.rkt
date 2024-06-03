@@ -34,7 +34,8 @@
 
 (define true #t)
 (define false #f)
-(define (delete itm lst) (remove* (list itm) lst))
+(define number:eqv? eqv?)
+(define (delete itm lst [test equal?]) (remove* (list itm) lst equal?))
 (define (delq itm lst) (remq* (list itm) lst))
 (define every andmap) ;; not definedin mitscheme, nor scmutils...
 (define any ormap)

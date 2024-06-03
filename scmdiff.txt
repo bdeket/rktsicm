@@ -1,19 +1,19 @@
-could not find: ../../racket/test/sicm/scmutils-20230125/enclose\alt-magic.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/general\assert.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/kernel\ghelper.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\functions.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\linear.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\ode.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\optimize.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\quad.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\quadrature\infinities.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\quadrature.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\roots.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\signals\cph-dsp\flovec-rkt.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\signals\cph-dsp\flovec-scm.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\signals.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/numerics\statistics.scm
-could not find: ../../racket/test/sicm/scmutils-20230125/poly\domain.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/enclose\alt-magic.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/general\assert.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/kernel\ghelper.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\functions.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\linear.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\ode.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\optimize.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\quad.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\quadrature\infinities.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\quadrature.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\roots.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\signals\cph-dsp\flovec-rkt.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\signals\cph-dsp\flovec-scm.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\signals.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/numerics\statistics.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in calculus/SR-frames
  3 difference(s) found in calculus/coord
  1 difference(s) found in calculus/dgutils
@@ -39,7 +39,6 @@ could not find: ../../racket/test/sicm/scmutils-20230125/poly\domain.scm
  5 difference(s) found in general/stack-queue
  7 difference(s) found in general/table
  3 difference(s) found in general/weak
- 1 difference(s) found in kernel/diff
 11 difference(s) found in kernel/express
  7 difference(s) found in kernel/extapply
  3 difference(s) found in kernel/function

@@ -162,57 +162,57 @@
 	 (let ((a
 		(a-reduce joint-arity
 			  (map g:arity g))))
-           (cond ((equal? a *at-least-zero*)
+           (cond ((pair:eq? a *at-least-zero*)
 		  (lambda x
 		    (g:apply f
 			   (map
 			    (lambda (gi)
 			      (g:apply gi x))
 			    g))))
-		 ((equal? a *exactly-zero*)
+		 ((pair:eq? a *exactly-zero*)
 		  (lambda ()
 		    (g:apply f
 			   (map (lambda (gi)
 				  (gi))
 				g))))
-		 ((equal? a *at-least-one*)
+		 ((pair:eq? a *at-least-one*)
 		  (lambda (x . y)
 		    (g:apply f
 			   (map (lambda (gi)
 				  (g:apply gi x y))
 				g))))
-		 ((equal? a *exactly-one*)
+		 ((pair:eq? a *exactly-one*)
 		  (lambda (x)
 		    (g:apply f
 			   (map (lambda (gi)
 				  (gi x))
 				g))))
 
-		 ((equal? a *at-least-two*)
+		 ((pair:eq? a *at-least-two*)
 		  (lambda (x y . z)
 		    (g:apply f
 			   (map (lambda (gi)
 				  (g:apply gi x y z))
 				g))))
-		 ((equal? a *exactly-two*)
+		 ((pair:eq? a *exactly-two*)
 		  (lambda (x y)
 		    (g:apply f
 			   (map (lambda (gi)
 				  (gi x y))
 				g))))
-		 ((equal? a *at-least-three*)
+		 ((pair:eq? a *at-least-three*)
 		  (lambda (u x y . z)
 		    (g:apply f
 			   (map (lambda (gi)
 				  (g:apply gi u x y z))
 				g))))
-		 ((equal? a *exactly-three*)
+		 ((pair:eq? a *exactly-three*)
 		  (lambda (x y z)
 		    (g:apply f
 			   (map (lambda (gi)
 				  (gi x y z))
 				g))))
-		 ((equal? a *one-or-two*)
+		 ((pair:eq? a *one-or-two*)
 		  (lambda (x #:optional y)
 		    (if (default-object? y)
 			(g:apply f
@@ -232,39 +232,39 @@
 			    g)))))))
 	(else
 	 (let ((a (g:arity g)))
-           (cond ((equal? a *at-least-zero*)
+           (cond ((pair:eq? a *at-least-zero*)
 		  (lambda x
 		    (g:apply f
 			     (list (g:apply g x)))))
-		 ((equal? a *exactly-zero*)
+		 ((pair:eq? a *exactly-zero*)
 		  (lambda ()
 		    (g:apply f
 			     (list (g:apply g '())))))
-		 ((equal? a *at-least-one*)
+		 ((pair:eq? a *at-least-one*)
 		  (lambda (x . y)
 		    (g:apply f
 			     (list (g:apply g x y)))))
-		 ((equal? a *exactly-one*)
+		 ((pair:eq? a *exactly-one*)
 		  (lambda (x)
 		    (g:apply f
 			     (list (g:apply g (list x))))))
-		 ((equal? a *at-least-two*)
+		 ((pair:eq? a *at-least-two*)
 		  (lambda (x y . z)
 		    (g:apply f
 			     (list (g:apply g x y z)))))
-		 ((equal? a *exactly-two*)
+		 ((pair:eq? a *exactly-two*)
 		  (lambda (x y)
 		    (g:apply f
 			     (list (g:apply g (list x y))))))
-		 ((equal? a *at-least-three*)
+		 ((pair:eq? a *at-least-three*)
 		  (lambda (u x y . z)
 		    (g:apply f
 			     (list (g:apply g u x y z)))))
-		 ((equal? a *exactly-three*)
+		 ((pair:eq? a *exactly-three*)
 		  (lambda (x y z)
 		    (g:apply f
 			     (list (g:apply g (list x y z))))))
-		 ((equal? a *one-or-two*)
+		 ((pair:eq? a *one-or-two*)
 		  (lambda (x #:optional y)
 		    (if (default-object? y)
 			(g:apply f

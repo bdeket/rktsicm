@@ -264,7 +264,8 @@
     (assert (procedure? proc))
     (let ((arity (procedure-arity proc)))
       (let ((memoized-procedure
-             (cond ((equal? arity '(0 . 0))
+             (cond ((and (fix:= (car arity) 0) ;(0 . 0)
+                         (fix:= (cdr arity) 0))
                     (let ((ran? #f) (value))
                       (lambda ()
                         (if ran?
@@ -273,7 +274,8 @@
                               (set! value (proc))
                               (set! ran? #t)
                               value)))))
-                   ((equal? arity '(1 . 1))
+                   ((and (fix:= (car arity) 1) ;(1 . 1)
+                         (fix:= (cdr arity) 1))
                     (case memo-type
                       ((linear) (linear-memoize-1arg proc))
                       ((hash) (hash-memoize-1arg proc))))

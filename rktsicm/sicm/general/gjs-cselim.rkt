@@ -5,7 +5,8 @@
 (require (only-in "../rkt/glue.rkt" default-object default-object?
                   every if generate-uninterned-symbol find
                   fix:+ fix:=)
-         "list-utils.rkt")
+         "list-utils.rkt"
+         "equals.rkt")
 
 (struct entry (expr name cntr) #:mutable)
 
@@ -135,8 +136,8 @@
          (lambda (expression ignored-variables)
            (cond ((or (not parent-recorder)
                       (occurs-in? bound-variables expression))
-                  (let ((vcell #;(assoc expression local-expressions-seen)
-                               (find (λ (x) (equal? expression (entry-expr x))) local-expressions-seen)))
+                  (let ((vcell #;(assoc expression local-expressions-seen simple:equal?)
+                               (find (λ (x) (simple:equal? expression (entry-expr x))) local-expressions-seen)))
                     (cond (vcell
                            ;; Increment reference count
                            (set-entry-cntr! vcell (fix:+ (entry-cntr vcell) 1))

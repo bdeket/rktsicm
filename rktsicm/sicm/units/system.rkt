@@ -8,6 +8,7 @@
          (only-in "../rkt/environment.rkt" environment-bound? environment-define environment-assign! scmutils-base-environment generic-environment)
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
+         "../general/equals.rkt"
          "../kernel/express.rkt"
          "../kernel/generic.rkt"
          "../kernel/numbers.rkt"
@@ -309,8 +310,8 @@
         (scale (if (default-object? u2) 1 u1)))
     (assert (and (not (units? value)) (number? scale) (units? units)))
     (if (with-units? value)
-        (if (equal? (unit-exponents units)
-                    (unit-exponents (u:units value)))
+        (if (simple:equal? (unit-exponents units)
+                           (unit-exponents (u:units value)))
             value
             (error "Units do not match: &" value units))
         (with-units (g:* scale (unit-scale units) value)
@@ -341,7 +342,7 @@
   (cond ((with-units? num)
          (let ((value (g:* (unit-scale (u:units num)) (u:value num)))
                (vect (unit-exponents (u:units num))))
-           (if (not (equal? vect (unit-exponents target-unit)))
+           (if (not (simple:equal? vect (unit-exponents target-unit)))
                (error "Cannot express in given units"
                       num target-unit target-unit-expression))
            (list *unit-constructor*
@@ -385,8 +386,8 @@
 
 (define (find-unit-description vect ulist)
   (find (lambda (entry)
-           (equal? (unit-exponents (list-ref entry 3))
-                   vect))
+           (simple:equal? (unit-exponents (list-ref entry 3))
+                          vect))
          ulist))
 
 (define (find-unit-name vect ulist)

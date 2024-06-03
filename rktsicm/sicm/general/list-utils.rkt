@@ -11,6 +11,7 @@
                   fix:+ fix:= fix:- int:> int:+
                   cons* there-exists? every)
          "../rkt/define.rkt"
+         "equals.rkt"
          racket/list)
 
 #; ;;bdk;; this changes order, I don't thrust this: (* A B C) <> (* C (* B A)) for matrices...
@@ -151,7 +152,7 @@
 (define (list-index-of x lst)
   (cond ((null? lst)
 	 (error "Not in list -- LIST-INDEX-OF" x))
-	((equal? x (car lst)) 0)
+	((eqv? x (car lst)) 0)
 	(else (fix:+ (list-index-of x (cdr lst)) 1))))
 
 (define (delete-nth n list)
@@ -264,20 +265,40 @@
   (define (walk e)
     (if (pair? e)
 	(cons (walk (car e)) (walk (cdr e)))
-	(let ((v (assoc e dictionary)))
+	(let ((v (assoc e dictionary simple:equal?)))
 	  (if v
 	      (cadr v)
 	      e))))
   (walk expression))
-|#
+
 
 (define (substitute-multiple expression dictionary)
   (define (walk e)
-    (let ((v (assoc e dictionary)))
+    (let ((v (assoc e dictionary simple:equal?)))
       (if v
           (cadr v)
           (if (pair? e)
               (cons (walk (car e)) (walk (cdr e)))
+              e))))
+  (walk expression))
+|#
+
+;;; Using a Guy Steele hack:
+
+(define (cons-if-necessary a d e)
+  (if (and (eq? a (car e)) (eq? d (cdr e)))
+      e
+      (cons a d)))
+
+(define (substitute-multiple expression dictionary)
+  (define (walk e)
+    (let ((v (assoc e dictionary simple:equal?)))
+      (if v
+          (cadr v)
+          (if (pair? e)
+              (cons-if-necessary (walk (car e))
+                                 (walk (cdr e))
+                                 e)
               e))))
   (walk expression))
 

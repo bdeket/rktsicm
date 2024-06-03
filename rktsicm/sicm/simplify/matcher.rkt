@@ -3,6 +3,7 @@
 (provide (all-defined-out))
 
 (require "rule-syntax.rkt"
+         "../general/equals.rkt"
          )
 
 ;;bdk;; start original file
@@ -32,7 +33,7 @@
 	 (succeed dictionary (cdr data))))
   predicate-match)
 
-(define (match:equal pattern-object [equality? equal?])
+(define (match:equal pattern-object [equality? simple:equal?])
   (match:predicate
    (lambda (data-object)
      (equality? pattern-object data-object))))

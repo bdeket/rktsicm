@@ -9,6 +9,7 @@
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          "../general/sets.rkt"
+         "../general/equals.rkt"
          "../kernel-intr.rkt"
          )
 
@@ -40,6 +41,9 @@
 (define (explicit-fpf? x)
   (and (pair? x)
        (eq? (car x) '*fpf*)))
+
+(define (fpf:make-explicit terms)
+  (cons '*fpf* terms))
 
 (define (fpf:arity fpf)
   (if (fpf:coeff? fpf)
@@ -104,7 +108,7 @@
 
 
 (define (fpf:same-exponents? fs1 fs2)
-  (equal? fs1 fs2))
+  (simple:equal? fs1 fs2))
 
 (define (fpf:>exponents? fs1 fs2)
   (fpf:graded> fs1 fs2))

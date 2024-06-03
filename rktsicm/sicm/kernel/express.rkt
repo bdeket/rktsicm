@@ -11,6 +11,7 @@
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
          "../general/table.rkt"
+         "../general/equals.rkt"
          "utils.rkt"
          "iterat.rkt"
          "cstm/express.rkt"
@@ -35,16 +36,32 @@
 
 ;;bdk;; moved to cstm/express 1
 
+#|
 (define (substitute new old expression)
   (define (sloop exp)
-    (cond ((equal? old exp) new)
+    (cond ((simple:equal? old exp) new)
           ((pair? exp)
            (cons (sloop (car exp))
                  (sloop (cdr exp))))
           ((vector? exp)
            ((vector-elementwise sloop) exp))
           (else exp)))
-  (if (equal? new old) expression (sloop expression)))
+  (if (simple:equal? new old) expression (sloop expression)))
+|#
+
+;;; Using a Guy Steele hack:
+
+(define (substitute new old expression)
+  (define (sloop exp)
+    (cond ((simple:equal? old exp) new)
+	  ((pair? exp)
+	   (cons-if-necessary (sloop (car exp))
+		              (sloop (cdr exp))
+                              exp))
+	  ((vector? exp)
+	   ((vector-elementwise sloop) exp))
+	  (else exp)))
+  (if (simple:equal? new old) expression (sloop expression)))
 
 
 ;;; Abstract quantities are represented with a type-tagged property list,
@@ -306,7 +323,7 @@
 				 ((expr:< (vector-ref expr1 i)
 					  (vector-ref expr2 i))
 				  #t)
-				 ((equal? (vector-ref expr1 i)
+				 ((simple:equal? (vector-ref expr1 i)
 					  (vector-ref expr2 i))
 				  (lp (fix:+ i 1)))
 				 (else #f)))))
@@ -317,7 +334,7 @@
 	(else
 	 (< (hash expr1) (hash expr2)))))
 
-(define expr:= equal?)
+(define expr:= simple:equal?)
 
 
 

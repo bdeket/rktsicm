@@ -9,6 +9,7 @@
          (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
          "../general/assert.rkt"
+         "../general/equals.rkt"
          "numeric.rkt"
          "iterat.rkt"
          "utils.rkt"
@@ -542,7 +543,7 @@
 	  (if (null? (cdr active-column-list)) ;one active column
 	      (matrix-ref m row (car active-column-list))
 	      (let ((value
-		     (assoc (list row active-column-list) cache)))
+		     (assoc (list row active-column-list) cache simple:equal?)))
 		(if value
 		    (cadr value)	; cache hit!
 		    (let loop		; cache miss!

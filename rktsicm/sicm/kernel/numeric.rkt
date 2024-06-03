@@ -6,10 +6,12 @@
          )
 
 (require (only-in "../rkt/glue.rkt"
-                  int:<= int:= int:- int:+ int:* fix:>)
+                  int:<= int:= int:- int:+ int:* fix:> make-initialized-vector)
+         (only-in racket/vector vector-map)
          (only-in "../rkt/define.rkt" define default-object?)
          "../general/assert.rkt"
          "../general/memoize.rkt"
+         (only-in "../general/list-utils.rkt" reduce)
          (only-in racket/math conjugate)
          (only-in "../general/permute.rkt" exact-quotient binomial-coefficient factorial)
          )
@@ -586,3 +588,12 @@
 	  (cont (+ u v)
 		(+ (* -1/2 u) v (* +i w))
 		(+ (* -1/2 u) v (* -i w))))))))
+
+
+;;; From MachineLearning stuff
+
+(define (softmax vector-of-numbers)
+  (let ((es (vector-map exp vector-of-numbers)))
+    (let ((s (reduce + 0 (vector->list es))))
+      (make-initialized-vector (vector-length es)
+	(lambda (i) (/ (vector-ref es i) s))))))

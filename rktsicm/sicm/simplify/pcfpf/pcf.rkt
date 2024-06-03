@@ -11,6 +11,7 @@
          "../../general/list-utils.rkt"
          "../../general/resource-limit.rkt"
          "../../general/sets.rkt"
+         "../../general/equals.rkt"
          "../../kernel-intr.rkt"
          )
 
@@ -726,10 +727,10 @@
 (define (unordered-pair-equal? a1 a2)
   (and (pair? a1)
        (pair? a2)
-       (or (and (equal? (car a1) (car a2))
-		(equal? (cdr a1) (cdr a2)))
-	   (and (equal? (car a1) (cdr a2))
-		(equal? (cdr a1) (car a2))))))
+       (or (and (simple:equal? (car a1) (car a2))
+		(simple:equal? (cdr a1) (cdr a2)))
+	   (and (simple:equal? (car a1) (cdr a2))
+		(simple:equal? (cdr a1) (car a2))))))
 
 (define (unordered-poly-hash a modulus)
   (let ((arity (poly/check-same-arity (car a) (cdr a))))

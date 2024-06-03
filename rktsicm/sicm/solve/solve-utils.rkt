@@ -5,6 +5,7 @@
 (require (only-in "../rkt/glue.rkt" delete-duplicates find)
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
+         "../general/equals.rkt"
          "solve.rkt")
 
 ;;bdk;; start original file
@@ -175,7 +176,7 @@
   (let ((d (s:simplify (symb:- e1 e2))))
     (and (number? d) (~0? d))))
 
-(define (same-variable? v1 v2) (equal? v1 v2))
+(define (same-variable? v1 v2) (simple:equal? v1 v2))
 
 (define (same-substitution? s1 s2)
   (and (same-variable? (substitution-variable s1)
@@ -188,7 +189,7 @@
 (define (same-justifications? js1 js2)
   (lset= same-justification? js1 js2))
 
-(define (same-justification? j1 j2) (equal? j1 j2))
+(define (same-justification? j1 j2) (simple:equal? j1 j2))
 
 (define (equivalent-solutions? sol1 sol2)
   (and (same-residual-equations? sol1 sol2)
@@ -230,7 +231,7 @@
 
 (define (substitution-variable-entry var solution)
   (find (lambda (subst)
-	  (equal? var (substitution-variable subst)))
+	  (simple:equal? var (substitution-variable subst)))
 	(substitutions solution)))
 
 (define (collect-best-solutions solutions)
@@ -265,8 +266,8 @@
 			      (lambda (j1 j2)
 				(< (length j1) (length j2))))))))
 		       subs))))
-	    (lp (lset-difference equal? sols equivalents)
-		(lset-union equal?
+	    (lp (lset-difference simple:equal? sols equivalents)
+		(lset-union simple:equal?
                             (map (lambda (just)
                                    (make-solution req
                                                   rev 

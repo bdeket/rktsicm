@@ -44,7 +44,7 @@
 (define (make-unit system exponents scale-factor)
   (if (or (eq? exponents the-empty-vector)
           (vector-forall zero? exponents))
-      (if (equal? scale-factor 1)
+      (if (= scale-factor 1)
           &unitless
           (list unit-type-tag system the-empty-vector scale-factor))
       (list unit-type-tag system exponents scale-factor)))

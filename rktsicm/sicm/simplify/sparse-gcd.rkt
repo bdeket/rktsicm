@@ -9,6 +9,7 @@
          "../general/list-utils.rkt"
          "../general/permute.rkt"
          "../general/resource-limit.rkt"
+         "../general/equals.rkt"
          "../kernel-gnrc.rkt"
          "pcfpf/pcf.rkt"
          "fpf.rkt"
@@ -88,7 +89,7 @@
 	((null? v) (win u))
 	((sparse-univariate? u)
 	 (win (sparse-univariate-gcd u v)))
-	((equal? u v) (win u))
+	((simple:equal? u v) (win u))
 	((sparse-one? u) (win u))
 	((sparse-one? v) (win v))
 	(else
@@ -195,7 +196,7 @@
 	 P))
   (sort-and-permute ds <
     (lambda (ods nds perm iperm)
-      (if (equal? ods nds)
+      (if (simple:equal? ods nds)
 	  (sparse-multivariate-gcd-helper P Q n ods
             (lambda (g)
               (if (null? g)
@@ -651,7 +652,7 @@
 			 (pp `(gcd-failed2 ,i ,AB ,AC ,gABAC))
 			 (error "bad")
 			 #f)
-			((not (equal? AgBC gABAC))
+			((not (simple:equal? AgBC gABAC))
 			 (pp (list 'not-gcd i A B C AB AC gBC AgBC gABAC))
 			 #f)
 			(else (loop (fix:+ i 1))))))))))))
@@ -667,8 +668,8 @@
     (let ((pdf (fpf:* pd pf)) (pdg (fpf:* pd pg)))
       (sparse-gcd (fpf:->sparse pdf) (fpf:->sparse pdg)
                   (lambda (g)
-                    (if (equal? (sort g sparse-term->)
-                                (fpf:->sparse pd))
+                    (if (simple:equal? (sort g sparse-term->)
+                                       (fpf:->sparse pd))
                         #t
                         (pp (list g (fpf:->sparse pd)))))
                   (lambda () #f)))))

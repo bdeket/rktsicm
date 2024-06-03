@@ -5,6 +5,7 @@
 (require (only-in "../../rkt/glue.rkt" if
                   fix:= fix:< fix:+ fix:- fix:1+ fix:negate fix:quotient)
          (only-in "../../rkt/define.rkt" define default-object?)
+         (rename-in (only-in racket/base equal?) [equal? pair:eq?])
          "../../general/assert.rkt"
          "../numeric.rkt"
          "../utils.rkt"
@@ -28,7 +29,7 @@
 (define (series:arity series) (cadr series))
 
 (define (series:promote-arity series)
-  (assert (equal? (series:arity series) *exactly-zero*))
+  (assert (pair:eq? (series:arity series) *exactly-zero*))
   (make-series *exactly-one* (series->stream series)))
 
 (define (series->stream series)
@@ -260,12 +261,12 @@
 	  (cons-stream (g:* n (head s))
 		       (deriv-iter (tail s) (fix:+ n 1)))))
     (define (derivative s varnums)
-      (cond ((equal? (series:arity s) *exactly-zero*)
+      (cond ((pair:eq? (series:arity s) *exactly-zero*)
 	     ((series:elementwise
 	       (lambda (term)
 		 (generic:partial-derivative term varnums)))
 	      s))
-	    ((equal? (series:arity s) *exactly-one*)
+	    ((pair:eq? (series:arity s) *exactly-one*)
 	     (if (not (null? varnums))
 		 (error "Cannot yet take partial derivatives of a series"
 			s varnums))
@@ -322,7 +323,7 @@
 ;;;  Note that this sequence is a stream, not a series.
 
 (define (partial-sums series)
-  (if (not (equal? (series:arity series) *exactly-zero*))
+  (if (not (pair:eq? (series:arity series) *exactly-zero*))
       (error "Cannot sum non arity=0 series" series))
   (let ((stream (series->stream series)))
     (partial-sums-stream (head stream) (tail stream))))
@@ -350,7 +351,7 @@
 				   (collect (tail stream-of-procs)))))
 	  (cons-stream first-result
 		       (collect (tail stream-of-procs))))))
-  (cond ((equal? (series:arity series) *exactly-one*)
+  (cond ((pair:eq? (series:arity series) *exactly-one*)
 	 (cond ((fix:= (length arguments) 1)
 		(make-series *exactly-zero*
 		 (map-streams g:*
@@ -360,16 +361,16 @@
 						 (car arguments))))))
 	       (else
 		(error "Wrong number of args to series" series arguments))))
-	((equal? (series:arity series) *exactly-zero*)
+	((pair:eq? (series:arity series) *exactly-zero*)
 	 (make-series *exactly-zero*
 	  (collect (series->stream series))))
 	(else
 	 (error "Bad arity series" series arguments))))
 
 (define (series:->function series)
-  (cond ((equal? (series:arity series) *exactly-zero*)
+  (cond ((pair:eq? (series:arity series) *exactly-zero*)
 	 (series:promote-arity series))
-	((equal? (series:arity series) *exactly-one*)
+	((pair:eq? (series:arity series) *exactly-one*)
 	 series)
 	(else
 	 (error "Wrong arity SERIES:->FUNCTION" series))))

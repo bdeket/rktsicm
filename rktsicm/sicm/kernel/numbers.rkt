@@ -7,6 +7,7 @@
          (only-in "../rkt/environment.rkt" symbolic-environment)
          (only-in "../rkt/todo.rkt" symbolic-operators condition?)
          "../general/sets.rkt"
+         "../general/equals.rkt"
          "numeric.rkt"
          "iterat.rkt"
          "utils.rkt"
@@ -524,7 +525,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 	(else
          (there-exists? (*known-reals*)
                         (lambda (w)
-                          (or (equal? w z)
+                          (or (simple:equal? w z)
                               (let ((diff
                                      (ignore-errors
                                       (lambda ()

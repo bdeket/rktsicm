@@ -6,6 +6,7 @@
 (require (only-in "../rkt/glue.rkt" any true for-all? fix:+)
          (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../general/logic-utils.rkt" assume!)
+         "../general/equals.rkt"
          "numeric.rkt"
          "cstm/express.rkt"
          "cstm/numsymb.rkt"
@@ -184,7 +185,7 @@
 	  #f)
       (if (number? a2)
 	  #f
-	  (if (equal? a1 a2)
+	  (if (simple:equal? a1 a2)
 	      #t
 	      `(= ,a1 ,a2)))))
 
@@ -889,13 +890,13 @@
 		    `(+ ,@pos))
 		(if (null? (cdr pos))
 		    (if (null? (cdr neg))
-                        (if (equal? (car pos) (car neg))
+                        (if (simple:equal? (car pos) (car neg))
                             :zero
                             `(- ,(car pos) ,(car neg)))
 			`(- ,(car pos) (+ ,@neg)))
 		    (if (null? (cdr neg))
 			`(- (+ ,@pos) ,(car neg))
-                        (if (equal? pos neg)
+                        (if (simple:equal? pos neg)
                             :zero
                             `(- (+ ,@pos) (+ ,@neg)))))))
 	(if (null? pos)
@@ -991,7 +992,7 @@
              num)
             ((and (number? num) (number? den))
              (/ num den))
-            ((equal? num den)
+            ((simple:equal? num den)
              :one)
             (else
              `(/ ,num ,den)))))

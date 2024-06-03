@@ -4,6 +4,7 @@
 
 (require (only-in "../rkt/glue.rkt" if)
          "../general/assert.rkt"
+         "../general/equals.rkt"
          "../kernel/generic.rkt"
          "../kernel/types.rkt"
          "../kernel/utils.rkt"
@@ -56,14 +57,14 @@
 (define (units:= x y)
   (or (g:zero? x)
       (g:zero? y)
-      (equal? (u:units x) (u:units y))))
+      (simple:equal? (u:units x) (u:units y))))
 
 (define (angular? x)
-  (equal? (u:units x) angular))
+  (simple:equal? (u:units x) angular))
 
 
 (define (with-units value units)
-  (if (equal? units &unitless)
+  (if (simple:equal? units &unitless)
       value
       (list with-units-type-tag value units)))
 

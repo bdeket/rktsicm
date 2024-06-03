@@ -8,6 +8,7 @@
          (only-in "list-utils.rkt" list-index-of)
          "sets.rkt"
          "assert.rkt"
+         "equals.rkt"
          )
 
 ;;bdk;; start original file
@@ -21,7 +22,7 @@
       (apply append
 	     (map (lambda (item)
 		    (map (lambda (perm) (cons item perm))
-			 (permutations (delete item lst))))
+			 (permutations (delete item lst simple:equal?))))
 		  lst))))
 
 (define (combinations lst p)
@@ -52,14 +53,14 @@
   (let lp1 ((plist permuted-list) (count 0))
     (if (null? plist)
 	count
-	(let ((bigger (cdr (member (car plist) original-list)))
+	(let ((bigger (cdr (member (car plist) original-list simple:equal?)))
 	      (rest (cdr plist)))
 	  (let lp2 ((l rest) (increment 0))
 	    (if (null? l)
 		(lp1 rest
 		     (fix:+ count increment))
 		(lp2 (cdr l)
-		     (if (not (member (car l) bigger))
+		     (if (not (member (car l) bigger simple:equal?))
 			 (fix:+ increment 1)
 			 increment))))))))
 
@@ -147,7 +148,7 @@
     (let lp ((i 0) (source lst) (answer '()))
       (if (fix:= i n)
 	  (reverse answer)
-	  (let ((entry (assoc i the-map)))
+	  (let ((entry (assv i the-map)))
 	    (if (not entry)
 		(lp (fix:+ i 1)
 		    (cdr source)

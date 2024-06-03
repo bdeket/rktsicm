@@ -2,11 +2,14 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../rkt/glue.rkt" list-head any))
+(require (only-in "../rkt/glue.rkt" list-head any)
+         "equals.rkt")
 
 ;;bdk;; start original file
 
 ;;;; Unifier with segment variables -- GJS -- 1 May 2016
+;;;   Of course, this does not really do the job, but it 
+;;;   may be useful.  See SDF.
 
 
 (define (unify t1 t2)
@@ -40,7 +43,7 @@
           ((or (null? xs) (null? ys)) #f)
 	  ((and (pair? xs) (pair? ys))
 	   (let ((x (car xs)) (y (car ys)))
-	     (cond ((equal? x y)
+	     (cond ((simple:equal? x y)
 		    (lp (cdr xs) (cdr ys) dict succeed))
 		   ((unify:element? x) (element x y))
 		   ((unify:element? y) (element y x))

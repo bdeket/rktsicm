@@ -8,7 +8,8 @@
 
 (define scmutil-old1 "../../racket/test/sicm/scmutils-20200810_bld/")
 (define scmutil-old2 "../../racket/test/sicm/scmutils-20220518/")
-(define scmutil-cur "../../racket/test/sicm/scmutils-20230125/")
+(define scmutil-old3 "../../racket/test/sicm/scmutils-20230125/")
+(define scmutil-cur "../../racket/test/sicm/scmutils-20230902/")
 (define scmutil-dir (make-parameter scmutil-cur))
 (define rktsicm-dir "./rktsicm/sicm/")
 

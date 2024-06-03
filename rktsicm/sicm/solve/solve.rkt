@@ -11,6 +11,7 @@
          "../general/sets.rkt"
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
+         "../general/equals.rkt"
          )
 
 ;;bdk;; start original file
@@ -144,7 +145,7 @@ The general strategy is:
            (let ((eqs (sort residual-eqs less-difficult?)))
              (let ((eqn (car eqs)))
                    (let ((vars
-                          (lset-intersection equal?
+                          (lset-intersection simple:equal?
                                              residual-vars (equation-variables eqn))))
                      (if (null? vars)       ; contradiction!
                          (contradiction-failure (list eqn) fail)
@@ -153,7 +154,7 @@ The general strategy is:
                                         (lambda (new-substitution fail)	
                                           (use-new-substitution
                                            new-substitution
-                                           (delete eqn residual-eqs)
+                                           (delete eqn residual-eqs simple:equal?)
                                            substitutions
                                            tough-eqns
                                            (lambda (new-residuals
@@ -161,13 +162,13 @@ The general strategy is:
                                                     new-tough
                                                     fail)
                                              (lp new-residuals
-                                                 (delete var residual-vars)
+                                                 (delete var residual-vars simple:equal?)
                                                  new-substitutions
                                                  new-tough
                                                  #t fail))
                                            fail))
                                         (lambda ()     ; eqn too hard now
-                                          (lp (delete eqn residual-eqs)
+                                          (lp (delete eqn residual-eqs simple:equal?)
                                               residual-vars
                                               substitutions
                                               (cons eqn tough-eqns)
@@ -236,7 +237,8 @@ The general strategy is:
   (not (any (lambda (premise)
                 (and (root-premise? premise)
                      (member (root-premise-opposite premise)
-                             template-justs)))
+                             template-justs
+                             simple:equal?)))
               substitution-justs)))    
 
 (define (isolate-var var eqn succeed fail)
@@ -250,7 +252,8 @@ The general strategy is:
                    ;;(pp `(isolate ,eqn ,value ,root-premises ,justs))
                    (if (any (lambda (root-premise)
                                 (member (root-premise-opposite root-premise)
-                                        justs))
+                                        justs
+                                        simple:equal?))
                               root-premises)
                        (error "This should not happen--ISOLATE-VAR") ;(fail)
                        (succeed
@@ -262,7 +265,7 @@ The general strategy is:
 (define (isolatable? var expr succeed fail)
   (let lp ((expr expr) (fail fail))
     ;; expr is residual asserted to be zero 
-    (cond ((equal? var expr)
+    (cond ((simple:equal? var expr)
            (succeed 0 fail))
           ((positive-power? expr)
 	   (lp (car (operands expr)) fail))
@@ -339,7 +342,7 @@ The general strategy is:
 	  (else (fail)))))
 
 (define (kernel-operator-spec op)
-  (assoc op *kernel-operator-table*))
+  (assoc op *kernel-operator-table* simple:equal?))
 
 (define *kernel-operator-table*
   `( (sqrt ,symb:square)
@@ -385,7 +388,7 @@ The general strategy is:
                 (s:simplify high))
           (let ((t (car terms)))
             (if (occurs? var t)
-                (cond ((equal? var t)
+                (cond ((simple:equal? var t)
                        (lp (cdr terms) const (symb:sum 1 lin) quad high))
                       ((expt? t)
                        (assimilate-expt t 1))
@@ -393,8 +396,8 @@ The general strategy is:
                        (let ((f
                               (find (lambda (factor) (occurs? var factor))
                                     (operands t))))
-                         (let ((others (delete f t)))
-                           (cond ((equal? var f)
+                         (let ((others (delete f t simple:equal?)))
+                           (cond ((simple:equal? var f)
                                   (lp (cdr terms)
                                       const
                                       (symb:sum others lin)
@@ -443,6 +446,18 @@ The general strategy is:
       (list +premise -premise))))
          
 (struct hypothetical (name extra) #:constructor-name make-hypothetical #:transparent)
+
+#|
+;;; Adding to simplify/default.scm. 
+;;; This does not work!  Not clear why...
+
+(define (simplify-hypothetical expr)
+  `(hypothetical ,(hypothetical-name expr)))
+
+(assign-operation 'simplify simplify-hypothetical hypothetical?)
+
+(define hypothetical make-hypothetical)
+|#
 
 (define hypothetical-memory (make-hash))
 
@@ -550,13 +565,14 @@ The general strategy is:
 			      substitutions)))
     (let ((expression (car result)) (justs (cdr result)))
       (make-equation expression         ;not just-union; already done.
-	(lset-union equal? (equation-justifications equation) justs)))))
+	(lset-union simple:equal? (equation-justifications equation) justs)))))
 
 (define (make-substitution var value justs)
   (if (any (lambda (just)
                  (and (root-premise? just)
                       (member (root-premise-opposite just)
-                              justs)))
+                              justs
+                              simple:equal?)))
                justs)
       (begin (error "Aargh-subst") #f))
   (list (list '= var (s:simplify value)) justs))
@@ -573,7 +589,8 @@ The general strategy is:
     (if (any (lambda (just)
                    (and (root-premise? just)
                         (member (root-premise-opposite just)
-                                justs)))
+                                justs
+                                simple:equal?)))
                  justs)
       (begin (error "Aargh-eqn") #f))
     (list pexpr justs vspecs)))
@@ -585,13 +602,13 @@ The general strategy is:
 (define s:simplify g:simplify)
 
 (define (occurs? var expr)
-  (or (equal? var expr)
+  (or (simple:equal? var expr)
       (and (pair? expr)
 	   (or (occurs? var (car expr))
 	       (occurs? var (cdr expr))))))
 
 (define ((variable-present? var) eqn)
-  (member var (equation-variables eqn)))
+  (member var (equation-variables eqn) simple:equal?))
 
 (define (fewer-variables? eqn1 eqn2)
   (< (length (equation-variables eqn1))
@@ -605,9 +622,9 @@ The general strategy is:
 (define ((max-exponent expression) var)
   (let lp ((expr expression))
     (cond ((null? expr) 0)
-	  ((equal? expr var) 1)
+	  ((simple:equal? expr var) 1)
 	  ((expt? expr)
-	   (if (equal? (car (operands expr)) var)
+	   (if (simple:equal? (car (operands expr)) var)
 	       (cadr (operands expr))
 	       0))
 	  ((list? expr) (apply max (map lp expr)))
@@ -623,13 +640,13 @@ The general strategy is:
 
 
 (define (just-union j1s j2s)
-  (lset-union equal? j1s j2s))
+  (lset-union simple:equal? j1s j2s))
 
 #|
 (define (just-union j1s j2s)
   (if (null? (*outstanding-contradictions*))
-      (lset-union equal? j1s j2s)
-      (apply lset-union equal? j1s j2s
+      (lset-union simple:equal? j1s j2s)
+      (apply lset-union simple:equal? j1s j2s
              (map contradiction-justifications
                   (*outstanding-contradictions*)))))
 |#
@@ -662,7 +679,7 @@ The general strategy is:
 
 (define (D2? x)
   (and (pair? x) 
-       (equal? (car x) '(expt D 2))))
+       (simple:equal? (car x) '(expt D 2))))
 
 (define (Dn? x)
   (and (pair? x) 
@@ -1398,7 +1415,7 @@ done
     (assert (= (length news) (length olds)))
     (let lp ((n news) (o olds) (expression expression))
       (cond ((null? n) expression)
-	    ((equal? (car n) (car o))
+	    ((simple:equal? (car n) (car o))
 	     (lp (cdr n) (cdr o) expression))
 	    (else
 	     (lp (cdr n)

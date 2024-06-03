@@ -228,7 +228,7 @@
 	  (let ((t1 (runtime)))
 	    (old-univariate-interpolate-values xs fs
 	      (lambda (old-result)
-		(let ((t2 (runtime)) (e (equal? old-result new-result)))
+		(let ((t2 (runtime)) (e (simple:equal? old-result new-result)))
 		  ;;(pp (list '+ (- t1 t0) (- t2 t1)))
 		  (assert e)))
 	      (lambda ()

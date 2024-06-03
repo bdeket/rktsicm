@@ -9,6 +9,7 @@
          (only-in "../rkt/todo.rkt" diff-memoize-1arg diff-memoize-2arg)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
+         (only-in "../general/equals.rkt" simple:equal?)
          "types.rkt"
          "utils.rkt"
          "cstm/s-operator.rkt"
@@ -171,8 +172,8 @@
 ;;; terms need to be compared using their tag lists.
 
 (define (same-differential-tags? dterm1 dterm2)
-  (equal? (differential-tags dterm1)
-	  (differential-tags dterm2)))
+  (simple:equal? (differential-tags dterm1)
+                 (differential-tags dterm2)))
 
 (define (<differential-tags? dterm1 dterm2)
   (let ((dts1 (differential-tags dterm1))

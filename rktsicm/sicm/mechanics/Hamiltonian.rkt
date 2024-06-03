@@ -5,6 +5,7 @@
 (require (only-in "../rkt/glue.rkt" if vector-tail generate-uninterned-symbol
                   fix:= fix:>)
          "../general/assert.rkt"
+         "../general/equals.rkt"
          "Lagrangian.rkt"
          "universal.rkt"
          )
@@ -239,7 +240,7 @@
     (define (G w)
       (if untested?
           (let ((thing (typical-object w)))
-            (if (not (equal?
+            (if (not (simple:equal?
                       (simplify
                        ((compose w-of-v (D putative-G))
                         thing))

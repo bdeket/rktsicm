@@ -6,6 +6,7 @@
                   fix:= fix:+ fix:-)
          (only-in "../../rkt/define.rkt" define lambda default-object?)
          "../../kernel-intr.rkt"
+         "../../general/equals.rkt"
          (only-in "../../display/print.rkt" simplify)
          "../../enclose/alt-magic.rkt"
          (only-in "../signals/cph-dsp/flovec.rkt" ->flonum)
@@ -298,7 +299,7 @@
       (let* ((n-params (length params))
 	     (n-state (vector-length fstate))
 	     (x (list n-params n-state parametric-sysder))
-	     (seen (assoc x *compiled-sysder-table*)))
+	     (seen (assoc x *compiled-sysder-table* simple:equal?)))
 	(if (and *memoizing-sysder* seen)
 	    (cadr seen)
 	    (let ((ans (compile-parametric n-params n-state parametric-flat-sysder)))

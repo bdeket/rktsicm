@@ -216,7 +216,7 @@ mum
 
 (let lp ((t1 (tree-copy cfoo)) (t2 (tree-copy cfoo)))
   (let ((c1 (canonical-copy t1)) (c2 (canonical-copy t2)))
-    (if (not (and (equal? t1 c1) (equal? t2 c2) (eq? c1 c2)))
+    (if (not (and (simple:equal? t1 c1) (simple:equal? t2 c2) (eq? c1 c2)))
         (error `(lose (,(hash c1) ,c1) (,(hash c2) ,c2)))
         (lp (tree-copy c1) t1))))
 ;GC #6 23:09:39: took:   0.10   (0%) CPU,   0.10   (0%) real; free: 307188457

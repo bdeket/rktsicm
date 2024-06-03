@@ -8,6 +8,7 @@
          (only-in "../rkt/glue.rkt" if symbol
                   fix:= fix:+ fix:-)
          (only-in "../rkt/define.rkt" define default-object?)
+         (rename-in (only-in racket/base equal?) [equal? pair:eq?])
          "../rkt/applyhook.rkt"
          "../general/logic-utils.rkt"
          "../parameters.rkt"
@@ -432,13 +433,13 @@
   (define apply-hook
     (make-apply-hook
      (procedure-rename
-      (cond ((equal? arity *exactly-zero*)
+      (cond ((pair:eq? arity *exactly-zero*)
              (lambda () (literal-apply apply-hook '())))
-            ((equal? arity *exactly-one*)
+            ((pair:eq? arity *exactly-one*)
              (lambda (x) (literal-apply apply-hook (list x))))
-            ((equal? arity *exactly-two*)
+            ((pair:eq? arity *exactly-two*)
              (lambda (x y) (literal-apply apply-hook (list x y))))
-            ((equal? arity *exactly-three*)
+            ((pair:eq? arity *exactly-three*)
              (lambda (x y z) (literal-apply apply-hook (list x y z))))
             (else
              (lambda args (literal-apply apply-hook args))))
@@ -492,7 +493,7 @@
 
 (define (literal-partial apply-hook path)
   (let ((fexp
-         (if (equal? (g:arity apply-hook) *exactly-one*) ;univariate
+         (if (pair:eq? (g:arity apply-hook) *exactly-one*) ;univariate
              (if (fix:= (car path) 0)
                  (if (fix:= (length path) 1)
                      ;; Special-case the single argument case, or a
@@ -546,7 +547,7 @@
 ;; 	       (abstract-quantity? vv))
 ;; 	   (let ((fexp		  
 ;; 		  (let ((is (reverse indices)))
-;; 		    (if (equal? (g:arity apply-hook) *exactly-one*) ;univariate
+;; 		    (if (pair:eq? (g:arity apply-hook) *exactly-one*) ;univariate
 ;; 			(if (fix:= (car is) 0)
 ;; 			    (if (fix:= (length indices) 1)
 ;; 				(symb:derivative (f:expression apply-hook))

@@ -1,6 +1,7 @@
 ## rktSICM
 
-a racket port of scmutils (v 20230125 as found [here](http://groups.csail.mit.edu/mac/users/gjs/6946/linux-install.htm))
+a racket port of scmutils (v 20230902 as found [here](http://groups.csail.mit.edu/mac/users/gjs/6946/installation.html))
+ * Note Re 20230902: As I understand it, the MIT scheme 11.2 introduced an update to `equal?` that made the implementation of scmutils a lot slower, most of the changes made 20230902 are to address this and use a more selective `equal?` where possible to speed things up again.
 
 Original documentation: [&lt;as text&gt;](http://groups.csail.mit.edu/mac/users/gjs/6946/refman.txt) or [&lt;as pdf&gt;](http://groups.csail.mit.edu/mac/users/gjs/6946/refman.pdf)
 

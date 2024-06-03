@@ -10,6 +10,7 @@
          "../general/gjs-cselim.rkt"
          "../general/eq-properties.rkt"
          "../general/logic-utils.rkt"
+         "../general/equals.rkt"
          "syntax.rkt"
          "simplify.rkt"
          "split-poly.rkt"
@@ -398,7 +399,7 @@
      (and sqrt-factor-simplify?
           (let ((xs (rcf:simplify x)) (ys (rcf:simplify y)))
             (define (if-false) #f)
-            (if (equal? xs ys)
+            (if (simple:equal? xs ys)
                 (and (assume! `(non-negative? ,xs) 'c1 if-false)
                      `(* ,@a ,xs ,@b ,@c))
                 (and (assume! `(non-negative? ,xs) 'c1 if-false)
@@ -409,7 +410,7 @@
      (and sqrt-factor-simplify?
           (let ((xs (rcf:simplify x)) (ys (rcf:simplify y)))
             (define (if-false) #f)
-            (if (equal? xs ys)
+            (if (simple:equal? xs ys)
                 (and (assume! `(non-negative? ,xs) 'c2 if-false)
                      1)
                 (and (assume! `(non-negative? ,xs) 'c2 if-false)
@@ -420,7 +421,7 @@
      (and sqrt-factor-simplify?
           (let ((xs (rcf:simplify x)) (ys (rcf:simplify y)))
             (define (if-false) #f)
-            (if (equal? xs ys)
+            (if (simple:equal? xs ys)
                 (and (assume! `(non-negative? ,xs) 'c3 if-false)
                      `(* ,@a ,@b))
                 (and (assume! `(non-negative? ,xs) 'c3 if-false)
@@ -431,7 +432,7 @@
      (and sqrt-factor-simplify?
           (let ((xs (rcf:simplify x)) (ys (rcf:simplify y)))
             (define (if-false) #f)
-            (if (equal? xs ys)
+            (if (simple:equal? xs ys)
                 (and (assume! `(non-negative? ,xs) 'c4 if-false)
                      `(/ 1 (* ,@a ,@b)))
                 (and (assume! `(non-negative? ,xs) 'c4 if-false)
@@ -443,7 +444,7 @@
      (and sqrt-factor-simplify?
           (let ((xs (rcf:simplify x)) (ys (rcf:simplify y)))
             (define (if-false) #f)
-            (if (equal? xs ys)
+            (if (simple:equal? xs ys)
                 (and (assume! `(non-negative? ,xs) 'c5 if-false)
                      `(/ (* ,@a ,@b)  (* ,@c ,@d)))
                 (and (assume! `(non-negative? ,xs) 'c5 if-false)
@@ -675,7 +676,7 @@
    ( (atan (? y) (? x))
      (and aggressive-atan-simplify?
           (let ((ys (rcf:simplify y)) (xs (rcf:simplify x)))
-            (if (equal? ys xs)
+            (if (simple:equal? ys xs)
                 (if (number? ys)
                     (if (negative? ys)
                         '(- (/ (* 3 :pi) 4))
@@ -687,7 +688,7 @@
                 (if (and (number? ys) (number? xs))
                     (atan ys xs)
                     (let ((s (rcf:simplify `(gcd ,ys ,xs))))
-                      (if (equal? s 1)
+                      (if (simple:equal? s 1)
                           #f            ;do nothing
                           (let ((note `(assuming (positive? ,s)))
                                 (yv (rcf:simplify `(/ ,ys ,s)))
@@ -1353,7 +1354,7 @@
 (define (simplify-until-stable rule-simplify canonicalize)
   (define (simp exp)
     (let ((newexp (rule-simplify exp)))
-      (if (equal? exp newexp)
+      (if (simple:equal? exp newexp)
 	  exp
 	  (simp (canonicalize newexp)))))
   simp)
@@ -1362,10 +1363,10 @@
 (define (simplify-until-stable rule-simplify canonicalize)
   (define (simp exp)
     (let ((newexp (rule-simplify exp)))
-      (if (equal? exp newexp)
+      (if (simple:equal? exp newexp)
 	  exp
 	  (let ((cexp (canonicalize newexp)))
-	    (if (equal? exp cexp)
+	    (if (simple:equal? exp cexp)
 		exp
 		(simp cexp))))))
   simp)
@@ -1374,10 +1375,10 @@
 (define (simplify-until-stable rule-simplify canonicalize)
   (define (simp exp)
     (let ((newexp (rule-simplify exp)))
-      (if (equal? exp newexp)
+      (if (simple:equal? exp newexp)
 	  exp
 	  (let ((cexp (canonicalize newexp)))
-	    (cond ((equal? cexp exp) exp)
+	    (cond ((simple:equal? cexp exp) exp)
 		  ((exact-zero? (fpf:simplify `(- ,exp ,cexp))) cexp)
 		  (else (simp cexp)))))))
   simp)
@@ -1388,7 +1389,7 @@
 (define (simplify-and-canonicalize rule-simplify canonicalize)
   (define (simp exp)
     (let ((newexp (rule-simplify exp)))
-      (if (equal? exp newexp)
+      (if (simple:equal? exp newexp)
 	  exp
 	  (canonicalize newexp))))
   simp)

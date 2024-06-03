@@ -8,6 +8,7 @@
          "../rkt/applyhook.rkt"
          "../general/assert.rkt"
          "../general/sets.rkt"
+         (rename-in (only-in racket/base equal?) [equal? pair:eq?])
          "cstm/s-operator.rkt"
          "express.rkt"
          "types.rkt"
@@ -76,7 +77,7 @@
 
 
 (define (o:zero-like op)
-  (assert (equal? (operator-arity op) *exactly-one*) "o:zero-like")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:zero-like")
   (make-op (lambda (f) (g:zero-like f))
 	   'zero
 	   (operator-subtype op)
@@ -84,7 +85,7 @@
 	   (operator-optionals op)))
 
 (define (o:one-like op)
-  (assert (equal? (operator-arity op) *exactly-one*) "o:one-like")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:one-like")
   (make-op g:identity
 	   'identity
 	   (operator-subtype op)
@@ -201,7 +202,7 @@
 	   (operator-optionals op)))
 
 (define (o:expt op n)
-  (assert (equal? (operator-arity op) *exactly-one*) "o:expt")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:expt")
   (make-op (iterated op n o:identity)
 	   `(expt ,(operator-name op) ,n)
 	   (operator-subtype op)
@@ -209,7 +210,7 @@
 	   (operator-optionals op)))
 
 (define (o:exp op)
-  (assert (equal? (operator-arity op) *exactly-one*) "o:exp")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:exp")
   (make-op (lambda (g)
 	     (lambda x
 	       (g:apply ((series:value exp-series (list op)) g) x)))
@@ -219,7 +220,7 @@
 	   (operator-optionals op)))
 
 (define (o:cos op)
-  (assert (equal? (operator-arity op) *exactly-one*) "o:cos")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:cos")
   (make-op (lambda (g)
 	     (lambda x
 	       (g:apply ((series:value cos-series (list op)) g) x)))
@@ -229,7 +230,7 @@
 	   (operator-optionals op)))
 
 (define (o:sin op)
-  (assert (equal? (operator-arity op) *exactly-one*) "o:sin")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:sin")
   (make-op (lambda (g)
 	     (lambda x
 	       (g:apply ((series:value sin-series (list op)) g) x)))
@@ -249,7 +250,7 @@
 
 (define (expn op #:optional exponent)
   (assert (operator? op))
-  (assert (equal? (operator-arity op) *exactly-one*) "o:expn")
+  (assert (pair:eq? (operator-arity op) *exactly-one*) "o:expn")
   (if (default-object? exponent)
       (o:exp op)
       (make-op

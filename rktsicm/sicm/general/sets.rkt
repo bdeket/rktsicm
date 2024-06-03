@@ -3,7 +3,8 @@
 (provide (all-defined-out))
 
 (require (only-in "../rkt/glue.rkt" true false define-integrable delq)
-         "list-utils.rkt")
+         "list-utils.rkt"
+         "equals.rkt")
 
 ;;bdk;; start original file
 
@@ -157,27 +158,27 @@
 ;;; elements are tested with equal?
 
 (define (list-adjoin item list)
-  (if (member item list)
+  (if (member item list simple:equal?)
       list
       (cons item list)))
 
 (define (list-union l1 l2)
   (cond ((null? l1) l2)
-	((member (car l1) l2)
+	((member (car l1) l2 simple:equal?)
 	 (list-union (cdr l1) l2))
 	(else (cons (car l1)
 		    (list-union (cdr l1) l2)))))
 
 (define (list-intersection l1 l2)
   (cond ((null? l1) '())
-	((member (car l1) l2)
+	((member (car l1) l2 simple:equal?)
 	 (cons (car l1)
 	       (list-intersection (cdr l1) l2)))
 	(else (list-intersection (cdr l1) l2))))
 
 (define (list-difference l1 l2)
   (cond ((null? l1) '())
-	((member (car l1) l2)
+	((member (car l1) l2 simple:equal?)
 	 (list-difference (cdr l1) l2))
 	(else
 	 (cons (car l1)
@@ -185,21 +186,21 @@
 
 (define (duplications? lst)
   (cond ((null? lst) false)
-	((member (car lst) (cdr lst)) true)
+	((member (car lst) (cdr lst) simple:equal?) true)
 	(else (duplications? (cdr lst)))))
 
 (define (remove-duplicates list)
   (if (null? list)
       '()
       (let ((rest (remove-duplicates (cdr list))))
-        (if (member (car list) rest)
+        (if (member (car list) rest simple:equal?)
             rest
             (cons (car list) rest)))))
 
 (define (subset? s1 s2)
   (if (null? s1)
       true
-      (and (member (car s1) s2)
+      (and (member (car s1) s2 simple:equal?)
 	   (subset? (cdr s1) s2))))
 
 (define (same-set? s1 s2)
