@@ -27,5 +27,7 @@
 
 (define primary-file "main.rkt")
 
+(define scribblings '(["doc/rktsicm.scrbl" (multi-page)]))
+
 (define categories '(scientific))
 (define pkg-desc "Port of scmutils to racket")
