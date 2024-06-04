@@ -8,6 +8,7 @@
 (define primary-file "main.rkt")
 
 (define deps '("base" "compatibility-lib"))
+(define build-deps '("base" "racket-doc" "at-exp-lib" "scribble-lib" "sandbox-lib"))
 
 (define compile-omit-paths '("tests"))
 (define test-omit-paths '(#rx"sicm[/|\\\\]calculus"
@@ -31,3 +32,5 @@
                           #rx".*\\.bak"
                           ))
 (define test-include-paths '("tests"))
+
+(define scribblings '(["scribblings/rktsicm.scrbl" (multi-page)]))
