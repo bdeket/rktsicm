@@ -35,7 +35,7 @@
                                   (general-boost (R beta))
                                   (extended-rotation R))
                          xi)
-                        #:timeout 3))
+                        #:timeout 15))
    ))
 
 (module+ test

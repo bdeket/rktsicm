@@ -20,7 +20,7 @@
     [(_ rules ...)
      (with-syntax ([compiled-rules
                     (datum->syntax stx
-                                   (cons list
+                                   (cons #'list
                                          (map rule:compile (syntax->datum #'(rules ...)))))])
        #'(rule-simplifier compiled-rules))]))
 

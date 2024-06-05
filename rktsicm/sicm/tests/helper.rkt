@@ -20,6 +20,8 @@
 (define-syntax (check-unique-match? stx)
   (syntax-case stx ()
     [(_ term (ids ...) pattern)
+     #'(check-unique-match? term (ids ...) pattern #:when #t)]
+    [(_ term (ids ...) pattern #:when guard)
      (with-syntax ([loc (list (syntax-source stx)
                               (syntax-line stx)
                               (syntax-column stx)
@@ -34,6 +36,7 @@
             (check-true
              (match term
                [pattern
+                 #:when guard
                 (if (= (length '(ids ...))
                        (length (remove-duplicates (list ids ...))))
                     #t
@@ -48,6 +51,14 @@
                          (x y)
                          `(+ (* 4 ,x)
                              (* ,x ,y))))
+  (let ([a (gensym)]
+        [b (gensym)])
+    (check-unique-match? `((+ 4 ,a)
+                           (* ,a ,b))
+                         (x y)
+                         (list-no-order `(* ,x ,y)
+                                        `(+ 4 ,z))
+                         #:when (eq? x z)))
   
   (check-exn exn:fail?
              (λ ()

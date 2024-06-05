@@ -4,22 +4,8 @@ raco test: (submod ".\\sicm\\tests\\calculus\\Lie.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\SR-boost.rkt" test)
---------------------
-calculus/SR-boost > Unnamed test
-FAILURE
-name:       check-simplified?
-params:
-  '(simplify
-  ((compose
-    (extended-rotation R-inverse)
-    (general-boost (R beta))
-    (extended-rotation R))
-   xi))
-message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   SR-boost.rkt:33:5
---------------------
-2 success(es) 1 failure(s) 0 error(s) 3 test(s) run
-1
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\calculus\\SR-frames.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
@@ -59,10 +45,10 @@ params:
        (list d/dt d/dr d/dtheta d/dphi)))
     (list dt dr dtheta dphi))))
 message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   connection.rkt:328:14
+location:   sicm\tests\calculus\connection.rkt:328:14
 --------------------
 6 success(es) 1 failure(s) 0 error(s) 7 test(s) run
-cpu time: 8078 real time: 8066 gc time: 267
+cpu time: 8953 real time: 8950 gc time: 250
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -86,9 +72,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 51218 real time: 51281 gc time: 436
-cpu time: 34266 real time: 34293 gc time: 124
-cpu time: 4453 real time: 4453 gc time: 62
+cpu time: 53078 real time: 53084 gc time: 595
+cpu time: 35328 real time: 35372 gc time: 171
+cpu time: 4687 real time: 4687 gc time: 46
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -140,7 +126,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 281 real time: 285 gc time: 0
+cpu time: 312 real time: 322 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -192,7 +178,7 @@ FAILURE
 name:       check-simplified?
 params:     '(simplify (exact->inexact (Hn 300)))
 message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   numeric.rkt:38:4
+location:   sicm\tests\kernel\numeric.rkt:38:4
 --------------------
 5 success(es) 1 failure(s) 0 error(s) 6 test(s) run
 1
@@ -326,15 +312,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2500 real time: 2497 gc time: 234
-cpu time: 719 real time: 713 gc time: 31
-cpu time: 875 real time: 875 gc time: 16
-cpu time: 203 real time: 203 gc time: 0
-cpu time: 47 real time: 44 gc time: 0
-cpu time: 10281 real time: 10286 gc time: 469
-cpu time: 0 real time: 3 gc time: 0
-cpu time: 31 real time: 26 gc time: 0
-cpu time: 12203 real time: 12202 gc time: 826
+cpu time: 3141 real time: 3114 gc time: 389
+cpu time: 797 real time: 798 gc time: 93
+cpu time: 1125 real time: 1121 gc time: 62
+cpu time: 250 real time: 261 gc time: 15
+cpu time: 62 real time: 53 gc time: 15
+cpu time: 12735 real time: 12715 gc time: 593
+cpu time: 0 real time: 4 gc time: 0
+cpu time: 31 real time: 37 gc time: 0
+cpu time: 16781 real time: 16776 gc time: 1640
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -370,6 +356,6 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-3/578 test failures
-runtime: 23.6m 
-Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz    6-cores  2592MHz 
+2/579 test failures
+runtime: 25.816666666666666m 
+Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
