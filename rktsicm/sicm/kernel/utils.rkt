@@ -1,16 +1,12 @@
 #lang racket/base
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) *birkholz* print-depth print-breadth)
          (all-from-out "cstm/arity.rkt"))
 
 (require (only-in "../rkt/glue.rkt"
                   fix:= fix:< fix:+ fix:- if undefined-value true)
          (only-in "../rkt/define.rkt" define default-object?)
-         (only-in "../rkt/todo.rkt" pp)
-         (only-in racket/syntax format-id)
-         ;(for-syntax (only-in racket/base ))
          "../general/list-utils.rkt"
-         "../general/eq-properties.rkt"
          "cstm/arity.rkt"
          "cstm/make-plain-procedure.rkt")
 
@@ -442,72 +438,5 @@
       (error "PRINT-BREADTH: Wrong type argument" newval)))
 
 
-;;;for printing things out
-
-(define (wallp-pp p? . objs)
-  (if p? (for-each pp objs)))
-
-(define (pp-it x)
-  (pp x)
-  x)
-
-(define (watch-it wallp message)
-  (lambda (e)
-    (if wallp
-	(begin (newline)
-	       (display message)
-           (pp e)))
-    e))
-
-(define (cpp x #:optional port)
-  (let ((port
-	 (if (default-object? port)
-	     (current-output-port)
-	     port)))
-    (display "#|\n" port)
-    (pp x port true)			; as code 
-    (display "|#\n" port)))
-
-;;; Programs may leave notes here
-
-(define *taking-notes* #t)
-(define *showing-notes* #f)
-
-(define *notes* '())
-
-(define (note-that! note)
-  (and note                             ;fail if note is #f
-       (begin
-         (if *showing-notes*
-             (display-note note))
-         (if *taking-notes*
-             (begin 
-               (set! *notes* (lset-adjoin equal? *notes* note))
-               'noted)
-             'ignored))))
-
-(define (clear-notes!)
-  (set! *last-notes* *notes*)
-  (set! *notes* '()))
-
-(define (display-note note)
-  (display "#| ")
-  (newline)
-  (pp note)
-  (display "|#")
-  (newline))
-
-(define *last-notes*)
-(define *last-notes-shown*)
-
-(define (show-notes)
-  (set! *last-notes-shown* *last-notes*)
-  (newline)
-  (display "#| ")
-  (for-each (lambda (note)
-              (newline)
-              (pp note)
-              (let ((sig (eq-get note 'rules)))
-                (if sig (pp sig))))
-            *last-notes*)
-  (display "|#"))
+;;bdk;; moved to ../display/pp 1
+;;bdk;; moved to ../general/notes 1

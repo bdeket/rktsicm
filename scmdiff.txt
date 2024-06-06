@@ -1,5 +1,8 @@
+could not find: ../../racket/test/sicm/scmutils-20230902/display\pp.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/doc\helpers.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/enclose\alt-magic.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/general\assert.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/general\notes.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/kernel\ghelper.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/numerics\functions.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/numerics\linear.scm
@@ -32,7 +35,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
 10 difference(s) found in general/gjs-cselim
  2 difference(s) found in general/hashcons
  2 difference(s) found in general/list-utils
- 4 difference(s) found in general/logic-utils
+ 3 difference(s) found in general/logic-utils
  8 difference(s) found in general/memoize
  1 difference(s) found in general/permute
  2 difference(s) found in general/resource-limit

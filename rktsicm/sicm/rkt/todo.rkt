@@ -1,9 +1,6 @@
 #lang racket/base
 
-(require (for-syntax racket/base racket/syntax)
-         racket/list
-         racket/math
-         racket/stream)
+(require (for-syntax racket/base racket/syntax))
 (require (only-in "racket-help.rkt" warn))
 
 (provide (all-defined-out))
@@ -52,7 +49,13 @@
 (todo sub-coeff "???")
 (todo expt-coeff "???")
 
-(==> pp println)
+;(==> pp println)
+(define (pp datum [port (current-output-port)] [as-code? #f])
+  ;; (pp (lambda (x) x) port true) should print
+  ;;;; (lambda (x) x)
+  ;; but racket will print
+  ;;;; #<procedure>
+  (println datum port (if as-code? 1 0)))
 
 (==> fluid-let let) ;should be done with parameterize
 

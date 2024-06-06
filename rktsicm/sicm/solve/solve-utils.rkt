@@ -6,6 +6,7 @@
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
          "../general/equals.rkt"
+         "../display/pp.rkt"
          "solve.rkt")
 
 ;;bdk;; start original file

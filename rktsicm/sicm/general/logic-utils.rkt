@@ -11,6 +11,7 @@
          "eq-properties.rkt"
          "../kernel/numeric.rkt"
          "../kernel/cstm/express.rkt"
+         (only-in "notes.rkt" note-that!)
          )
 
 ;;bdk;; start original file
@@ -89,7 +90,6 @@
 (define (add-assumption! assumption responsible-party)
   (let ((a `(assuming ,assumption)))
     (eq-adjoin! a 'rules responsible-party)
-    #; ;TODO
     (note-that! a)))
 
 #|

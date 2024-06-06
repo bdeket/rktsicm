@@ -1,8 +1,7 @@
 #lang racket/base
 
 (require rackunit
-         "../../main.rkt"
-         "../../rkt/int.rkt"
+         "../../kernel/utils.rkt"
          "../helper.rkt"
          )
 
@@ -14,7 +13,6 @@
                ((((defer-application (lambda (x) (* 3 x))) (lambda (x) (+ x 2)))
                  (lambda (x) (/ x 2))) 3)
                21/2))
-
    ))
 
 (module+ test

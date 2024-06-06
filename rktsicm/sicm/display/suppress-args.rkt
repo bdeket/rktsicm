@@ -2,9 +2,7 @@
 
 (provide (all-defined-out))
 
-(require racket/syntax
-         "../rkt/racket-help.rkt"
-         )
+(require racket/syntax)
 
 ;;bdk;; start original file
 

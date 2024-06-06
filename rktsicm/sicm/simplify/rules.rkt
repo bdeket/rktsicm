@@ -11,6 +11,7 @@
          "../general/eq-properties.rkt"
          "../general/logic-utils.rkt"
          "../general/equals.rkt"
+         (only-in "../general/notes.rkt" note-that!)
          "syntax.rkt"
          "simplify.rkt"
          "split-poly.rkt"

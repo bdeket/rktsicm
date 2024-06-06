@@ -6,7 +6,7 @@
                   fix:= fix:< fix:> fix:+ fix:- fix:*
                   flo:+ flo:- flo:* flo:/)
          (only-in "../../rkt/define.rkt" define default-object?)
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" wallp-pp pp)
          "../../kernel-intr.rkt"
          "../linear/full-pivot.rkt"
          "advance.rkt"

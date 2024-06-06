@@ -7,7 +7,6 @@
          "pcfpf/pcf-fpf.rkt"
          "../general/resource-limit.rkt"
          "../general/list-utils.rkt"
-         "../kernel/utils.rkt"
          "fpf.rkt"
          "pcfpf/pcf.rkt"
          "sparse.rkt"
