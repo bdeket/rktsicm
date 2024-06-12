@@ -1,373 +1,109 @@
-raco test: ".\\sicm\\generic.rkt"
-raco test: ".\\sicm\\main.rkt"
-raco test: (submod ".\\sicm\\tests\\calculus\\Lie.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\SR-boost.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\SR-frames.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\basis.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\connection.rkt" test)
---------------------
-calculus/connection > ORIG:flat-lorentz
-FAILURE
-name:       check-simplified?
-params:
-  '(simplify
-  (accumulate
-   acc
-   (for-each
-    (lambda (alpha)
-      (for-each
-       (lambda (beta)
-         (for-each
-          (lambda (gamma)
-            (for-each
-             (lambda (delta)
-               (acc
-                (simplify
-                 (((Riemann
-                    (covariant-derivative
-                     (Christoffel->Cartan
-                      (orthonormal-spherical-Lorentz-second-connection 'c^2))))
-                   alpha
-                   beta
-                   gamma
-                   delta)
-                  spherical-Lorentz-point))))
-             (list d/dt d/dr d/dtheta d/dphi)))
-          (list d/dt d/dr d/dtheta d/dphi)))
-       (list d/dt d/dr d/dtheta d/dphi)))
-    (list dt dr dtheta dphi))))
-message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   sicm\tests\calculus\connection.rkt:328:14
---------------------
-6 success(es) 1 failure(s) 0 error(s) 7 test(s) run
-cpu time: 8985 real time: 8997 gc time: 128
-1
-raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\covariant-derivative.rkt" test)
-15 success(es) 0 failure(s) 0 error(s) 15 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\curvature.rkt" test)
-7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\dgutils.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\exterior-derivative.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\form-fields.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
-0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 47719 real time: 47714 gc time: 579
-cpu time: 31672 real time: 31669 gc time: 271
-cpu time: 3890 real time: 3887 gc time: 31
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
-8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\indexed.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\interior-product.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\manifold.rkt" test)
-13 success(es) 0 failure(s) 0 error(s) 13 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\maps.rkt" test)
-7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\metric.rkt" test)
-8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\ode.rkt" test)
-0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\so3.rkt" test)
-18 success(es) 0 failure(s) 0 error(s) 18 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\tensors.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\vector-calculus.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\vector-fields.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\calculus\\wedge.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\display\\pp.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\display\\suppress-args.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\assert.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\eq-properties.rkt" test)
-13 success(es) 0 failure(s) 0 error(s) 13 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\gjs-cselim.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\hashcons.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 359 real time: 363 gc time: 0
-cpu time: 0 real time: 0 gc time: 0
-cpu time: 0 real time: 0 gc time: 0
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\notes.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\permute.rkt" test)
-6 success(es) 0 failure(s) 0 error(s) 6 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\sets.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\general\\weak.rkt" test)
-8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\helper.rkt" test)
-raco test: (submod ".\\sicm\\tests\\kernel\\arity.rkt" test)
-24 success(es) 0 failure(s) 0 error(s) 24 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\deriv.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\diff.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\diffbug\\derivative-test.rkt" test)
-32 success(es) 0 failure(s) 0 error(s) 32 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\express.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\extapply.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\function.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\ghelper.rkt" test)
-5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\litfun.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\modarith.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\numeric.rkt" test)
---------------------
-kernel/numeric > harmonic - slow
-FAILURE
-name:       check-simplified?
-params:     '(simplify (exact->inexact (Hn 300)))
-message:    "timeout = 3s => simplification/calculation too difficult?"
-location:   sicm\tests\kernel\numeric.rkt:38:4
---------------------
-5 success(es) 1 failure(s) 0 error(s) 6 test(s) run
-1
-raco test: (submod ".\\sicm\\tests\\kernel\\quaternion.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\structs.rkt" test)
-28 success(es) 0 failure(s) 0 error(s) 28 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\kernel\\utils.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\Hamiltonian.rkt" test)
-14 success(es) 0 failure(s) 0 error(s) 14 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\Lagrangian-transformations.rkt" test)
-5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\Lagrangian.rkt" test)
-11 success(es) 0 failure(s) 0 error(s) 11 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\Lie-transform.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\Noether.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\Routhian.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\action.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\canonical.rkt" test)
-10 success(es) 0 failure(s) 0 error(s) 10 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\gamma-bar.rkt" test)
-9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\qual+pointtransform.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\rigid.rkt" test)
-10 success(es) 0 failure(s) 0 error(s) 10 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\symplectic.rkt" test)
-11 success(es) 0 failure(s) 0 error(s) 11 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\time-varying.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\mechanics\\universal.rkt" test)
-9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\extrapolate\\re.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\functions\\bessel.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\functions\\elliptic.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\linear\\eigen.rkt" test)
-9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\linear\\svd-least-squares.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\linear\\svd.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\linear\\vandermonde.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\ode\\bulirsch-stoer.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\ode\\interface.rkt" test)
-5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\ode\\ode-advancer.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\ode\\qc.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\optimize\\optimize.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\quadrature\\defint.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\quadrature\\quadrature.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\roots\\bisect.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\roots\\multidimensional.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\roots\\newton-kahan.rkt" test)
-4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\roots\\zbrent.rkt" test)
-9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\roots\\zeros.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\signals\\cph-dsp\\flovec.rkt" test)
-22 success(es) 0 failure(s) 0 error(s) 22 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\signals\\dft.rkt" test)
-7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\signals\\fft.rkt" test)
-6 success(es) 0 failure(s) 0 error(s) 6 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\numerics\\signals\\fourier.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\poly\\interp-generic.rkt" test)
-5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\rkt\\define.rkt" test)
-9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 2782 real time: 2779 gc time: 64
-cpu time: 921 real time: 918 gc time: 249
-cpu time: 1063 real time: 1057 gc time: 79
-cpu time: 234 real time: 248 gc time: 15
-cpu time: 63 real time: 51 gc time: 0
-cpu time: 12031 real time: 12028 gc time: 655
-cpu time: 0 real time: 4 gc time: 0
-cpu time: 31 real time: 36 gc time: 0
-cpu time: 15860 real time: 15861 gc time: 1254
-9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
-8 success(es) 0 failure(s) 0 error(s) 8 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\pcf.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\rz-test-cases.rkt" test)
-7 success(es) 0 failure(s) 0 error(s) 7 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\simplify.rkt" test)
-1 success(es) 0 failure(s) 0 error(s) 1 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\sparse-gcd.rkt" test)
-11 success(es) 0 failure(s) 0 error(s) 11 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\sparse-interpolate.rkt" test)
-5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\sparse.rkt" test)
-2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\simplify\\split-poly.rkt" test)
-5 success(es) 0 failure(s) 0 error(s) 5 test(s) run
-0
-raco test: (submod ".\\sicm\\tests\\solve\\solve-utils.rkt" test)
-23 success(es) 0 failure(s) 0 error(s) 23 test(s) run
-0
-raco test: ".\\sicm\\tests\\solve\\solve.rkt"
-'(((+ -5 (* 3 x484) (* -1 x485)) (eq:0) (x485 x484)) ((+ -7 (* 3 x484) x485) (eq:1) (x485 x484)))
-'(((+ -5 (* 3 x492) (* -1 x493)) (eq:0) (x493 x492)) ((+ k494 (* 3 x492) x493) (eq:1) (x493 x492 k494)))
-raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
-3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
-0
+   0 .\sicm\generic.rkt
+   0 .\sicm\main.rkt
+   4 .\sicm\tests\calculus\Lie.rkt
+   3 .\sicm\tests\calculus\SR-boost.rkt
+   3 .\sicm\tests\calculus\SR-frames.rkt
+   2 .\sicm\tests\calculus\basis.rkt
+1  7 .\sicm\tests\calculus\connection.rkt
+   3 .\sicm\tests\calculus\coord.rkt
+  15 .\sicm\tests\calculus\covariant-derivative.rkt
+   7 .\sicm\tests\calculus\curvature.rkt
+   2 .\sicm\tests\calculus\dgutils.rkt
+   1 .\sicm\tests\calculus\exterior-derivative.rkt
+   2 .\sicm\tests\calculus\form-fields.rkt
+   0 .\sicm\tests\calculus\frame-maker.rkt
+   3 .\sicm\tests\calculus\gram-schmidt.rkt
+   8 .\sicm\tests\calculus\hodge-star.rkt
+   3 .\sicm\tests\calculus\indexed.rkt
+   1 .\sicm\tests\calculus\interior-product.rkt
+  13 .\sicm\tests\calculus\manifold.rkt
+   7 .\sicm\tests\calculus\maps.rkt
+   8 .\sicm\tests\calculus\metric.rkt
+   0 .\sicm\tests\calculus\ode.rkt
+  18 .\sicm\tests\calculus\so3.rkt
+   3 .\sicm\tests\calculus\tensors.rkt
+   2 .\sicm\tests\calculus\vector-calculus.rkt
+   3 .\sicm\tests\calculus\vector-fields.rkt
+   2 .\sicm\tests\calculus\wedge.rkt
+   4 .\sicm\tests\display\pp.rkt
+   3 .\sicm\tests\display\suppress-args.rkt
+   3 .\sicm\tests\general\assert.rkt
+  13 .\sicm\tests\general\eq-properties.rkt
+   4 .\sicm\tests\general\gjs-cselim.rkt
+   1 .\sicm\tests\general\hashcons.rkt
+   4 .\sicm\tests\general\list-utils.rkt
+   3 .\sicm\tests\general\memoize.rkt
+   4 .\sicm\tests\general\notes.rkt
+   6 .\sicm\tests\general\permute.rkt
+   1 .\sicm\tests\general\sets.rkt
+   8 .\sicm\tests\general\weak.rkt
+   7 .\sicm\tests\helper.rkt
+  24 .\sicm\tests\kernel\arity.rkt
+   2 .\sicm\tests\kernel\deriv.rkt
+   1 .\sicm\tests\kernel\diff.rkt
+  32 .\sicm\tests\kernel\diffbug\derivative-test.rkt
+   1 .\sicm\tests\kernel\express.rkt
+   2 .\sicm\tests\kernel\extapply.rkt
+   1 .\sicm\tests\kernel\function.rkt
+   5 .\sicm\tests\kernel\ghelper.rkt
+   3 .\sicm\tests\kernel\litfun.rkt
+   3 .\sicm\tests\kernel\modarith.rkt
+1  6 .\sicm\tests\kernel\numeric.rkt
+   3 .\sicm\tests\kernel\quaternion.rkt
+  28 .\sicm\tests\kernel\structs.rkt
+   1 .\sicm\tests\kernel\utils.rkt
+  14 .\sicm\tests\mechanics\Hamiltonian.rkt
+   5 .\sicm\tests\mechanics\Lagrangian-transformations.rkt
+  11 .\sicm\tests\mechanics\Lagrangian.rkt
+   3 .\sicm\tests\mechanics\Lie-transform.rkt
+   1 .\sicm\tests\mechanics\Noether.rkt
+   2 .\sicm\tests\mechanics\Routhian.rkt
+   1 .\sicm\tests\mechanics\action.rkt
+  10 .\sicm\tests\mechanics\canonical.rkt
+   9 .\sicm\tests\mechanics\gamma-bar.rkt
+   2 .\sicm\tests\mechanics\qual+pointtransform.rkt
+  10 .\sicm\tests\mechanics\rigid.rkt
+  11 .\sicm\tests\mechanics\symplectic.rkt
+   1 .\sicm\tests\mechanics\time-varying.rkt
+   9 .\sicm\tests\mechanics\universal.rkt
+   3 .\sicm\tests\numerics\extrapolate\re.rkt
+   1 .\sicm\tests\numerics\functions\bessel.rkt
+   3 .\sicm\tests\numerics\functions\elliptic.rkt
+   9 .\sicm\tests\numerics\linear\eigen.rkt
+   1 .\sicm\tests\numerics\linear\svd-least-squares.rkt
+   4 .\sicm\tests\numerics\linear\svd.rkt
+   3 .\sicm\tests\numerics\linear\vandermonde.rkt
+   3 .\sicm\tests\numerics\ode\bulirsch-stoer.rkt
+   5 .\sicm\tests\numerics\ode\interface.rkt
+   1 .\sicm\tests\numerics\ode\ode-advancer.rkt
+   3 .\sicm\tests\numerics\ode\qc.rkt
+   2 .\sicm\tests\numerics\optimize\optimize.rkt
+   2 .\sicm\tests\numerics\quadrature\defint.rkt
+   3 .\sicm\tests\numerics\quadrature\quadrature.rkt
+   4 .\sicm\tests\numerics\roots\bisect.rkt
+   3 .\sicm\tests\numerics\roots\multidimensional.rkt
+   4 .\sicm\tests\numerics\roots\newton-kahan.rkt
+   9 .\sicm\tests\numerics\roots\zbrent.rkt
+   2 .\sicm\tests\numerics\roots\zeros.rkt
+  22 .\sicm\tests\numerics\signals\cph-dsp\flovec.rkt
+   7 .\sicm\tests\numerics\signals\dft.rkt
+   6 .\sicm\tests\numerics\signals\fft.rkt
+   3 .\sicm\tests\numerics\signals\fourier.rkt
+   5 .\sicm\tests\poly\interp-generic.rkt
+   9 .\sicm\tests\rkt\define.rkt
+   2 .\sicm\tests\simplify\expand-nary.rkt
+   9 .\sicm\tests\simplify\gcd-tests.rkt
+   8 .\sicm\tests\simplify\matcher.rkt
+   3 .\sicm\tests\simplify\pcf.rkt
+   7 .\sicm\tests\simplify\rz-test-cases.rkt
+   1 .\sicm\tests\simplify\simplify.rkt
+  11 .\sicm\tests\simplify\sparse-gcd.rkt
+   5 .\sicm\tests\simplify\sparse-interpolate.rkt
+   2 .\sicm\tests\simplify\sparse.rkt
+   5 .\sicm\tests\simplify\split-poly.rkt
+  23 .\sicm\tests\solve\solve-utils.rkt
+  25 .\sicm\tests\solve\solve.rkt
+   3 .\sicm\tests\units\system.rkt
 2/603 test failures
-runtime: 24.95m 
+runtime: 7.333333333333333m 
 Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
