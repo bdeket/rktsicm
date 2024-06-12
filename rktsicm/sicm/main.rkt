@@ -28,8 +28,7 @@
                        "calculus.rkt"
                        ))
 
-(require (only-in "rkt/environment.rkt" extend-environment
-                  scmutils-base-environment generic-environment)
+(require (only-in "rkt/environment.rkt" scmutils-base-environment generic-environment)
          racket/runtime-path)
 (define-runtime-path here ".")
 (define (mkpath x) `(file ,(path->string (build-path here x))))

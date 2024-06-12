@@ -79,8 +79,12 @@
 
 (define (extend-environment cns env)
   (for* ([s (in-list (namespace-mapped-symbols env))]
-         [v (in-value (namespace-variable-value s #t (λ () not-defined) env))]
-         #:unless (eq? v not-defined))
+         [v (in-value (with-handlers ([exn:fail:syntax? (λ (e) not-defined)])
+                        (namespace-variable-value s #t (λ () not-defined) env)))]
+         #:unless (eq? v not-defined)
+         [w (in-value (with-handlers ([exn:fail:syntax? (λ (e) not-defined)])
+                        (namespace-variable-value s #t (λ () not-defined) cns)))]
+         #:unless (eq? v w))
     (namespace-set-variable-value! s v #t cns))
   cns)
 
