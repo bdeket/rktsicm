@@ -48,7 +48,7 @@ message:    "timeout = 3s => simplification/calculation too difficult?"
 location:   sicm\tests\calculus\connection.rkt:328:14
 --------------------
 6 success(es) 1 failure(s) 0 error(s) 7 test(s) run
-cpu time: 9437 real time: 9438 gc time: 281
+cpu time: 8985 real time: 8997 gc time: 128
 1
 raco test: (submod ".\\sicm\\tests\\calculus\\coord.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -72,9 +72,9 @@ raco test: (submod ".\\sicm\\tests\\calculus\\frame-maker.rkt" test)
 0 success(es) 0 failure(s) 0 error(s) 0 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\gram-schmidt.rkt" test)
-cpu time: 59828 real time: 59843 gc time: 643
-cpu time: 37000 real time: 36998 gc time: 110
-cpu time: 4594 real time: 4587 gc time: 47
+cpu time: 47719 real time: 47714 gc time: 579
+cpu time: 31672 real time: 31669 gc time: 271
+cpu time: 3890 real time: 3887 gc time: 31
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\calculus\\hodge-star.rkt" test)
@@ -119,6 +119,12 @@ raco test: (submod ".\\sicm\\tests\\display\\pp.rkt" test)
 raco test: (submod ".\\sicm\\tests\\display\\suppress-args.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
+raco test: (submod ".\\sicm\\tests\\general\\assert.rkt" test)
+3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
+0
+raco test: (submod ".\\sicm\\tests\\general\\eq-properties.rkt" test)
+13 success(es) 0 failure(s) 0 error(s) 13 test(s) run
+0
 raco test: (submod ".\\sicm\\tests\\general\\gjs-cselim.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
@@ -129,7 +135,7 @@ raco test: (submod ".\\sicm\\tests\\general\\list-utils.rkt" test)
 4 success(es) 0 failure(s) 0 error(s) 4 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\general\\memoize.rkt" test)
-cpu time: 359 real time: 350 gc time: 0
+cpu time: 359 real time: 363 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 cpu time: 0 real time: 0 gc time: 0
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
@@ -318,15 +324,15 @@ raco test: (submod ".\\sicm\\tests\\simplify\\expand-nary.rkt" test)
 2 success(es) 0 failure(s) 0 error(s) 2 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\gcd-tests.rkt" test)
-cpu time: 3297 real time: 3301 gc time: 189
-cpu time: 1047 real time: 1035 gc time: 218
-cpu time: 1515 real time: 1531 gc time: 94
-cpu time: 391 real time: 403 gc time: 15
-cpu time: 78 real time: 63 gc time: 0
-cpu time: 14641 real time: 14656 gc time: 925
+cpu time: 2782 real time: 2779 gc time: 64
+cpu time: 921 real time: 918 gc time: 249
+cpu time: 1063 real time: 1057 gc time: 79
+cpu time: 234 real time: 248 gc time: 15
+cpu time: 63 real time: 51 gc time: 0
+cpu time: 12031 real time: 12028 gc time: 655
 cpu time: 0 real time: 4 gc time: 0
-cpu time: 31 real time: 39 gc time: 0
-cpu time: 18000 real time: 18024 gc time: 1524
+cpu time: 31 real time: 36 gc time: 0
+cpu time: 15860 real time: 15861 gc time: 1254
 9 success(es) 0 failure(s) 0 error(s) 9 test(s) run
 0
 raco test: (submod ".\\sicm\\tests\\simplify\\matcher.rkt" test)
@@ -362,6 +368,6 @@ raco test: ".\\sicm\\tests\\solve\\solve.rkt"
 raco test: (submod ".\\sicm\\tests\\units\\system.rkt" test)
 3 success(es) 0 failure(s) 0 error(s) 3 test(s) run
 0
-2/587 test failures
-runtime: 25.333333333333332m 
+2/603 test failures
+runtime: 24.95m 
 Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 

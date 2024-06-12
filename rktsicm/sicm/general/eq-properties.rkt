@@ -1,6 +1,8 @@
 #lang racket/base
 
 (provide (except-out (all-defined-out) assoc-del assq-del assoc-del* assq-del* assoc-set assq-set))
+(module+ ALL (provide (all-from-out (submod ".."))
+                      assoc-del assq-del assoc-del* assq-del* assoc-set assq-set))
 
 (require (only-in "../rkt/glue.rkt" hash-table/get hash-table/put! delq)
          "list-utils.rkt")
@@ -21,7 +23,7 @@
       [(ormap (λ (x) (is-equal? (caar lst) x)) itms)
        (loop (cdr lst))]
       [else (cons (car lst) (loop (cdr lst)))])))
-(define (assq-del* itms lst) (assoc-del itms lst eq?))
+(define (assq-del* itms lst) (assoc-del* itms lst eq?))
 
 (define (assoc-set lst itm val [is-equal? equal?])
   (define done #f)
