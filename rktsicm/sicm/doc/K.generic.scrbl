@@ -5,7 +5,8 @@
           (for-label sicm))
 
 @title[#:tag "kernel/generic"]{Generic}
-@defmodule[sicm/generic #:packages ("rktsicm") #:lang]
+@defmodule[sicm/kernel/generic #:packages ("rktsicm")]
+
 The @racket[sicm/generic] language provides all generic @racketid[g:function]s as @racketid[function]. The original racket @racketid[function]s are exported as @racketid[rkt:function]
 
 @defsameproc*[[([v value?] ...) value? (+ g:+)]

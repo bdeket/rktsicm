@@ -40,9 +40,9 @@ The mechanics and calculus modules are all defined in this language.
 @include-section{01-example.scrbl}
 @;@include-section{mit.scrbl}
 
-@include-section{03-00-general.scrbl}
-
-@include-section{04-00-kernel.scrbl}
+@include-section{general.scrbl}
+@;@include-section{generics.scrbl}
+@include-section{kernel.scrbl}
 @;@include-section{simplify.scrbl}
 @;@include-section{display.scrbl}
 @;@include-section{numerics.scrbl}
