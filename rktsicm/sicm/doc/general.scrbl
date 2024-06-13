@@ -1,30 +1,72 @@
 #lang scribble/manual
 
-@(require (for-syntax racket/base)
-          "helpers.rkt"
-          )
+@(require "helpers.rkt"
+          (for-label racket/base
+                     racket/contract))
 
-@title{General}
+@title[#:style 'toc]{General}
+Modules under @racket[sicm/general] hold functions that are not exported by @racket[sicm]. Mostly they are used for internal purposes, but they might be handy.
 
+@local-table-of-contents[]
 
 @section{assert}
-@(require (for-label sicm/general/assert))
 @defmodule[sicm/general/assert #:packages ("rktsicm")]
-@deftempproc*[assert]
-Helper for raising test failures.
+@(let ()
+   (local-require (for-label sicm/general/assert))
+   @list{
+ @defform[(assert test [msg id args ...])
+          #:contracts ([test any?]
+                       [msg string?])]
+ Helper for raising test failures. Shorthand for
+ @codeblock{(unless test (error "some message ..."))}})
 
 @section{eq-properties}
-@(require (for-label sicm/general/eq-properties))
 @defmodule[sicm/general/eq-properties #:packages ("rktsicm")]
-@deftempproc*[eq-adjoin! eq-clone! eq-delete! eq-get eq-label! eq-path eq-plist eq-properties
-              eq-put! eq-rem!]
-Master record for defining/adding/removing properties on objects.
+@(let ()
+   (local-require (for-label sicm/general/eq-properties))
+   @list{
+ This module provides methods for anotating objects. It manages a master record where objects are linked (weakly) to some properties. One of the ways this is used is in the solver to annotate that an abstract-number is expected to be real, or positive etc...
+ 
+ Objects that are @racket[eq?] will share the same properties. Property keys are tested with @racket[eq?]
+  
+ @defproc[(eq-get [obj any/c] [key any/c]) any/c]
+ Retrieve the property @racket[key] from object @racket[obj].
+ @defproc[(eq-put! [obj any/c] [key any/c] [val any/c]) obj]
+ Sets property @racket[key] for object @racket[obj] to value @racket[val].
+ @defproc[(eq-label! [obj any/c] [key any/c] [val any/c] ... ...) obj]
+ Sets property @racket[key], value @racket[val] pairs for object @racket[obj].
+ @defproc[(eq-rem! [obj any/c] [key any/c] ...) obj]
+ Removes properties @racket[key] from object @racket[obj].
+ @defproc[(eq-plist [obj any?]) (listof (cons/c any/c any/c))]
+ Retrieve the properties from @racket[obj] as an association list.
+
+ @defproc[(eq-adjoin! [obj any/c] [key any/c] [val any/c]) obj]
+ For property @racket[key] of object @racket[obj] where the property points to a set, add value @racket[val] to this set. If property @racket[key] is not yet defined, create it.
+ @defproc[(eq-delete! [obj any/c] [key any/c] [val any/c]) obj]
+ For property @racket[key] of object @racket[obj] where the property points to a set, remove value @racket[val] from this set.
+
+ @defproc[(eq-clone! [source any/c] [target any/c]) target]
+ Copy all properties defined on @racket[source] to @racket[target], removing any previously defined properties of @racket[target].})
 
 @section{equals}
-@(require (for-label sicm/general/equals))
 @defmodule[sicm/general/equals #:packages ("rktsicm")]
-@deftempproc*[pair:eq? simple:equal? vector:equal?]
-Fast variants of @racket[equal?] for specific data.
+@(let ()
+   (local-require (for-label sicm/general/equals))
+   @list{
+ This module defines some new equality tests that where introduced after MIT-Scheme 11.2 updated its definition of @racket[equal?]. While in @racket[rktsicm] no improvements where noted when changing to the below equality tests, they are implemented and used to keep the source code in line with the original as much as possible.
+                                                                                                                   
+ @defproc[(pair:eq? [x pair?] [y pair?]) boolean?]
+ Check that the @racket[car] and @racket[cdr] of two pairs ar @racket[eq?].
+ @defproc[(vector:equal? [x vector?] [y vector?]) boolean?]
+ Check that two @racket[vector]s are @racket[simple:equal?]
+ @defproc[(simple:equal? [x any/c] [y any/c]) boolean?]
+ Equality check that returns @racket[#t] if both objects are one of:
+ @itemlist[
+ @item{@racket[eq?]}
+ @item{@racket[pair?] and both @racket[car] and @racket[cdr] are @racket[simple:equal?]}
+ @item{@racket[vector?] and @racket[vector:equal?]}
+ @item{@racket[number?] and @racket[eqv?]}
+ @item{@racket[string?] and @racket[string=?]}]})
 
 @|#|
 Only used by unifier-rule-simplifier, which is not used
@@ -80,6 +122,12 @@ Unique consing
               scmutils-memoize-multi-arg-eq simple-memoize-multi-arg-eq struct:memoizer
               weak-find-eq-args? weak-find-equal-args? weak-find-eqv-args? memoizer]
 
+@section{notes}
+@(require (for-label sicm/general/notes))
+@defmodule[sicm/general/note #:packages ("rktsicm")]
+@deftempproc*[*notes* note-that! clear-notes! display-note show-notes]
+
+
 @section{permute}
 @(require (for-label sicm/general/permute))
 @defmodule[sicm/general/permute #:packages ("rktsicm")]
@@ -94,17 +142,18 @@ Unique consing
 @deftempproc*[allocated-time-expired? with-limited-time]
 
 @section{sets}
-@(require (for-label sicm/general/sets))
 @defmodule[sicm/general/sets #:packages ("rktsicm")]
-@deftempproc*[<numbers adjoin-set difference-sets duplications? element-set? empty-set empty-set?
-              eq-set/adjoin eq-set/difference eq-set/empty? eq-set/equal? eq-set/intersection
-              eq-set/make-empty eq-set/member? eq-set/remove eq-set/subset? eq-set/union
-              intersect-sets list->set list-adjoin list-difference list-intersection list-union
-              make-sets-package multi-set/adjoin multi-set/difference multi-set/element?
-              multi-set/empty multi-set/empty? multi-set/first multi-set/intersection
-              multi-set/remove multi-set/rest multi-set/union numbers real-numbers remove-duplicates
-              remove-set same-set? set->list singleton-set singleton-set? subset-sets? subset?
-              symbols union-sets]
+@(let ()
+   (local-require (for-label sicm/general/sets))
+   @deftempproc*[<numbers adjoin-set difference-sets duplications? element-set? empty-set empty-set?
+                 eq-set/adjoin eq-set/difference eq-set/empty? eq-set/equal? eq-set/intersection
+                 eq-set/make-empty eq-set/member? eq-set/remove eq-set/subset? eq-set/union
+                 intersect-sets list->set list-adjoin list-difference list-intersection list-union
+                 make-sets-package multi-set/adjoin multi-set/difference multi-set/element?
+                 multi-set/empty multi-set/empty? multi-set/first multi-set/intersection
+                 multi-set/remove multi-set/rest multi-set/union numbers real-numbers remove-duplicates
+                 remove-set same-set? set->list singleton-set singleton-set? subset-sets? subset?
+                 symbols union-sets])
 
 @section{stack-queue}
 @(require (for-label sicm/general/stack-queue))
