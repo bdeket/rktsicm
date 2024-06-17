@@ -79,13 +79,26 @@ Only used by unifier-rule-simplifier, which is not used
 |#|
 
 @section{gjs-cselim}
-@(require (for-label sicm/general/gjs-cselim))
 @defmodule[sicm/general/gjs-cselim #:packages ("rktsicm")]
-@deftempproc*[entry-cntr entry-expr entry-name entry? expressions-seen gjs/cselim
-              make-canonical-lets make-expression-recorder make-let-expression occurs-in?
-              record-expression! set-entry-cntr! set-entry-expr! set-entry-name! struct:entry
-              variable->expression entry]
-common-subexpression eliminator
+@(let ()
+   (local-require scribble/examples
+                  racket/sandbox
+                  (for-label sicm/general/gjs-cselim))
+   @list{
+ Some utilities for finding common subexpressions
+ @defproc[(gjs/cselim [expression any/c] [not-worth-subdividing? predicate/c (λ (x) #f)]) any/c]
+ Given a (symbolic) expression, find the common subexpressions and rewrite the expression inserting @racket[let]'s at the highest possible level. Any expression that is @racket[not-worth-subdividing?] will be left as is.
+ @examples[#:eval (parameterize ([sandbox-memory-limit 50]
+                                 [sandbox-eval-limits '(15 30)]
+                                 [sandbox-output 'string]
+                                 [sandbox-error-output 'string])
+                    (make-evaluator 'racket/base #:requires '(sicm/general/gjs-cselim)))
+           #:once
+           (gjs/cselim '(lambda (x)
+                          (/ (+ (* x 3) (- y z) (- x y) (* x 3))
+                             (- y z))))]
+ @defproc[(occurs-in? [variables any/c] [expression any/c]) (or/c #f #t list?)]
+ Check if any of the @racket[variables] occur in the @racket[expression], but also works if @racket[variables] or @racket[expression] is an object instead of a list.})
 
 @section{hashcons}
 @(require (for-label sicm/general/hashcons))
