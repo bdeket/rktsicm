@@ -4,6 +4,7 @@ a racket port of scmutils (v 20230902 as found [here](http://groups.csail.mit.ed
  * Note Re 20230902: As I understand it, the MIT scheme 11.2 introduced an update to `equal?` that made the implementation of scmutils a lot slower, most of the changes made 20230902 are to address this and use a more selective `equal?` where possible to speed things up again.
 
 Original documentation: [&lt;as text&gt;](http://groups.csail.mit.edu/mac/users/gjs/6946/refman.txt) or [&lt;as pdf&gt;](http://groups.csail.mit.edu/mac/users/gjs/6946/refman.pdf)
+A start for scribble documentation is made in the [documentation branch](https://github.com/bdeket/rktsicm/tree/documentation), and can be previewed at [bdeket.github.io/rktsicm](https://bdeket.github.io/rktsicm).
 
 Except for the print/plot/compile utilities everything in the main `load-real.scm` hieararchy has been preserved.
 Currently everything compiles. More testing will be needed to check that everything works as expected.
@@ -12,6 +13,11 @@ Currently everything compiles. More testing will be needed to check that everyth
 ```
 raco pkg install git://github.com/bdeket/rktsicm/?path=rktsicm
 ```
+Installation with documentation can be done with the documentation branch as shown below. However the evaluator for the examples uses a lot of memory and building documentation fails because of this.
+```
+raco pkg install git://github.com/bdeket/rktsicm/?path=rktsicm#documentation
+```
+
 
 #### use:
 ```
