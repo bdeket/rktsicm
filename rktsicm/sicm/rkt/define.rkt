@@ -9,23 +9,22 @@
                      syntax/parse
                      racket/stxparam)
          racket/stxparam
-         (submod racket/performance-hint begin-encourage-inline))
+         (submod racket/performance-hint begin-encourage-inline)
+         "default-object.rkt")
 
 #;(define-syntax-parameter default-object?
   (λ (stx) (raise-syntax-error 'default-object?
                                "only valid within lambda with #:optional "
                                stx)))
-(define the-default-object (gensym 'default))
-(define (default-object? x) (eq? the-default-object x))
 
 (define-syntax (mylambda stx)
   (syntax-parse stx
     [(_ (margs ... #:optional . (rst ... . e)) body ...)
      (with-syntax ([(oargs ...) (syntax->list #'(rst ...))])
        (quasisyntax/loc stx
-         (lambda (margs ... [oargs the-default-object] ... . e)
+         (lambda (margs ... [oargs default-object] ... . e)
            #;(syntax-parameterize ([default-object? (syntax-rules ()
-                                                    [(_ a) (eq? the-default-object a)])])
+                                                    [(_ a) (eq? default-object a)])])
              body ...)
            body ...)))]
     [(_ (margs ... . e) body ...)

@@ -1,8 +1,8 @@
 #lang racket/base
 
 (require rackunit
-         "../../rkt/define.rkt")
-(require/expose "../../rkt/define.rkt" [the-default-object])
+         "../../rkt/define.rkt"
+         "../../rkt/default-object.rkt")
 
 (define the-tests
   (test-suite
@@ -32,8 +32,8 @@
     "4"
     (define (do4 a b #:optional c d)
       (list 'do4 a b c d))
-    (check-equal? (do4 1 2) `(do4 1 2 ,the-default-object ,the-default-object))
-    (check-equal? (do4 1 2 3) `(do4 1 2 3 ,the-default-object))
+    (check-equal? (do4 1 2) `(do4 1 2 ,default-object ,default-object))
+    (check-equal? (do4 1 2 3) `(do4 1 2 3 ,default-object))
     (check-equal? (do4 1 2 3 4) '(do4 1 2 3 4)))
   
    (test-case
@@ -41,7 +41,7 @@
     (define (do5 a b #:optional c d . e)
       (list 'do5 a b c d e))
     (check-equal? (do5 1 2 3 4 5 6 7) '(do5 1 2 3 4 (5 6 7)))
-    (check-equal? (do5 1 2) `(do5 1 2 ,the-default-object ,the-default-object ())))
+    (check-equal? (do5 1 2) `(do5 1 2 ,default-object ,default-object ())))
   
    (test-case
     "6"

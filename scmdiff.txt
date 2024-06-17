@@ -1,5 +1,4 @@
 could not find: ../../racket/test/sicm/scmutils-20230902/display\pp.scm
-could not find: ../../racket/test/sicm/scmutils-20230902/doc\helpers.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/enclose\alt-magic.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/general\assert.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/general\notes.scm
@@ -32,7 +31,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  7 difference(s) found in display/print
  8 difference(s) found in display/suppress-args
  4 difference(s) found in general/eq-properties
-10 difference(s) found in general/gjs-cselim
+ 9 difference(s) found in general/gjs-cselim
  2 difference(s) found in general/hashcons
  2 difference(s) found in general/list-utils
  3 difference(s) found in general/logic-utils

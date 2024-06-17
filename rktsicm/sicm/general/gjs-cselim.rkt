@@ -1,10 +1,10 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide gjs/cselim occurs-in?)
 
-(require (only-in "../rkt/glue.rkt" default-object default-object?
-                  every if generate-uninterned-symbol find
+(require (only-in "../rkt/glue.rkt" every if generate-uninterned-symbol find
                   fix:+ fix:=)
+         (only-in "../rkt/define.rkt" define default-object?)
          "list-utils.rkt"
          "equals.rkt")
 
@@ -15,7 +15,8 @@
 ;;;; Simple-minded common-subexpression eliminator.  
 ;;;    GJS: 9 December 2005, 23 December 2019
 
-(define (gjs/cselim expression [not-worth-subdividing? default-object])
+
+(define (gjs/cselim expression #:optional not-worth-subdividing?)
   (if (default-object? not-worth-subdividing?)
       (set! not-worth-subdividing? (lambda (expr) #f)))
   (let ((initial-expression-recorder

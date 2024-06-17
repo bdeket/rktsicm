@@ -105,6 +105,6 @@
   25 .\sicm\tests\solve\solve.rkt
    3 .\sicm\tests\units\system.rkt
 2/603 test failures
-runtime: 7.7m 
+runtime: 8.066666666666666m 
 Welcome to Racket v8.13.0.5-2024-06-04-8387da236d [bc].
 Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
