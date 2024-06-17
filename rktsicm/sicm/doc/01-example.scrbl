@@ -5,17 +5,11 @@
           (for-label (only-in racket lambda λ quote)
                      sicm))
 
-@(define SICMEVAL (parameterize ([sandbox-eval-limits #f]
+@(define SICMEVAL (parameterize ([sandbox-memory-limit 50]
+                                 [sandbox-eval-limits '(15 30)]
                                  [sandbox-output 'string]
                                  [sandbox-error-output 'string])
-                    (make-evaluator 'racket/base
-                                    #:requires '(sicm/generic))))
-@(SICMEVAL '(require sicm/simplify
-                     sicm/numerics
-                     sicm/poly
-                     sicm/solve
-                     sicm/units
-                     sicm/mechanics))
+                    (make-evaluator 'sicm)))
 
 @title[#:tag "intro"]{Introduction}
 

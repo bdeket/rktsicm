@@ -5,3 +5,4 @@
 (define collection 'multi)
 
 (define deps '("base"))
+(define build-deps '("base" "racket-doc" "at-exp-lib" "scribble-lib" "sandbox-lib"))
