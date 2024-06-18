@@ -32,7 +32,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  8 difference(s) found in display/suppress-args
  4 difference(s) found in general/eq-properties
  9 difference(s) found in general/gjs-cselim
- 2 difference(s) found in general/hashcons
+ 1 difference(s) found in general/hashcons
  2 difference(s) found in general/list-utils
  3 difference(s) found in general/logic-utils
  8 difference(s) found in general/memoize

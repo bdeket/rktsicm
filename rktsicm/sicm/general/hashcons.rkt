@@ -1,9 +1,65 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide canonical-copy)
+(module+ ALL (provide (all-from-out (submod "..")) clean the-cons-table cons-unique))
 
 (require "../rkt/hashtable.rkt")
 
+;;bdk;; new impl.
+(define (clean)
+  (for* ([x (in-list (hash-keys the-cons-table))]
+         [H (in-value (hash-ref the-cons-table x #f))]
+         #:when H)
+    (when (hash? H)
+      (for* ([y (in-list (hash-keys H))]
+             [B (in-value (hash-ref H y #f))]
+             #:when (and B (not (weak-box-value B))))
+        (hash-remove! H y)))
+    (when (= (hash-count H) 0)
+      (hash-remove! the-cons-table x))))
+
+;;bdk;; TODO
+;;bdk;; unlike the original impl. this is potentially litered with empty boxes
+;;bdk;; racket hash doesn't really allow to make a hash function with
+;;bdk;; a different eqv? implementation I think
+;;bdk;; at the moment it's cleaned up after finding 10 gc'ed boxes
+(define the-cons-table (make-hasheqv))
+(define-values (cons-unique from-cons-table-get)
+  (let ([miss 0])
+    (define (miss+)
+      (if (< 10 miss)
+          (begin (clean)
+                 (set! miss 0))
+          (set! miss (+ miss 1))))
+    (values
+     (λ (x y)
+      (define H (hash-ref the-cons-table x #f))
+      (cond
+        [H
+         (define B (hash-ref H y #f))
+         ;; the value of a weak-box is always a pair, so #f can be used for gc-ed values
+         (cond
+           [(and B (weak-box-value B))]
+           [else
+            (when B (miss+))
+            (define the-cons (cons x y))
+            (hash-set! H y (make-weak-box the-cons))
+            the-cons])]
+        [else
+         (define the-cons (cons x y))
+         (hash-set! the-cons-table x
+                    (make-weak-hasheqv (list (cons y (make-weak-box the-cons)))))
+         the-cons]))
+     (λ (x [def #f])
+       (cond
+         [(hash-ref the-cons-table (car x) #f)
+          => (λ (X)
+               (cond
+                 [(hash-ref X (cdr x) #f) => (λ (Y) (or (weak-box-value Y) (begin (miss+) def)))]
+                 [else def]))]
+         [else def])))))
+
+#;#;#;#;
 ;;bdk;; start original file
 
 ;;;;         HashCONS
@@ -26,7 +82,6 @@
 
 ;;; HashCONS needs a fancy key-ephemeral hash table!
 
-#;#;#;#;
 (define (pair-eqv? u v)
   (and (eqv? (car u) (car v))
        (eqv? (cdr u) (cdr v))))
@@ -70,49 +125,6 @@
           the-canonical-pair))
       hashcons))
 
-;start new impl.
-(define (clean)
-  (for* ([x (in-list (hash-keys the-cons-table))]
-         [H (in-value (hash-ref the-cons-table x #f))]
-         #:when H)
-    (when (hash? H)
-      (for* ([y (in-list (hash-keys H))]
-             [B (in-value (hash-ref H y #f))]
-             #:when (and B (not (weak-box-value B))))
-        (hash-remove! H y)))
-    (when (= (hash-count H) 0)
-      (hash-remove! the-cons-table x))))
-
-;TODO
-;unlike the original impl. this is potentially litered with empty boxes
-;racket hash doesn't really allow to make a hash function with
-;a different eqv? implementation I think
-;at the moment it's cleaned up after finding 10 gc'ed boxes
-(define the-cons-table (make-hasheqv))
-(define cons-unique
-  (let ([miss 0])
-    (λ (x y)
-      (define H (hash-ref the-cons-table x #f))
-      (cond
-        [H
-         (define B (hash-ref H y #f))
-         (cond
-           [(and B (weak-box-value B))]
-           [else
-            (when B
-              (if (< 10 miss)
-                  (begin (clean)
-                         (set! miss 0))
-                  (set! miss (+ miss 1))))
-            (define the-cons (cons x y))
-            (hash-set! H y (make-weak-box the-cons))
-            the-cons])]
-        [else
-         (define the-cons (cons x y))
-         (hash-set! the-cons-table x
-                    (make-weak-hasheqv (list (cons y (make-weak-box the-cons)))))
-         the-cons]))))
-
 (define hash-cons cons-unique)
 
 ;;; This code copies a list structure, with all
@@ -123,7 +135,8 @@
     (cons-unique (canonical-copy (car x))
                  (canonical-copy (cdr x))))
   (if (pair? x)
-      (let ((v (hash-table/get the-cons-table
+      (let ((v (;hash-table/get the-cons-table
+                from-cons-table-get
                                x
                                #f)))
         (or v (recurse)))

@@ -2,44 +2,52 @@
 
 (require rackunit
          racket/list
-         "../../general/hashcons.rkt")
+         (submod "../../general/hashcons.rkt" ALL))
+
+(define (tree-copy itm)
+  (if (pair? itm)
+      (cons (tree-copy (car itm))
+            (tree-copy (cdr itm)))
+      itm))
+(define foo
+  '(define (canonical-copy x)
+     (if (pair? x)
+         (let ((canonical-pair
+                (hash-table/get the-cons-table x #f)))
+           (or canonical-pair
+               (let ((new
+                      (cons (canonical-copy (car x))
+                            (canonical-copy (cdr x)))))
+                 (hash-table/put! the-cons-table new new)
+                 new)))
+         x)))
+(define bar
+  '(define cons-unique
+     (let ((the-pair (cons #f #f)))  
+       (define (hashcons x y)
+         (set-car! the-pair x)
+         (set-cdr! the-pair y)
+         (let ((canonical-pair
+                (hash-table/get the-cons-table the-pair #f)))
+           (or canonical-pair
+               (let ((new the-pair))
+                 (hash-table/put! the-cons-table new new)
+                 (set! the-pair (cons #f #f))
+                 new))))
+       hashcons)))
 
 (define the-tests
   (test-suite
    "general/hashcons"
    (test-case
-    ""
-    (define foo
-      '(define (canonical-copy x)
-         (if (pair? x)
-             (let ((canonical-pair
-                    (hash-table/get the-cons-table x #f)))
-               (or canonical-pair
-                   (let ((new
-                          (cons (canonical-copy (car x))
-                                (canonical-copy (cdr x)))))
-                     (hash-table/put! the-cons-table new new)
-                     new)))
-             x)))
-    (define bar
-      '(define cons-unique
-         (let ((the-pair (cons #f #f)))  
-           (define (hashcons x y)
-             (set-car! the-pair x)
-             (set-cdr! the-pair y)
-             (let ((canonical-pair
-                    (hash-table/get the-cons-table the-pair #f)))
-               (or canonical-pair
-                   (let ((new the-pair))
-                     (hash-table/put! the-cons-table new new)
-                     (set! the-pair (cons #f #f))
-                     new))))
-           hashcons)))
+    "canonical-copy"
+    
     (define cfoo (canonical-copy foo))
     (define cbar (canonical-copy bar))
     (define baz (caddr (caddr (caddr (caddr (caddr cfoo))))))
     
     (check-true (eq? cfoo (canonical-copy foo)))
+    (check-true (eq? cfoo (canonical-copy cfoo)))
     (check-false (eq? (caddr (caddr (caddr (caddr (caddr foo)))))
                       (caddr (caddr (caddar (cddddr (caddr (caddr bar))))))))
     (check-true (eq? (caddr (caddr (caddr (caddr (caddr cfoo)))))
@@ -51,6 +59,12 @@
     (define hc2 (hash-count the-cons-table))
     (check-true (< hc2 hc1))
     )
+   (test-case
+    "cons-unique"
+    (define A (list 4))
+    (define B (list 5))
+    (define the-cons (cons-unique A B))
+    (check-true (eq? the-cons (cons-unique A B))))
    ))
 
 (module+ test
