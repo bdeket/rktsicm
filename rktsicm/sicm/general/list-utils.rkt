@@ -75,8 +75,8 @@
        (cond
          [(null? eqs) #f]
          [else
-          (inner (cdr s1)
-                 (append (cdr eqs) ots))])]))
+          (inner (filter (λ (x) (not (comp? cur x))) (cdr s1))
+                 ots)])]))
   (inner s1 s2))
 
 (define (lset-union comp? s1 s2)
