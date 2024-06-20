@@ -114,15 +114,110 @@ Given an expression, @racket[canonical-copy] will create a copy that will always
 
 @;*************************************************************************************************
 @section{list-utils}
-@(require (for-label sicm/general/list-utils))
+This module contains functions that operate on list structures.
+
 @defmodule[sicm/general/list-utils #:packages ("rktsicm")]
-@deftempproc*[%append %map %map-1 %map-2 %reverse %reverse! append-map butlast cons-if-necessary
-              count-elements countsymbols delete-nth delq-once distinct-pairs drop except-last-pair
-              find-first find-infimum for-each-distinct-pair fringe-smaller-than? last last-pair
-              list-index-of list-transpose list:elementwise lset-adjoin lset-difference
-              lset-intersection lset-union lset= make-list map&reduce map-distinct-pairs partition
-              reduce reduce-left reduce-right safe-map split-at split-list sublist subst
-              substitute-multiple take variable<?]
+@(require (for-label sicm/general/list-utils))
+@subsection{list sections}
+@defproc[(last-pair [lst pair?]) pair?]
+Return the last @racket[cons] for which the @racket[cdr] is not a @racket[pair?].
+@defproc[(except-last-pair [lst pair?]) list?]
+Return a new @racket[list] consisting of every element of @racket[lst] except the last @racket[cons].
+@defproc[(last [lst list?]) any/c]
+Retern the last element of @racket[lst].
+@defproc[(butlast [lst list?]) list?]
+Return a new @racket[list] consisting of every element of @racket[lst] except the last element.
+@defproc[(split-list [lst list?] [pred? predicate/c] [receiver (-> any/c any/c any/c)]) any/c]
+Equivalent to
+@racketblock[(let-values ([(yes no) (partition pred? lst)]) (receiver yes no))]
+@defproc[(sublist [lst list?] [start integer?] [end integer?]) list?]
+Create a @racket[list] starting from element at index @racket[start] till @racket[end] (non inclusive).
+@defproc[(delete-nth [lst list?] [n integer?]) list?]
+Create a new @racket[list] without the nth element.
+@defproc[(delq-once [lst list?] [element any/c]) list?]
+Create a new @racket[list] with the first item for which item is @racket[eq?] to @racket[element] removed.
+
+@subsection{substitution}
+@defproc[(subst [new any/c] [old any/c] [expression any/c]) any/c]
+In a nested list structure, replace any element that is @racket[eq?] to @racket[old] with @racket[new].
+@defproc[(substitute-multiple [expression any/c] [substitutions (listof (list/c any/c any/c))]) any/c]
+In a nested list structre, replace any element that is @racket[simple:equal?] to a @racket[car] in the substitution dictionary with its @racket[cadr].
+Care is taken to keep subexpression that did not change @racket[eq?] to the original.
+
+@subsection{Count and search}
+@defproc[(count-elements [pred? predicate/c] [lst list?]) integer?]
+Count the elements in the list for which @racket[pred?] returns @racket[#t].
+@defproc[(countsymbols [expression any/c]) integer?]
+Count all the elements in the expression and subexpressions for which @racket[symbol?] returns @racket[#t].
+@defproc[(find-first [pred? predicate/c] [lst list?]) any/c]
+Returns the first element for which @racket[pred?] returns @racket[#t].
+@defproc[(find-infimum [lst list?] [cmpr (-> any/c any/c any/c)]) any/c]
+Returns the first element @racket[e] for which @racket[(cmpr e l)] returns @racket[#t], where @racket[l] are all other elements after @racket[e] in @racket[lst].
+@defproc[(list-index-of [elmnt any/c] [lst list?]) (or/c #f integer?)]
+Returns the index of the first element that is @racket[eqv?] to @racket[elmnt].
+
+@subsection{map and fold}
+@defproc[(safe-map [fct (-> any/c any/c)] [lst pair?]) pair?]
+@racket[map] that works on a single, possible improper lists.
+@deftogether[[@defproc[(reduce [combine (-> any/c any/c any/c)] [def any/c] [lst list?]) any/c]
+              @defproc[(reduce-left [combine (-> any/c any/c any/c)] [def any/c] [lst list?]) any/c]]]
+Similar as @racket[foldl] but if @racket[lst] is @racket[null?], @racket[def] is returned. If @racket[lst] is a singleton, the first/only element is returned. If the @racket[lst] is longer than 1, the first two elements to which fct is applied are the first two elements of the list.
+@defproc[(reduce-right [combine (-> any/c any/c any/c)] [def any/c] [lst list?]) any/c]
+Similar as @racket[foldr] but if @racket[lst] is @racket[null?], @racket[def] is returned. If @racket[lst] is a singleton, the first/only element is returned. If the @racket[lst] is longer than 1, the first two elements to which fct is applied are the last two elements of the list.
+@examples[#:eval (parameterize ([sandbox-memory-limit 50]
+                                [sandbox-eval-limits '(15 30)]
+                                [sandbox-output 'string]
+                                [sandbox-error-output 'string])
+                   (make-evaluator 'racket/base #:requires '(sicm/general/list-utils)))
+          #:once
+          (reduce (λ (a b) `(fct ,a ,b)) 'nil '(1))
+          (reduce-left  (λ (a b) `(fct ,a ,b)) 'nil '(1 2 3))
+          (reduce-right (λ (a b) `(fct ,a ,b)) 'nil '(1 2 3))]
+@defproc[((list:elementwise [fct procedure?]) [lists list?] ...) list?]
+Equal to
+@codeblock{(apply map proc lists)}
+@defproc[(map&reduce [fct procedure?] [combine (-> any/c any/c any/c)] [init any/c] [lsts list?] ...) an]
+Equivalent to:
+@codeblock{(foldl combine init (apply map fct lsts))}
+without constructing the intermediate list. Note works like @racket[foldl] and not like the @racket[reduce-left] as defined above.
+
+@subsection{combinations of 2 elements}
+@defproc[(distinct-pairs [lst list?]) (listof (cons/c any/c any/c))]
+Creates a list containing all distinct pairs of 2 elements in the list.
+@deftogether[[@defproc[(map-distinct-pairs [fct (-> any/c any/c any/c)] [lst list?]) list?]
+              @defproc[(for-each-distinct-pair[fct (-> any/c any/c any/c)] [lst list?]) void?]]]
+Equivalent to using @racket[map] or @racket[for-each] as in
+@codeblock{(map (λ (p) (f (car p) (cdr p))) (distinct-pairs lst))}
+without constructing the intermediate list.
+
+@subsection{set operations on list}
+Operations on lists that are treated as sets. Due to the implementation, if set1 has duplicates, the result still might have duplicates.
+@defproc[(lset= [is-equal? (-> any/c any/c any/c)] [set1 list?] [set2 list?]) boolean?]
+Checks if two sets are the same, duplicates are ignored.
+@defproc[(lset-adjoin [is-equal? (-> any/c any/c any/c)] [e any/c] [set1 list?]) list?]
+Add an element to the set, if not yet present.
+@defproc[(lset-union [is-equal? (-> any/c any/c any/c)] [set1 list?] [set2 list?]) list?]
+Add all unique items from set2, to set1.
+@defproc[(lset-difference [is-equal? (-> any/c any/c any/c)] [set1 list?] [set2 list?]) list?]
+Remove all items from set2 from set1.
+@defproc[(lset-intersection [is-equal? (-> any/c any/c any/c)] [set1 list?] [set2 list?]) list?]
+Keep only the items that are both in set1 and set2.
+
+@subsection{other}
+@defproc[((fringe-smaller-than? [n integer?]) [expression any/c]) (or/c #f integer?)]
+Equivalent to:
+@codeblock{
+ (let ([len (length (flatten expr))])
+   (if (< len n) len #f))}
+But breaking early if the result is @racket[#f]
+@defproc[(list-transpose [lsts (listof list?)]) (listof list?)]
+For lsts a list of n lists with (same) length m, return a new list T of m lists with length n so that
+@racket[(eq? (list-ref (list-ref lsts i) j)
+             (list-ref (list-ref T j) i))].
+@defproc[(cons-if-necessary [a any/c] [b any/c] [c (cons/c any/c any/c)]) (cons/c any/c any/c)]
+Returns a @racket[cons] of a and b. If however @racket[(and (eq? a (car c)) (eq? b (cdr c)))] it returns c.
+@defproc[(variable<? [a symbol?] [b symbol?]) boolean?]
+Equal to @racket[symbol<?]
 
 @;*************************************************************************************************
 @section{logic-utils}
