@@ -17,10 +17,6 @@ The following main language is provided:
 
 @para{}
 Additionaly some other intermediate languages are defined.
-@para{}
-An internal glue language to make scmutil files work in racket with as little alterations as possible.
-@codeblock{#lang s-exp sicm/rkt/glue}
-It redefines names of racket functions to their mit-scheme equivalents. However, it should @emph{NOT} be seen as a mit-scheme equivalent. Probably the only valid usecase is when partially loading the sicm/kernel. In general these mit-scheme version of functions are not provided in @racket[sicm].
 
 @para{}
 @codeblock{#lang s-exp sicm/kernel}
@@ -30,7 +26,7 @@ The kernel functions, with applicable structures and with racket's base mathemat
 Lastly, a minimum working language on top of the kernel language:
 @codeblock{#lang s-exp sicm/generic}
 This loads @racket[simplify] and binds all mathematical symbols to their generic function. ie: @racket[+] will be bound to @racket[g:+] etc.
-The mechanics and calculus modules are all defined in this language.
+The mechanics and calculus modules are defined in this language.
 
 @local-table-of-contents[#:style 'immediate-only]
 
