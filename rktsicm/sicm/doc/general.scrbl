@@ -9,17 +9,7 @@
 @title[#:style 'toc]{General}
 Modules under @racket[sicm/general] hold functions that are not exported by @racket[sicm]. Mostly they are used for internal purposes, but they might be handy.
 
-@local-table-of-contents[]
-
-@;*************************************************************************************************
-@section{assert}
-@defmodule[sicm/general/assert #:packages ("rktsicm")]
-@(require (for-label sicm/general/assert))
-@defform[(assert test [msg id args ...])
-         #:contracts ([test any?]
-                      [msg string?])]
-Helper for raising test failures. Shorthand for
-@codeblock{(unless test (error "some message ..."))}
+@local-table-of-contents[#:style 'immediate-only]
 
 @;*************************************************************************************************
 @section{eq-properties}
@@ -221,10 +211,49 @@ Equal to @racket[symbol<?]
 
 @;*************************************************************************************************
 @section{logic-utils}
-@(require (for-label sicm/general/logic-utils))
 @defmodule[sicm/general/logic-utils #:packages ("rktsicm")]
-@deftempproc*[&and &or *and *assumption-tolerance-multiplier* *or add-assumption! assume!
-              conjunction disjunction false? implication negation true? with-protection assert]
+@(require (for-label sicm/general/logic-utils
+                     (only-in sicm/kernel/express operator operands)
+                     (only-in sicm/rkt/environment scmutils-base-environment)))
+
+@defform[(assert test [msg id args ...])
+         #:contracts ([test any?]
+                      [msg string?])]
+Helper for raising test failures. Shorthand for
+@codeblock{(unless test (error "some message ..."))}
+
+@deftogether[[@defproc[(true?  [val any/c]) boolean?]
+              @defproc[(false? [val any/c]) boolean?]]]
+Check if @racket[val] is @racket[#t] or @racket[#f] respectively.
+
+@deftogether[[@defproc[(*or [lst list?]) boolean?]
+              @defproc[(&or [val any/c] ...) boolean?]]]
+Check if at least one item of @racket[lst] or of @racket[val] is @racket[#t]
+
+@deftogether[[@defproc[(*and [lst list?]) boolean?]
+              @defproc[(&and [val any/c] ...) boolean?]]]
+Check if all items of @racket[lst] or of @racket[val] are @racket[#t]
+
+@defproc[(conjunction [pred1? predicate/c] [pred2? predicate/c]) predicate/c]
+Creates a new predicate equal to:
+@codeblock{(λ (x) (and (pred1? x) (pred2? x)))}
+
+@defproc[(disjunction [pred1? predicate/c] [pred2? predicate/c]) predicate/c]
+Creates a new predicate equal to:
+@codeblock{(λ (x) (or (pred1? x) (pred2? x)))}
+
+@defproc[(implication [pred1? predicate/c] [pred2? predicate/c]) predicate/c]
+Creates a new predicate equal to:
+@codeblock{(λ (x) (or (not (pred1? x)) (pred2? x)))}
+
+@defproc[(negation [pred? predicate/c]) predicate/c]
+Creates a new predicate equal to:
+@codeblock{(λ (x) (not (pred? x)))}
+
+@defproc[(assume! [assumption any/c] [responsible any/c] [if-false (-> any/c) take-note!])
+         (or/c 'OK 'noted any/c)]
+If @racket[assumption] is an expression, and all the @racket[operands] are @racket[number?]s, try to evaluate it using the @racket[procedure?] bound to the @racket[operator] in @racket[scmutils-base-environment]. If the @racket[assumption] is @racket[#t], return @racket['OK]. If it is false, evaluate @racket[if-false]. The default is to add a note about the @racket['false!] assumption, returning @racket['noted].
+In all other cases that the assumption was not tested, a note is added to @racket[*notes*], with extra info about the @racket[responsible] rule as an @racket[eq-property] and the result of the call is @racket['noted].
 
 @;*************************************************************************************************
 @section{memoize}
