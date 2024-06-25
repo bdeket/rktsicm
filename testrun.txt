@@ -33,6 +33,7 @@
    4 .\sicm\tests\general\gjs-cselim.rkt
    2 .\sicm\tests\general\hashcons.rkt
   32 .\sicm\tests\general\list-utils.rkt
+   8 .\sicm\tests\general\logic-utils.rkt
    3 .\sicm\tests\general\memoize.rkt
    4 .\sicm\tests\general\notes.rkt
    6 .\sicm\tests\general\permute.rkt
@@ -105,7 +106,7 @@
   23 .\sicm\tests\solve\solve-utils.rkt
   25 .\sicm\tests\solve\solve.rkt
    3 .\sicm\tests\units\system.rkt
-2/635 test failures
-runtime: 7.25m 
-Welcome to Racket v8.13.0.5-2024-06-04-8387da236d [bc].
-Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
+2/643 test failures
+runtime: 7.383333333333334m 
+Welcome to Racket v8.13.0.7-2024-06-20-a8d8f3c63c [bc].
+Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz    6-cores  2592MHz 

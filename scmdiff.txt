@@ -88,7 +88,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in poly/polyinterp
  1 difference(s) found in poly/polyroot
  2 difference(s) found in simplify/default
- 1 difference(s) found in simplify/fpf
+ 2 difference(s) found in simplify/fpf
  3 difference(s) found in simplify/matcher
  1 difference(s) found in simplify/pcf-fpf
  2 difference(s) found in simplify/pcf

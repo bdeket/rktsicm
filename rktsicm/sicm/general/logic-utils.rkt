@@ -1,10 +1,8 @@
 #lang racket/base
 
-(provide (all-defined-out)
-         assert)
+(provide assume! &or *or &and *and false? true? conjunction disjunction negation implication assert)
 
-(require (for-syntax racket/base)
-         (only-in"../rkt/glue.rkt" if every false true)
+(require (only-in"../rkt/glue.rkt" if every false true)
          "../rkt/define.rkt"
          (only-in "../rkt/environment.rkt" environment-bound? environment-lookup scmutils-base-environment)
          "assert.rkt"
