@@ -7,6 +7,7 @@
 
 (void (clear-arguments)
       (suppress-arguments (list '(up x0 y0 z0))))
+(provide the-tests)
 (define the-tests
   (test-suite
    "calculus/exterior-derivative"

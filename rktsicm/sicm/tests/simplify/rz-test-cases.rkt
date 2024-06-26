@@ -13,6 +13,7 @@
     (poly:= (poly:gcd (poly:* pd pf) (poly:* pd pg))
 	    pd)))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "simplify/rz-test-cases"

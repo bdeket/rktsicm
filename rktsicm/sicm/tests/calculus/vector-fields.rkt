@@ -5,7 +5,8 @@
          "../helper.rkt"
          )
 
-(define tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "calculus/vector-fields"
    (test-case
@@ -118,4 +119,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests tests))
+  (run-tests the-tests))

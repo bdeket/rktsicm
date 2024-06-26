@@ -4,7 +4,8 @@
          "../../main.rkt"
          )
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/extapply"
    (test-case "ORIG:with-self-evaluating-unbound-variables"
@@ -31,4 +32,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

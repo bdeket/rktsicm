@@ -3,7 +3,8 @@
 (require rackunit
          "../../general/permute.rkt")
 
-(define tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "general/permute"
    (test-case "combinations"
@@ -34,4 +35,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests tests))
+  (run-tests the-tests))

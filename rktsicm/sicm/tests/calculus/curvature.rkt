@@ -10,6 +10,7 @@
  (suppress-arguments '((up x0 y0)))
  (rename-part 'derivative 'D))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "calculus/curvature"
@@ -204,8 +205,8 @@
     ;;; a vector field.  Riemann must take uniform stuff, and U is a
     ;;; vector field on N (the-real-line), however variation is defined
     ;;; only over the map.  The following does not work!
-    #;( ;;bdk;; --- covariant-derivative-over-map => not defined...
-       check-exn #px"Wrong type argument -- LITERAL-FUNCTION"
+    (skip ;;bdk;; --- covariant-derivative-over-map => not defined...
+       (check-exn #px"Wrong type argument -- LITERAL-FUNCTION"
                (λ () (let ((U (components->vector-field (lambda (x) 1) the-real-line 'U))
                            (mu:N->M (compose (M '->point)
                                              (up (literal-function 'f^theta)
@@ -226,7 +227,7 @@
                          (s:map/r 
                           (lambda (w)
                             ((w deviation) ((the-real-line '->point) 'tau)))
-                          1form-basis)))))
+                          1form-basis))))))
     ;;; OK, in considering the variational problem, the map is actually
     ;;; two dimensional, time is one direction and variation the other.
     ;;; The Christoffel symbols (for R=1) (p.341 MTW) are:
@@ -452,7 +453,7 @@
                                (sin (f^theta tau)))))
     ;;; Loaded solve by (load "/usr/local/scmutils/src/solve/linreduce")
     #;(set! *divide-out-terms* #f) ;;bdk;; not defined
-    #;(check-simplified? (let ((tau 'tau)
+    (skip (check-simplified? (let ((tau 'tau)
                              (theta (literal-function 'f^theta))
                              (phi (literal-function 'f^phi))
                              (w^0 (literal-function 'w^0))
@@ -477,8 +478,8 @@
                          '(up (* (w^1 tau) (sin (f^theta tau)) (cos (f^theta tau)) ((D f^phi) tau))
                               (/ (+ (* -1 (w^1 tau) (cos (f^theta tau)) ((D f^theta) tau))
                                     (* -1 (cos (f^theta tau)) ((D f^phi) tau) (w^0 tau)))
-                                 (sin (f^theta tau)))))
-    #;(check-simplified? (let ((U d/dt)
+                                 (sin (f^theta tau))))))
+    (skip (check-simplified? (let ((U d/dt)
                              (mu:N->M (compose (S2-spherical '->point)
                                                (up (literal-function 'f^theta)
                                                    (literal-function 'f^phi))
@@ -513,7 +514,7 @@
                          (/
                           (+ (* -1 w^0 (cos (f^theta tau)) ((D f^phi) tau))
                              (* -1 w^1 ((D f^theta) tau) (cos (f^theta tau))))
-                          (sin (f^theta tau))))))
+                          (sin (f^theta tau)))))))
    (test-case
     "Computing parallel transport without the embedding"
     (define-coordinates t the-real-line)

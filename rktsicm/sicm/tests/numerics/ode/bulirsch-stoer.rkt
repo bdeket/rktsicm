@@ -8,6 +8,7 @@
          )
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/ode/bulirsch-stoer"

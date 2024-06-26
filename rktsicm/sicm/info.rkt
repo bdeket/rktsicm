@@ -20,7 +20,7 @@
                           #rx"sicm[/|\\\\]solve"
                           #rx"sicm[/|\\\\]units"
                           "tests/0course"
-                          ;#rx"compiled"
+                          "tests/compiled"
                           #rx".*\\.bak"
                           ))
 (define test-include-paths '("tests"))

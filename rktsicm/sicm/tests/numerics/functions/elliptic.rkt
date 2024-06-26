@@ -4,7 +4,8 @@
          "../../../main.rkt"
          )
 
-(define numerics/functions/elliptic
+(provide the-tests)
+(define the-tests
   (test-suite
    "numerics/functions/elliptic"
    (test-case "elliptic-integral-F"
@@ -46,4 +47,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests numerics/functions/elliptic))
+  (run-tests the-tests))

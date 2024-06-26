@@ -4,6 +4,7 @@
          "../../simplify/simplify.rkt"
          "../helper.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "simplify/simplify"

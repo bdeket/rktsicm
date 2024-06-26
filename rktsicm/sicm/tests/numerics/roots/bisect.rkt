@@ -6,6 +6,7 @@
          )
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/roots/bisect"

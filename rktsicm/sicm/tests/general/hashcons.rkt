@@ -36,6 +36,7 @@
                  new))))
        hashcons)))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/hashcons"

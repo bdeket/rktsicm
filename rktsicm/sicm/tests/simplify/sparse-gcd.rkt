@@ -19,6 +19,7 @@
                             (println (list g (fpf:->sparse pd)))))
                       (lambda () #f)))))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "simplify/sparse"

@@ -3,6 +3,7 @@
 (require rackunit
          "../../display/suppress-args.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "display/suppress-args"

@@ -7,6 +7,7 @@
          )
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/linear/eigen"

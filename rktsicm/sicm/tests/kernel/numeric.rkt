@@ -7,7 +7,8 @@
          "../helper.rkt"
          )
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/numeric"
    (test-case
@@ -99,4 +100,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

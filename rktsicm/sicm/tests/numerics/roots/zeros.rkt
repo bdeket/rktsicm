@@ -7,6 +7,7 @@
 
 (define 2pi (* 2 (angle -1)))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/roots/zeros"

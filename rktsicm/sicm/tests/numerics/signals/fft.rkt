@@ -3,6 +3,7 @@
 (require rackunit
          "../../../numerics/signals/fft.rkt"
          "../../../kernel/heuristic.rkt"
+         "../../helper.rkt"
          )
 
 (define 2pi (* 8 (atan 1 1)))
@@ -18,6 +19,7 @@
 (define sig2 (m-cycles-sin-in-n-samples 2 16))
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/signals/fft"
@@ -39,7 +41,7 @@
    (check-within (ftc sig2)
                  '(0 0 +1/2i 0 0 0 0 0 0 0 0 0 0 0 -1/2i 0)
                  1e-15)
-   #;(test-case
+   (skip (test-case
     "General tests of transform"
     (define (fft-test period)
       (let ((data
@@ -70,7 +72,7 @@
  6.4492460489728735e-28+6.518949305520136e-28i
  -1.844996145931605e-28-6.601586323919541e-30i)
 |#
-    )
+    ))
 ;;; General tests of transform.
    ))
 

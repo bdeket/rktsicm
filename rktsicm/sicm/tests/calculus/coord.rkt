@@ -5,7 +5,8 @@
          "../helper.rkt"
          )
 
-(define calculus/basis
+(provide the-tests)
+(define the-tests
   (test-suite
    "calculus/coord"
    (test-case "ORIG:define-coordinates"
@@ -59,4 +60,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests calculus/basis))
+  (run-tests the-tests))

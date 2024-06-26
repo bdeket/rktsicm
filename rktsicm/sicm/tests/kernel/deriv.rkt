@@ -5,7 +5,8 @@
          "../../mechanics/universal.rkt"
          )
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/deriv"
    (test-case "ORIG:simple-derivative-internal"
@@ -29,4 +30,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

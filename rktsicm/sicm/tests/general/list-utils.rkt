@@ -2,8 +2,10 @@
 
 (require rackunit
          "../../general/list-utils.rkt"
+         (submod "../helper.rkt" runner)
          (only-in racket/list shuffle))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/list-utils"
@@ -113,7 +115,7 @@
    (test-case
     "list-transpose"
     (check-equal? (list-transpose '((1 2)(3 4)(5 6))) '((1 3 5)(2 4 6)))
-    #;(check-equal? (list-transpose '((1 2)(3)(5 6))) '((1 3 5))))
+    (skip (check-equal? (list-transpose '((1 2)(3)(5 6))) '((1 3 5)))))
    (test-case
     "list-index-of"
     (check-equal? (list-index-of  1 '(0 1 2 3 4)) 1)

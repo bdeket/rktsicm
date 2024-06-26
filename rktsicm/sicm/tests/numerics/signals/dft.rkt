@@ -11,6 +11,7 @@
 (define pi (angle -1))
 (define 2pi (* 2 pi))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/signals/fft"

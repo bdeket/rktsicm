@@ -3,6 +3,7 @@
 (require rackunit
          "../../general/equals.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/assert"

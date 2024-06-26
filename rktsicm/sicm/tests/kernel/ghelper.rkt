@@ -96,6 +96,7 @@
    (check-equal? (procedure-arity (make-generic-operator (list 5 4 3)))
                  '(3 4 5)))]))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "kernel/ghelper-class"

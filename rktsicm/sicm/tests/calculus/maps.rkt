@@ -7,6 +7,7 @@
 
 (rename-part 'derivative 'D)
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "calculus/maps"

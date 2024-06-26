@@ -4,7 +4,8 @@
          "../../../main.rkt"
          )
 
-(define numerics/functions/bessel
+(provide the-tests)
+(define the-tests
   (test-suite
    "numerics/functions/bessel"
    (test-case "bessel-check"
@@ -27,4 +28,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests numerics/functions/bessel))
+  (run-tests the-tests))

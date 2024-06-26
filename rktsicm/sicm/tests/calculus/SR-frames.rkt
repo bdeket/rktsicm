@@ -8,6 +8,7 @@
 
 (define :c (*c*))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "calculus/SR-frames"

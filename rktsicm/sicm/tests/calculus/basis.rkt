@@ -4,7 +4,8 @@
          "../../main.rkt"
          )
 
-(define calculus/basis
+(provide the-tests)
+(define the-tests
   (test-suite
    "calculus/basis"
    (test-case "ORIG:vector-basis->dual"
@@ -51,4 +52,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests calculus/basis))
+  (run-tests the-tests))

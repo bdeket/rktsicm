@@ -6,7 +6,8 @@
          "../helper.rkt"
          )
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/structs"
    (test-case "ORIG:map-chain"
@@ -355,4 +356,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

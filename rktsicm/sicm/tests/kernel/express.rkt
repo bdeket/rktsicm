@@ -3,6 +3,7 @@
 (require rackunit
          "../../kernel/express.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "kernel/express"

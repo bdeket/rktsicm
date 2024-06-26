@@ -32,6 +32,7 @@
       (rename-part 'derivative 'D)) 
 ; ie (fct (up x0 y0)) is converted to fct
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "calculus/covariant-derivative"

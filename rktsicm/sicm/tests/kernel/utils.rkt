@@ -5,7 +5,8 @@
          "../helper.rkt"
          )
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/utils"
    (test-case "ORIG:defer-application"
@@ -17,4 +18,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

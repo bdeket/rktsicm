@@ -3,6 +3,7 @@
 (require rackunit
          (submod "../../general/eq-properties.rkt" ALL))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/eq-properties"

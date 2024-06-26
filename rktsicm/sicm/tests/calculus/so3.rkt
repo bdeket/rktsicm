@@ -8,7 +8,8 @@
 
 (rename-part 'derivative 'D)
 
-(define tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "calculus/so3"
    (test-case
@@ -63,17 +64,18 @@
                          (up (+ (* -1 c (sin theta) (cos phi)) (* b (sin phi)))
                              (+ 1 (* -1 c (sin theta) (sin phi)) (* -1 b (cos phi)))
                              0)))
-    #;(define foo-x
-        (solve
-         (lambda (p)
-           (list->vector
-            (map simplify
-                 (ultra-flatten (equation2-x p (up 'theta 'phi 'psi))))))
-         3 9 list))
-    #;(check-simplified? (simplify ((cadr foo-x) #()))
-                         '(up (/ (* -1 (sin phi) (cos theta)) (sin theta))
-                              (cos phi)
-                              (/ (sin phi) (sin theta))))
+    (skip
+     (define foo-x
+       (solve
+        (lambda (p)
+          (list->vector
+           (map simplify
+                (ultra-flatten (equation2-x p (up 'theta 'phi 'psi))))))
+        3 9 list))
+     (check-simplified? (simplify ((cadr foo-x) #()))
+                        '(up (/ (* -1 (sin phi) (cos theta)) (sin theta))
+                             (cos phi)
+                             (/ (sin phi) (sin theta)))))
     (define (equation2-z p q)
       (let ((theta (ref q 0))
             (phi (ref q 1))
@@ -101,15 +103,16 @@
                          (up (+ (* -1 c (sin theta) (cos phi)) (* b (sin phi)))
                              (+ (* -1 c (sin theta) (sin phi)) (* -1 b (cos phi)))
                              0)))
-    #;(define foo-z
-        (solve
-         (lambda (p)
-           (list->vector
-            (map simplify
-                 (ultra-flatten (equation2-z p (up 'theta 'phi 'psi))))))
-         3 9 list))
-    #;(check-simplified? ((cadr foo-z) #())
-                         '(up 1 0 0))
+    (skip
+     (define foo-z
+       (solve
+        (lambda (p)
+          (list->vector
+           (map simplify
+                (ultra-flatten (equation2-z p (up 'theta 'phi 'psi))))))
+        3 9 list))
+     (check-simplified? ((cadr foo-z) #())
+                        '(up 1 0 0)))
     (define (equation2-y p q)
       (let ((theta (ref q 0))
             (phi (ref q 1))
@@ -137,17 +140,18 @@
                          (up (+ -1 (* -1 c (sin theta) (cos phi)) (* b (sin phi)))
                              (+ (* -1 c (sin theta) (sin phi)) (* -1 b (cos phi)))
                              0)))
-    #;(define foo-y
-        (solve
-         (lambda (p)
-           (list->vector
-            (map simplify
-                 (ultra-flatten (equation2-y p (up 'theta 'phi 'psi))))))
-         3 9 list))
-    #;(check-simplified? ((cadr foo-y) #())
-                         '(up (/ (* (cos theta) (cos phi)) (sin theta))
-                              (sin phi)
-                              (/ (* -1 (cos phi)) (sin theta)))))
+    (skip
+     (define foo-y
+       (solve
+        (lambda (p)
+          (list->vector
+           (map simplify
+                (ultra-flatten (equation2-y p (up 'theta 'phi 'psi))))))
+        3 9 list))
+     (check-simplified? ((cadr foo-y) #())
+                        '(up (/ (* (cos theta) (cos phi)) (sin theta))
+                             (sin phi)
+                             (/ (* -1 (cos phi)) (sin theta))))))
    (test-case
     "commutator"
     (check-simplified? (((+ (commutator e_x e_y) e_z)
@@ -417,10 +421,10 @@
                        '(up (+ (* c (sin vartheta)) b)
                             (+ (* -1 c (cos varphi) (cos vartheta)) (* -1 a (sin varphi)))
                             (+ -1 (* -1 c (cos vartheta) (sin varphi)) (* a (cos varphi)))))
-    #;(check-simplified? ((cadr (solve (equation0 'vartheta 'varphi 'varpsi) 3 3 list)) #())
+    (skip (check-simplified? ((cadr (solve (equation0 'vartheta 'varphi 'varpsi) 3 3 list)) #())
                          '(up (cos varphi)
                               (* (tan vartheta) (sin varphi))
-                              (/ (* -1 (sin varphi)) (cos vartheta))))
+                              (/ (* -1 (sin varphi)) (cos vartheta)))))
     (define ((equation1 vartheta varphi varpsi) p)
       (let ((a (ref p 0)) (b (ref p 1)) (c (ref p 2)))
         (let ((M ((D (lambda (t) (- (* (Angles->M (up (+ vartheta (* a t))
@@ -432,10 +436,10 @@
           (up (ref M 0 1)
               (ref M 0 2)
               (ref M 1 2)))))
-    #;(check-simplified? ((cadr (solve (equation1 'vartheta 'varphi 'varpsi) 3 3 list)) #())
+    (skip (check-simplified? ((cadr (solve (equation1 'vartheta 'varphi 'varpsi) 3 3 list)) #())
                          '(up (sin varphi)
                               (* -1 (tan vartheta) (cos varphi))
-                              (/ (cos varphi) (cos vartheta))))
+                              (/ (cos varphi) (cos vartheta)))))
     (define ((equation2 vartheta varphi varpsi) p)
       (let ((a (ref p 0)) (b (ref p 1)) (c (ref p 2)))
         (let ((M ((D (lambda (t) (- (* (Angles->M (up (+ vartheta (* a t))
@@ -447,8 +451,8 @@
           (up (ref M 0 1)
               (ref M 0 2)
               (ref M 1 2)))))
-    #;(check-simplified? ((cadr (solve (equation2 'vartheta 'varphi 'varpsi) 3 3 list)) #())
-                         '(up 0 1 0))
+    (skip (check-simplified? ((cadr (solve (equation2 'vartheta 'varphi 'varpsi) 3 3 list)) #())
+                         '(up 0 1 0)))
     'fake-done-to-not-end-on-define)
    (test-case
     "alternate angles - commutator"
@@ -680,4 +684,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests tests))
+  (run-tests the-tests))

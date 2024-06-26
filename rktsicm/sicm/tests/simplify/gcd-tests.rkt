@@ -29,6 +29,7 @@
      (+ (* -3 'y1 (square 'x)) (square 'y1) 1)))
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "simplify/rz-test-cases"

@@ -2,8 +2,10 @@
 
 (require rackunit
          "../../simplify/pcf.rkt"
-         "../../simplify/pcfpf/pcf-fpf.rkt")
+         "../../simplify/pcfpf/pcf-fpf.rkt"
+         (submod "../helper.rkt" runner))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "simplify/pcf"
@@ -23,9 +25,9 @@
     (define k2 (poly/make-from-dense 1 '(3 0 5 0 -4 -9 21)))
     (check-equal? (poly/gcd-euclid k1 k2)
                   1)
-    #;(check-equal? (poly/gcd-collins (poly/mul (poly/mul x-1 x-1) x+1)
+    (skip (check-equal? (poly/gcd-collins (poly/mul (poly/mul x-1 x-1) x+1)
                                     (poly/mul (poly/mul x+1 x+1) x-1))
-                  '(*dense* 1 1 0 -1)))
+                  '(*dense* 1 1 0 -1))))
    (test-case
     "part 2"
     (define p1 (poly/make-from-dense 1 '(1 1 1)))
@@ -45,13 +47,15 @@
     (let-values ([(P V) (pcf:expression-> '(+ (* x y z) (* x x z) (* y y)) values)])
       (check-equal? (pcf:->expression (poly/derivative-partial P 2) V)
                     '(+ (* z x) (* 2 y)))))
-;;;(->expression
-;;; (poly/derivative-partial
-;;;  (->poly '(+ (* x y z) (* x x z) (* y y))
-;;;	     '(x y z))
-;;;  2)
-;;; '(x y z))
-;;;Value: (+ (* z x) (* 2 y))
+   (skip '::
+         ;;;(->expression
+         ;;; (poly/derivative-partial
+         ;;;  (->poly '(+ (* x y z) (* x x z) (* y y))
+         ;;;	     '(x y z))
+         ;;;  2)
+         ;;; '(x y z))
+         ;;;Value: (+ (* z x) (* 2 y))
+         )
    ))
 
 (module+ test

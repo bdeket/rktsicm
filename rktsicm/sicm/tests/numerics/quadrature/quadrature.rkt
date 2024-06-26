@@ -2,13 +2,15 @@
 
 (require rackunit
          "../../../numerics/quadrature/quadrature.rkt"
+         (submod "../../helper.rkt" runner)
          )
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/quadrature/quadrature"
-   #; ;TODO all over the place!!! ;marked as BUG
+   (skip ;TODO all over the place!!! ;marked as BUG
    (check-equal? (* 2
                     ((make-definite-integrator
                       #;(lambda->numerical-procedure
@@ -18,7 +20,7 @@
                       :+infinity
                       .01)
                      'INTEGRAL))
-                 (angle -1))
+                 (angle -1)))
    (test-case
     "witch"
     (define witch (λ (x) (/ 4.0 (+ 1.0 (* x x)))))

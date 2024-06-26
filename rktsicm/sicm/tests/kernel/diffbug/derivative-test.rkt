@@ -9,6 +9,7 @@
 (define Real^2->Real (-> (X Real Real) Real))
 (define Real^3->Real (-> (X Real Real Real) Real))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "kernel/diffbug/derivative-test"

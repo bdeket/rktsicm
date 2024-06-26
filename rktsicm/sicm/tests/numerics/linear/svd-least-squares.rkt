@@ -8,6 +8,7 @@
          )
 (kernel:assign-operations)
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/linear/svd-least-squares"

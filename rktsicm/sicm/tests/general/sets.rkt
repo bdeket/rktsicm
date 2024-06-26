@@ -3,6 +3,7 @@
 (require rackunit
          "../../general/sets.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/sets"

@@ -19,6 +19,7 @@
 (define archimedean-pi-sequence
   (map-streams semi-perimeter side-lengths side-numbers))
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/extrapolate/re"

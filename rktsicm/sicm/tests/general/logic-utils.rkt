@@ -5,6 +5,7 @@
          "../../general/eq-properties.rkt"
          "../../general/notes.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/logic-utils"

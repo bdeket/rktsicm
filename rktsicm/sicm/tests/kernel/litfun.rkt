@@ -7,7 +7,8 @@
          )
 (rename-part 'derivative 'D)
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/litfun"
    (test-case "ORIG:literal-function"
@@ -95,4 +96,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

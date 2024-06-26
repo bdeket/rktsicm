@@ -5,6 +5,7 @@
 
 (rename-part 'derivative 'D)
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "mechanics/gamma-bar"

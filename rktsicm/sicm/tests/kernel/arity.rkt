@@ -3,6 +3,7 @@
 (require rackunit
          "../../kernel/cstm/arity.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "kernel/cstm/arity"

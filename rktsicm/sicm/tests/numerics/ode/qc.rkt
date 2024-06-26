@@ -8,6 +8,7 @@
          )
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/ode/qc"
@@ -38,7 +39,8 @@
                     #(1.648716933638961)
                     #(2.588254411801423)
                     #(2.7182707063734948) 1. .4041654277154577)
-                  .0001))
+                  .0001)
+    (skip '^^))
    (test-case
     "A trapezoid method: xn+1 is found by corrector iteration"
     (check-within ((advance-generator
@@ -79,7 +81,8 @@
                     #(2.3414853586609374)
                     #(2.637148056178347)
                     #(2.7182832352360498) 1. .11894979864256087)
-                  .0001))
+                  .0001)
+    (skip '^^))
    (test-case
     ";;; A trapezoid method:  xn+1 is found by Newton iteration"
     (check-within ((advance-generator
@@ -122,7 +125,8 @@
                     #(2.3362773683519777)
                     #(2.630016590666874)
                     #(2.718279922395027) 1. .11684285320335219)
-                  .0001))
+                  .0001)
+    (skip '^^))
     ))
 
 (module+ test

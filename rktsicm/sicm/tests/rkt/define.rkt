@@ -4,6 +4,7 @@
          "../../rkt/define.rkt"
          "../../rkt/default-object.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "rkt/define"

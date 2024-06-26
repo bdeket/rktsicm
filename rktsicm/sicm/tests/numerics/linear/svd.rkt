@@ -4,9 +4,11 @@
          "../../../numerics/linear/svd.rkt"
          "../../../numerics/linear/lu.rkt"
          "../../../kernel-intr.rkt"
+         (submod "../../helper.rkt" runner)
          )
 
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/linear/svd"
@@ -110,10 +112,10 @@
                                                             (m:make-identity n))))))
 			     
                        (elp (/ eps 3) (- m 1)))))))))
-    #;(test 13)
-    #;(test 19)
-    #;(test 20)
-    #;(test 30)
+    (skip #;(test 13)
+          #;(test 19)
+          #;(test 20)
+          #;(test 30))
 
 ;;; Singular values for (hilbert 30) are:
     (check-within (cadddr (svd (hilbert 30) list))

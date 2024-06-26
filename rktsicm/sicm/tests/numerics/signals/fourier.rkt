@@ -4,6 +4,7 @@
          "../../helper.rkt"
          )
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "numerics/signals/fourier"

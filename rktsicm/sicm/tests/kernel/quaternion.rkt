@@ -5,7 +5,8 @@
          "../../rkt/int.rkt"
          )
 
-(define kernel-tests
+(provide the-tests)
+(define the-tests
   (test-suite
    "kernel/quaternion"
    (test-case "ORIG:quaternion->angle-axis"
@@ -62,4 +63,4 @@
 
 (module+ test
   (require rackunit/text-ui)
-  (run-tests kernel-tests))
+  (run-tests the-tests))

@@ -10,6 +10,7 @@
 ;* from solve-utils.rkt                                                                            *
 ;***************************************************************************************************
 ;;; Examples of use
+(provide the-tests)
 (define the-tests
   (test-suite
    "solve/solve-utils"

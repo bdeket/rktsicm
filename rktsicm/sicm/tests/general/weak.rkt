@@ -3,6 +3,7 @@
 (require rackunit
          "../../general/weak.rkt")
 
+(provide the-tests)
 (define the-tests
   (test-suite
    "general/weak"
