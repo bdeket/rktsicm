@@ -1,11 +1,10 @@
 #lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation))
-(require (only-in "../rkt/glue.rkt" for-all? there-exists? ignore-errors
+(require (only-in "../rkt/glue.rkt" for-all? there-exists? ignore-errors condition?
                   fix:= fix:+)
          (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/environment.rkt" symbolic-environment)
-         (only-in "../rkt/todo.rkt" symbolic-operators condition?)
          "../general/sets.rkt"
          "../general/equals.rkt"
          "numeric.rkt"

@@ -11,6 +11,8 @@
          "../types.rkt"
          "../../parameters.rkt")
 
+(define symbolic-operators '())
+
 ;;bdk;; insert 1
 ;;; Enable simplification on construction -- wastes time?
 #; ;moved to parameters
@@ -39,6 +41,7 @@
 	  (make-combination number-type-tag operator-symbol operands)))))
 
 (define (addto-symbolic-operator-table operator procedure)
+  (set! symbolic-operators (cons operator symbolic-operators))
   (hash-table/put! symbolic-operator-table operator procedure))
 
 

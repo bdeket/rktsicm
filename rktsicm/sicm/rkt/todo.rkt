@@ -40,7 +40,6 @@
 
 (define angular '&angular)
 (define *angular* '&angular)
-(define symbolic-operators '())
 
 (define (diff-memoize-1arg fct) (warn (format "diff-memoize-1arg: not moizing - ~a" fct)) fct)
 (define (diff-memoize-2arg fct) (warn (format "diff-memoize-2arg: not moizing - ~a" fct)) fct)
@@ -68,7 +67,6 @@
   (λ (continuation restarts . field-names)
     (error "TODO")))
 (define condition-type:inapplicable-object (gensym 'condition))
-(define (condition? . rst) (error "TODO"))
 
 (define (lexical-unbound? . rst) (error "lexical-unbound?: TODO"))
 
