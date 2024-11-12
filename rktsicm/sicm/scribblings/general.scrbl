@@ -278,10 +278,49 @@ In all other cases that the assumption was not tested, a note is added to @racke
 @section{permute}
 @(require (for-label sicm/general/permute))
 @defmodule[sicm/general/permute #:packages ("rktsicm")]
-@deftempproc*[binomial-coefficient combinations exact-quotient factorial list-interchanges
-              number-of-combinations number-of-permutations permutation-interchanges
-              permutation-parity permutations permute sort-and-permute split-permutations
-              subpermute]
+@deftogether[[@defproc[(permutations [lst list?]) (listof list?)]
+              @defproc[(combinations [lst list?] [n integer?]) (listof list?)]]]
+Generates all permutations or combinations of @racket[n] elements from a list of elements.
+
+@defproc[(permute [permutation (listof integer?) [lst list?]]) list?]
+Generate the permutation of @racket[lst] acccording to the permutation indexes @racket[permutation].
+
+@defproc[(sort-and-permute [lst list?] [<? less-than?] [cont (-> list? list? (-> list? list?) (-> list? list?) any/c)]) any/c]
+Based on a list of elements and a sorting function, generate the permutation that changes @racket[lst] into the sorted list according to @racket[<?]. Finally the @racket[cont] function is called with the original @racket[lst] sorted list, a permutation procedure that would convert the original @racket[lst] into the sorted list, and the inverse permutation procedure that would permute a sorted list into the original @racket[lst].
+
+@defproc[(subpermute [psteps (listof (cons integer? integer?))] [lst list?]) list?]
+Permute part of a @racket[lst] based on the steps of @racket[psteps], where each element of @racket[pstep] is the @racket[cons] of the new position with the old position.
+@examples[#:eval (parameterize ([sandbox-memory-limit 50]
+                                [sandbox-eval-limits '(15 30)]
+                                [sandbox-output 'string]
+                                [sandbox-error-output 'string])
+                   (make-evaluator 'racket/base #:requires '(sicm/general/permute)))
+          #:once
+          (subpermute '((1 . 4) (4 . 2) (2 . 3) (3 . 1)) '(a b c d e f))]
+
+@deftogether[[@defproc[(list-interchanges [p-lst list?] [o-lst list?]) integer?]
+              @defproc[(permutation-interchanges [p-lst (listof real?)]) integer?]]]
+Count how many swaps between neighbouring elements are necessary to go from the permuted @racket[p-lst] to the original @racket[o-lst]. For @racket[permutation-interchanges] the original list is defined as @racket[(sort p-lst <)].
+
+@defproc[(split-permutations [o-lst list?] [p-lsts (listof list?)] [cont (-> (listof list?) (listof list?) any/c)]) any/c]
+Split the list of permutated lists @racket[p-lsts] according the fact if @racket[(even? (list-interchange p-lst o-lst))] and call @racket[cont] on the even and odd lists.
+
+@defproc[(permutation-parity [p-lst list?] [o-lst list?]) (or/c 1 0 -1)]
+Returns @racket[1] if @racket[p-lst] needs an @racket[even?] number of interchanges to go to @racket[o-lst]. @racket[-1] if it needs an @racket[odd?] number of interchanges, and @racket[0] if it is not a permutation of @racket[o-lst].
+
+@defproc[(exact-quotient [n integer?] [m integer?]) integer?]
+Returns the quotient of @racket[n] and @racket[m], but only if the remainder is @racket[0]. Otherwise raising an error.
+
+@deftogether[[@defproc[(factorial [n integer?]) integer?]
+              @defproc[(number-of-permutations [n integer?]) integer?]]]
+Return the factorial of @racket[n]: @racket[(* n (- n 1) (- n 2) ... 1)]
+
+@deftogether[[@defproc[(binomial-coefficient [n integer?] [k integer?]) integer?]
+              @defproc[(number-of-combinations [n integer?] [k integer?]) integer?]]]
+Return the binomial of @racket[n] and @racket[k]:
+@codeblock{(/ (* n (- n 1) (- n 2) ... (- n k -1))
+              (* k (- k 1) (- k 2) ... 1))}
+
 
 @;*************************************************************************************************
 @section{resource-limit}
