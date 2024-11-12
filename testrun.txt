@@ -6,12 +6,12 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   3                     0.5 ./rktsicm/sicm\tests\calculus\SR-boost.rkt
   3                     0.0 ./rktsicm/sicm\tests\calculus\SR-frames.rkt
   2                     0.0 ./rktsicm/sicm\tests\calculus\basis.rkt
-  7             1       1.0 ./rktsicm/sicm\tests\calculus\connection.rkt
+  7             1       0.5 ./rktsicm/sicm\tests\calculus\connection.rkt
   3                     0.0 ./rktsicm/sicm\tests\calculus\coord.rkt
- 15                     6.5 ./rktsicm/sicm\tests\calculus\covariant-derivative.rkt
+ 15                     6.0 ./rktsicm/sicm\tests\calculus\covariant-derivative.rkt
   7                  2  3.0 ./rktsicm/sicm\tests\calculus\curvature.rkt
   2                     0.0 ./rktsicm/sicm\tests\calculus\dgutils.rkt
-  1                     0.5 ./rktsicm/sicm\tests\calculus\exterior-derivative.rkt
+  1                     0.0 ./rktsicm/sicm\tests\calculus\exterior-derivative.rkt
   2                     0.5 ./rktsicm/sicm\tests\calculus\form-fields.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\frame-maker.rkt
   3                     3.5 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
@@ -22,11 +22,11 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   7                     1.0 ./rktsicm/sicm\tests\calculus\maps.rkt
   8                     0.5 ./rktsicm/sicm\tests\calculus\metric.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
- 18                  2  2.5 ./rktsicm/sicm\tests\calculus\so3.rkt
+ 18                  2  2.0 ./rktsicm/sicm\tests\calculus\so3.rkt
   3                     1.0 ./rktsicm/sicm\tests\calculus\tensors.rkt
   2                     1.0 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
   3                     0.5 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
-  2                     0.0 ./rktsicm/sicm\tests\calculus\wedge.rkt
+  2                     0.5 ./rktsicm/sicm\tests\calculus\wedge.rkt
   4                  1  0.0 ./rktsicm/sicm\tests\display\pp.rkt
   3                     0.0 ./rktsicm/sicm\tests\display\suppress-args.rkt
   3                     0.0 ./rktsicm/sicm\tests\general\assert.rkt
@@ -38,7 +38,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   8                     0.0 ./rktsicm/sicm\tests\general\logic-utils.rkt
   3                     0.0 ./rktsicm/sicm\tests\general\memoize.rkt
   4                     0.0 ./rktsicm/sicm\tests\general\notes.rkt
-  6                     0.0 ./rktsicm/sicm\tests\general\permute.rkt
+ 19                     0.0 ./rktsicm/sicm\tests\general\permute.rkt
   1                     0.0 ./rktsicm/sicm\tests\general\sets.rkt
   8                     0.0 ./rktsicm/sicm\tests\general\weak.rkt
   8                     0.0 ./rktsicm/sicm\tests\helper.rkt
@@ -48,9 +48,9 @@ TOT FAIL ERR TOUT SKIP TIME NAME
  32                     0.5 ./rktsicm/sicm\tests\kernel\diffbug\derivative-test.rkt
   1                     0.0 ./rktsicm/sicm\tests\kernel\express.rkt
   2                     0.0 ./rktsicm/sicm\tests\kernel\extapply.rkt
-  1                     0.5 ./rktsicm/sicm\tests\kernel\function.rkt
+  1                     0.0 ./rktsicm/sicm\tests\kernel\function.rkt
   5                     0.0 ./rktsicm/sicm\tests\kernel\ghelper.rkt
-  3                     0.5 ./rktsicm/sicm\tests\kernel\litfun.rkt
+  3                     0.0 ./rktsicm/sicm\tests\kernel\litfun.rkt
   3                     0.0 ./rktsicm/sicm\tests\kernel\modarith.rkt
   6             1       0.5 ./rktsicm/sicm\tests\kernel\numeric.rkt
   3                     0.0 ./rktsicm/sicm\tests\kernel\quaternion.rkt
@@ -66,7 +66,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
  10                     0.0 ./rktsicm/sicm\tests\mechanics\canonical.rkt
   9                     0.0 ./rktsicm/sicm\tests\mechanics\gamma-bar.rkt
   2                     0.0 ./rktsicm/sicm\tests\mechanics\qual+pointtransform.rkt
- 10                     0.5 ./rktsicm/sicm\tests\mechanics\rigid.rkt
+ 10                     0.0 ./rktsicm/sicm\tests\mechanics\rigid.rkt
  11                     0.0 ./rktsicm/sicm\tests\mechanics\symplectic.rkt
   1                     0.0 ./rktsicm/sicm\tests\mechanics\time-varying.rkt
   9                     0.0 ./rktsicm/sicm\tests\mechanics\universal.rkt
@@ -92,11 +92,11 @@ TOT FAIL ERR TOUT SKIP TIME NAME
  22                     0.0 ./rktsicm/sicm\tests\numerics\signals\cph-dsp\flovec.rkt
   7                     0.0 ./rktsicm/sicm\tests\numerics\signals\dft.rkt
   7                  1  0.0 ./rktsicm/sicm\tests\numerics\signals\fft.rkt
-  3                     0.5 ./rktsicm/sicm\tests\numerics\signals\fourier.rkt
-  5                     0.5 ./rktsicm/sicm\tests\poly\interp-generic.rkt
+  3                     0.0 ./rktsicm/sicm\tests\numerics\signals\fourier.rkt
+  5                     0.0 ./rktsicm/sicm\tests\poly\interp-generic.rkt
   9                     0.0 ./rktsicm/sicm\tests\rkt\define.rkt
   2                     0.0 ./rktsicm/sicm\tests\simplify\expand-nary.rkt
-  9                     1.0 ./rktsicm/sicm\tests\simplify\gcd-tests.rkt
+  9                     0.5 ./rktsicm/sicm\tests\simplify\gcd-tests.rkt
   8                     0.0 ./rktsicm/sicm\tests\simplify\matcher.rkt
   4                  2  0.0 ./rktsicm/sicm\tests\simplify\pcf.rkt
   7                     0.0 ./rktsicm/sicm\tests\simplify\rz-test-cases.rkt
@@ -110,7 +110,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
 TOT FAIL ERR TOUT SKIP TIME NAME
-651             2   18 38.5 TOTAL
-runtime: 7.116666666666666m 
-Welcome to Racket v8.13.0.7-2024-06-20-a8d8f3c63c [bc].
+664             2   18 36.0 TOTAL
+runtime: 6.683333333333334m 
+Welcome to Racket v8.15.0.4-2024-11-07-688e2b2e51 [bc].
 Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
