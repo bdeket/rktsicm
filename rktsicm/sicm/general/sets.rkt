@@ -1,6 +1,15 @@
 #lang racket/base
 
-(provide (all-defined-out))
+;;bdk;; eq-set and multi-set are not used in the library. For multi-set
+;;bdk;; I fail to see the added value so will not provide/document them.
+(provide (except-out (all-defined-out) multi-set/empty multi-set/empty? multi-set/first
+                     multi-set/rest multi-set/element? multi-set/adjoin multi-set/remove
+                     multi-set/union multi-set/intersection multi-set/difference))
+(module+ ALL
+  (provide (all-from-out (submod ".."))
+           multi-set/empty multi-set/empty? multi-set/first
+           multi-set/rest multi-set/element? multi-set/adjoin multi-set/remove
+           multi-set/union multi-set/intersection multi-set/difference))
 
 (require (only-in "../rkt/glue.rkt" true false define-integrable delq)
          "list-utils.rkt"
