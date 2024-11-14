@@ -162,6 +162,7 @@
                            *with-extra-equations*
                            *outstanding-contradictions*
                            *numerical-constants*
+                           *time-upper-limit*
                            ))
 
 (define (skip-rkt-langprovreq lines [name #f])
