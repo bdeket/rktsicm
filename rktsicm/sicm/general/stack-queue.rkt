@@ -1,13 +1,18 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(require (only-in "../rkt/glue.rkt" if unspecific))
 
+(provide make-stack&queue stack&queue-empty? stack&queued? push! add-to-end! pop!)
+(module+ ALL (provide (all-from-out (submod "..")) stack&queue-front stack&queue-back))
+
+(define-values (pair? cons car cdr set-cdr!) (values mpair? mcons mcar mcdr set-mcdr!))
 ;;bdk;; start original file
 
 ;;;; Simple stack&queue Abstraction
 
-(struct stack&queue (front back) #:mutable #:constructor-name %make-stack&queue)
-#;(define-record-type <stack&queue>
+
+(struct stack&queue (front back) #:mutable #:constructor-name %make-stack&queue) #;
+(define-record-type <stack&queue>
     (%make-stack&queue front back)
     stack&queue?
   (front stack&queue-front set-stack&queue-front!)
@@ -31,19 +36,20 @@
 	(set-stack&queue-front! stq
 	  (cons object (stack&queue-front stq)))
 	(set-stack&queue-back! stq
-	  (stack&queue-front stq)))))
+	  (stack&queue-front stq))))
+  unspecific)
 
 (define (add-to-end! stq object)
   (let ((new (cons object '())))
     (if (pair? (stack&queue-back stq))
-	;(set-cdr! (stack&queue-back stq) new)
-        (set-stack&queue-back! (append (stack&queue-back stq) new))
-	(set-stack&queue-front! stq new))
-    (set-stack&queue-back! stq new)))
+	(set-cdr! (stack&queue-back stq) new)
+        (set-stack&queue-front! stq new))
+    (set-stack&queue-back! stq new)
+    unspecific))
 
 (define (pop! stq)
   (let ((next (stack&queue-front stq)))
-    (when (not (pair? next))
+    (if (not (pair? next))
 	(error "Empty stack&queue -- POP"))
     (if (pair? (cdr next))
 	(set-stack&queue-front! stq (cdr next))

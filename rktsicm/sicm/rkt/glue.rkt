@@ -60,7 +60,7 @@
 (define pathname? path?)
 (define (for-each-vector-element v f) (vector-map f v))
 (define 1+ add1)
-(define unspecific void)
+(define unspecific (void))
 (define rationalize->exact rationalize)
 (define (floor->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
 (define (round->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
