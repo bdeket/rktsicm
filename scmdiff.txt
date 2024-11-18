@@ -37,8 +37,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  3 difference(s) found in general/logic-utils
  8 difference(s) found in general/memoize
  1 difference(s) found in general/permute
- 2 difference(s) found in general/resource-limit
- 5 difference(s) found in general/stack-queue
+ 1 difference(s) found in general/stack-queue
  7 difference(s) found in general/table
  3 difference(s) found in general/weak
 11 difference(s) found in kernel/express

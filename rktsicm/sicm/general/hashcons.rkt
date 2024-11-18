@@ -1,7 +1,8 @@
 #lang racket/base
 
 (provide canonical-copy)
-(module+ ALL (provide (all-from-out (submod "..")) clean the-cons-table cons-unique))
+(module+ ALL (provide (all-from-out (submod "..")) clean the-cons-table cons-unique
+                      list-unique append-unique map-unique))
 
 (require "../rkt/hashtable.rkt")
 

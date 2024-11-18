@@ -2,7 +2,8 @@
 
 (require rackunit
          racket/list
-         (submod "../../general/hashcons.rkt" ALL))
+         (submod "../../general/hashcons.rkt" ALL)
+         "../helper.rkt")
 
 (define (tree-copy itm)
   (if (pair? itm)
@@ -66,6 +67,23 @@
     (define B (list 5))
     (define the-cons (cons-unique A B))
     (check-true (eq? the-cons (cons-unique A B))))
+   (test-case
+    "list-unique"
+    (check-true (eq? (list-unique 1 2 3 4 'a)
+                     (list-unique 1 2 3 4 'a))))
+   (test-case
+    "map-unique"
+    (check-true (eq? (map-unique add1 '(0 1 2 3 4))
+                     (list-unique 1 2 3 4 5))))
+   (test-case
+    "append-unique"
+    (define L2 (list 4 5 6))
+    (check-true (eq? (append-unique (list 1 2 3) L2)
+                     (append-unique (list 1 2 3) L2)))
+    (skip
+    ;; this currently fails (also in scmutils) but probably should be #t
+     (check-true (eq? (append-unique (list 1 2 3) (list 4 5 6))
+                      (append-unique (list 1 2 3) (list 4 5 6))))))
    ))
 
 (module+ test
