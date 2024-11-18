@@ -1,6 +1,8 @@
 #lang racket/base
 
 (provide gjs/cselim occurs-in?)
+(module+ ALL (provide (all-from-out (submod "..")) make-let-expression make-canonical-lets
+                      make-expression-recorder record-expression! expressions-seen variable->expression))
 
 (require (only-in "../rkt/glue.rkt" every if generate-uninterned-symbol find
                   fix:+ fix:=)
@@ -28,7 +30,7 @@
             ((pair? expression)
              (case (car expression)
                ((quote) expression)
-               ((lambda)
+               ((lambda λ)
                 (let* ((new-bound-variables (cadr expression))
                        (local-expression-recorder
                         (make-expression-recorder expression-recorder
@@ -181,7 +183,7 @@
                       (find (lambda (entry) (eq? (entry-name entry) variable))
                              local-expressions-seen)))
                  (if entry
-                     entry
+                     (list (entry-expr entry))
                      (if parent-recorder
                          ((parent-recorder 'get-entry) variable)
                          (error "Variable not present"))))
@@ -196,7 +198,7 @@
   (expression-recorder 'seen))
 
 (define (variable->expression expression-recorder variable)
-  (entry-expr ((expression-recorder 'get-entry) variable)))
+  (car ((expression-recorder 'get-entry) variable)))
 
 (define (occurs-in? variables expression)
   (let lp ((expression expression))
