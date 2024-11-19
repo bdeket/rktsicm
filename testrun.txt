@@ -14,7 +14,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   1                     0.0 ./rktsicm/sicm\tests\calculus\exterior-derivative.rkt
   2                     0.5 ./rktsicm/sicm\tests\calculus\form-fields.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\frame-maker.rkt
-  3                     3.0 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
+  3                     3.5 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
   8                     3.5 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
   3                     0.0 ./rktsicm/sicm\tests\calculus\indexed.rkt
   1                     0.5 ./rktsicm/sicm\tests\calculus\interior-product.rkt
@@ -22,7 +22,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   7                     1.0 ./rktsicm/sicm\tests\calculus\maps.rkt
   8                     0.5 ./rktsicm/sicm\tests\calculus\metric.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
- 18                  2  2.0 ./rktsicm/sicm\tests\calculus\so3.rkt
+ 18                  2  2.5 ./rktsicm/sicm\tests\calculus\so3.rkt
   3                     1.0 ./rktsicm/sicm\tests\calculus\tensors.rkt
   2                     1.0 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
   3                     0.5 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
@@ -37,7 +37,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   5                  1  0.0 ./rktsicm/sicm\tests\general\hashcons.rkt
  32                  1  0.0 ./rktsicm/sicm\tests\general\list-utils.rkt
   8                     0.0 ./rktsicm/sicm\tests\general\logic-utils.rkt
-  3                     0.0 ./rktsicm/sicm\tests\general\memoize.rkt
+  8                     0.0 ./rktsicm/sicm\tests\general\memoize.rkt
   4                     0.0 ./rktsicm/sicm\tests\general\notes.rkt
  19                     0.0 ./rktsicm/sicm\tests\general\permute.rkt
   1                     0.0 ./rktsicm/sicm\tests\general\resource-limit.rkt
@@ -57,10 +57,10 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   3                     0.0 ./rktsicm/sicm\tests\kernel\litfun.rkt
   3                     0.0 ./rktsicm/sicm\tests\kernel\modarith.rkt
   6             1       0.5 ./rktsicm/sicm\tests\kernel\numeric.rkt
-  3                     0.0 ./rktsicm/sicm\tests\kernel\quaternion.rkt
+  3                     0.5 ./rktsicm/sicm\tests\kernel\quaternion.rkt
  28                     0.0 ./rktsicm/sicm\tests\kernel\structs.rkt
   1                     0.0 ./rktsicm/sicm\tests\kernel\utils.rkt
- 14                     0.0 ./rktsicm/sicm\tests\mechanics\Hamiltonian.rkt
+ 14                     0.5 ./rktsicm/sicm\tests\mechanics\Hamiltonian.rkt
   5                     0.0 ./rktsicm/sicm\tests\mechanics\Lagrangian-transformations.rkt
  11                     0.0 ./rktsicm/sicm\tests\mechanics\Lagrangian.rkt
   3                     0.5 ./rktsicm/sicm\tests\mechanics\Lie-transform.rkt
@@ -114,7 +114,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
 TOT FAIL ERR TOUT SKIP TIME NAME
-734             2   22 35.5 TOTAL
-runtime: 6.533333333333333m 
+739             2   22 37.0 TOTAL
+runtime: 6.75m 
 Welcome to Racket v8.15.0.4-2024-11-07-688e2b2e51 [bc].
-Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
+Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz    6-cores  2592MHz 

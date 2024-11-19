@@ -35,7 +35,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in general/hashcons
  2 difference(s) found in general/list-utils
  3 difference(s) found in general/logic-utils
- 8 difference(s) found in general/memoize
+19 difference(s) found in general/memoize
  1 difference(s) found in general/permute
  1 difference(s) found in general/stack-queue
  7 difference(s) found in general/table
