@@ -1,10 +1,12 @@
 #lang racket/base
 
 (provide (except-out (all-defined-out) clean-weak-alist clean-subtable-alist clean-alist)
-         (rename-out [ALT-CLEAN-WEAK-ALIST clean-weak-alist]))
+         (rename-out [ALT-CLEAN-WEAK-ALIST clean-weak-alist])
+         gc-reclaimed-object?)
 
 (require "../rkt/fixnum.rkt"
          "../rkt/if.rkt"
+         "../rkt/gcreclaimed.rkt"
          (only-in "../rkt/todo.rkt" todo set-cdr!))
 
 (todo clean-expression-table "canonicalizer")
@@ -12,9 +14,6 @@
 
 ;; set-car! is only used to invalidate pairs -> this is solved in purge-list by rechecking
 (define set-car! void)
-
-(define gc-reclaimed-object (gensym))
-(define (gc-reclaimed-object? v) (eq? gc-reclaimed-object v))
 
 (struct weak-pair (car cdr) #:transparent #:mutable)
 (define (weak-cons car cdr) (weak-pair (make-weak-box car) cdr))

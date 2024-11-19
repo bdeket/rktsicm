@@ -6,7 +6,7 @@
          (only-in racket/list last take)
          "arity.rkt")
 
-(provide make-plain-procedure make-plain-procedure-stx make-plain-procedure-slct make-plain-procedure-slct+
+(provide make-plain-procedure make-plain-procedure-stx make-plain-procedure-slct
          (for-syntax λ quasisyntax unsyntax-splicing unsyntax))
 
 #; ;waaaay to slow
@@ -114,40 +114,40 @@
     [(equal? arity *at-least-zero*)  (λ r (apply f r))]
     [(equal? arity *one-or-two*)     (case-lambda [(x) (f x)]
                                                   [(x y) (f x y)])]
-    [else                            (make-plain-procedure f arity)]))
+    [else                            (make-plain-procedure name f arity)]))
 
 (define (make-plain-procedure-slct+ name wrp)
   (define (stx f e arity)
     #`(cond
-        [(equal? #,arity *exactly-zero*)
+        [(equal? '#,arity *exactly-zero*)
          #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))])
            #`(λ (x ...) #,(f #'(x ...) #f)))]
-        [(equal? #,arity *exactly-one*)
+        [(equal? '#,arity *exactly-one*)
          #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
            #`(λ (x ...) #,(f #'(x ...) #f)))]
-        [(equal? #,arity *exactly-two*)
+        [(equal? '#,arity *exactly-two*)
          #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))])
            #`(λ (x ...) #,(f #'(x ...) #f)))]
-        [(equal? #,arity *exactly-three*)
+        [(equal? '#,arity *exactly-three*)
          #,(with-syntax ([(x ...) (build-list 3 (λ (i) (format-id #f "x~a" i)))])
            #`(λ (x ...) #,(f #'(x ...) #f)))]
-        [(equal? #,arity *at-least-three*)
+        [(equal? '#,arity *at-least-three*)
          #,(with-syntax ([(x ...) (build-list 3 (λ (i) (format-id #f "x~a" i)))]
                        [y       (format-id #f "y")])
            #`(λ (x ... . y) #,(f #'(x ...) #'y)))]
-        [(equal? #,arity *at-least-two*)
+        [(equal? '#,arity *at-least-two*)
          #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))]
                        [y       (format-id #f "y")])
            #`(λ (x ... . y) #,(f #'(x ...) #'y)))]
-        [(equal? #,arity *at-least-one*)
+        [(equal? '#,arity *at-least-one*)
          #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))]
                        [y       (format-id #f "y")])
            #`(λ (x ... . y) #,(f #'(x ...) #'y)))]
-        [(equal? #,arity *at-least-zero*)
+        [(equal? '#,arity *at-least-zero*)
          #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))]
                        [y       (format-id #f "y")])
            #`(λ (x ... . y) #,(f #'(x ...) #'y)))]
-        [(equal? #,arity *one-or-two*)
+        [(equal? '#,arity *one-or-two*)
          (case-lambda #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
                           #`[(x ...) #,(f #'(x ...) #f)])
                       #,(with-syntax ([(x ...) (build-list 2 (λ (i) (format-id #f "x~a" i)))])

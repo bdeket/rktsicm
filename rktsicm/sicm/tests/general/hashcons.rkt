@@ -1,7 +1,6 @@
 #lang racket/base
 
 (require rackunit
-         racket/list
          (submod "../../general/hashcons.rkt" ALL)
          "../helper.rkt")
 

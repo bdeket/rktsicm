@@ -1,17 +1,30 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide samritchie-memoizer clear-memoizer-tables hash-memoize-1arg linear-memoize
+         (except-out (struct-out memoizer) memoizer-of) memoizer-org *memoizers*)
+(module+ ALL (provide (all-from-out (submod ".."))))
 
-(require (except-in "../rkt/glue.rkt" default-object?)
+(require "../rkt/glue.rkt"
          (only-in "../rkt/define.rkt" define default-object?)
          "weak.rkt"
          "eq-properties.rkt"
          )
 
-(struct memoizer (memo f max-table-size info reset) #:transparent)
-(define (add-memoizer! M)
-  (set! *memoizers* (cons M *memoizers*)))
+(struct memoizer (fun of type max-table-size info reset))
+(define (memoizer-org M) (weak-box-value (memoizer-of M) gc-reclaimed-object))
 
+(define (add-memoizer! M F info reset [type #f][T -1])
+  (define M* (procedure-reduce-arity-mask
+              (if (apply-hook? F)
+                  (make-apply-hook M (apply-hook-extra F))
+                  M)
+              (procedure-arity-mask F)
+              (string->symbol (format "mem:~a" (or (object-name F) "")))))
+  (eq-clone! F M*)
+  (define MS (memoizer M* (make-weak-box F) type T info reset))
+  (hash-set! (hash-ref! (car *memoizers*) F (make-hasheq)) type MS)
+  (hash-set! (cdr *memoizers*) M* MS)
+  M*)
 
 ;;bdk;; start original file
 
@@ -20,45 +33,42 @@
 
 ;;; A weak alist of memoized functions.
 
-(define *memoizers* '())
+(define *memoizers* (cons (make-ephemeron-hasheq) (make-ephemeron-hasheq)))
 
-(define (memoizer-gc-daemon)
-  (set! *memoizers*
-        (clean-weak-alist *memoizers*))
-  'done)
+;;bdk;;(define (memoizer-gc-daemon)
+;;bdk;;  (set! *memoizers*
+;;bdk;;        (clean-weak-alist *memoizers*))
+;;bdk;;  'done)
 
-;(add-gc-daemon! memoizer-gc-daemon)
+;;bdk;;(add-gc-daemon! memoizer-gc-daemon)
 
 ;;;(define *auditing-memoizers* #f)
 (define *auditing-memoizers* #t)
 
-#;#;
-(define (show-memoizer-statistics)
-  (for-each (lambda (m)
-              (let ((f (weak-car m)) (s ((cadr (weak-cdr m)))))
-                (if (not (gc-reclaimed-object? f))
-                    (pp `(,(car s)
-                          ,(cadr s)
-                          ,(function-expression (cadddr (weak-cdr m))
-                                                f))))))
-            *memoizers*)
-  'done)
+;;bdk;;(define (show-memoizer-statistics)
+;;bdk;;  (for-each (lambda (m)
+;;bdk;;              (let ((f (weak-car m)) (s ((cadr (weak-cdr m)))))
+;;bdk;;                (if (not (gc-reclaimed-object? f))
+;;bdk;;                    (pp `(,(car s)
+;;bdk;;                          ,(cadr s)
+;;bdk;;                          ,(function-expression (cadddr (weak-cdr m))
+;;bdk;;                                                f))))))
+;;bdk;;            *memoizers*)
+;;bdk;;  'done)
 
-(define (function-expression f memo-f)
-  (or (object-name memo-f
-                   generic-environment
-                   rule-environment
-                   numerical-environment
-                   scmutils-base-environment)
-      (procedure-name f)))
+;;bdk;;(define (function-expression f memo-f)
+;;bdk;;  (or (object-name memo-f
+;;bdk;;                   generic-environment
+;;bdk;;                   rule-environment
+;;bdk;;                   numerical-environment
+;;bdk;;                   scmutils-base-environment)
+;;bdk;;      (procedure-name f)))
 
   
 (define (clear-memoizer-tables)
-  (for-each (lambda (m)
-              (let ((f (weak-car m)))
-                (if (not (gc-reclaimed-object? f))
-                  ((caddr (weak-cdr m))))))
-            *memoizers*)
+  (for ([M (in-hash-values (cdr *memoizers*))]
+        #:unless (gc-reclaimed-object? (memoizer-fun M)) )
+    ((memoizer-reset M)))
   'done)
 
 ;;; Single-argument linear memoizer.  Can use weak alists for
@@ -96,11 +106,7 @@
                            (purge-list (cons (weak-cons x ans) table)
                                        max-table-size))
                      ans))))))
-      (set! *memoizers*
-            (cons (weak-cons memo-f
-                             (list max-table-size info reset f))
-                  *memoizers*))
-      memo-f)))
+      (add-memoizer! memo-f f info reset 'lin-mem-1arg max-table-size))))
 
 ;;; A general linear-time memoizer for functions.  In this case the
 ;;; arg lists are ALWAYS unprotected, so we cannot use weak pairs in
@@ -141,11 +147,7 @@
                                              table)
                                        max-table-size))
                      ans))))))
-      (set! *memoizers*
-            (cons (weak-cons memo-f
-                             (list max-table-size info reset f))
-                  *memoizers*))
-      memo-f)))
+      (add-memoizer! memo-f f info reset 'lin-mem max-table-size))))
 
 ;;; Equality of arguments in argument lists or weak argument lists.
 
@@ -207,10 +209,7 @@
                      (hash-table/put! table x ans)
                      ans))))))
       (reset)
-      (set! *memoizers*
-            (cons (weak-cons memo-f (list -1 info reset f))
-                  *memoizers*))
-      memo-f)))
+      (add-memoizer! memo-f f info reset 'hash-mem-1arg))))
 
 ;;; A general hash memoizer for functions.  In this case the arg lists
 ;;; are ALWAYS unprotected, so we cannot use a weak table here.
@@ -238,81 +237,77 @@
                      (hash-table/put! table x ans)
                      ans))))))
       (reset)
-      (set! *memoizers*
-            (cons (weak-cons memo-f (list -1 info reset f))
-                  *memoizers*))
-      memo-f)))
+      (add-memoizer! memo-f f info reset 'hash-mem))))
 
 
 ;;; To install and remove memoizers on named procedures
 
-#;#;
-(define (memoize-procedure! name #:optional memo-type environment)
-  (assert (symbol? name))
-  (if (default-object? environment)
-      (set! environment (nearest-repl/environment))
-      (assert (environment? environment)))
-  (assert (environment-bound? environment name))
-  (if (default-object? memo-type)
-      (set! memo-type 'linear)
-      (assert (memq memo-type '(linear hash))))
-  (if (environment-bound? environment '*memoized-procedures*)
-      (if (assq name (eval '*memoized-procedures* environment))
-          (begin (warn name "rememoizing!")
-                 (unmemoize-procedure! name environment))))
-  (let ((proc (eval name environment)))
-    (assert (procedure? proc))
-    (let ((arity (procedure-arity proc)))
-      (let ((memoized-procedure
-             (cond ((and (fix:= (car arity) 0) ;(0 . 0)
-                         (fix:= (cdr arity) 0))
-                    (let ((ran? #f) (value))
-                      (lambda ()
-                        (if ran?
-                            value
-                            (begin
-                              (set! value (proc))
-                              (set! ran? #t)
-                              value)))))
-                   ((and (fix:= (car arity) 1) ;(1 . 1)
-                         (fix:= (cdr arity) 1))
-                    (case memo-type
-                      ((linear) (linear-memoize-1arg proc))
-                      ((hash) (hash-memoize-1arg proc))))
-                   (else
-                    (case memo-type
-                      ((linear) (linear-memoize proc))
-                      ((hash) (hash-memoize proc)))))))	
-        (if (not (environment-bound? environment
-                                     '*memoized-procedures*))
-            (environment-define environment
-                                '*memoized-procedures*
-                                (list (cons name proc)))
-            (environment-assign! environment
-                                 '*memoized-procedures*
-                                 (cons (cons name proc)
-                                       (eval '*memoized-procedures*
-                                             environment))))
-        (environment-assign! environment
-                             name
-                             memoized-procedure)
-        'done))))
+;;bdk;;(define (memoize-procedure! name #:optional memo-type environment)
+;;bdk;;  (assert (symbol? name))
+;;bdk;;  (if (default-object? environment)
+;;bdk;;      (set! environment (nearest-repl/environment))
+;;bdk;;      (assert (environment? environment)))
+;;bdk;;  (assert (environment-bound? environment name))
+;;bdk;;  (if (default-object? memo-type)
+;;bdk;;      (set! memo-type 'linear)
+;;bdk;;      (assert (memq memo-type '(linear hash))))
+;;bdk;;  (if (environment-bound? environment '*memoized-procedures*)
+;;bdk;;      (if (assq name (eval '*memoized-procedures* environment))
+;;bdk;;          (begin (warn name "rememoizing!")
+;;bdk;;                 (unmemoize-procedure! name environment))))
+;;bdk;;  (let ((proc (eval name environment)))
+;;bdk;;    (assert (procedure? proc))
+;;bdk;;    (let ((arity (procedure-arity proc)))
+;;bdk;;      (let ((memoized-procedure
+;;bdk;;             (cond ((and (fix:= (car arity) 0) ;(0 . 0)
+;;bdk;;                         (fix:= (cdr arity) 0))
+;;bdk;;                    (let ((ran? #f) (value))
+;;bdk;;                      (lambda ()
+;;bdk;;                        (if ran?
+;;bdk;;                            value
+;;bdk;;                            (begin
+;;bdk;;                              (set! value (proc))
+;;bdk;;                              (set! ran? #t)
+;;bdk;;                              value)))))
+;;bdk;;                   ((and (fix:= (car arity) 1) ;(1 . 1)
+;;bdk;;                         (fix:= (cdr arity) 1))
+;;bdk;;                    (case memo-type
+;;bdk;;                      ((linear) (linear-memoize-1arg proc))
+;;bdk;;                      ((hash) (hash-memoize-1arg proc))))
+;;bdk;;                   (else
+;;bdk;;                    (case memo-type
+;;bdk;;                      ((linear) (linear-memoize proc))
+;;bdk;;                      ((hash) (hash-memoize proc)))))))	
+;;bdk;;        (if (not (environment-bound? environment
+;;bdk;;                                     '*memoized-procedures*))
+;;bdk;;            (environment-define environment
+;;bdk;;                                '*memoized-procedures*
+;;bdk;;                                (list (cons name proc)))
+;;bdk;;            (environment-assign! environment
+;;bdk;;                                 '*memoized-procedures*
+;;bdk;;                                 (cons (cons name proc)
+;;bdk;;                                       (eval '*memoized-procedures*
+;;bdk;;                                             environment))))
+;;bdk;;        (environment-assign! environment
+;;bdk;;                             name
+;;bdk;;                             memoized-procedure)
+;;bdk;;        'done))))
 
-(define (unmemoize-procedure! name #:optional environment)
-  (assert (symbol? name))
-  (if (default-object? environment)
-      (set! environment (nearest-repl/environment))
-      (assert (environment? environment)))
-  (assert (environment-bound? environment name))
-  (assert (environment-bound? environment '*memoized-procedures*))
-  (let ((vcell (assq name (eval '*memoized-procedures* environment))))
-    (assert vcell)
-    (environment-assign! environment (car vcell) (cdr vcell))
-    (environment-assign! environment
-                         '*memoized-procedures*
-                         (delete vcell
-                                 (eval '*memoized-procedures* environment)))
-    'done!))
+;;bdk;;(define (unmemoize-procedure! name #:optional environment)
+;;bdk;;  (assert (symbol? name))
+;;bdk;;  (if (default-object? environment)
+;;bdk;;      (set! environment (nearest-repl/environment))
+;;bdk;;      (assert (environment? environment)))
+;;bdk;;  (assert (environment-bound? environment name))
+;;bdk;;  (assert (environment-bound? environment '*memoized-procedures*))
+;;bdk;;  (let ((vcell (assq name (eval '*memoized-procedures* environment))))
+;;bdk;;    (assert vcell)
+;;bdk;;    (environment-assign! environment (car vcell) (cdr vcell))
+;;bdk;;    (environment-assign! environment
+;;bdk;;                         '*memoized-procedures*
+;;bdk;;                         (delete vcell
+;;bdk;;                                 (eval '*memoized-procedures* environment)))
+;;bdk;;    'done!))
 
 ;;; Added by GJS on 11 Nov 2021, I was frustrated that my memoizers never
 ;;; seemed to help much...
@@ -447,20 +442,16 @@
       (set! hits 0)
       (set! misses 0))
 
-    (define the-memoized-procedure
-      (procedure-rename
-       (λ args
-         (let ((seen ((memory 'fetch) args)))
-           (if (not-found? seen)
-               (let ((val (apply procedure args)))
-                 (store! val args)
-                 (set! misses (+ misses 1))
-                 val)
-               (begin
-                 (set! hits (+ hits 1))
-                 seen))))
-       (string->symbol (let ([x (object-name procedure)])
-                         (if x (format "mem:~a" x) 'the-memoized-procedure)))))
+    (define (the-memoized-procedure . args)
+      (let ((seen ((memory 'fetch) args)))
+        (if (not-found? seen)
+            (let ((val (apply procedure args)))
+              (store! val args)
+              (set! misses (+ misses 1))
+              val)
+            (begin
+              (set! hits (+ hits 1))
+              seen))))
 
     (define (me m)
       (case m
@@ -469,11 +460,8 @@
         ((reset) (reset))
         (else (error "unknown message: memoize" m))))
 
-    (set! *memoizers*
-          (cons (weak-cons the-memoized-procedure
-                           (list -1 info reset procedure))
-                *memoizers*))
-
+    (set! the-memoized-procedure
+          (add-memoizer! the-memoized-procedure procedure info reset 'mem-mul-arg-eq))
     (reset)
     me))
 
@@ -530,18 +518,13 @@
 ;;; For scmutils
 
 (define (make-scmutils-memoizer)
-  (let ((memoizers (make-key-weak-eq-hash-table))
-        (nope '(not-seen)))
+  (let ((memoizers (car *memoizers*))
+        (nope (gensym 'not-seen)))
     (define (make-memoizer f)
-      (let ((seen (hash-table-ref/default memoizers f nope)))
+      (let ((seen (hash-ref (hash-ref memoizers f #hash()) 'mem-mul-arg-eq nope)))
         (if (eq? seen nope)
-            (let ((mf (simple-memoize-multi-arg-eq f)))
-              (if (apply-hook? f)                 
-                (set! mf (make-apply-hook mf (apply-hook-extra f))))
-              (eq-clone! f mf)
-              (hash-table-set! memoizers f mf)
-              mf)
-            seen)))
+            (simple-memoize-multi-arg-eq f)
+            (memoizer-fun seen))))
     make-memoizer))
 
 (define scmutils-memoize-multi-arg-eq
