@@ -1,7 +1,8 @@
 #lang racket/base
 
 (provide samritchie-memoizer clear-memoizer-tables hash-memoize-1arg linear-memoize
-         (except-out (struct-out memoizer) memoizer-of) memoizer-org *memoizers*)
+         (except-out (struct-out memoizer) memoizer-of make-memoizer) memoizer-org the-memoizers
+         weak-find-equal-args? weak-find-eqv-args? weak-find-eq-args?)
 (module+ ALL (provide (all-from-out (submod ".."))))
 
 (require "../rkt/glue.rkt"
@@ -10,7 +11,7 @@
          "eq-properties.rkt"
          )
 
-(struct memoizer (fun of type max-table-size info reset))
+(struct memoizer (fun of type max-table-size info reset) #:constructor-name make-memoizer)
 (define (memoizer-org M) (weak-box-value (memoizer-of M) gc-reclaimed-object))
 
 (define (add-memoizer! M F info reset [type #f][T -1])
@@ -21,11 +22,12 @@
               (procedure-arity-mask F)
               (string->symbol (format "mem:~a" (or (object-name F) "")))))
   (eq-clone! F M*)
-  (define MS (memoizer M* (make-weak-box F) type T info reset))
+  (define MS (make-memoizer M* (make-weak-box F) type T info reset))
   (hash-set! (hash-ref! (car *memoizers*) F (make-hasheq)) type MS)
   (hash-set! (cdr *memoizers*) M* MS)
   M*)
 
+(define (the-memoizers) (hash-values (cdr *memoizers*)))
 ;;bdk;; start original file
 
 ;;;; Memoizers

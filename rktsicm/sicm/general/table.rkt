@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide make-table adjoin-to-list! put! table-of lookup default-lookup)
+(provide make-table get put! add-to-list! adjoin-to-list! lookup table-of default-lookup)
 (module+ ALL (provide (all-from-out (submod "..")) rlookup rassq rassoc disassoc))
 
 (require (only-in "../rkt/glue.rkt" false)

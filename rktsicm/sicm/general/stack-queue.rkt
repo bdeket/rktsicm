@@ -2,7 +2,7 @@
 
 (require (only-in "../rkt/glue.rkt" if unspecific))
 
-(provide make-stack&queue stack&queue-empty? stack&queued? push! add-to-end! pop!)
+(provide make-stack&queue stack&queue? stack&queue-empty? stack&queued? push! add-to-end! pop!)
 (module+ ALL (provide (all-from-out (submod "..")) stack&queue-front stack&queue-back))
 
 (define-values (pair? cons car cdr set-cdr!) (values mpair? mcons mcar mcdr set-mcdr!))
