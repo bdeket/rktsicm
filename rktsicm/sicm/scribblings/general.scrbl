@@ -58,12 +58,30 @@ Equality check that returns @racket[#t] if both objects are one of:
  @item{@racket[string?] and @racket[string=?]}]
 
 @;*************************************************************************************************
-@|#|
-Only used by unifier-rule-simplifier, which is not used
 @section{equation-style-unifier}
-@(require (for-label sicm/general/equation-style-unifier))
 @defmodule[sicm/general/equation-style-unifier #:packages ("rktsicm")]
-@deftempproc*[unify unify:internal unify:value unify:occurs-in? unify:bind unify:lookup
+@(require (for-label sicm/general/equation-style-unifier))
+
+@defproc[(unify [template x-expr] [expr x-expr]) (or/c #f (listof (list symbol? any/c)))]
+This module provides match-like @racket[unify] procedure. It check if the (symbolic) expression can be matched against the template.
+Template variables can match a single item: @racket[(? id)]. Or they can match multiple items @racket[(?? id)]. If the same @racket[id] is used more than once, it needs to match objects that are equal?
+A third option can be given to the template variables that acts as a guard: @racket[(? id guard)].
+@examples[#:eval (parameterize ([sandbox-memory-limit 50]
+                                [sandbox-eval-limits '(15 30)]
+                                [sandbox-output 'string]
+                                [sandbox-error-output 'string])
+                   (make-evaluator 'racket/base #:requires '(sicm/general/equation-style-unifier)))
+          #:once
+          (unify '(1) '(2))
+          (unify '(1 (vector 2)) '(1 (vector 2)))
+          (unify '(+ (? a) (? a)) '(+ 2 3))
+          (unify '(+ (? a) (? a)) '(+ 2 2))
+          (unify '(+ (? a) (* (?? b) (? a))) '(+ 2 (* 3 4 5 6 2)))
+          (unify '(+ (? a) (? a)) (list '+ (vector 2) (vector 2)))
+          (unify `(+ (? a ,even?) (?? b ,(λ (l) (andmap odd? l)))) '(+ 2 3 5))]
+
+@|#|
+@deftempproc*[unify:internal unify:value unify:occurs-in? unify:bind unify:lookup
               unify:content unify:element? unify:segment? unify:variable? unify:name
               unify:restricted? unify:restriction unify:type]
 |#|
@@ -75,6 +93,7 @@ Only used by unifier-rule-simplifier, which is not used
 Some utilities for finding common subexpressions
 @defproc[(gjs/cselim [expression any/c] [not-worth-subdividing? predicate/c (λ (x) #f)]) any/c]
 Given a (symbolic) expression, find the common subexpressions and rewrite the expression inserting @racket[let]'s at the highest possible level. Any expression that is @racket[not-worth-subdividing?] will be left as is.
+@racket[gjs/cselim] recognizes @racket[lambda], @racket[λ] and plain @racket[let] as introducing new scope. Named @racket[let], @racket[let-values], definitions, or other mechanisms that introduce new bindings will probably give the wrong result.
 @examples[#:eval (parameterize ([sandbox-memory-limit 50]
                                 [sandbox-eval-limits '(15 30)]
                                 [sandbox-output 'string]
@@ -83,7 +102,16 @@ Given a (symbolic) expression, find the common subexpressions and rewrite the ex
           #:once
           (gjs/cselim '(lambda (x)
                          (/ (+ (* x 3) (- y z) (- x y) (* x 3))
-                            (- y z))))]
+                            (- y z))))
+          (gjs/cselim '(list (+ 4 x)
+                             (let* ([x 4]
+                                    [y (+ 4 x)])
+                               (+ (* x y) (/ (* x y) (+ 4 x))))))
+          (gjs/cselim '(list (+ 4 x)
+                             (let ([x 4]
+                                   [y (+ 4 x)])
+                               (+ (* x y) (/ (* x y) (+ 4 x))))))]
+
 @defproc[(occurs-in? [variables any/c] [expression any/c]) (or/c #f #t list?)]
 Check if any of the @racket[variables] occur in the @racket[expression], but also works if @racket[variables] or @racket[expression] is an object instead of a list.
 
@@ -259,20 +287,61 @@ In all other cases that the assumption was not tested, a note is added to @racke
 @section{memoize}
 @(require (for-label sicm/general/memoize))
 @defmodule[sicm/general/memoize #:packages ("rktsicm")]
-@deftempproc*[*auditing-memoizers* *memoizers* *not-seen* *samritchie-memoizing* add-memoizer!
-              clear-memoizer-tables eq-args? equal-args? eqv-args? hash-memoize hash-memoize-1arg
-              linear-memoize linear-memoize-1arg make-scmutils-memoizer memoize-multi-arg-eq
-              memoizer-f memoizer-gc-daemon memoizer-info memoizer-max-table-size memoizer-memo
-              memoizer-reset memoizer? n-dimensional-table same-args? samritchie-memoizer
-              scmutils-memoize-multi-arg-eq simple-memoize-multi-arg-eq struct:memoizer
-              weak-find-eq-args? weak-find-equal-args? weak-find-eqv-args? memoizer]
+
+Memoize has functions for momoization. It also exports some control functions to get statistics on the memoized functions.
+
+The memoized functions generated have the same @racket[arity] as the original. If the original function was an @racket[apply-hook], the memoized function will also be so, with the same @racket[apply-hook-extra]'s. And any eq-properties that the original function had will also be copied to the new memoized function.
+None of the memoizers here defined work out of the box for functions that take keyword arguments.
+
+@defproc[(samritchie-memoizer [func procedure?]) procedure?]
+Multiple argument memoizer that guarantees that memorizing two functions that are @racket[eq?] result in the same memoized function.
+
+@defproc[(linear-memoize [func procedure?] [table-size integer? 12] [finder (-> any/c any/c any/c) weak-find-equal-args?]) procedure?]
+Multiple argument memoizer that keeps at most @racket[table-size] elements in memory. Finding previously calculated items is done with @racket[finder]. A function constructed with @racket[weak-finder].
+
+@deftogether[[@defthing[weak-find-equal-args? (-> any/c any/c any/c)]
+              @defthing[weak-find-eqv-args?  (-> any/c any/c any/c)]
+              @defthing[weak-find-eq-args? (-> any/c any/c any/c)]]]
+Finder functions to be used together with @racket[linear-memoize].
+
+@defproc[(hash-memoize-1arg [func (-> any/c any/c)]) (-> any/c any/c)]
+Multiple argument memoizer for functions of 1 argument.
+
+@defproc[(clear-memoizer-tables) void]
+Clear all the memoized values from the memoized functions.
+
+@defproc[(the-memoizers) (listof memoizer)]
+A list of all @racket[memoizer]'s currently known.
+
+@defstruct[memoizer ([fun procedure?]
+                     [org procedure?]
+                     [type symbol?]
+                     [max-table-size integer?]
+                     [info (-> (list integer? integer? any/c))]
+                     [reset (-> void)])
+           #:omit-constructor]
+Combines information about a memoized function. @racket[memoizer-fun] and @racket[memoizer-org] hold the memoized and original function. The @racket[type] is a symbol that shows wich memoizing function created the memoized function.
+
+@racket[memoizer-info] returns a list that consist of two integers, showing how many hits and misses the memoized function has had, and a third argument that holds info about the internal memory of the memoized function.
+
+@racket[memoizer-reset] returns a function to reset the memory of the memoized function.
 
 @;*************************************************************************************************
 @section{notes}
 @(require (for-label sicm/general/notes))
-@defmodule[sicm/general/note #:packages ("rktsicm")]
-@deftempproc*[*notes* note-that! clear-notes! display-note show-notes]
+@defmodule[sicm/general/notes #:packages ("rktsicm")]
 
+@defthing[*notes* (listof any/c)]
+List of notes. Notes are used in logic utils and simplifier to note down assumptions used.
+
+@defproc[(note-that! [note any/c]) any/c]
+Add a [note] to the @racket[*notes*] list. 
+
+@defproc[(clear-notes!) void]
+Reset the @racket[*notes*] list.
+
+@defproc[(show-notes) void]
+Show the notes that were in the @racket[*notes*] list before the last call to @racket[(clear-notes!)]
 
 @;*************************************************************************************************
 @section{permute}
@@ -326,7 +395,10 @@ Return the binomial of @racket[n] and @racket[k]:
 @section{resource-limit}
 @(require (for-label sicm/general/resource-limit))
 @defmodule[sicm/general/resource-limit #:packages ("rktsicm")]
-@deftempproc*[allocated-time-expired? with-limited-time]
+@deftogether[[@defproc[(with-limited-time [max-time real?] [thunk (-> any/c)]) any/c]
+              @defproc[(allocated-time-expired?) boolean?]]]
+Helper for timekeeping. @racket[with-limited-time] calls the @racket[thunk] in which @racket[allocated-time-expired?] will return @racket[#t] when more time has expired than @racket[max-time] (in seconds).
+Outside of @racket[with-limited-time], @racket[allocated-time-expired?] will always return @racket[#f].
 
 @;*************************************************************************************************
 @section{sets}
@@ -347,22 +419,74 @@ Return the binomial of @racket[n] and @racket[k]:
 @section{stack-queue}
 @(require (for-label sicm/general/stack-queue))
 @defmodule[sicm/general/stack-queue #:packages ("rktsicm")]
-@deftempproc*[stack&queue? stack&queue-front stack&queue-back make-stack&queue stack&queue-empty?
-              stack&queued? push! add-to-end! pop!]
+This module provides a simple stack-queue. It is used internally by the ambigous operator. As a data structure, it is not recomended.
+
+@defproc[(make-stack&queue) stack&queue?]
+Creates a new empty stack&queue.
+
+@defproc[(stack&queue? [obj any/c]) boolean?]
+Check if on object is a @racket[stack&queue?].
+
+@defproc[(stack&queue-empty? [sq stack&queue?]) boolean?]
+Check if @racket[sq] is an empty @racket[stack&queue?].
+
+@deftogether[[@defproc[(push! [sq stack&queue?] [val any/c]) void]
+              @defproc[(add-to-end! [sq stack&queue?] [val any/c]) void]]]
+Adds @racket[val] to the front or end of the @racket[stack&queue?].
+
+@defproc[(pop! [sq stack&queue?]) any/c]
+Get the first element of the @racket[stack&queue?], leaving the @racket[stack&queue?] that element shorter.
 
 @;*************************************************************************************************
 @section{table}
 @(require (for-label sicm/general/table))
 @defmodule[sicm/general/table #:packages ("rktsicm")]
-@deftempproc*[adjoin-to-list! default-lookup lookup make-table put! table-of]
+
+@subsection{Tables}
+@defproc[(make-table [name any/c] [assoc (-> any/c (listof (pair? any/c any/c)) (or/c #f (pair? any/c any/c)))]) table]
+Create an empty (multidimensional) table. A table is defined as an object-like function.
+
+@deftogether[[@defproc[(get [table table] [keys any/c] ...) any/c]
+              @defproc[(put! [table table] [val any/c] [keys any/c] ...) void]
+              @defproc[(add-to-list! [obj any/c] [table table] [keys any/c] ...) any/c]
+              @defproc[(adjoin-to-list! [obj any/c] [table table] [keys any/c] ...) any/c]]]
+Retrieve and put objects in the table.
+
+@subsection{AList tables}
+@defproc[(lookup [key any/c] [table (listof (list any/c any/c))]) any/c]
+Traverse the association-list @racket[table] returning the @racket[val] from the @racket[(list key val)] item that has @racket[eq?] @racket[key]
+
+@subsection{PList tables}
+@defproc[(default-lookup [key any/c] [default any/c] [table (listof any/c)]) any/c]
+Traverse the the property-list @racket[table], which is a list where the even-numbered items are keys, and odd-numbered items are the values.
+For the first item that is @racket[eq?] to the @racket[key], return the next item in the list. If no corresponding item is found, the @racket[default] argument is returned.
+
+@defproc[(table-of [same? (-> any/c any/c any/c)] [keys (listof any/c)] [vals (listof any/c)]) (-> any/c any/c)]
+From a list of @racket[keys] and a list of @racket[vals] generate a procedure that takes a @racket[key] and gives the corresponding val. The @racket[vals] list should be at least as long as the @racket[keys] list.
+The first item in the @racket[keys] list that is the same according to @racket[same?] will give the corresponding item from the @racket[vals] list.
 
 @;*************************************************************************************************
 @section{weak}
 @(require (for-label sicm/general/weak))
 @defmodule[sicm/general/weak #:packages ("rktsicm")]
+
+@deftogether[[@defproc[(weak-cons [car any/c] [cdr any/c]) weak-pair?]
+              @defproc[(weak-pair? [obj any/c]) boolean?] 
+              @defproc[(weak-car [wp weak-pair?]) any/c]
+              @defproc[(weak-pair/car? [wp weak-pair?]) boolean?]
+              @defproc[(weak-cdr [wp weak-pair?]) any/c]
+              @defproc[(set-weak-cdr! [wp weak-pair?] [val any/c]) void]]]
+Weak pairs, as in the value in the car of the weak-cons is retained weakly.
+If the car was garbage-collected, the value returned will be a value that is @racket[gc-reclaimed-object?]. The @racket[weak-pair/car?] will check that the car is not yet garbage-collected.
+
+@deftogether[[@defproc[(list->weak-list [lst list?]) weak-pair?]
+              @defproc[(weak-list-length [lst weak-pair?]) integer?]
+              @defproc[(weak-list-intact? [lst list?]) boolean?]]]
+Turn a list into a weak-list, ie a set of @racket[weak-cons]es up to a final @racket['()]. A procedure for getting the length of the weak list.
+A weak-list is intact if non of the @racket[weak-car]'s of the list are garbage-collected.
+
 @deftempproc*[clean-expression-table clean-weak-alist clean-weak-list gc-reclaimed-object
-              gc-reclaimed-object? get-weak-member list->weak-list purge-list set-car!
-              set-weak-pair-car! set-weak-pair-cdr! struct:weak-pair weak-car weak-cdr weak-cons
-              weak-find weak-find-eq? weak-find-equal? weak-find-eqv? weak-finder weak-length
-              weak-list-intact? weak-pair-car weak-pair-cdr weak-pair/car? weak-pair? weak-set-cdr!
-              weak-pair]
+              gc-reclaimed-object? get-weak-member purge-list
+              set-weak-pair-cdr!
+              weak-find weak-find-eq? weak-find-equal? weak-find-eqv? weak-finder
+              set-weak-pair-car! weak-pair-car weak-pair-cdr set-car!]
