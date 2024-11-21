@@ -14,6 +14,21 @@
     (check-equal? (stack&queue-back (make-stack&queue)) '())
     )
    (test-case
+    "stack&queued?"
+    (define stq (make-stack&queue))
+    (push! stq 1)
+    (push! stq 3)
+    (add-to-end! stq 5)
+    (check-true  (stack&queued? stq 1))
+    (check-true  (stack&queued? stq 3))
+    (check-true  (stack&queued? stq 5))
+    (check-false (stack&queued? stq 7))
+    (pop! stq)
+    (check-true  (stack&queued? stq 1))
+    (check-false (stack&queued? stq 3))
+    (check-true  (stack&queued? stq 5))
+    (check-false (stack&queued? stq 7)))
+   (test-case
     "pop! empty"
     (check-exn #px"^Empty stack&queue" (λ () (pop! (make-stack&queue)))))
    (test-case

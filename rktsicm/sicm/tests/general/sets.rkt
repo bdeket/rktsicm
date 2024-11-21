@@ -5,10 +5,13 @@
 
 (provide the-tests)
 (define (set-package-test S e1 e2 e3 e4)
-  (check-equal? ((empty-set? S) (empty-set S)) #t)
+  (check-true ((empty-set? S) (empty-set S)))
+  (check-true ((empty-set? S) ((list->set S) '())))
   
   (check-equal? ((singleton-set S) e1) ((singleton-set S) e1))
-  (check-equal? ((singleton-set? S) ((singleton-set S) e2)) #t)
+  (check-true ((singleton-set? S) ((singleton-set S) e2)))
+  (check-false ((singleton-set? S) (empty-set S)))
+  (check-false ((singleton-set? S) ((list->set S) (list e1 e2))))
 
   (check-equal? ((list->set S) (list e1)) ((singleton-set S) e1))
   (check-equal? ((set->list S) ((list->set S) (list e3 e2 e1))) (list e1 e2 e3))
@@ -20,15 +23,20 @@
   (check-equal? ((adjoin-set S) e2 ((singleton-set S) e1))
                 ((list->set S) (list e2 e1)))
   (check-equal? ((adjoin-set S) e2 ((singleton-set S) e1))
-                ((list->set S) (list e1 e2)))
+                ((list->set S) (list e1 e2 e2)))
   
   (check-equal? ((remove-set S) e2 ((adjoin-set S) e2 ((singleton-set S) e1)))
                 ((singleton-set S) e1))
+  (check-equal? ((remove-set S) e2 (empty-set S))
+                (empty-set S))
   (check-equal? ((remove-set S) e2 ((list->set S) (list e3 e2 e1)))
                 ((list->set S) (list e1 e3)))
+  (check-equal? ((remove-set S) e1 ((list->set S) (list e4 e3 e2)))
+                ((list->set S) (list e4 e3 e2)))
 
-  (check-equal? ((element-set? S) e3 ((list->set S) (list e3 e2 e1))) #t)
-  (check-equal? ((element-set? S) e3 ((list->set S) (list e2 e1))) #f)
+  (check-true  ((element-set? S) e3 ((list->set S) (list e3 e2 e1))))
+  (check-false ((element-set? S) e3 ((list->set S) (list e2 e1))))
+  (check-false ((element-set? S) e1 ((list->set S) (list e4 e2 e3))) #f)
 
   (check-equal? ((intersect-sets S) ((list->set S) (list e3 e2 e1)) ((list->set S) (list e2 e1 e4)))
                 ((list->set S) (list e2 e1)))
@@ -134,6 +142,7 @@
     (define S3 (eq-set/adjoin 3 (eq-set/adjoin 6 (eq-set/adjoin 5 (eq-set/make-empty)))))
     (check-false (eq? S1 S2))
     (check-true (eq? (eq-set/union S1 S2) S2))
+    (check-true (eq? (eq-set/union S2 S1) S2))
     (check-true (eq-set/equal? (eq-set/union S2 S3) (eq-set/adjoin 6 S2))))
    (test-case
     "eq-set/intersection"
@@ -141,6 +150,7 @@
     (define S2 (eq-set/adjoin 3 (eq-set/adjoin 2 (eq-set/adjoin 5 (eq-set/make-empty)))))
     (define S3 (eq-set/adjoin 3 (eq-set/adjoin 6 (eq-set/adjoin 5 (eq-set/make-empty)))))
     (check-true (eq-set/equal? (eq-set/intersection S1 S2) S1))
+    (check-true (eq-set/equal? (eq-set/intersection S2 S1) S1))
     (check-true (eq-set/equal? (eq-set/intersection S2 S3) S1)))
    (test-case
     "eq-set/difference"
@@ -199,6 +209,7 @@
     (define S2 (multi-set/adjoin 3 (multi-set/adjoin 2 (multi-set/adjoin 5 (multi-set/empty)))))
     (define S3 (multi-set/adjoin 3 (multi-set/adjoin 6 (multi-set/adjoin 5 (multi-set/empty)))))
     (check-equal? (multi-set/intersection S1 S2) (multi-set/adjoin 5 (multi-set/adjoin 3 (multi-set/empty))))
+    (check-equal? (multi-set/intersection S2 S1) (multi-set/adjoin 5 (multi-set/adjoin 3 (multi-set/empty))))
     (check-equal? (multi-set/intersection S2 S3) (multi-set/adjoin 5 (multi-set/adjoin 3 (multi-set/empty)))))
    (test-case
     "multi-set/difference"

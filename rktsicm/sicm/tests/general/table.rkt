@@ -13,10 +13,18 @@
     (check-equal? (vector-ref table 0) 'test)
     (check-true (no-value? (car ((vector-ref table 5))))))
    (test-case
+    "TABLE - reset!"
+    (define table (make-table 'test assq))
+    (put! table 1 'A)
+    (check-equal? (get table 'A) 1)
+    ((vector-ref table 4) '(A))
+    (check-true (no-value? (get table 'A))))
+   (test-case
     "TABLE - get / getter / put! / putter!"
     (define table (make-table 'test assq))
     (check-true (no-value? (get table 'A)))
     (put! table 1 'A)
+    (check-true (no-value? (get table)))
     (check-equal? (get table 'A) 1)
     (put! table 2 'B 'C)
     (check-equal? (get table 'B 'C) 2)
@@ -31,6 +39,7 @@
     (define table (make-table 'test assq))
     (put! table 1 'A)
     (check-equal? (get-with-default table 'default 'B) 'default)
+    (check-equal? (get-with-default table 'default 'A) 1)
     (define TG (getter-with-default table 'default))
     (check-equal? (TG 'A) 1)
     (check-equal? (TG 'C) 'default))
@@ -50,7 +59,9 @@
     (check-equal? (get table 'A) '(2 . 1))
     (add-to-list! 5 table 'B 'C)
     (add-to-list! 6 table 'B 'C)
-    (check-equal? (get table 'B 'C) '(6 5)))
+    (check-equal? (get table 'B 'C) '(6 5))
+    (add-to-list! 7 table)
+    (check-equal? (get table) '(7)))
    (test-case
     "TABLE - adjoin-to-list!"
     (define table (make-table 'test assq))

@@ -79,6 +79,9 @@
               (check-equal? (binomial-coefficient 10 0) 1)
               (check-equal? (binomial-coefficient 10 3) 120))
    (test-case "number-of-combinations"
+              (check-equal? (number-of-combinations 5 0) 1)
+              (check-equal? (number-of-combinations 6 7) 0)
+              (check-equal? (number-of-combinations 6 6) 1)
               (check-equal? (number-of-combinations 10 3) (binomial-coefficient 10 3))
               (check-equal? (number-of-combinations 10 4) (binomial-coefficient 10 4)))
    (test-case "permutation-parity"

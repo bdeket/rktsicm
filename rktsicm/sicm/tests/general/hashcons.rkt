@@ -67,6 +67,9 @@
     (define the-cons (cons-unique A B))
     (check-true (eq? the-cons (cons-unique A B))))
    (test-case
+    "from-cons-table-get"
+    (check-eq? (from-cons-table-get '(nothing) 'strange) 'strange))
+   (test-case
     "list-unique"
     (check-true (eq? (list-unique 1 2 3 4 'a)
                      (list-unique 1 2 3 4 'a))))

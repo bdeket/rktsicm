@@ -81,6 +81,9 @@
     (check-equal? (fib1 20) 6765)
     (check-equal? (fib1 35) 9227465))
    (test-case
+    "the-memoizers"
+    (check-equal? (length (the-memoizers)) (hash-count (cdr *memoizers*))))
+   (test-case
     "hash-memoize-1arg"
     (let* ([fib1 (procedure-rename fib1 'fib1)]; don't leave links to memoize proc so it can be gc'd
            [mfib (hash-memoize-1arg fib1)])
@@ -152,7 +155,14 @@
       (check-true (eq? mfib (samritchie-memoizer fib1)))))
    (test-case
     "clear-memoizer-tables"
+    ;; if this test is run in the same proces as others we can not be sure *memoizers* is empty...
     (collect-garbage 'major)
+    (clear-memoizer-tables)
+    (define (∑)
+      (for/sum ([(k v) (in-hash (cdr *memoizers*))])
+        ;(println (list k ((memoizer-info v)) (LLEN (caddr ((memoizer-info v))))))
+        (LLEN (caddr ((memoizer-info v))))))
+    (define ∑0 (∑))
     (let* ([fib1 (procedure-rename fib1 'fib1)]; don't leave links to memoize proc so it can be gc'd
            [fib2 (procedure-rename fib2 'fib2)]
            [mfib-s1 (samritchie-memoizer fib1)]
@@ -164,16 +174,9 @@
       (check-eq? mfib-s1 mfib-s2)
       (check-not-eq? mfib-s1 mfib-s3)
       (mfib-s1 1) (mfib-s2 2) (mfib-s3 3 4) (mfib-h1 5) (mfib-l1 6) (mfib-l2 7 8)
-      (check-equal? (for/sum ([(k v) (in-hash (cdr *memoizers*))])
-                      ;(println (list k ((memoizer-info v)) (LLEN (caddr ((memoizer-info v))))))
-                      (LLEN (caddr ((memoizer-info v)))))
-                    6)
+      (check-equal? (∑) (+ ∑0 6))
       (clear-memoizer-tables)
-      (check-equal? (for/sum ([(k v) (in-hash (cdr *memoizers*))])
-                      ;(println (list k ((memoizer-info v)) (LLEN (caddr ((memoizer-info v))))))
-                      (LLEN (caddr ((memoizer-info v)))))
-                    0)
-      1))
+      (check-equal? (∑) ∑0)))
    #|
 
 (define (ffib n m)

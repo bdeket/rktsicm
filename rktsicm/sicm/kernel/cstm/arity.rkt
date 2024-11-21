@@ -103,8 +103,8 @@
 
 
 (define (combine-arity A B)
-  (unless (procedure-arity? A) (error))
-  (unless (procedure-arity? B) (error))
+  (unless (procedure-arity? A) (raise-argument-error 'combine-arity "procedure-arity?" A))
+  (unless (procedure-arity? B) (raise-argument-error 'combine-arity "procedure-arity?" B))
   (normalize-arity (append (if (list? A) A (list A))
                            (if (list? B) B (list B)))))
 

@@ -70,7 +70,8 @@
     (check-equal? (eq-plist A) (cons A '((waar . #t))))
     (eq-put! A 'daar 6)
     (check-equal? (eq-plist A) (cons A '((daar . 6)(waar . #t))))
-    )
+    (define B (list 5))
+    (check-false (eq-plist B)))
    (test-case
     "eq-rem!"
     (define A (list 4))
@@ -89,7 +90,9 @@
     (eq-delete! A 'waar 1)
     (check-equal? (eq-get A 'waar) '(9 2 3))
     (eq-delete! A 'waar 1)
-    (check-equal? (eq-get A 'waar) '(9 2 3)))
+    (check-equal? (eq-get A 'waar) '(9 2 3))
+    (eq-delete! A 'niks 2)
+    (check-equal? (eq-get A 'niks) '()))
    (test-case
     "eq-clone!"
     (define A (list 4))
@@ -103,7 +106,8 @@
     (eq-label! A 'waar #t 'daar '(1 2 3))
     (check-equal? (eq-get A 'waar) #t)
     (check-equal? (eq-get A 'daar) '(1 2 3))
-    (check-equal? (eq-get A 'othr) #f))
+    (check-equal? (eq-get A 'othr) #f)
+    (check-exn #px"Malformed plist" (λ () (eq-label! A 'een 2 'drie))))
    (test-case
     "eq-path"
     (check-equal? ((eq-path 'A) #f) #f)

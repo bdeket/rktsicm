@@ -1,11 +1,12 @@
 #lang racket/base
 
-(require (only-in "../rkt/glue.rkt" if unspecific))
+(require (only-in "../rkt/glue.rkt" if unspecific)
+         (only-in compatibility/mlist mmemq))
 
 (provide make-stack&queue stack&queue? stack&queue-empty? stack&queued? push! add-to-end! pop!)
 (module+ ALL (provide (all-from-out (submod "..")) stack&queue-front stack&queue-back))
 
-(define-values (pair? cons car cdr set-cdr!) (values mpair? mcons mcar mcdr set-mcdr!))
+(define-values (pair? cons car cdr set-cdr! memq) (values mpair? mcons mcar mcdr set-mcdr! (λ (x l) (and (mmemq x l) #t))))
 ;;bdk;; start original file
 
 ;;;; Simple stack&queue Abstraction
