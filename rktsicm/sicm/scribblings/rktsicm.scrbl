@@ -40,7 +40,7 @@ The mechanics and calculus modules are defined in this language.
 @;@include-section{generics.scrbl}
 @include-section{kernel.scrbl}
 @;@include-section{simplify.scrbl}
-@;@include-section{display.scrbl}
+@include-section{display.scrbl}
 @;@include-section{numerics.scrbl}
 @;@include-section{poly.scrbl}
 @;@include-section{solve.scrbl}
