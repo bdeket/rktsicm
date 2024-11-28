@@ -1,6 +1,6 @@
 #lang s-exp "extapply.rkt"
 
-(provide (all-defined-out)
+(provide (except-out (all-defined-out) symb:magexpr symb:anglexpr)
          (all-from-out "cstm/numsymb.rkt"))
 
 (require (only-in "../rkt/glue.rkt" any true for-all? fix:+)
@@ -320,11 +320,18 @@
 (define (difference? expr)
   (and (pair? expr) (eq? (car expr) '-)))
 
-(define (symb:minuend expr) (cadr expr))
+(define (symb:minuend expr)
+  (if (or (null? (cdr expr)) (null? (cddr expr)))
+      0
+      (cadr expr)))
 (define (symb:subtrahend expr)
-  (if (null? (cdddr expr))
-      (caddr expr)
-      `(* ,@(cddr expr))))
+  (if (null? (cdr expr))
+      0
+      (if (null? (cddr expr))
+          (cadr expr)
+          (if (null? (cdddr expr))
+              (caddr expr)
+              `(+ ,@(cddr expr))))))
 
 (define (symb:- a1 a2)
   (cond ((and (number? a1) (number? a2)) (- a1 a2))
@@ -361,11 +368,15 @@
 (define (quotient? expr)
   (and (pair? expr) (eq? (car expr) '/)))
 
-(define (symb:numerator expr) (cadr expr))
+(define (symb:numerator expr)
+  (if (or (null? (cdr expr)) (null? (cddr expr))) 1
+      (cadr expr)))
 (define (symb:denominator expr)
-  (if (null? (cdddr expr))
-      (caddr expr)
-      `(* ,@(cddr expr))))
+  (if (null? (cdr expr)) 1
+      (if (null? (cddr expr)) (cadr expr)
+          (if (null? (cdddr expr))
+              (caddr expr)
+              `(* ,@(cddr expr))))))
 
 (define symb:dividend symb:numerator)
 (define symb:divisor symb:denominator)
@@ -714,7 +725,7 @@
                        ':-pi/2
                        ':pi/2)
                    (and (assume! `(positive? ,y) 'symb:atan)
-                        0)))
+                        ':pi/2)))
 
               ((and (number? x)
                     (number? y)
@@ -974,13 +985,13 @@
   (define (make-product numfact factors)
     (if (null? factors)
         numfact
-        (if (one? numfact)
-            (if (null? (cdr factors))
-                (car factors)
-                `(* ,@factors))
-            (if (null? (cdr factors))
-                `(* ,numfact ,(car factors))
-                `(* ,numfact ,@factors)))))
+        (cond
+          [(zero? numfact)       numfact]
+          [(one? numfact)        (if (null? (cdr factors))
+                                     (car factors)
+                                     `(* ,@factors))]
+          [(null? (cdr factors)) `(* ,numfact ,(car factors))]
+          [else                  `(* ,numfact ,@factors)])))
   (define (make-answer pfactor pos nfactor neg)
     (let ((num (make-product pfactor pos))
           (den (make-product nfactor neg)))

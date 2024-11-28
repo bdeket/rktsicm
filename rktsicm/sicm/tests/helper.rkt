@@ -6,6 +6,7 @@
          (rename-in racket/base [raise dont-shadow-my-raise])
          rackunit
          racket/match
+         racket/port
          racket/list
          syntax/srcloc
          racket/syntax
@@ -13,7 +14,7 @@
          "../display/suppress-args.rkt")
 
 (provide check-unique-match? check-simplified?
-         accumulate skip
+         accumulate out->string skip
          clear-arguments suppress-arguments rename-part)
 
 ;***************************************************************************************************
@@ -141,6 +142,9 @@
          [acc (λ (v) (set! val (append val (list v))))])
     expr
     val))
+;***************************************************************************************************
+(define-syntax-rule (out->string body ...)
+  (call-with-output-string (λ (out) (parameterize ([current-output-port out]) body ...))))
 
 ;***************************************************************************************************
 

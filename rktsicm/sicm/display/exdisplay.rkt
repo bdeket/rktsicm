@@ -1,13 +1,34 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide internal-show-expression 2d-show-expression expression->tex-string derivative-symbol)
+(module+ ALL (provide (all-from-out (submod ".."))))
 
-(require racket/system
-         racket/port
-         (only-in "../rkt/glue.rkt" floor->exact undefined-value)
+(require racket/port
+         (only-in "../rkt/glue.rkt" floor->exact undefined-value string-head string-tail)
+         "../rkt/define.rkt"
          "../kernel-intr.rkt"
          "../general/list-utils.rkt"
          )
+
+(define (string-search-forward srch str)
+  (define a (regexp-match-positions srch str))
+  (if a (caar a) #f))
+
+(define char-set list)
+(define (string-find-next-char-in-set str lst)
+  (for/first ([s (in-string str)]
+              [i (in-naturals)]
+              #:when (member s lst))
+    i))
+
+(define (->scriptbox nr uptable args)
+  (insure-bp uptable nr ((if (null? (cddr args))
+                             car
+                             (λ (l) (2d:unparse-matrix uptable (list l))))
+                         (cdr args))))
+  
+
+(define derivative-symbol 'D)
 
 ;;bdk;; start original file
 
@@ -73,68 +94,68 @@
        (and (pair? expr) (eq? (car expr) 'matrix-by-rows)))
 |#
 
-(define derivative-symbol 'D)
 
 ;;; exported functions
-(define internal-show-expression undefined-value)
-(define 2d-show-expression undefined-value)
-(define expression->tex-string undefined-value)
-(define display-tex-string undefined-value)
+(define internal-show-expression)
+(define 2d-show-expression)
+(define expression->tex-string)
+(define display-tex-string)
 
-(define last-tex-string-generated undefined-value)
+(define last-tex-string-generated)
 
 (define enable-tex-display #t)
 
-(let ()					;package all stuff internally
+;;bdk;;internal packaging managed with provides
+;;bdk;;(let ()					;package all stuff internally
 
-(define display-in-screen-window
-  (let ((count 0))
-    (lambda (tex-string)
-      (let* ((dirname (path->string (find-system-path 'temp-dir)))
-	     (file-name (string-append dirname
-				       "temp-display"
-				       (number->string count)))
-	     (complete-tex-input (string-append
-				  ;;" \\magnification=\\magstep2\n"
-				  ;;"\\hsize=48pc  \\hoffset=-4pc  "
-				  "\\voffset=-6pc "
-				  "\\hsize=48pc " " \\hoffset=-6pc  "
-				  boxit-string "\n"
-				  tex-string
-				  "\\vfil\\bye")))
-	(with-output-to-file
-	    (string-append file-name ".tex")
-	  (lambda () (display complete-tex-input)))
-	#|
-	(working-unix/system (string-append "cd " dirname ";"
-					    " tex " file-name
-					    " > //dev//null 2>&1 "))
-	(working-unix/system
-	 (string-append "xdvi " file-name ".dvi "
-			"-s 4 "
-			"-yoffset 3.5 "
-			"-geometry 900x400+1+1; "
-			"//bin//rm " file-name ".*"
-			))
-	|#
-	(system
-	 (string-append "cd " dirname ";"
-			" tex " file-name
-			" > /dev/null 2>&1 ")
-	 'output #f
-	 'shell-file-name "/bin/sh")
-	(system
-	 (string-append "xdvi " file-name ".dvi "
-			"-s 4 "
-			"-yoffset 3.5 "
-			"-geometry 900x400+1+1"
-			" > /dev/null 2>&1; "
-			"/bin/rm " file-name ".*"
-			)
-	 'output #f
-	 'shell-file-name "/bin/sh")
-	(set! count (+ count 1))
-	))))
+;;bdk;;(define display-in-screen-window
+;;bdk;;  (let ((count 0))
+;;bdk;;    (lambda (tex-string)
+;;bdk;;      (let* ((dirname (->namestring (user-homedir-pathname)))
+;;bdk;;	     (file-name (string-append dirname
+;;bdk;;				       "temp-display"
+;;bdk;;				       (number->string count)))
+;;bdk;;	     (complete-tex-input (string-append
+;;bdk;;				  ;;" \\magnification=\\magstep2\n"
+;;bdk;;				  ;;"\\hsize=48pc  \\hoffset=-4pc  "
+;;bdk;;				  "\\voffset=-6pc "
+;;bdk;;				  "\\hsize=48pc " " \\hoffset=-6pc  "
+;;bdk;;				  boxit-string "\n"
+;;bdk;;				  tex-string
+;;bdk;;				  "\\vfil\\bye")))
+;;bdk;;	(with-output-to-file
+;;bdk;;	    (string-append file-name ".tex")
+;;bdk;;	  (lambda () (display complete-tex-input)))
+;;bdk;;	#|
+;;bdk;;	(working-unix/system (string-append "cd " dirname ";"
+;;bdk;;					    " tex " file-name
+;;bdk;;					    " > //dev//null 2>&1 "))
+;;bdk;;	(working-unix/system
+;;bdk;;	 (string-append "xdvi " file-name ".dvi "
+;;bdk;;			"-s 4 "
+;;bdk;;			"-yoffset 3.5 "
+;;bdk;;			"-geometry 900x400+1+1; "
+;;bdk;;			"//bin//rm " file-name ".*"
+;;bdk;;			))
+;;bdk;;	|#
+;;bdk;;	(run-shell-command
+;;bdk;;	 (string-append "cd " dirname ";"
+;;bdk;;			" tex " file-name
+;;bdk;;			" > /dev/null 2>&1 ")
+;;bdk;;	 'output #f
+;;bdk;;	 'shell-file-name "/bin/sh")
+;;bdk;;	(run-shell-command
+;;bdk;;	 (string-append "xdvi " file-name ".dvi "
+;;bdk;;			"-s 4 "
+;;bdk;;			"-yoffset 3.5 "
+;;bdk;;			"-geometry 900x400+1+1"
+;;bdk;;			" > /dev/null 2>&1; "
+;;bdk;;			"/bin/rm " file-name ".*"
+;;bdk;;			)
+;;bdk;;	 'output #f
+;;bdk;;	 'shell-file-name "/bin/sh")
+;;bdk;;	(set! count (+ count 1))
+;;bdk;;	))))
 
 
 (define boxit-string
@@ -191,7 +212,7 @@
 
 (define (explicit-box? elt)
   (and (pair? elt)
-       (eq? (car elt) 'BOX)))
+       (eq? (car elt) 'box)))
 
 (define (box-voffset box)
   (if (explicit-box? box)
@@ -622,12 +643,13 @@
 
 (define (2d:unparse-superscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	(script (insure-bp uptable 140 (cadr args))))
+	;;bdk;;(script (insure-bp uptable 140 (cadr args)))
+        (script (->scriptbox 140 uptable args)))
     (make-box-with-bp
      140
      (glue-horiz
       (list top
-	    (shift-top-to (+ (box-voffset top) (box-nlines top))
+	    (shift-top-to (+ (box-voffset top) (box-nlines top) (box-nlines script) -1)
 			  script))))))
 
 
@@ -653,7 +675,8 @@
 
 (define (2d:unparse-subscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	(script (insure-bp uptable 140 (cadr args))))
+	;;bdk;;(script (insure-bp uptable 140 (cadr args)))
+        (script (->scriptbox 140 uptable args)))
     (make-box-with-bp
      140
      (glue-horiz
@@ -772,7 +795,7 @@
 (define (2d:unparse-partial-derivative uptable args)
   (make-box-with-bp
    140
-   (glue-horiz (list (2d:unparse-subscript uptable (list "D" (cadr args)))
+   (glue-horiz (list (2d:unparse-subscript uptable (list* "D" (cdr args))) ;;bdk;; partial can have more than 1 arg
 		     (insure-bp uptable 140 (car args))))))
 
 (define (tex:unparse-partial-derivative uptable args)
@@ -1171,16 +1194,12 @@
 	     (make-box-with-bp 190 string)))))
 |#
 
-  (define (string-search-forward srch str)
-    (define a (regexp-match-positions srch str))
-    (if a (car a) #f))
-
 (define (unparse-string string symbol-substs uptable)
   (define (for-terminal special-string special-string-length special-symbol)
     (let ((n (string-search-forward special-string string)))
       (if (and n (= (+ n special-string-length) (string-length string)))
 	  (unparse `(,special-symbol
-		     ,(string->symbol (substring string 0 n)))
+		     ,(string->symbol (string-head string n)))
 		   symbol-substs uptable)
 	  #f)))
   (cond ((= (string-length string) 1) string)
@@ -1200,23 +1219,16 @@
 	      (string-tail string (+ index 1))))))
 |#
 
-  (define char-set list)
-  (define (string-find-next-char-in-set str lst)
-    (for/first ([s (in-string str)]
-                [i (in-naturals)]
-                #:when (member s lst))
-      i))
-  
 (define (split-at-underscore-or-caret string cont)
   ;;cont = (lambda (before at after) ...)
   (let ((index (string-find-next-char-in-set string (char-set #\^ #\_))))
     (if (not index)
 	(cont #f #f #f)
-	(cont (substring string 0 index)
+	(cont (string-head string index)
 	      (if (char=? (string-ref string index) #\^)
 		  'superscript
 		  'subscript)
-	      (substring string (+ index 1))))))
+	      (string-tail string (+ index 1))))))
 
 
 
@@ -1312,20 +1324,19 @@
 		processed-terms
 		)))))))
 
-(set! internal-show-expression
-      void
-  #;(lambda (exp)
-    (set! last-tex-string-generated (expression->tex-string exp))
-    (let ((name (graphics-type-name (graphics-type #f))))
-      (if (and (memq name '(x x11)) enable-tex-display)
-	  (begin (display-in-screen-window last-tex-string-generated)
-		 (newline)
-		 (newline)
-		 ;;  (display tex-string)
-		 ;;  (newline)
-		 ;;  (newline)
-		 )
-	  (2d-show-expression exp)))))
+(set! internal-show-expression void)
+;;bdk;;  (lambda (exp)
+;;bdk;;    (set! last-tex-string-generated (expression->tex-string exp))
+;;bdk;;    (let ((name (graphics-type-name (graphics-type #f))))
+;;bdk;;      (if (and (memq name '(x x11)) enable-tex-display)
+;;bdk;;	  (begin (display-in-screen-window last-tex-string-generated)
+;;bdk;;		 (newline)
+;;bdk;;		 (newline)
+;;bdk;;		 ;;  (display tex-string)
+;;bdk;;		 ;;  (newline)
+;;bdk;;		 ;;  (newline)
+;;bdk;;		 )
+;;bdk;;	  (2d-show-expression exp)))))
 
 
 (set! 2d-show-expression
@@ -1357,9 +1368,9 @@
 	  (string-append "\\boxit{ " "$" tex-string "$" "}"))))
 |#
 
-(set! display-tex-string display-in-screen-window)
+;;bdk;;(set! display-tex-string display-in-screen-window)
 
-)       ;end let()
+;;bdk;;)       ;end let()
 
 
 ;;;(define left-up-delimiter "\\left \\lceil \\matrix{ ")

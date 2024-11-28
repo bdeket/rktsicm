@@ -64,12 +64,14 @@
 (define 1+ add1)
 (define unspecific (void))
 (define rationalize->exact rationalize)
-(define (floor->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
-(define (round->exact x) (if (inexact? x)(inexact->exact (floor x)) x))
+(define (floor->exact x) (inexact->exact (floor x)))
+(define (round->exact x) (inexact->exact (round x)))
 (define (myrandom i) (if (flonum? i) (* i (random)) (random i)))
 
 (define (symbol-upcase sym) (string->symbol (string-upcase (symbol->string sym))))
 (define (symbol-downcase sym) (string->symbol (string-downcase (symbol->string sym))))
+(define (string-head str ind) (substring str 0 ind))
+(define (string-tail str ind) (substring str ind))
 
 (define delete-duplicates remove-duplicates)
 

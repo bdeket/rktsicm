@@ -27,7 +27,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in calculus/tensors
  1 difference(s) found in calculus/vector-fields
  5 difference(s) found in calculus/wedge
-12 difference(s) found in display/exdisplay
+10 difference(s) found in display/exdisplay
  7 difference(s) found in display/print
  8 difference(s) found in display/suppress-args
  4 difference(s) found in general/eq-properties
@@ -53,7 +53,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in kernel/matrices
  5 difference(s) found in kernel/numbers
  3 difference(s) found in kernel/numeric
- 4 difference(s) found in kernel/numsymb
+13 difference(s) found in kernel/numsymb
  1 difference(s) found in kernel/operator
  5 difference(s) found in kernel/strutl
  3 difference(s) found in kernel/types

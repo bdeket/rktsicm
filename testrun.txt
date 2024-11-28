@@ -2,31 +2,32 @@ TOT FAIL ERR TOUT SKIP TIME NAME
 --------------------------------------------------------------
                         0.0 ./rktsicm/sicm\generic.rkt
                         0.0 ./rktsicm/sicm\main.rkt
-  4                     0.0 ./rktsicm/sicm\tests\calculus\Lie.rkt
+  4                     0.5 ./rktsicm/sicm\tests\calculus\Lie.rkt
   3                     0.5 ./rktsicm/sicm\tests\calculus\SR-boost.rkt
   3                     0.0 ./rktsicm/sicm\tests\calculus\SR-frames.rkt
   2                     0.0 ./rktsicm/sicm\tests\calculus\basis.rkt
-  7             1       0.5 ./rktsicm/sicm\tests\calculus\connection.rkt
+  7             1       1.0 ./rktsicm/sicm\tests\calculus\connection.rkt
   3                     0.0 ./rktsicm/sicm\tests\calculus\coord.rkt
- 15                     5.5 ./rktsicm/sicm\tests\calculus\covariant-derivative.rkt
-  7                  2  2.5 ./rktsicm/sicm\tests\calculus\curvature.rkt
+ 15                     6.0 ./rktsicm/sicm\tests\calculus\covariant-derivative.rkt
+  7                  2  3.0 ./rktsicm/sicm\tests\calculus\curvature.rkt
   2                     0.0 ./rktsicm/sicm\tests\calculus\dgutils.rkt
   1                     0.0 ./rktsicm/sicm\tests\calculus\exterior-derivative.rkt
   2                     0.5 ./rktsicm/sicm\tests\calculus\form-fields.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\frame-maker.rkt
-  3                     3.0 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
-  8                     3.0 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
+  3                     3.5 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
+  8                     3.5 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
   3                     0.0 ./rktsicm/sicm\tests\calculus\indexed.rkt
-  1                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
+  1                     0.5 ./rktsicm/sicm\tests\calculus\interior-product.rkt
  13                     0.5 ./rktsicm/sicm\tests\calculus\manifold.rkt
   7                     1.0 ./rktsicm/sicm\tests\calculus\maps.rkt
   8                     0.5 ./rktsicm/sicm\tests\calculus\metric.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
  18                  2  2.0 ./rktsicm/sicm\tests\calculus\so3.rkt
   3                     1.0 ./rktsicm/sicm\tests\calculus\tensors.rkt
-  2                     0.5 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
+  2                     1.0 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
   3                     0.5 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
   2                     0.0 ./rktsicm/sicm\tests\calculus\wedge.rkt
+  7                  1  0.0 ./rktsicm/sicm\tests\display\exdisplay.rkt
   4                  1  0.0 ./rktsicm/sicm\tests\display\pp.rkt
   3                     0.0 ./rktsicm/sicm\tests\display\suppress-args.rkt
   3                     0.0 ./rktsicm/sicm\tests\general\assert.rkt
@@ -57,6 +58,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   3                     0.0 ./rktsicm/sicm\tests\kernel\litfun.rkt
   3                     0.0 ./rktsicm/sicm\tests\kernel\modarith.rkt
   6             1       0.5 ./rktsicm/sicm\tests\kernel\numeric.rkt
+ 22                  1  0.0 ./rktsicm/sicm\tests\kernel\numsymb.rkt
   3                     0.0 ./rktsicm/sicm\tests\kernel\quaternion.rkt
  28                     0.0 ./rktsicm/sicm\tests\kernel\structs.rkt
   1                     0.0 ./rktsicm/sicm\tests\kernel\utils.rkt
@@ -114,7 +116,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
 TOT FAIL ERR TOUT SKIP TIME NAME
-726             2   22 33.5 TOTAL
-runtime: 6.216666666666667m 
+755             2   24 37.0 TOTAL
+runtime: 6.783333333333333m 
 Welcome to Racket v8.15.0.4-2024-11-07-688e2b2e51 [bc].
-Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz    6-cores  2592MHz 
+Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 
