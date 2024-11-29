@@ -4,4 +4,4 @@
 
 (define collection 'multi)
 
-(define deps '("base"))
+(define deps '("base" "compatibility-lib"))
