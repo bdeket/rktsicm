@@ -68,7 +68,6 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in numerics/ode/gear
  1 difference(s) found in numerics/ode/interface
  1 difference(s) found in numerics/ode/ode-advancer
- 1 difference(s) found in numerics/optimize/unimin
  1 difference(s) found in numerics/quad/quad-flo
  3 difference(s) found in numerics/quadrature/quadrature
  1 difference(s) found in numerics/quadrature/rational

@@ -14,7 +14,7 @@
   (cond
     [(null? rst) (log-rktsicm-warning "warning")]
     [else
-     (log-rktsicm-warning (car rst))
+     (log-rktsicm-warning (format "~a" (car rst)))
      (for ([p (in-list (cdr rst))]) (log-rktsicm-warning (format " ~a" p)))]))
 
 

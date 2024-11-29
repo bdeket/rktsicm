@@ -16,6 +16,7 @@
 #|
 |#
 
+
 ;;; The following univariate optimization routines typically return
 ;;; a list (x fx ...) where x is the argmument at which the extremal
 ;;; value fx is achieved. The following helps destructure this list.

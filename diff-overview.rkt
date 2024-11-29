@@ -125,7 +125,7 @@
            [in #f])
     (cond
       [(null? l0) '()]
-      [(and in (= open 0)) l0]
+      [(and in (= open 0)) (scm-remove-declare l0)]
       [(regexp-match #px"^\\(declare \\(usual-integrations" (caar l0))
        (lp (cdr l0)
            (- (length (regexp-match* #px"\\(" (caar l0)))
