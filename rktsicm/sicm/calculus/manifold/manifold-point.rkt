@@ -25,7 +25,7 @@
 
 (define (transfer-point embedded embedding)
   (lambda (point)
-    (assert (eq? (embedded 'manifold) (manifold-point-manifold point)))
+    (assert (eq? (embedded 'manifold) (point->manifold point)))
     (assert (= ((embedded 'manifold) 'embedding-dimension)
                ((embedding 'manifold) 'embedding-dimension)))		 
     (manifold-point (manifold-point-spec point)
@@ -33,16 +33,19 @@
                     '())))
 ;;bdk;; insert 1 end
 
+(define point->manifold manifold-point-manifold)
+(define coordinate-reps manifold-point-coordinate-representations)
+(define set-coordinate-reps! set-manifold-point-coordinate-representations!)
+
 ;;bdk;; insert 2
 (define (get-coordinates point coordinate-system thunk)
-  (let ((entry (assq coordinate-system (manifold-point-coordinate-representations point))))
+  (let ((entry (assq coordinate-system (coordinate-reps point))))
     (if entry
         (cadr entry)
         (let ((val (s:map/r simplify-numerical-expression (thunk))))
-          (set-manifold-point-coordinate-representations!
-           point
-           (cons (list coordinate-system val)
-                 (manifold-point-coordinate-representations point)))
+          (set-coordinate-reps! point
+                                (cons (list coordinate-system val)
+                                      (coordinate-reps point)))
           val))))
 ;;bdk;; insert 2 end
 

@@ -35,11 +35,11 @@
 ;;; by fluid binding.
 
 (define (solve-equations equations unknowns)
-  (parameterize ((*complete-solutions* '())
-                 (*underdetermined-solutions* '())
-                 (*with-residual-equations* '())
-                 (*with-tough-equations* '())
-                 (*with-extra-equations* '()))
+  (parameterize ([*complete-solutions* '()]
+                 [*underdetermined-solutions* '()]
+                 [*with-residual-equations* '()]
+                 [*with-tough-equations* '()]
+                 [*with-extra-equations* '()])
     (solve-incremental equations
                        unknowns
                        default-succeed

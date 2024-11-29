@@ -701,28 +701,27 @@
 ;;; GCD memoizer.  A hairy attempt to speed up the gcd.  Ultimately
 ;;; this failed and we went to a sparse interpolation gcd.
 
-#; ;;bdk;; since it's not working don't bother...
-(define (gcd-memoizer poly/gcd)
-  (let ((table
-	 ((weak-hash-table/constructor unordered-poly-hash
-				       unordered-pair-equal?))))
-    (define (the-memoized-gcd p1 p2)
-      (if *gcd-memoizer-enabled*
-	  (let ((x (cons p1 p2)))
-	    (let ((seen (hash-table/get table x *not-seen*)))
-	      (if (not (eq? seen *not-seen*))
-		  (begin (set! *gcd-hit* (fix:+ *gcd-hit* 1))
-			 seen)
-		  (let ((ans (poly/gcd p1 p2)))
-		    (set! *gcd-miss* (fix:+ *gcd-miss* 1))
-		    (hash-table/put! table x ans)
-		    ans))))
-	  (poly/gcd p1 p2)))
-    the-memoized-gcd))
+;;brm;;(define (gcd-memoizer poly/gcd)
+;;brm;;  (let ((table
+;;brm;;	 ((weak-hash-table/constructor unordered-poly-hash
+;;brm;;				       unordered-pair-equal?))))
+;;brm;;    (define (the-memoized-gcd p1 p2)
+;;brm;;      (if *gcd-memoizer-enabled*
+;;brm;;	  (let ((x (cons p1 p2)))
+;;brm;;	    (let ((seen (hash-table/get table x *not-seen*)))
+;;brm;;	      (if (not (eq? seen *not-seen*))
+;;brm;;		  (begin (set! *gcd-hit* (fix:+ *gcd-hit* 1))
+;;brm;;			 seen)
+;;brm;;		  (let ((ans (poly/gcd p1 p2)))
+;;brm;;		    (set! *gcd-miss* (fix:+ *gcd-miss* 1))
+;;brm;;		    (hash-table/put! table x ans)
+;;brm;;		    ans))))
+;;brm;;	  (poly/gcd p1 p2)))
+;;brm;;    the-memoized-gcd))
 
-(define *gcd-memoizer-enabled* #f)
-(define *gcd-hit* 0)
-(define *gcd-miss* 0)
+;;brm;;(define *gcd-memoizer-enabled* #f)
+;;brm;;(define *gcd-hit* 0)
+;;brm;;(define *gcd-miss* 0)
 
 (define (unordered-pair-equal? a1 a2)
   (and (pair? a1)

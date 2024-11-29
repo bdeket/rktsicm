@@ -184,8 +184,8 @@ The general strategy is:
          equations))
 
 (define (contradiction-failure contradictions fail)
-  (parameterize ((*outstanding-contradictions*
-               (append contradictions (*outstanding-contradictions*))))
+  (parameterize ([*outstanding-contradictions*
+               (append contradictions (*outstanding-contradictions*))])
     (fail)))
 
 (define (use-new-substitution newsubst oldresids oldsubsts oldtough

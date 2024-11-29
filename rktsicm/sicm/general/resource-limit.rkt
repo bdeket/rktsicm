@@ -13,7 +13,7 @@
        (> (runtime) (*time-upper-limit*))))
       
 (define (with-limited-time allocated-time thunk)
-  (parameterize ((*time-upper-limit* (+ allocated-time (runtime))))
+  (parameterize ([*time-upper-limit* (+ allocated-time (runtime))])
     (thunk)))
 
 

@@ -369,8 +369,8 @@
       (caddr (apply-hook-extra f))
       #f))
 
-#; ;moved to parameters
-(define *literal-reconstruction* #f)
+
+;;bdk;; moved to ../parameters 3
 
 ;;bdk;; moved to types 1
 

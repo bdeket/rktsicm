@@ -37,34 +37,34 @@
 
 (define *memoizers* (cons (make-ephemeron-hasheq) (make-ephemeron-hasheq)))
 
-;;bdk;;(define (memoizer-gc-daemon)
-;;bdk;;  (set! *memoizers*
-;;bdk;;        (clean-weak-alist *memoizers*))
-;;bdk;;  'done)
+;;brm;;(define (memoizer-gc-daemon)
+;;brm;;  (set! *memoizers*
+;;brm;;        (clean-weak-alist *memoizers*))
+;;brm;;  'done)
 
-;;bdk;;(add-gc-daemon! memoizer-gc-daemon)
+;;brm;;(add-gc-daemon! memoizer-gc-daemon)
 
 ;;;(define *auditing-memoizers* #f)
 (define *auditing-memoizers* #t)
 
-;;bdk;;(define (show-memoizer-statistics)
-;;bdk;;  (for-each (lambda (m)
-;;bdk;;              (let ((f (weak-car m)) (s ((cadr (weak-cdr m)))))
-;;bdk;;                (if (not (gc-reclaimed-object? f))
-;;bdk;;                    (pp `(,(car s)
-;;bdk;;                          ,(cadr s)
-;;bdk;;                          ,(function-expression (cadddr (weak-cdr m))
-;;bdk;;                                                f))))))
-;;bdk;;            *memoizers*)
-;;bdk;;  'done)
+;;brm;;(define (show-memoizer-statistics)
+;;brm;;  (for-each (lambda (m)
+;;brm;;              (let ((f (weak-car m)) (s ((cadr (weak-cdr m)))))
+;;brm;;                (if (not (gc-reclaimed-object? f))
+;;brm;;                    (pp `(,(car s)
+;;brm;;                          ,(cadr s)
+;;brm;;                          ,(function-expression (cadddr (weak-cdr m))
+;;brm;;                                                f))))))
+;;brm;;            *memoizers*)
+;;brm;;  'done)
 
-;;bdk;;(define (function-expression f memo-f)
-;;bdk;;  (or (object-name memo-f
-;;bdk;;                   generic-environment
-;;bdk;;                   rule-environment
-;;bdk;;                   numerical-environment
-;;bdk;;                   scmutils-base-environment)
-;;bdk;;      (procedure-name f)))
+;;brm;;(define (function-expression f memo-f)
+;;brm;;  (or (object-name memo-f
+;;brm;;                   generic-environment
+;;brm;;                   rule-environment
+;;brm;;                   numerical-environment
+;;brm;;                   scmutils-base-environment)
+;;brm;;      (procedure-name f)))
 
   
 (define (clear-memoizer-tables)
@@ -244,72 +244,72 @@
 
 ;;; To install and remove memoizers on named procedures
 
-;;bdk;;(define (memoize-procedure! name #:optional memo-type environment)
-;;bdk;;  (assert (symbol? name))
-;;bdk;;  (if (default-object? environment)
-;;bdk;;      (set! environment (nearest-repl/environment))
-;;bdk;;      (assert (environment? environment)))
-;;bdk;;  (assert (environment-bound? environment name))
-;;bdk;;  (if (default-object? memo-type)
-;;bdk;;      (set! memo-type 'linear)
-;;bdk;;      (assert (memq memo-type '(linear hash))))
-;;bdk;;  (if (environment-bound? environment '*memoized-procedures*)
-;;bdk;;      (if (assq name (eval '*memoized-procedures* environment))
-;;bdk;;          (begin (warn name "rememoizing!")
-;;bdk;;                 (unmemoize-procedure! name environment))))
-;;bdk;;  (let ((proc (eval name environment)))
-;;bdk;;    (assert (procedure? proc))
-;;bdk;;    (let ((arity (procedure-arity proc)))
-;;bdk;;      (let ((memoized-procedure
-;;bdk;;             (cond ((and (fix:= (car arity) 0) ;(0 . 0)
-;;bdk;;                         (fix:= (cdr arity) 0))
-;;bdk;;                    (let ((ran? #f) (value))
-;;bdk;;                      (lambda ()
-;;bdk;;                        (if ran?
-;;bdk;;                            value
-;;bdk;;                            (begin
-;;bdk;;                              (set! value (proc))
-;;bdk;;                              (set! ran? #t)
-;;bdk;;                              value)))))
-;;bdk;;                   ((and (fix:= (car arity) 1) ;(1 . 1)
-;;bdk;;                         (fix:= (cdr arity) 1))
-;;bdk;;                    (case memo-type
-;;bdk;;                      ((linear) (linear-memoize-1arg proc))
-;;bdk;;                      ((hash) (hash-memoize-1arg proc))))
-;;bdk;;                   (else
-;;bdk;;                    (case memo-type
-;;bdk;;                      ((linear) (linear-memoize proc))
-;;bdk;;                      ((hash) (hash-memoize proc)))))))	
-;;bdk;;        (if (not (environment-bound? environment
-;;bdk;;                                     '*memoized-procedures*))
-;;bdk;;            (environment-define environment
-;;bdk;;                                '*memoized-procedures*
-;;bdk;;                                (list (cons name proc)))
-;;bdk;;            (environment-assign! environment
-;;bdk;;                                 '*memoized-procedures*
-;;bdk;;                                 (cons (cons name proc)
-;;bdk;;                                       (eval '*memoized-procedures*
-;;bdk;;                                             environment))))
-;;bdk;;        (environment-assign! environment
-;;bdk;;                             name
-;;bdk;;                             memoized-procedure)
-;;bdk;;        'done))))
+;;brm;;(define (memoize-procedure! name #:optional memo-type environment)
+;;brm;;  (assert (symbol? name))
+;;brm;;  (if (default-object? environment)
+;;brm;;      (set! environment (nearest-repl/environment))
+;;brm;;      (assert (environment? environment)))
+;;brm;;  (assert (environment-bound? environment name))
+;;brm;;  (if (default-object? memo-type)
+;;brm;;      (set! memo-type 'linear)
+;;brm;;      (assert (memq memo-type '(linear hash))))
+;;brm;;  (if (environment-bound? environment '*memoized-procedures*)
+;;brm;;      (if (assq name (eval '*memoized-procedures* environment))
+;;brm;;          (begin (warn name "rememoizing!")
+;;brm;;                 (unmemoize-procedure! name environment))))
+;;brm;;  (let ((proc (eval name environment)))
+;;brm;;    (assert (procedure? proc))
+;;brm;;    (let ((arity (procedure-arity proc)))
+;;brm;;      (let ((memoized-procedure
+;;brm;;             (cond ((and (fix:= (car arity) 0) ;(0 . 0)
+;;brm;;                         (fix:= (cdr arity) 0))
+;;brm;;                    (let ((ran? #f) (value))
+;;brm;;                      (lambda ()
+;;brm;;                        (if ran?
+;;brm;;                            value
+;;brm;;                            (begin
+;;brm;;                              (set! value (proc))
+;;brm;;                              (set! ran? #t)
+;;brm;;                              value)))))
+;;brm;;                   ((and (fix:= (car arity) 1) ;(1 . 1)
+;;brm;;                         (fix:= (cdr arity) 1))
+;;brm;;                    (case memo-type
+;;brm;;                      ((linear) (linear-memoize-1arg proc))
+;;brm;;                      ((hash) (hash-memoize-1arg proc))))
+;;brm;;                   (else
+;;brm;;                    (case memo-type
+;;brm;;                      ((linear) (linear-memoize proc))
+;;brm;;                      ((hash) (hash-memoize proc)))))))	
+;;brm;;        (if (not (environment-bound? environment
+;;brm;;                                     '*memoized-procedures*))
+;;brm;;            (environment-define environment
+;;brm;;                                '*memoized-procedures*
+;;brm;;                                (list (cons name proc)))
+;;brm;;            (environment-assign! environment
+;;brm;;                                 '*memoized-procedures*
+;;brm;;                                 (cons (cons name proc)
+;;brm;;                                       (eval '*memoized-procedures*
+;;brm;;                                             environment))))
+;;brm;;        (environment-assign! environment
+;;brm;;                             name
+;;brm;;                             memoized-procedure)
+;;brm;;        'done))))
 
-;;bdk;;(define (unmemoize-procedure! name #:optional environment)
-;;bdk;;  (assert (symbol? name))
-;;bdk;;  (if (default-object? environment)
-;;bdk;;      (set! environment (nearest-repl/environment))
-;;bdk;;      (assert (environment? environment)))
-;;bdk;;  (assert (environment-bound? environment name))
-;;bdk;;  (assert (environment-bound? environment '*memoized-procedures*))
-;;bdk;;  (let ((vcell (assq name (eval '*memoized-procedures* environment))))
-;;bdk;;    (assert vcell)
-;;bdk;;    (environment-assign! environment (car vcell) (cdr vcell))
-;;bdk;;    (environment-assign! environment
-;;bdk;;                         '*memoized-procedures*
-;;bdk;;                         (delete vcell
-;;bdk;;                                 (eval '*memoized-procedures* environment)))
-;;bdk;;    'done!))
+;;brm;;(define (unmemoize-procedure! name #:optional environment)
+;;brm;;  (assert (symbol? name))
+;;brm;;  (if (default-object? environment)
+;;brm;;      (set! environment (nearest-repl/environment))
+;;brm;;      (assert (environment? environment)))
+;;brm;;  (assert (environment-bound? environment name))
+;;brm;;  (assert (environment-bound? environment '*memoized-procedures*))
+;;brm;;  (let ((vcell (assq name (eval '*memoized-procedures* environment))))
+;;brm;;    (assert vcell)
+;;brm;;    (environment-assign! environment (car vcell) (cdr vcell))
+;;brm;;    (environment-assign! environment
+;;brm;;                         '*memoized-procedures*
+;;brm;;                         (delete vcell
+;;brm;;                                 (eval '*memoized-procedures* environment)))
+;;brm;;    'done!))
 
 ;;; Added by GJS on 11 Nov 2021, I was frustrated that my memoizers never
 ;;; seemed to help much...

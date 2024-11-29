@@ -3,6 +3,7 @@
 (provide (all-defined-out))
 
 (require (only-in "../rkt/glue.rkt" if undefined-value? hash-table? pathname? any)
+         (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/todo.rkt" pp)
          (only-in "../rkt/environment.rkt" generic-environment rule-environment numerical-environment scmutils-base-environment system-global-environment)
          "../general/assert.rkt"
@@ -23,6 +24,10 @@
        )
 (require 'todo)
 
+(define canonicalize-numbers (make-generic-operator 1 'canonicalize-numbers values))
+(assign-operation canonicalize-numbers (λ (expr) (and (number? expr) *heuristic-numbers*)) heuristic-canonicalize-complex)
+(assign-operation canonicalize-numbers list? (λ (expr) (cons (canonicalize-numbers (operator expr))
+                                                             (map canonicalize-numbers (operands expr)))))
 ;;bdk;; start original file
 
 ;;; Hamiltonians look better if we divide them out.
@@ -31,23 +36,19 @@
 
 (define *heuristic-numbers* #f)
 
-(define canonicalize-numbers (make-generic-operator 1 'canonicalize-numbers values))
-(assign-operation canonicalize-numbers (λ (expr) (and (number? expr) *heuristic-numbers*)) heuristic-canonicalize-complex)
-(assign-operation canonicalize-numbers list? (λ (expr) (cons (canonicalize-numbers (operator expr))
-                                                             (map canonicalize-numbers (operands expr)))))
 #; ;;bdk;; do in units
 (assign-operation canonicalize-numbers with-units? with-si-units->expression)
-#;
-(define (canonicalize-numbers expr)
-  (cond ((with-units? expr)
-	 (with-si-units->expression expr))
-	((list? expr)
-	 (cons (canonicalize-numbers (operator expr))
-	       (map canonicalize-numbers (operands expr))))
-	((and (number? expr) *heuristic-numbers*)
-	 (heuristic-canonicalize-complex expr))
-	(else
-	 expr)))
+
+;;brm;;(define (canonicalize-numbers expr)
+;;brm;;  (cond ((with-units? expr)
+;;brm;;	 (with-si-units->expression expr))
+;;brm;;	((list? expr)
+;;brm;;	 (cons (canonicalize-numbers (operator expr))
+;;brm;;	       (map canonicalize-numbers (operands expr))))
+;;brm;;	((and (number? expr) *heuristic-numbers*)
+;;brm;;	 (heuristic-canonicalize-complex expr))
+;;brm;;	(else
+;;brm;;	 expr)))
 
 (define (ham:simplify hexp)
   (cond ((and (quotient? hexp) *divide-out-terms*)
@@ -156,15 +157,18 @@
 	   (not (list? expr))
 	   (any improper-expression? expr))))
 
-(define (show-expression expr [simplifier simplify])
+(define (show-expression expr #:optional simplifier)
+  (if (default-object? simplifier) (set! simplifier simplify))
   (prepare-for-printing expr simplifier)
   ;; (display "#;\n")
   (pp (*last-expression-printed*))
   (cond ((not *only-printing*)
-	 (internal-show-expression
-	  (*last-expression-printed*)))))
+         (internal-show-expression
+          (*last-expression-printed*)))))
 
-(define (print-expression expr [simplifier simplify])
+(define (print-expression expr #:optional simplifier)
+  (if (default-object? simplifier)
+      (set! simplifier simplify))
   (prepare-for-printing expr simplifier)
   ;; (display "#;\n")
   (pp (*last-expression-printed*)))
@@ -172,14 +176,18 @@
 (define pe print-expression)
 (define se show-expression)
 
-#;#; ;;bdk;; not interested
-(define (print-expression-prefix expr [simplifier simplify])
-  (prepare-for-printing expr simplifier)
-  ((pp-line-prefix "; ") (*last-expression-printed*)))
 
-(define pep print-expression-prefix)
+;;brm;;(define (print-expression-prefix expr #:optional simplifier)
+;;brm;;  (if (default-object? simplifier)
+;;brm;;      (set! simplifier simplify))
+;;brm;;  (prepare-for-printing expr simplifier)
+;;brm;;  ((pp-line-prefix "; ") (*last-expression-printed*)))
 
-(define (print-expression-comment expr [simplifier simplify])
+;;brm;;(define pep print-expression-prefix)
+
+(define (print-expression-comment expr #:optional simplifier)
+  (if (default-object? simplifier)
+      (set! simplifier simplify))
   (prepare-for-printing expr simplifier)
   (newline)
   (display "#| Result:")
@@ -189,7 +197,7 @@
 
 (define pec print-expression-comment)
 
-;overwriting the fct's in kernel/todo/print-simplify
+;;bdk;;overwriting the fct's in kernel/todo/print-simplify
 (set-simplify! simplify);used in kernel/numbers
 (set-print-expression! print-expression);used in pseries
 (set-careful-simplify! careful-simplify);used in quaternions

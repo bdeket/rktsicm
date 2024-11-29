@@ -215,7 +215,7 @@ v1_bar(w(v2_bar))(x) - v2_bar(w(v1_bar))(x)
 			      `(constant-vector-field ,m0 ,v))))
 
 
-(define (((exterior-derivative-helper kform) #!rest vectors) point)
+(define (((exterior-derivative-helper kform) . vectors) point)
   (let ((k (get-rank kform)))
     (assert (fix:= (length vectors) (fix:+ k 1)))
     (let ((n ((point->manifold point) 'dimension)))

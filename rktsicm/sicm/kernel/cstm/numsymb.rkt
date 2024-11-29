@@ -15,8 +15,7 @@
 
 ;;bdk;; insert 1
 ;;; Enable simplification on construction -- wastes time?
-#; ;moved to parameters
-(define enable-constructor-simplifications? #t)
+;;bdk;; moved to ../../parameters 4
 
 (define (enable-constructor-simplifications doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
@@ -24,8 +23,7 @@
   (enable-constructor-simplifications? doit?))
 
 ;;; Disable intermediate simplification -- wastes time.
-#; ;moved to parameters
-(define incremental-simplifier #f)
+;;bdk;; moved to ../../parameters 5
 
 (define symbolic-operator-table (make-eq-hash-table))
 

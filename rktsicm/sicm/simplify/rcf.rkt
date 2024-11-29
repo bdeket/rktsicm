@@ -2,8 +2,9 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../rkt/glue.rkt" default-object default-object? int:negate
+(require (only-in "../rkt/glue.rkt" int:negate
                   fix:= fix:> fix:< fix:+ fix:- fix:-1+ fix:zero? fix:quotient fix:negative?)
+         (only-in "../rkt/define.rkt" define default-object?)
          "../general/list-utils.rkt"
          "../general/sets.rkt"
          "../kernel-intr.rkt"
@@ -395,7 +396,7 @@
       (symb:/ (pcf:->expression (ratform-numerator p) vars)
 	      (pcf:->expression (ratform-denominator p) vars))))
 
-(define (rcf:expression-> expr cont [less? default-object])
+(define (rcf:expression-> expr cont #:optional less?)
   ;; cont = (lambda (ratp vars) ... )
   (let ((evars
 	 (sort (list-difference (variables-in expr)
@@ -410,7 +411,7 @@
 
 (define (rcf:->lambda p)
   (if (pcf? p)
-      (poly:->lambda p);WAS poly->function
+      (poly:->lambda p);;bdk;;WAS poly->function
       (let* ((n (rcf:arity p))
 	     (vars (generate-list-of-symbols 'x n))
 	     (exp (rcf:->expression p vars)))	  

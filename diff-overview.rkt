@@ -10,6 +10,7 @@
 (define scmutil-old2 "../../racket/test/sicm/scmutils-20220518/")
 (define scmutil-old3 "../../racket/test/sicm/scmutils-20230125/")
 (define scmutil-cur "../../racket/test/sicm/scmutils-20230902/")
+(define scmutil-ptch "../../racket/test/sicm/scmutils-20230902_ptch/")
 (define scmutil-dir (make-parameter scmutil-cur))
 (define rktsicm-dir "./rktsicm/sicm/")
 
@@ -29,6 +30,7 @@
       scm-remove-declare
       scm-clean-optional
       scm-clean-rest
+      no-square-brackets
       trim-whitespace))
 (define (->rkt-lines rkt)
   (~> (for/list ([l (in-list (file->lines rkt))]
@@ -38,6 +40,9 @@
       insert-rkt-part
       skip-inserts-rkt
       rkt-unparameterize
+      rkt-ignore-ignore
+      define-g-in-generic
+      no-square-brackets
       trim-whitespace))
 
 (define (make-diff scmL rktL) (diff-indices (map car scmL) (map car rktL)))
@@ -59,6 +64,7 @@
     (displayln (format "--- ~a ---  ~a+>~a" (cadr Li) (caddr Li) l))
     (for ([i (in-range @ (+ @ l))])
       (define itm (list-ref L i))
+      ;(println itm)
       (displayln (format "~a: ~a" (~r (caddr itm) #:min-width 4)
                          (get (cadr itm) (caddr itm))))))
   (for ([i (in-list indices)])
@@ -200,7 +206,9 @@
         (for/fold ([lines lines])
                   ([p (in-list known-parameters)])
           ((clean-smthng (regexp-quote (format "(~a)" p)) (format "~a" p))
-           lines)))))
+           ((clean-smthng (regexp (format "\\(~a ([^)]+)" (regexp-quote (format "~a" p))))
+                          (format "(set! ~a \\1" p))
+            lines))))))
 
 (define (skip-inserts-rkt lines)
   (let lp ([l0 lines]
@@ -238,6 +246,25 @@
        '()]
       [in (cons (car l0) (lp (cdr l0) in))]
       [else (lp (cdr l0) in)])))
+
+(define (rkt-ignore-ignore lines)
+  (for/list ([l (in-list lines)])
+    (cons (regexp-replace #px"^;;brm;;" (car l) "")
+          (cdr l))))
+
+(define (define-g-in-generic lines)
+  (for/list ([l (in-list lines)])
+    (if (regexp-match #px"cstm/generic\\.rkt" (cadr l))
+        (cons (regexp-replace #px"define-g" (car l) "define") (cdr l))
+        l)))
+
+(define (no-square-brackets lines)
+  (for/list ([l (in-list lines)])
+    (cons (regexp-replace #px"\\["
+                          (regexp-replace #px"\\]" (car l)
+                                          ")")
+                          "(")
+          (cdr l))))
 
 (define (trim-whitespace lines)
   (for/list ([l (in-list lines)])

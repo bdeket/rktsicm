@@ -63,7 +63,7 @@
 
     ;; Analyze relative to existing tables
     (define (analyze-expression expr)
-      (parameterize ((incremental-simplifier #f))
+      (parameterize ([incremental-simplifier #f])
 	(base-simplify (analyze expr))))
 
 

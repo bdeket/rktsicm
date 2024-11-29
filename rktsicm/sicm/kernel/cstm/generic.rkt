@@ -313,12 +313,16 @@
       (cond
         [(procedure? f)
          (apply f args)]
-        #;[(applicable-literal? f) ; moved to litfun ... the nesting went too deep :/
+        #;[(applicable-literal? f) ;;bdk;; moved to litfun ... the nesting went too deep :/
            (apply
             (literal-function f
                               (permissive-function-type (length args)))
             args)]
-        #|((eq? f second) (apply (access second system-global-environment) args))|#
+        #|
+         ((eq? f second)
+          (apply (access second system-global-environment)
+                 args))
+        |#
         [else
          (define ans
            (for/fold ([ans notfound])

@@ -106,56 +106,56 @@
 (define enable-tex-display #t)
 
 ;;bdk;;internal packaging managed with provides
-;;bdk;;(let ()					;package all stuff internally
+;;brm;;(let ()					;package all stuff internally
 
-;;bdk;;(define display-in-screen-window
-;;bdk;;  (let ((count 0))
-;;bdk;;    (lambda (tex-string)
-;;bdk;;      (let* ((dirname (->namestring (user-homedir-pathname)))
-;;bdk;;	     (file-name (string-append dirname
-;;bdk;;				       "temp-display"
-;;bdk;;				       (number->string count)))
-;;bdk;;	     (complete-tex-input (string-append
-;;bdk;;				  ;;" \\magnification=\\magstep2\n"
-;;bdk;;				  ;;"\\hsize=48pc  \\hoffset=-4pc  "
-;;bdk;;				  "\\voffset=-6pc "
-;;bdk;;				  "\\hsize=48pc " " \\hoffset=-6pc  "
-;;bdk;;				  boxit-string "\n"
-;;bdk;;				  tex-string
-;;bdk;;				  "\\vfil\\bye")))
-;;bdk;;	(with-output-to-file
-;;bdk;;	    (string-append file-name ".tex")
-;;bdk;;	  (lambda () (display complete-tex-input)))
-;;bdk;;	#|
-;;bdk;;	(working-unix/system (string-append "cd " dirname ";"
-;;bdk;;					    " tex " file-name
-;;bdk;;					    " > //dev//null 2>&1 "))
-;;bdk;;	(working-unix/system
-;;bdk;;	 (string-append "xdvi " file-name ".dvi "
-;;bdk;;			"-s 4 "
-;;bdk;;			"-yoffset 3.5 "
-;;bdk;;			"-geometry 900x400+1+1; "
-;;bdk;;			"//bin//rm " file-name ".*"
-;;bdk;;			))
-;;bdk;;	|#
-;;bdk;;	(run-shell-command
-;;bdk;;	 (string-append "cd " dirname ";"
-;;bdk;;			" tex " file-name
-;;bdk;;			" > /dev/null 2>&1 ")
-;;bdk;;	 'output #f
-;;bdk;;	 'shell-file-name "/bin/sh")
-;;bdk;;	(run-shell-command
-;;bdk;;	 (string-append "xdvi " file-name ".dvi "
-;;bdk;;			"-s 4 "
-;;bdk;;			"-yoffset 3.5 "
-;;bdk;;			"-geometry 900x400+1+1"
-;;bdk;;			" > /dev/null 2>&1; "
-;;bdk;;			"/bin/rm " file-name ".*"
-;;bdk;;			)
-;;bdk;;	 'output #f
-;;bdk;;	 'shell-file-name "/bin/sh")
-;;bdk;;	(set! count (+ count 1))
-;;bdk;;	))))
+;;brm;;(define display-in-screen-window
+;;brm;;  (let ((count 0))
+;;brm;;    (lambda (tex-string)
+;;brm;;      (let* ((dirname (->namestring (user-homedir-pathname)))
+;;brm;;	     (file-name (string-append dirname
+;;brm;;				       "temp-display"
+;;brm;;				       (number->string count)))
+;;brm;;	     (complete-tex-input (string-append
+;;brm;;				  ;;" \\magnification=\\magstep2\n"
+;;brm;;				  ;;"\\hsize=48pc  \\hoffset=-4pc  "
+;;brm;;				  "\\voffset=-6pc "
+;;brm;;				  "\\hsize=48pc " " \\hoffset=-6pc  "
+;;brm;;				  boxit-string "\n"
+;;brm;;				  tex-string
+;;brm;;				  "\\vfil\\bye")))
+;;brm;;	(with-output-to-file
+;;brm;;	    (string-append file-name ".tex")
+;;brm;;	  (lambda () (display complete-tex-input)))
+;;brm;;	#|
+;;brm;;	(working-unix/system (string-append "cd " dirname ";"
+;;brm;;					    " tex " file-name
+;;brm;;					    " > //dev//null 2>&1 "))
+;;brm;;	(working-unix/system
+;;brm;;	 (string-append "xdvi " file-name ".dvi "
+;;brm;;			"-s 4 "
+;;brm;;			"-yoffset 3.5 "
+;;brm;;			"-geometry 900x400+1+1; "
+;;brm;;			"//bin//rm " file-name ".*"
+;;brm;;			))
+;;brm;;	|#
+;;brm;;	(run-shell-command
+;;brm;;	 (string-append "cd " dirname ";"
+;;brm;;			" tex " file-name
+;;brm;;			" > /dev/null 2>&1 ")
+;;brm;;	 'output #f
+;;brm;;	 'shell-file-name "/bin/sh")
+;;brm;;	(run-shell-command
+;;brm;;	 (string-append "xdvi " file-name ".dvi "
+;;brm;;			"-s 4 "
+;;brm;;			"-yoffset 3.5 "
+;;brm;;			"-geometry 900x400+1+1"
+;;brm;;			" > /dev/null 2>&1; "
+;;brm;;			"/bin/rm " file-name ".*"
+;;brm;;			)
+;;brm;;	 'output #f
+;;brm;;	 'shell-file-name "/bin/sh")
+;;brm;;	(set! count (+ count 1))
+;;brm;;	))))
 
 
 (define boxit-string
@@ -1325,18 +1325,18 @@
 		)))))))
 
 (set! internal-show-expression void)
-;;bdk;;  (lambda (exp)
-;;bdk;;    (set! last-tex-string-generated (expression->tex-string exp))
-;;bdk;;    (let ((name (graphics-type-name (graphics-type #f))))
-;;bdk;;      (if (and (memq name '(x x11)) enable-tex-display)
-;;bdk;;	  (begin (display-in-screen-window last-tex-string-generated)
-;;bdk;;		 (newline)
-;;bdk;;		 (newline)
-;;bdk;;		 ;;  (display tex-string)
-;;bdk;;		 ;;  (newline)
-;;bdk;;		 ;;  (newline)
-;;bdk;;		 )
-;;bdk;;	  (2d-show-expression exp)))))
+;;brm;;  (lambda (exp)
+;;brm;;    (set! last-tex-string-generated (expression->tex-string exp))
+;;brm;;    (let ((name (graphics-type-name (graphics-type #f))))
+;;brm;;      (if (and (memq name '(x x11)) enable-tex-display)
+;;brm;;	  (begin (display-in-screen-window last-tex-string-generated)
+;;brm;;		 (newline)
+;;brm;;		 (newline)
+;;brm;;		 ;;  (display tex-string)
+;;brm;;		 ;;  (newline)
+;;brm;;		 ;;  (newline)
+;;brm;;		 )
+;;brm;;	  (2d-show-expression exp)))))
 
 
 (set! 2d-show-expression
@@ -1368,9 +1368,9 @@
 	  (string-append "\\boxit{ " "$" tex-string "$" "}"))))
 |#
 
-;;bdk;;(set! display-tex-string display-in-screen-window)
+;;brm;;(set! display-tex-string display-in-screen-window)
 
-;;bdk;;)       ;end let()
+;;brm;;)       ;end let()
 
 
 ;;;(define left-up-delimiter "\\left \\lceil \\matrix{ ")

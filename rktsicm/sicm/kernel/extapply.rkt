@@ -19,8 +19,7 @@
 
 ;;; Extension of Scheme for application of non-procedures in operator position.
 
-#; ;parameter moved to paramters
-(define *enable-generic-apply* true)
+;;bdk;; moved to ../parameters 1
 
 ; closer to the original, but contracts (like on map) make this fail => the applicable structure is
 ;    never called as function. so no real gain over impl. below
@@ -125,8 +124,7 @@
 ;;; *enable-generic-apply* is tested in applicable-literal?, used in
 ;;; g:apply.  See generic.scm.
 
-#; ;moved to parameter
-(define *enable-literal-apply* #f)
+;;bdk;; moved to ../parameters 2
 
 (define (with-literal-apply-enabled thunk)
   (parameterize ([*enable-literal-apply* #t])

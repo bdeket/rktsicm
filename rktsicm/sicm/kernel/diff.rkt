@@ -849,8 +849,8 @@
   (memq tag (*active-tags*)))
 
 (define (with-active-tag tag f args)
-  (parameterize ((*active-tags*
-                  (cons tag (*active-tags*))))
+  (parameterize ([*active-tags*
+                  (cons tag (*active-tags*))])
     (apply f args)))
 
 (define (extract-dx-function dx procedure)

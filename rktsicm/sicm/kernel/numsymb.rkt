@@ -325,10 +325,8 @@
       0
       (cadr expr)))
 (define (symb:subtrahend expr)
-  (if (null? (cdr expr))
-      0
-      (if (null? (cddr expr))
-          (cadr expr)
+  (if (null? (cdr expr)) 0
+      (if (null? (cddr expr)) (cadr expr)
           (if (null? (cdddr expr))
               (caddr expr)
               `(+ ,@(cddr expr))))))
@@ -983,15 +981,13 @@
 
 (define (mulup-args pos neg)
   (define (make-product numfact factors)
-    (if (null? factors)
-        numfact
-        (cond
+    (cond [(null? factors)       numfact]
           [(zero? numfact)       numfact]
           [(one? numfact)        (if (null? (cdr factors))
                                      (car factors)
                                      `(* ,@factors))]
           [(null? (cdr factors)) `(* ,numfact ,(car factors))]
-          [else                  `(* ,numfact ,@factors)])))
+          [else                  `(* ,numfact ,@factors)]))
   (define (make-answer pfactor pos nfactor neg)
     (let ((num (make-product pfactor pos))
           (den (make-product nfactor neg)))

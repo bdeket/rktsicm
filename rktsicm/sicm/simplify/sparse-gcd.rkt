@@ -629,7 +629,7 @@
 	    (map list 
 		 (generate-list max-terms
 				(lambda (_) (random-monomial))))))
-  (parameterize ((*heuristic-sparse-gcd-enabled* #f))
+  (parameterize ([*heuristic-sparse-gcd-enabled* #f])
     (let loop ((i 0))
       (if (> i n-trials)
 	  #t

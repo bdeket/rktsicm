@@ -78,8 +78,8 @@
 
 
 (define (with-incremental-simplifier thunk)
-  (parameterize ((incremental-simplifier g:simplify)
-                 (enable-constructor-simplifications? #t))
+  (parameterize ([incremental-simplifier g:simplify]
+                 [enable-constructor-simplifications? #t])
     (clear-memoizer-tables)
     (thunk)))
 
