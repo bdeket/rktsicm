@@ -1,0 +1,140 @@
+#lang racket/base
+
+(require rackunit
+         racket/list
+         "../../../numerics/optimize/multimin.rkt"
+         )
+
+(define ((F f) p) (apply f (map abs (vector->list p))))
+
+(provide the-tests)
+(define the-tests
+  (test-suite
+   "numerics/optimize/multimin"
+   (test-case
+    "simplex"
+    (define SM (make-simplex #(1 2 3) 1 (F +)))
+    (check-equal? (simplex-size SM) 4)
+    (check-equal? (simplex-vertex (simplex-highest SM)) #(2 2 3))
+    (check-equal? (simplex-value (simplex-next-highest SM)) 7)
+    (check-equal? (simplex-value (simplex-lowest SM)) 6)
+    (check-equal? (simplex-centroid SM) #(5/4 9/4 13/4))
+    (define SM2 (simplex-adjoin #(-1 -2 -1) ((F +) #(-1 -2 -1)) SM))
+    (check-equal? (simplex-value (simplex-lowest SM2)) 4)
+    (check-equal? (simplex-sort (cons (simplex-entry #(-1 -2 -1) 4) SM)) SM2)
+    (check-false (stationary? SM 1e-3))
+    (check-true (stationary? SM 1e+3))
+    (define E (extender #(1 2 3) #(1 2 4)))
+    (check-equal? (E 0) #(1 2 3))
+    (check-equal? (E 1) #(1 2 4))
+    (check-equal? (E 3) #(1 2 6)))
+   (test-case
+    "nelder-mead"
+    (define F+ (F +))
+    (let ([SOL (nelder-mead F+ #(1 2 3) 1 1e-10 10)])
+      (check-equal? (car SOL) 'maxcount)
+      (check-equal? (caddr SOL) 10))
+    (let ([SOL (nelder-mead F+ #(1 2 3) 1 10 10)])
+      (check-equal? SOL '(ok (#(1 2 3) . 6) 0)))
+    (let ([SOL (nelder-mead F+ #(1 2 3) 1 1e-10 500)])
+      (check-equal? (car SOL) 'ok)
+      (check-within (simplex-vertex (cadr SOL)) #(0 0 0) 2e-10))
+    (let ([SOL (nelder-mead (F *) #(-1 1e-3 -1e-3) 1 1e-10 20)])
+      ;; trying to force a simplex-shrink-step. Not sure this is the best test for the result
+      (check-equal? (car SOL) 'maxcount)
+      (check-within (simplex-vertex (cadr SOL)) #(0 0 0) 2e-3)))
+   (test-case
+    "generate-gradient-procedure"
+    (define G (generate-gradient-procedure (F +) 3 1e-10))
+    (check-within (G #(1 1 1)) #(1 1 1) 1e-10)
+    (check-within (G #(5 9 3)) #(1 1 1) 1e-10)
+    (check-within (G #(-5 9 3)) #(-1 1 1) 1e-10))
+   (test-case
+    "line-min-davidon"
+    (define F+ (F +))
+    (define G+ (generate-gradient-procedure F+ 2 1e-10))
+    (check-within (line-min-davidon F+ G+ #(1 -2) #(0 4) 10)
+                  '(ok #(1 0) 1) 1e-10)
+    (check-within (line-min-davidon F+ G+ #(1.0 -1.0) #(3 3) 1e-10)
+                  '(no-min) 1e-10)
+    (check-within (line-min-davidon F+ G+ #(-3 0) #(3 3) 1e-10)
+                  '(no-min) 1e-10)
+    (check-within (line-min-davidon F+ G+ #(-2.0 -1.0) #(3 3) 1e-10)
+                  '(ok #(-1/2 1/2) 1) 1e-10)
+    (check-within (line-min-davidon F+ G+ #(-2.0 -1.0) #(3 3) 0)
+                  '(ok #(-1/2 1/2) 1) 1e-10))
+   (test-case
+    "line-min-brent"
+    (define F+ (F +))
+    (define G+ (generate-gradient-procedure F+ 2 1e-10))
+    (check-within (line-min-brent F+ G+ #(1 -2) #(0 4) 10)
+                  '(ok #(1 0) 1) 1e-10)
+    (let ([SOL (line-min-brent F+ G+ #(1.0 -1.0) #(3 3) 1e-10)])
+      (check-equal? (car SOL) 'ok) 
+      (check-= (caddr SOL) 2 1e-16))
+    (let ([SOL (line-min-brent F+ G+ #(-3 0) #(3 3) 1e-10)])
+      (check-equal? (car SOL) 'ok) 
+      (check-= (caddr SOL) 3 1e-16))
+    (let ([SOL (line-min-brent F+ G+ #(-2.0 -1.0) #(3 3) 1e-10)])
+      (check-equal? (car SOL) 'ok) 
+      (check-= (caddr SOL) 1 1e-16))
+    (let ([SOL (line-min-brent F+ G+ #(-2.0 -1.0) #(3 3) 0)])
+      (check-equal? (car SOL) 'ok) 
+      (check-= (caddr SOL) 1 1e-16)))
+   (test-case
+    "fletcher-powell dfp dfp-brent"
+    (define F+ (F +))
+    (define G+ (generate-gradient-procedure F+ 2 1e-10))
+    (let ([SOL (dfp F+ G+ #(1 2) -1 1e-10 0)])
+      (check-equal? (car SOL) 'maxcount)
+      (check-equal? (caddr SOL) 0)
+      (check-within (cdadr SOL) 1 1e-10))
+    (let ([SOL (dfp-brent F+ G+ #(1 2) -1 1e-10 0)])
+      (check-equal? (car SOL) 'maxcount)
+      (check-equal? (caddr SOL) 0)
+      (check-within (cdadr SOL) 1 1e-10))
+    (let ([SOL (dfp F+ '() #(1 2) -1 1e-10 100)])
+      (check-equal? (car SOL) 'ok)
+      (check-within (caadr SOL) #(0 0) 1e-6)
+      (check-within (cdadr SOL) 0 1e-6))
+    (let ([SOL (dfp-brent F+ '() #(1 2) -1 1e-10 100)])
+      (check-equal? (car SOL) 'ok)
+      (check-within (caadr SOL) #(0 0) 1e-6)
+      (check-within (cdadr SOL) 0 1e-6))
+    (let ([SOL (dfp (F -) '() #(1 2 3) -1 1e-10 100)])
+      (check-equal? (car SOL) 'no-min)
+      (check-within (caadr SOL) #(1 2 3) 1e-6)
+      (check-within (cdadr SOL) -4 1e-6))
+    (let ([SOL (dfp-brent (F -) '() #(1 2 3 4) -1 1e-10 100)])
+      (check-equal? (car SOL) 'no-min)
+      (check-within (caadr SOL) #(1 2 3 4) 1e-6)
+      (check-within (cdadr SOL) -8 1e-6)))
+   (test-case
+    "bfgs"
+    (define F+ (F +))
+    (define G+ (generate-gradient-procedure F+ 2 1e-10))
+    (let ([SOL (bfgs F+ G+ #(1 2) -1 1e-10 0)])
+      (check-equal? (car SOL) 'maxcount)
+      (check-equal? (caddr SOL) 0)
+      (check-within (cdadr SOL) 1 1e-10))
+    (let ([SOL (bfgs F+ '() #(1 2) -1 1e-10 100)])
+      (check-equal? (car SOL) 'ok)
+      (check-within (caadr SOL) #(0 0) 1e-6)
+      (check-within (cdadr SOL) 0 1e-6))
+    (let ([SOL (bfgs (F -) '() #(1 2 3) -1 1e-10 100)])
+      (check-equal? (car SOL) 'no-min)
+      (check-within (caadr SOL) #(1 2 3) 1e-6)
+      (check-within (cdadr SOL) -4 1e-6))
+    (let ([SOL (bfgs (F +) '() #(1 2 3 4) -1 1e-10 100)])
+      (check-equal? (car SOL) 'ok)
+      (check-within (caadr SOL) #(0 0 0 0) 1e-6)
+      (check-within (cdadr SOL) 0 1e-6))
+    (let ([SOL (bfgs (F -) '() #(1 2 3 4) -1 1e-10 100)])
+      (check-equal? (car SOL) 'no-min)
+      (check-within (caadr SOL) #(1 2 3 4) 1e-6)
+      (check-within (cdadr SOL) -8 1e-6)))
+   ))
+
+(module+ test
+  (require rackunit/text-ui)
+  (run-tests the-tests))

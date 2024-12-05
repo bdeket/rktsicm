@@ -198,14 +198,14 @@
                   (>= (v:dot-product v gt) 0))
               (let* ((vg0 (v:dot-product v g0))
                      (vgt (v:dot-product v gt))
-                     (z (+ (* 3 (- f0 ft) (/ 1 t)) vg0 vgt))
+                     (z (+ (* 3 (- f0 ft)  (/ 1 (max 1e-10 t))) vg0 vgt))
                      (w (sqrt (- (* z z) (* vg0 vgt))))
                      (tstar (* t (- 1 (/ (+ vgt w (- z)) 
                                          (+ vgt (- vg0) (* 2 w))))))
                      (fstar (linef tstar)))
-                 (if (< fstar f0)
-                     (list 'ok (t->x tstar) fstar)
-                     (loop tstar (+ iter 1))))
+                 (cond ((< fstar f0)  (list 'ok (t->x tstar) fstar))
+                       ((< 0 tstar 1) (loop tstar (+ iter 1)))
+                       (else          (loop (/ t 2) (+ iter 1)))))
               (loop (* t 2) (+ iter 1)))))))
   
   
