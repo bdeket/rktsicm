@@ -97,8 +97,9 @@
   (cond ((and (base? p1) (base? p2)) (base/equal? p1 p2))
 	((or (base? p1) (base? p2)) #f)
 	(else
-	 (let ((arity (poly/check-same-arity p1 p2)))
-	   (and (fix:= (poly/degree p1) (poly/degree p2))
+	 (let ((arity (poly/check-same-arity? p1 p2))) ;;bdk;; #f if arity not "="
+	   (and arity
+                (fix:= (poly/degree p1) (poly/degree p2))
 		(poly/equal? (poly/leading-coefficient p1)
 			     (poly/leading-coefficient p2))
 		(poly/equal? (poly/except-leading-term arity p1)
@@ -162,12 +163,16 @@
 
 ;;; Functions can only be combined if they have the same arity.
 
-(define (poly/check-same-arity p1 p2)
+(define (poly/check-same-arity? p1 p2)
   (cond ((base? p1) (poly/arity p2))
 	((base? p2) (poly/arity p1))
 	((fix:= (poly/arity p1) (poly/arity p2))
 	 (poly/arity p1))
-	(else (error "Unequal arities -- POLY" p1 p2))))
+	(else #f)))
+;;bdk;; make same-arity? return #t or #f, and same-arity errors as before
+(define (poly/check-same-arity p1 p2)
+  (or (poly/check-same-arity? p1 p2)
+      (error "Unequal arities -- POLY" p1 p2)))
 
 
 (define (poly/add p1 p2)
@@ -558,65 +563,65 @@
 ;;;  Thus, I have not updated it to use the 
 ;;;  success and failure continuations needed.
 
-#; ;incomplete implementation (poly/content needs 3 arguments!
-(define (poly/gcd-collins u v)
-  (let ((poly/content
-	 (poly/content-maker poly/gcd-collins))
-	(poly/primitive-part
-	 (poly/primitive-part-maker poly/gcd-collins)))
-
-    (define (pgcd u v oc)
-      (if collins-wallp? (pp (list u v)))
-      (cond ((poly/zero? v) u)
-	    ((fix:zero? (poly/degree v)) poly/one)
-	    (else
-	     (poly/pseudo-remainder u v
-	       (lambda (r delta)
-		 (pgcd v
-		       (poly/normalize r
-			 (poly/expt (poly/leading-coefficient u)
-				    oc))
-		       delta))))))
-    (define (ppgcd u v)
-      (cond ((poly/one? u) u)
-	    ((poly/one? v) v)
-	    ((and (base? u) (base? v)) (base/gcd u v))
-	    ((fix:>= (poly/degree u) (poly/degree v))
-	     (poly/primitive-part (pgcd u v 0)))
-	    (else
-	     (poly/primitive-part (pgcd v u 0)))))
-    (cond ((poly/zero? u) v)
-	  ((poly/zero? v) u)
-	  ((poly/one? u) u)
-	  ((poly/one? v) v)
-	  ((base? u)
-	   (if (base? v)
-	       (base/gcd u v)
-	       (poly/gcd-collins u (poly/content v))))
-	  ((base? v)
-	   (poly/gcd-collins (poly/content u) v))
-	  (else
-	   (let ((arity (poly/check-same-arity u v))
-		 (uc (poly/content u))
-		 (vc (poly/content v)))
-	     (let ((ans 
-		    (if (poly/one? uc)
-			(if (poly/one? vc)
-			    (ppgcd u v)
-			    (ppgcd u (poly/normalize v vc)))
-			(if (poly/one? vc)
-			    (ppgcd (poly/normalize u uc) v)
-			    (let ((c (poly/gcd-collins uc vc)))
-			      (if (poly/one? c)
-				  (ppgcd (poly/normalize u uc)
-					 (poly/normalize v vc))
-				  (poly/scale-1 arity
-				    (ppgcd (poly/normalize u uc)
-					   (poly/normalize v vc))
-				    c)))))))
-	       (poly/abs ans)))))))
-
-(define collins-wallp? false)
+;;bdk;;incomplete implementation (poly/content needs 3 arguments!
+;;brm;;(define (poly/gcd-collins u v)
+;;brm;;  (let ((poly/content
+;;brm;;	 (poly/content-maker poly/gcd-collins))
+;;brm;;	(poly/primitive-part
+;;brm;;	 (poly/primitive-part-maker poly/gcd-collins)))
+;;brm;;
+;;brm;;    (define (pgcd u v oc)
+;;brm;;      (if collins-wallp? (pp (list u v)))
+;;brm;;      (cond ((poly/zero? v) u)
+;;brm;;	    ((fix:zero? (poly/degree v)) poly/one)
+;;brm;;	    (else
+;;brm;;	     (poly/pseudo-remainder u v
+;;brm;;	       (lambda (r delta)
+;;brm;;		 (pgcd v
+;;brm;;		       (poly/normalize r
+;;brm;;			 (poly/expt (poly/leading-coefficient u)
+;;brm;;				    oc))
+;;brm;;		       delta))))))
+;;brm;;    (define (ppgcd u v)
+;;brm;;      (cond ((poly/one? u) u)
+;;brm;;	    ((poly/one? v) v)
+;;brm;;	    ((and (base? u) (base? v)) (base/gcd u v))
+;;brm;;	    ((fix:>= (poly/degree u) (poly/degree v))
+;;brm;;	     (poly/primitive-part (pgcd u v 0)))
+;;brm;;	    (else
+;;brm;;	     (poly/primitive-part (pgcd v u 0)))))
+;;brm;;    (cond ((poly/zero? u) v)
+;;brm;;	  ((poly/zero? v) u)
+;;brm;;	  ((poly/one? u) u)
+;;brm;;	  ((poly/one? v) v)
+;;brm;;	  ((base? u)
+;;brm;;	   (if (base? v)
+;;brm;;	       (base/gcd u v)
+;;brm;;	       (poly/gcd-collins u (poly/content v))))
+;;brm;;	  ((base? v)
+;;brm;;	   (poly/gcd-collins (poly/content u) v))
+;;brm;;	  (else
+;;brm;;	   (let ((arity (poly/check-same-arity u v))
+;;brm;;		 (uc (poly/content u))
+;;brm;;		 (vc (poly/content v)))
+;;brm;;	     (let ((ans 
+;;brm;;		    (if (poly/one? uc)
+;;brm;;			(if (poly/one? vc)
+;;brm;;			    (ppgcd u v)
+;;brm;;			    (ppgcd u (poly/normalize v vc)))
+;;brm;;			(if (poly/one? vc)
+;;brm;;			    (ppgcd (poly/normalize u uc) v)
+;;brm;;			    (let ((c (poly/gcd-collins uc vc)))
+;;brm;;			      (if (poly/one? c)
+;;brm;;				  (ppgcd (poly/normalize u uc)
+;;brm;;					 (poly/normalize v vc))
+;;brm;;				  (poly/scale-1 arity
+;;brm;;				    (ppgcd (poly/normalize u uc)
+;;brm;;					   (poly/normalize v vc))
+;;brm;;				    c)))))))
+;;brm;;	       (poly/abs ans)))))))
+;;brm;;
+;;brm;;(define collins-wallp? false)
 
 #|
 ;;; Test examples
@@ -718,43 +723,43 @@
 ;;brm;;		    ans))))
 ;;brm;;	  (poly/gcd p1 p2)))
 ;;brm;;    the-memoized-gcd))
-
+;;brm;;
 ;;brm;;(define *gcd-memoizer-enabled* #f)
 ;;brm;;(define *gcd-hit* 0)
 ;;brm;;(define *gcd-miss* 0)
-
-(define (unordered-pair-equal? a1 a2)
-  (and (pair? a1)
-       (pair? a2)
-       (or (and (simple:equal? (car a1) (car a2))
-		(simple:equal? (cdr a1) (cdr a2)))
-	   (and (simple:equal? (car a1) (cdr a2))
-		(simple:equal? (cdr a1) (car a2))))))
-
-(define (unordered-poly-hash a modulus)
-  (let ((arity (poly/check-same-arity (car a) (cdr a))))
-    (let ((args (vector-ref hash-args-vector arity))) 
-      (let ((v (* (poly/horner (car a) args)
-		  (poly/horner (cdr a) args))))
-	(modulo (* (numerator v) (denominator v))
-		modulus)))))
-
-(define n-random-primes 100)
-(define skip-initial-primes 100)
-
-(define prime-numbers-vector
-  (make-initialized-vector n-random-primes
-			   (lambda (i)
-			     (stream-ref prime-numbers-stream
-					 (fix:+ i skip-initial-primes)))))
-
-(define hash-args-vector
-  (make-initialized-vector n-random-primes
-    (lambda (i)
-      (make-initialized-list i
-	(lambda (j)
-	  (vector-ref prime-numbers-vector
-		      (random (min (* 2 i) n-random-primes))))))))
+;;brm;;
+;;brm;;(define (unordered-pair-equal? a1 a2)
+;;brm;;  (and (pair? a1)
+;;brm;;       (pair? a2)
+;;brm;;       (or (and (simple:equal? (car a1) (car a2))
+;;brm;;		(simple:equal? (cdr a1) (cdr a2)))
+;;brm;;	   (and (simple:equal? (car a1) (cdr a2))
+;;brm;;		(simple:equal? (cdr a1) (car a2))))))
+;;brm;;
+;;brm;;(define (unordered-poly-hash a modulus)
+;;brm;;  (let ((arity (poly/check-same-arity (car a) (cdr a))))
+;;brm;;    (let ((args (vector-ref hash-args-vector arity))) 
+;;brm;;      (let ((v (* (poly/horner (car a) args)
+;;brm;;		  (poly/horner (cdr a) args))))
+;;brm;;	(modulo (* (numerator v) (denominator v))
+;;brm;;		modulus)))))
+;;brm;;
+;;brm;;(define n-random-primes 100)
+;;brm;;(define skip-initial-primes 100)
+;;brm;;
+;;brm;;(define prime-numbers-vector
+;;brm;;  (make-initialized-vector n-random-primes
+;;brm;;			   (lambda (i)
+;;brm;;			     (stream-ref prime-numbers-stream
+;;brm;;					 (fix:+ i skip-initial-primes)))))
+;;brm;;
+;;brm;;(define hash-args-vector
+;;brm;;  (make-initialized-vector n-random-primes
+;;brm;;    (lambda (i)
+;;brm;;      (make-initialized-list i
+;;brm;;	(lambda (j)
+;;brm;;	  (vector-ref prime-numbers-vector
+;;brm;;		      (random (min (* 2 i) n-random-primes))))))))
 
 ;;; (define poly/gcd-memoized (gcd-memoizer poly/gcd-euclid))
 ;;; (define poly/gcd-memoized (gcd-memoizer poly/gcd-collins))
@@ -1162,7 +1167,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
        (poly/make-from-sparse arity
 	(dense->sparse (poly/termlist p))))
       (else
-       (error "Bad type -- POLY/->DENSE" p)))))
+       (error "Bad type -- POLY/->SPARSE" p)))))
 
 (define (poly/lowest-order p)
   (cond ((base? p) 0)
