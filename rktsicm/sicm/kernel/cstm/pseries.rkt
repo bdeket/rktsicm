@@ -219,21 +219,21 @@
 
 (define (series:expt s e)
   (letrec ((square (lambda (s) (mul-series s s)))
-	   (series:one
-	    (cons-stream :one zero-stream))
-	   (zuras
+	   (stream:one
+	    (series->stream series:one))
+           (zuras
 	    (lambda (t e k)
 	      (cons-stream :one
-		(stream:c*s (div-coeff e k)
+		(stream:c*s (generic:/ e k)
 			    (mul-series t
 					(zuras t
-					       (sub-coeff e 1)
+					       (generic:- e 1)
 					       (fix:+ k 1)))))))
 	   (iexpt
 	    (lambda (s e)
 	      (cond ((fix:< e 0)
 		     (invert-series (iexpt s (fix:negate e))))
-		    ((fix:= e 0) :one)
+		    ((fix:= e 0) stream:one)
 		    ((fix:= e 1) s)
 		    ((even? e)
 		     (square
@@ -248,7 +248,7 @@
 	    (lambda (s e)
 	      (if (exact-integer? e)
 		  (iexpt s e)
-		  (stream:c*s (expt-coeff (head s) e)
+		  (stream:c*s (generic:expt (head s) e)
 		    (zuras (stream:s/c (tail s) (head s)) e 1))))))
     (make-series (series:arity s)
 		 (expt (series->stream s) e))))
@@ -466,7 +466,7 @@
 (define (binomial-series a)
   (define (binomial-helper a n c)
     (if (g:= a 0)
-	(cons-stream c zero)
+	(cons-stream c zero-stream)
 	(cons-stream c
 	  (binomial-helper (g:- a 1) (g:+ n 1) (g:/ (g:* c a) n)))))
   (make-series *exactly-one* (binomial-helper a 1 1)))
