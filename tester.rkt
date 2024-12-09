@@ -247,8 +247,14 @@
       ;; in lock, so printouts are not interleaved
       (printf "raco test: ~a ~s\n" id (normalize-module-path p))
       (flush-output))
+    (define outputb (get-output-bytes stdout))
     (unless quiet-program?
-      (display (get-output-bytes stdout)))
+      (display outputb))
+    (call-with-output-file #:exists 'append
+      (build-path (current-test-invocation-directory) "testresults.bak")
+      (λ (out)
+        (fprintf out "raco test: ~a ~s\n" id (normalize-module-path p))
+        (display outputb out)))
 
     ans))
 

@@ -6,6 +6,7 @@
                   fix:= fix:> fix:< fix:+
                   int:zero? int:quotient int:-)
          (only-in "../rkt/define.rkt" define default-object?)
+         (only-in "../general/logic-utils.rkt" &and)
          "../general/list-utils.rkt"
          "../general/sets.rkt"
          "../general/equals.rkt"
@@ -302,8 +303,7 @@
       (if (null? nterms)
 	  (cont '() '())
 	  (let ((nexps (fpf:exponents (car nterms))))
-	    (cond (#;(*and (map >= nexps dexps)) ;;bdk;; this is wrong
-                   (andmap >= nexps dexps)
+	    (cond ((&and (map >= nexps dexps))
 		   (let ((qt
 			  (fpf:make-term (map int:- nexps dexps)
 			    (div (fpf:coefficient (car nterms)) dcoeff))))

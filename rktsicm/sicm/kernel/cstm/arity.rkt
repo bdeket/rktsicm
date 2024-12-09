@@ -143,7 +143,7 @@
           (define b (arity-at-least-value B))
           (if (< a b)
               (vector (normalize-arity (for/list ([i (in-range a b)]) i)) B '())
-              (vector '() B (normalize-arity (for/list ([i (in-range b a)]) i))))]
+              (vector '() A (normalize-arity (for/list ([i (in-range b a)]) i))))]
          [(list? B)
           (inner-+l A B)]
          [else (error "huhB?" B)])]

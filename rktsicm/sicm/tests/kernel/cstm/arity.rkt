@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require rackunit
-         "../../kernel/cstm/arity.rkt")
+         "../../../kernel/cstm/arity.rkt")
 
 (provide the-tests)
 (define the-tests
@@ -97,11 +97,15 @@
                   (vector (list 5 6) (arity-at-least 7) '()))
     (check-equal? (arity-intersect (arity-at-least 6) (arity-at-least 7))
                   (vector 6 (arity-at-least 7) '()))
+    (check-equal? (arity-intersect (arity-at-least 7) (arity-at-least 5))
+                  (vector '() (arity-at-least 7) '(5 6)))
     (check-equal? (arity-intersect (arity-at-least 6) (list 2 6 8))
                   (vector (list 7 (arity-at-least 9)) '(6 8) 2))
   
     (check-equal? (arity-intersect (list 2 5 (arity-at-least 7)) (list 4 5 (arity-at-least 9)))
                   (vector (list 2 7 8) (list 5 (arity-at-least 9)) 4))
+    (check-equal? (arity-intersect (list 2 5 (arity-at-least 7)) (arity-at-least 4))
+                  (vector 2 (list 5 (arity-at-least 7)) '(4 6)))
     (check-equal? (arity-intersect '(2 3) '(2 3)) #(() (2 3) ())))))
 
 (module+ test

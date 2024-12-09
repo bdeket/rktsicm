@@ -151,6 +151,7 @@
 ;***************************************************************************************************
 (module runner racket/base
   (require rackunit
+           rackunit/private/format
            (for-syntax racket/base))
   (provide my-test-runner timeout skip)
   (define timeout (make-parameter #f))
@@ -184,6 +185,7 @@
                                  (if (skipper) (begin (skipper #f) skip) succes)]
                                 [(test-failure? rslt)
                                  (define exn (test-failure-result rslt))
+                                 (display-test-failure/error exn)
                                  (cond
                                    [(exn:test:check? exn)
                                     (define stack (exn:test:check-stack exn))
@@ -196,7 +198,9 @@
                                                [else #f])
                                              (lp (cdr ci)))]))]
                                    [else fail])]
-                                [(test-error? rslt) error])
+                                [(test-error? rslt)
+                                 (display-test-failure/error (test-error-result rslt))
+                                 error])
                               seed))
                            seed
                            test)))))

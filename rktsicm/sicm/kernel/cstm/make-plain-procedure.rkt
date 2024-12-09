@@ -8,6 +8,7 @@
 
 (provide make-plain-procedure make-plain-procedure-stx make-plain-procedure-slct
          (for-syntax λ quasisyntax unsyntax-splicing unsyntax))
+(module+ ALL (provide (all-from-out (submod ".."))))
 
 #; ;waaaay to slow
 (define (rest-app f . rst)
@@ -102,7 +103,7 @@
 (define (plain-procedure-slct name f A)
   (define arity (if (procedure-arity? A)
                     (normalize-arity A)
-                    (raise-argument-error name "procedure-arity?" arity)))
+                    (raise-argument-error name "procedure-arity?" A)))
   (cond
     [(equal? arity *exactly-zero*)   (λ () (f))]
     [(equal? arity *exactly-one*)    (λ (x) (f x))]
@@ -120,7 +121,7 @@
   (define (stx f e arity)
     #`(cond
         [(equal? '#,arity *exactly-zero*)
-         #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))])
+         #,(with-syntax ([(x ...) '()])
            #`(λ (x ...) #,(f #'(x ...) #f)))]
         [(equal? '#,arity *exactly-one*)
          #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
@@ -144,7 +145,7 @@
                        [y       (format-id #f "y")])
            #`(λ (x ... . y) #,(f #'(x ...) #'y)))]
         [(equal? '#,arity *at-least-zero*)
-         #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))]
+         #,(with-syntax ([(x ...) '()]
                        [y       (format-id #f "y")])
            #`(λ (x ... . y) #,(f #'(x ...) #'y)))]
         [(equal? '#,arity *one-or-two*)
@@ -165,7 +166,7 @@
            [R (eval-syntax #'r)])
        #`(cond
            [(equal? a *exactly-zero*)
-            #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))])
+            #,(with-syntax ([(x ...) '()])
                 (quasisyntax/loc #'o (λ (x ...) #,(O #'(x ...)))))]
            [(equal? a *exactly-one*)
             #,(with-syntax ([(x ...) (build-list 1 (λ (i) (format-id #f "x~a" i)))])
@@ -189,7 +190,7 @@
                             [y       (format-id #f "y")])
                 (quasisyntax/loc #'r (λ (x ... . y) #,(R #'(x ...) #'y))))]
            [(equal? a *at-least-zero*)
-            #,(with-syntax ([(x ...) (build-list 0 (λ (i) (format-id #f "x~a" i)))]
+            #,(with-syntax ([(x ...) '()]
                             [y       (format-id #f "y")])
                 (quasisyntax/loc #'r (λ (x ... . y) #,(R #'(x ...) #'y))))]
            [(equal? a *one-or-two*)
