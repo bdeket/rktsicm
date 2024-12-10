@@ -247,7 +247,7 @@
   (let lp ((guess (->quad pi)))
     (write-line guess)
     (let ((new-guess (quad:+ guess (quad:sin guess))))
-      (if (< (abs (quad:high (quad:- new-guess guess))) *quad-epsilon*)
+      (if (<= (abs (quad:high (quad:- new-guess guess))) *quad-epsilon*)
 	  new-guess
 	  (lp new-guess)))))
 			    

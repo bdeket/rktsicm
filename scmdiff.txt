@@ -58,7 +58,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  4 difference(s) found in kernel/quaternion
  5 difference(s) found in kernel/strutl
  3 difference(s) found in kernel/types
-13 difference(s) found in kernel/utils
+ 7 difference(s) found in kernel/utils
  1 difference(s) found in mechanics/Hamiltonian
  1 difference(s) found in mechanics/Noether
  1 difference(s) found in mechanics/qualitative
@@ -71,7 +71,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in numerics/ode/interface
  1 difference(s) found in numerics/ode/ode-advancer
  2 difference(s) found in numerics/optimize/multimin
- 1 difference(s) found in numerics/quad/quad-flo
+ 2 difference(s) found in numerics/quad/quad-flo
  3 difference(s) found in numerics/quadrature/quadrature
  1 difference(s) found in numerics/quadrature/rational
  1 difference(s) found in numerics/roots/bisect

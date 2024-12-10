@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out) *birkholz* print-depth print-breadth)
+(provide (all-defined-out)
          (all-from-out "cstm/arity.rkt"))
 
 (require (only-in "../rkt/glue.rkt"
@@ -47,7 +47,6 @@
 ((((defer-application (lambda (x) (* 3 x))) (lambda (x) (+ x 2))) (lambda (x) (/ x 2))) 3)
 #| 21/2 |#
 |#
-
 
 (define make-pairwise-test
   (lambda (pred)
@@ -149,11 +148,13 @@
 	 (lambda x
 	   (f (apply g x))))))
 
-
 (define (compose-bin f g)
   (cond
     [(pair? g)
      (define a (a-reduce joint-arity (map procedure-arity g)))
+     (define len (length g))
+     (unless (joint-arity (procedure-arity f) (exact-arity len))
+       (raise-argument-error 'compose-bin+n (format "first procedure that accepts ~a argument(s)" len) f))
      (make-plain-procedure-slct 'compose-bin+n
                                 a
                                 (λ (xs) #`(apply f (map (λ (gi) (gi #,@xs)) g)))
@@ -162,6 +163,8 @@
                                 (λ (xs rst) #`(apply #,f (map (λ (gi) (apply gi #,@xs #,rst)) '#,g))))]
     [else
      (define a (procedure-arity g))
+     (unless (joint-arity (procedure-arity f) (exact-arity 1))
+       (raise-argument-error 'compose-bin+1 "first procedure that accepts 1 argument" f))
      (make-plain-procedure-slct 'compose-bin+1
                                 a
                                 (λ (xs) #`(f (g #,@xs)))
@@ -359,7 +362,6 @@
     (f (list->vector args))))
 
 
-
 #|
 ;;; The following procedure came from SCHEME 6.1.2 RUNTIME
 (define alphaless?
@@ -413,29 +415,28 @@
 
 ;;; Special property of MIT/GNU Scheme
 
-(define *birkholz*
-  #f #;
-  (environment-bound? system-global-environment 'set-fluid!))
+;;brm;;(define *birkholz* 
+;;brm;;  (environment-bound? system-global-environment 'set-fluid!))
 
-(define (print-depth [newval #f])
-  (error "TODO") #;
-  (if (or (not newval)
-	  (and (integer? newval)
-	       (positive? newval)))
-      (if *birkholz*
-	  (set-fluid! *unparser-list-depth-limit* newval)
-	  (set! *unparser-list-depth-limit* newval))
-      (error "PRINT-DEPTH: Wrong type argument" newval)))
+;;brm;;(define (print-depth #:optional newval)
+;;brm;;  (if (default-object? newval) (set! newval #f))
+;;brm;;  (if (or (not newval)
+;;brm;;	  (and (integer? newval)
+;;brm;;	       (positive? newval)))
+;;brm;;      (if *birkholz*
+;;brm;;	  (set-fluid! *unparser-list-depth-limit* newval)
+;;brm;;	  (set! *unparser-list-depth-limit* newval))
+;;brm;;      (error "PRINT-DEPTH: Wrong type argument" newval)))
 
-(define (print-breadth [newval #f])
-  (error "TODO")#;
-  (if (or (not newval)
-	  (and (integer? newval)
-	       (positive? newval)))
-      (if *birkholz*
-	  (set-fluid! *unparser-list-breadth-limit* newval)
-	  (set! *unparser-list-breadth-limit* newval))
-      (error "PRINT-BREADTH: Wrong type argument" newval)))
+;;brm;;(define (print-breadth #:optional newval)
+;;brm;;  (if (default-object? newval) (set! newval #f))
+;;brm;;  (if (or (not newval)
+;;brm;;	  (and (integer? newval)
+;;brm;;	       (positive? newval)))
+;;brm;;      (if *birkholz*
+;;brm;;	  (set-fluid! *unparser-list-breadth-limit* newval)
+;;brm;;	  (set! *unparser-list-breadth-limit* newval))
+;;brm;;      (error "PRINT-BREADTH: Wrong type argument" newval)))
 
 
 ;;bdk;; moved to ../display/pp 1
