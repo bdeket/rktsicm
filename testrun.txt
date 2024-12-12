@@ -19,7 +19,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   3                     0.0 ./rktsicm/sicm\tests\calculus\indexed.rkt
   1                     0.5 ./rktsicm/sicm\tests\calculus\interior-product.rkt
  13                     0.5 ./rktsicm/sicm\tests\calculus\manifold.rkt
-  7                     1.5 ./rktsicm/sicm\tests\calculus\maps.rkt
+  7                     1.0 ./rktsicm/sicm\tests\calculus\maps.rkt
   8                     0.5 ./rktsicm/sicm\tests\calculus\metric.rkt
                         0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
  18                  2  2.5 ./rktsicm/sicm\tests\calculus\so3.rkt
@@ -35,7 +35,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   3                     0.0 ./rktsicm/sicm\tests\general\equals.rkt
  12                  2  0.0 ./rktsicm/sicm\tests\general\equation-style-unifier.rkt
   9                  1  0.0 ./rktsicm/sicm\tests\general\gjs-cselim.rkt
-  6                  1  0.0 ./rktsicm/sicm\tests\general\hashcons.rkt
+  7                  1  0.0 ./rktsicm/sicm\tests\general\hashcons.rkt
  32                  1  0.0 ./rktsicm/sicm\tests\general\list-utils.rkt
   8                     0.0 ./rktsicm/sicm\tests\general\logic-utils.rkt
   9                     0.0 ./rktsicm/sicm\tests\general\memoize.rkt
@@ -59,19 +59,20 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   3                     0.0 ./rktsicm/sicm\tests\kernel\litfun.rkt
  30                  1  0.0 ./rktsicm/sicm\tests\kernel\matrices.rkt
   3                     0.0 ./rktsicm/sicm\tests\kernel\modarith.rkt
-  6             1       0.5 ./rktsicm/sicm\tests\kernel\numeric.rkt
+ 17             1    1  0.0 ./rktsicm/sicm\tests\kernel\numeric.rkt
  22                  1  0.0 ./rktsicm/sicm\tests\kernel\numsymb.rkt
  14                     0.0 ./rktsicm/sicm\tests\kernel\pseries.rkt
  12                  1  0.0 ./rktsicm/sicm\tests\kernel\quaternion.rkt
- 28                     0.0 ./rktsicm/sicm\tests\kernel\structs.rkt
+ 28                     0.0 ./rktsicm/sicm\tests\kernel\structs-extra.rkt
+ 41                  3  0.0 ./rktsicm/sicm\tests\kernel\structs.rkt
  15                     0.0 ./rktsicm/sicm\tests\kernel\utils.rkt
  14                     0.5 ./rktsicm/sicm\tests\mechanics\Hamiltonian.rkt
   5                     0.0 ./rktsicm/sicm\tests\mechanics\Lagrangian-transformations.rkt
  11                     0.0 ./rktsicm/sicm\tests\mechanics\Lagrangian.rkt
   3                     0.5 ./rktsicm/sicm\tests\mechanics\Lie-transform.rkt
   1                     0.0 ./rktsicm/sicm\tests\mechanics\Noether.rkt
-  2                     0.5 ./rktsicm/sicm\tests\mechanics\Routhian.rkt
-  1                     0.5 ./rktsicm/sicm\tests\mechanics\action.rkt
+  2                     0.0 ./rktsicm/sicm\tests\mechanics\Routhian.rkt
+  1                     0.0 ./rktsicm/sicm\tests\mechanics\action.rkt
  10                     0.0 ./rktsicm/sicm\tests\mechanics\canonical.rkt
   9                     0.0 ./rktsicm/sicm\tests\mechanics\gamma-bar.rkt
   8                  1  0.0 ./rktsicm/sicm\tests\mechanics\pendulum.rkt
@@ -79,7 +80,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
  10                     0.0 ./rktsicm/sicm\tests\mechanics\rigid.rkt
  11                     0.0 ./rktsicm/sicm\tests\mechanics\symplectic.rkt
   1                     0.0 ./rktsicm/sicm\tests\mechanics\time-varying.rkt
-  9                     0.0 ./rktsicm/sicm\tests\mechanics\universal.rkt
+  9                     0.5 ./rktsicm/sicm\tests\mechanics\universal.rkt
   3                     0.0 ./rktsicm/sicm\tests\numerics\extrapolate\re.rkt
   1                     0.0 ./rktsicm/sicm\tests\numerics\functions\bessel.rkt
   3                     0.0 ./rktsicm/sicm\tests\numerics\functions\elliptic.rkt
@@ -124,7 +125,7 @@ TOT FAIL ERR TOUT SKIP TIME NAME
   4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
 TOT FAIL ERR TOUT SKIP TIME NAME
-888             2   30 39.0 TOTAL
-runtime: 7.083333333333333m 
+941             2   34 38.0 TOTAL
+runtime: 6.933333333333334m 
 Welcome to Racket v8.15.0.7-2024-11-28-4d5ddce14b [bc].
 Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz    6-cores  2208MHz 

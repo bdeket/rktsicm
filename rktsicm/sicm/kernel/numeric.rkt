@@ -471,7 +471,7 @@
 ;;; have only small fractions.
 
 (define make-rational
-  (λ (n d)(/ (inexact->exact n) (inexact->exact d))) #;  
+  (λ (n d)(assert (exact-integer? n))(assert (exact-integer? d))(/ n d)) #;  
   (access make-rational (->environment '(runtime number))))
 
 #| Wrong    
@@ -492,12 +492,17 @@
   (make-rectangular (round (real-part z))
 		    (round (imag-part z))))
 
+(define (complex-denominator z)
+  (lcm (denominator (real-part z)) (denominator (imag-part z))))
+
 (define (gcd-complex a b)
-  (cond ((zero? a) b)
-        ((zero? b) a)
-        (else
-         (let ((q (round-complex (/ a b))))
-           (gcd-complex b (- a (* q b)))))))
+  (let lp ((a (* a (complex-denominator a)))
+           (b (* b (complex-denominator b))))
+    (cond ((zero? a) b)
+          ((zero? b) a)
+          (else
+           (let ((q (round-complex (/ a b))))
+             (lp b (- a (* q b))))))))
 
 (define (exact-complex? x)
   (and (number? x) (exact? x)))
@@ -513,10 +518,10 @@
 	(else 1)))
 
 
-(define *no-rationals-in-divide* #f)
+(define *no-rationals-in-divide* (make-parameter #f))
 
 (define (scheme-number-divide n d c)
-  (if (and *no-rationals-in-divide*
+  (if (and (*no-rationals-in-divide*)
 	   (exact-integer? n)
 	   (exact-integer? d))
       (let ((qr (integer-divide n d)))

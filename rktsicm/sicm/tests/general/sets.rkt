@@ -71,7 +71,13 @@
     (set-package-test real-numbers 1 2 3 7))
    (test-case
     "set-package numbers"
-    (set-package-test numbers +i 2-3i 2+i 1))
+    (set-package-test numbers +i 2-3i 2+i 1)
+    (define S0 (empty-set numbers))
+    (define S1 ((adjoin-set numbers) 1 S0))
+    (define S2 ((adjoin-set numbers) 1 S1))
+    (define S3 ((adjoin-set numbers) 2 S2))
+    (define S4 ((adjoin-set numbers) 1.5 S3))
+    (check-equal? ((list->set numbers) S4) '(1 1.5 2)))
    (test-case
     "set-package from strings"
     (set-package-test (make-sets-package string-ci=? string-ci<?) "a" "B" "c" "D")

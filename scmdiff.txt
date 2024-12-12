@@ -51,11 +51,12 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  2 difference(s) found in kernel/mathutil
  1 difference(s) found in kernel/matrices
  2 difference(s) found in kernel/numbers
- 3 difference(s) found in kernel/numeric
+ 6 difference(s) found in kernel/numeric
 10 difference(s) found in kernel/numsymb
  1 difference(s) found in kernel/operator
  6 difference(s) found in kernel/pseries
  4 difference(s) found in kernel/quaternion
+ 1 difference(s) found in kernel/structs
  5 difference(s) found in kernel/strutl
  3 difference(s) found in kernel/types
  7 difference(s) found in kernel/utils

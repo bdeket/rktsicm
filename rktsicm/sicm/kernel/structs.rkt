@@ -86,7 +86,7 @@
 (define (s:multiply v1 v2)
   (cond ((s:compatible-for-contraction? v1 v2)
          (v:dot-product (s:->vector v1) (s:->vector v2)))
-        ((or *allowing-incompatible-multiplication*
+        ((or (*allowing-incompatible-multiplication*)
              (and (or (and (down? v1) (down? v2))
                       (and (up? v1) (up? v2)))
                   (s:forall (lambda (c)
@@ -98,7 +98,7 @@
         (else
          (bkpt "Incompatible multiplication" v1 v2))))
 
-(define *allowing-incompatible-multiplication* #t)
+(define *allowing-incompatible-multiplication* (make-parameter #t))
 
 
 
@@ -659,8 +659,8 @@
             (m:generate (s:length s) ncols
                         (lambda (i j)
                           (s:ref (s:ref s i) j)))
-            (error "Not A_m^n -- A_m^n->Mmn" s)))
-      (error "Not A_m^n -- A_m^n->Mmn" s)))
+            (error "Not A_m^n -- A_m^n->Mnm" s)))
+      (error "Not A_m^n -- A_m^n->Mnm" s)))
 #|
 (A_m^n->Mnm (up (down 'a 'b) (down 'c 'd) (down 'e 'f)))
 ;Value: (*matrix* (3 . 2) #(#(a b) #(c d) #(e f)))
@@ -1145,10 +1145,10 @@
       (down (down (down 0 0) (down m2 0)) (down (down 0 0) (down 0 m2))))
 |#
 
-(define *careful-conversion* #t)
+(define *careful-conversion* (make-parameter #t))
 
 (define (s->m ls ms rs)
-  (if *careful-conversion*
+  (if (*careful-conversion*)
       (assert (numerical-quantity? (g:* ls (g:* ms rs)))
               "Innapropriate s->m" ls ms rs))
   (let ((ndowns (s:dimension ls))
@@ -1186,7 +1186,7 @@
                                     (cons (ultra-unflatten col-shape
                                                            (vector->list colj))
                                           (lp (fix:+ j 1)))))))))
-      (if *careful-conversion*
+      (if (*careful-conversion*)
           (assert (numerical-quantity? (g:* ls (g:* ms rs)))
                   "Innapropriate m->s" ls ms rs))
       ms)))

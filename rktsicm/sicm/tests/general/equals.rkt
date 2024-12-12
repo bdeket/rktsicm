@@ -24,6 +24,7 @@
    (test-case
     "simple:equal?"
     (check-true (simple:equal? 1 1))
+    (check-true (simple:equal? 2. (+ 1 1.)))
 
     (check-true (simple:equal? "string" "string"))
     (check-false (simple:equal? "string" "String"))

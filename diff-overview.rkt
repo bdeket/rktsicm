@@ -169,6 +169,9 @@
                            *outstanding-contradictions*
                            *numerical-constants*
                            *time-upper-limit*
+                           *allowing-incompatible-multiplication*
+                           *careful-conversion*
+                           *no-rationals-in-divide*
                            ))
 
 (define (skip-rkt-langprovreq lines [name #f])
