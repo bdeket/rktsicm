@@ -129,10 +129,11 @@
              (lambda x
                (operator (apply f1 x) (apply f2 x))))))))
 
-(define ((coerce-to-function g) . x)
-  (if (numerical-quantity? g)
-      g
-      (g:apply g x)))
+(define (coerce-to-function g)
+  ;;bdk;; keep same function if possible (for arity, name, etc)
+  (cond ((procedure? g) g)
+        ((numerical-quantity? g) (lambda x g))
+		(else (lambda x (g:apply g x)))))
 
 (define (f:arity f) (procedure-arity f))
 

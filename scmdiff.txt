@@ -41,14 +41,14 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  3 difference(s) found in general/weak
 10 difference(s) found in kernel/express
  3 difference(s) found in kernel/extapply
- 3 difference(s) found in kernel/function
+ 4 difference(s) found in kernel/function
  3 difference(s) found in kernel/genenv
 13 difference(s) found in kernel/generic
 11 difference(s) found in kernel/ghelper-class
 20 difference(s) found in kernel/ghelper-pro
  2 difference(s) found in kernel/iterat
  7 difference(s) found in kernel/litfun
- 2 difference(s) found in kernel/mathutil
+ 3 difference(s) found in kernel/mathutil
  1 difference(s) found in kernel/matrices
  2 difference(s) found in kernel/numbers
  6 difference(s) found in kernel/numeric

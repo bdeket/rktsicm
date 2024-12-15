@@ -18,7 +18,7 @@
 (define tail stream-rest)
 (define stream-cdr stream-rest)
 (define the-empty-stream empty-stream)
-(define (stream-pair? x) (and (stream? x) (not (stream-empty? x))))
+(define (stream-pair? x) (and (stream? x) (not (list? x)) (not (stream-empty? x))))
 (define (stream-head s n) (stream->list (stream-take s n)))
 
 ;;bdk;; start original file

@@ -93,7 +93,7 @@
                         ((structure? x)
                          (ref-internal
                           (s:structure
-                           (s:type x)
+                           (s:same x)
                            (subvector (s:->vector x)
                                       (adjust-index (car i) (s:length x))
                                       (adjust-end (cadr i) (s:length x))))

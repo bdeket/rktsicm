@@ -142,6 +142,9 @@
   (cond
     [(and (pair? g) (not (structure? g)))
      (define a (a-reduce joint-arity (map g:arity g)))
+     (define len (length g))
+     (unless (joint-arity (g:arity f) (exact-arity len))
+       (raise-argument-error 'g:compose-bin+n (format "first procedure that accepts ~a argument(s)" len) f))
      (make-plain-procedure-slct 'g:compose-bin+n
                                 a
                                 (λ (xs) #`(g:apply f (map (λ (gi) (g:apply gi (list #,@xs))) g)))
@@ -150,7 +153,9 @@
                                 (λ (xs rst) #`(g:apply #,f (map (λ (gi) (g:apply gi (cons* #,@xs #,rst))) '#,g))))]
     [else
      (define a (g:arity g))
-     (make-plain-procedure-slct 'compose-bin+1
+     (unless (joint-arity (g:arity f) (exact-arity 1))
+       (raise-argument-error 'g:compose-bin+1 "first procedure that accepts 1 argument" f))
+     (make-plain-procedure-slct 'g:compose-bin+1
                                 a
                                 (λ (xs) #`(g:apply f (list (g:apply g (list #,@xs)))))
                                 (λ (xs rst) #`(g:apply f (list (g:apply g (cons* #,@xs #,rst)))))
