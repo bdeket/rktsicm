@@ -2,7 +2,8 @@
 
 (provide (all-defined-out)
          incremental-simplifier
-         enable-constructor-simplifications?)
+         enable-constructor-simplifications?
+         heuristic-number-canonicalizer)
 
 (require "../../rkt/hashtable.rkt"
          "../../general/assert.rkt"
@@ -44,7 +45,7 @@
 
 
 ;;; currently disabled -- see heuristic.scm
-(define heuristic-number-canonicalizer #f)
+;;bdk;; moved to ../../parameters 6
 
 #|
 ;;; From general/canonicalizer.scm
@@ -56,8 +57,8 @@
 
 (define (numerical-expression expr)
   (cond ((number? expr)
-	 (if (and (inexact? expr) heuristic-number-canonicalizer)
-	     (heuristic-number-canonicalizer expr)
+	 (if (and (inexact? expr) (heuristic-number-canonicalizer))
+	     ((heuristic-number-canonicalizer) expr)
 	     expr))
 	((symbol? expr) expr)
 	((literal-number? expr)

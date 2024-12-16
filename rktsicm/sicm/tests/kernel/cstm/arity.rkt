@@ -29,6 +29,11 @@
     (check-equal? (arity-min (arity-at-least 3)) 3)
     (check-equal? (arity-min (procedure-arity (case-lambda [(x y) 2][(a b c d . x) 4]))) 2))
    (test-case
+    "artity-max"
+    (check-equal? (arity-max (exact-arity 1)) 1)
+    (check-equal? (arity-max (arity-at-least 3)) +inf.0)
+    (check-equal? (arity-max (procedure-arity (case-lambda [(x y) 2][(a b c d x) 4]))) 5))
+   (test-case
     "joint-arity"
     (check-equal? (joint-arity (exact-arity 2) (exact-arity 2)) (exact-arity 2))
     (check-equal? (joint-arity (exact-arity 2) (exact-arity 6)) #f)

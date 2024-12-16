@@ -33,6 +33,9 @@
 ;;bdk;; insert 5
 (define incremental-simplifier (make-parameter #f))
 ;;bdk;; insert 5 end
+;;bdk;; insert 6
+(define heuristic-number-canonicalizer (make-parameter #f))
+;;bdk;; insert 6 end
 
 ;***************************************************************************************************
 ;* for calculus/SR-tools                                                                           *

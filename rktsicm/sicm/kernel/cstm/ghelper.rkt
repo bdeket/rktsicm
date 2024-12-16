@@ -41,14 +41,23 @@
 (define (set-symbol-operator-record! operator record)
   (hash-set! *generic-symbol-operator-table* operator record))
 
-(define (get-operator-record-for operator . args)
-  (define tree (operator-record-tree (get-operator-record operator)))
+(define (get-operator-record-for operator #:defaults? [def? #t] . args)
+  (define orec (get-operator-record operator))
+  (define len (length args))
+  (define amax (arity-max (operator-record-arity orec)))
+  (unless (<= len amax)
+    (raise-argument-error 'get-operator-record-for
+                          (format "at most ~a arguments for operator ~a" amax (operator-record-name orec))
+                          args))
+  (define tree (operator-record-tree orec))
   `(,@(let lp ([args args]
                [tree tree])
         (define branch (tree-branch tree))
         (cond
           [(null? branch)
-           (list (list '-> (tree-han tree)))]
+           (if (null? args)
+               (list (list '-> (tree-han tree)))
+               '())]
           [else
            (apply
             append
@@ -67,7 +76,9 @@
                          '())
                    ,@(map (λ (l) (cons pred? l)) (lp (cdr args) branch)))]
                 [else '()])))]))
-    (any/c? ... -> ,(tree-han tree))))
+    ,@(if def?
+          `((any/c? ... -> ,(tree-han tree)))
+          '())))
 
 ;***************************************************************************************************
 ;*                                                                                                 *

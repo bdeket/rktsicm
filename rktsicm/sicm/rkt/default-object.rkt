@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide default-object default-object?)
+(provide (rename-out [the-default-object default-object]) default-object?)
 
-(define default-object (gensym 'default))
-(define (default-object? x) (eq? x default-object))
+(struct default-object ())
+(define the-default-object (default-object))

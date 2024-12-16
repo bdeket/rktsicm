@@ -8,26 +8,23 @@
 (require (only-in "../rkt/glue.rkt" string:<? undefined-value undefined-value?
                   fix:= fix:< fix:+)
          (only-in "../rkt/environment.rkt" generic-environment rule-environment numerical-environment scmutils-base-environment procedure-name object-name)
+         (rename-in (only-in racket/base equal-hash-code) [equal-hash-code hash])
          "../general/eq-properties.rkt"
          "../general/list-utils.rkt"
          "../general/table.rkt"
          "../general/equals.rkt"
          "utils.rkt"
          "iterat.rkt"
+         "../parameters.rkt"
          "cstm/express.rkt"
+         (only-in "cstm/generic.rkt" generic:expression)
+         (only-in "cstm/ghelper.rkt" get-operator-record-for)
          "cstm/s-operator.rkt"
          "cstm/diff.rkt"
          "matrices.rkt"
-         "cstm/numsymb.rkt"
          "cstm/structs.rkt"
          "types.rkt"
-         (only-in "../rkt/todo.rkt" todos)
          )
-
-(todos todo
-       [#:from "???"
-        with-si-units->expression])
-(require 'todo)
 
 ;;bdk;; start original file
 
@@ -119,8 +116,8 @@
 (define (expression expr)
   (define (exprlp expr)
     (cond ((number? expr)
-	   (if (and (inexact? expr) heuristic-number-canonicalizer)
-	       (heuristic-number-canonicalizer expr)
+	   (if (and (inexact? expr) (heuristic-number-canonicalizer))
+	       ((heuristic-number-canonicalizer) expr)
 	       expr))
 	  ((symbol? expr) expr)	   
 	  ((null? expr) expr)
@@ -163,8 +160,12 @@
 		     (matrix->array ((m:elementwise exprlp) expr))))))
 	  ((literal-number? expr)
 	   (exprlp (expression-of expr)))
+          #; ;;bdk;; fallback to (a new) generic
 	  ((or (with-units? expr) (units? expr))
 	   (exprlp (with-si-units->expression expr)))
+          ((let ([v (get-operator-record-for generic:expression expr #:defaults? #f)])
+             (not (null? v)))
+           (generic:expression expr))
 	  ((pair? expr)
 	   (cond ((eq? (car expr) '???) expr)
 		 ((memq (car expr) abstract-type-tags)
@@ -296,7 +297,7 @@
 	     (or (string? expr2) (pair? expr2) (vector? expr2))))
 	((symbol? expr2) #f)
         ((string? expr1)
-	 (if (string expr2)
+	 (if (string? expr2)
 	     (string:<? expr1 expr2)
 	     (or (pair? expr2) (vector? expr2))))
 	((string? expr2) #f)

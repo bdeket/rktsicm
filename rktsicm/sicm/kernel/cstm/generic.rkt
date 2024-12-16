@@ -503,7 +503,12 @@
 ;;bdk;; insert 11 end
 
 
-; was in simplify/simplify
+;;bdk;; was in simplify/simplify.
+;;bdk;; the faltrough defined here will be overwritten there. It is defined to allow testing
+;;bdk;; without loading the simplifier
 
-(define-g g:simplify (make-generic-operator 1 'simplify))
+(define-g g:simplify (make-generic-operator 1 'simplify (let ([faltrough (lambda (x) (displayln "!! not simplified !!") x)]) faltrough)))
+
+;;bdk;; new to accomodate units in kernel/express
+(define generic:expression (make-generic-operator 1 'expression))
 

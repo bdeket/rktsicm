@@ -40,6 +40,12 @@
     [(arity-at-least? ar) (arity-at-least-value ar)]
     [else (apply min (map arity-min ar))]))
 
+(define (arity-max ar)
+  (cond
+    [(integer? ar) ar]
+    [(arity-at-least? ar) +inf.0]
+    [else (apply max (map arity-max ar))]))
+
 ;;bdk;; insert 2
 (define (joint-arity a1 a2)
   (if (and a1 a2)

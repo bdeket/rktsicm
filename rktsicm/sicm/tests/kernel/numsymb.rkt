@@ -29,16 +29,19 @@
     )
    (test-case
     "numerical-expression"
-    (check-false heuristic-number-canonicalizer)
+    (check-false (heuristic-number-canonicalizer))
     (check-false numerical-expression-canonicalizer)
-    (check-equal? (numerical-expression #i11/10) #i11/10)
-    (check-equal? (numerical-expression 5) 5)
-    (check-equal? (numerical-expression 'a) 'a)
-    (check-equal? (numerical-expression (literal-number 'c)) 'c)
-    (check-equal? (numerical-expression ((literal-function 'f) 't)) '(f t))
-    (check-equal? (numerical-expression (down 4 8)) (down 4 8))
-    (check-equal? (numerical-expression '(4 8)) '(4 8))
-    (check-equal? (numerical-expression #(4 8)) #(4 8))
+    (parameterize ([heuristic-number-canonicalizer #f])
+      (check-equal? (numerical-expression #i11/10) #i11/10)
+      (check-equal? (numerical-expression 5) 5)
+      (check-equal? (numerical-expression 'a) 'a)
+      (check-equal? (numerical-expression (literal-number 'c)) 'c)
+      (check-equal? (numerical-expression ((literal-function 'f) 't)) '(f t))
+      (check-equal? (numerical-expression (down 4 8)) (down 4 8))
+      (check-equal? (numerical-expression '(4 8)) '(4 8))
+      (check-equal? (numerical-expression #(4 8)) #(4 8)))
+    (parameterize ([heuristic-number-canonicalizer (λ (x) 'vier)])
+      (check-equal? (numerical-expression #i11/10) 'vier))
     )
    (test-case
     "make-numsymb-expression"
@@ -522,6 +525,7 @@
     
     (check-true (sec? '(sec a)))
     (check-equal? (symb:sec 3.) (sec 3.))
+    (check-equal? (symb:sec 0) 1)
     ;; !!
     ;(check-exn #px"Zero argument -- SEC" (λ () (symb:csc ':pi/2)))
     (check-equal? (symb:sec 3) '(/ 1 (cos 3)))

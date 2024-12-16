@@ -172,6 +172,7 @@
                            *allowing-incompatible-multiplication*
                            *careful-conversion*
                            *no-rationals-in-divide*
+                           heuristic-number-canonicalizer
                            ))
 
 (define (skip-rkt-langprovreq lines [name #f])

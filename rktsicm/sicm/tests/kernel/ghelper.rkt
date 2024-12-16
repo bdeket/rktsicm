@@ -15,8 +15,12 @@
        (define (foo-default x y z) 'foo-default)
        (define foo (make-generic-operator 3 'foo foo-default))
        (check-equal? (get-operator-record foo) (operator-record 'foo 3 (tree '() #t foo-default)))
+       (check-equal? (get-operator-record 'foo) (operator-record 'foo 3 (tree '() #t foo-default)))
+       (check-false (get-operator-record (gensym)))
 
        (check-equal? (procedure-arity foo) 3)
+       (check-equal? (generic-operator-arity foo) 3)
+       (check-exn #px"Not an operator:" (λ () (generic-operator-arity (gensym))))
 
        (check-exn #px"argument arity intersecting with operator arity"
                   (λ () (assign-operation foo (λ (a b) 'a) any? any?)))
@@ -77,16 +81,51 @@
        (check-equal? (foo 'b 'c 'c) 3)
        (check-equal? (foo 'b 'b 'b) 5)
        (check-equal? (foo 'c 'c 'c) 'foo-default)
-       (check-equal? (foo 'a 'a 'c) 'foo-default))]))
+       (check-equal? (foo 'a 'a 'c) 'foo-default)
+       (check-equal? (get-operator-record-for foo 'a 'b 'b)
+                     `((,a? ,b? (... ...) -> ,foo-handler1)
+                       (any/c? (... ...) -> ,foo-default)))
+       (check-equal? (get-operator-record-for foo 'a #:defaults? #f)
+                     `((,a? ,c? (... ...) -> ,foo-handler2)
+                       (,a? ,c? -> ,foo-handler2)
+                       (,a? ,b? (... ...) -> ,foo-handler1)
+                       (,a? ,b? -> ,foo-handler1)))
+       (check-exn #px"get-operator-record-for: contract violation\n  expected: at most 3 arguments for operator foo"
+                  (λ () (get-operator-record-for foo 1 2 3 4)))
+       )]))
 (define-syntax (test-it2 stx)
   (syntax-case stx ()
     [(_ make-generic-operator)
      #'(test-case
    "bar"
    (define bar (make-generic-operator 1 'bar))
+   (check-exn #px"Generic operator inapplicable: #<procedure:_bar_>\n function:" (λ () (bar 1)))
+   (check-exn #px"make-generic-operator: contract violation\n  expected: procedure that satisfies  arity 1\n  given:"
+              (λ () (make-generic-operator 1 'bar (λ () 0))))
+   
    (check-equal? (procedure-arity bar) 1)
-   (assign-operation bar (λ (x) x))
+   (define (ID x) x)
+   (assign-operation bar ID)
+   (check-equal? (bar 1) 1)
+   
+   (check-exn #px"assign-operation: contract violation\n  expected: known generic operator\n  given:"
+              (λ () (assign-operation (gensym) ID)))
+   (check-exn #px"assign-operation:bar: contract violation\n  expected: handler procedure\\?\n  given:"
+              (λ () (assign-operation bar 'ID)))
+   (check-exn #px"assign-operation:bar: contract violation\n  expected: predicate\\?\n  given:"
+              (λ () (assign-operation bar ID 'test?)))
 
+   (check-equal? (get-operator-record-for bar 3 #:defaults? #f) '())
+   (check-equal? (get-operator-record-for bar 3 #:defaults? #t) `((any/c? (... ...) -> ,ID)))
+
+   (define (a? a) (equal? a 'a)) (define (b? b) (equal? b 'b)) (define (c? c) (equal? c 'c))
+   (assign-operation bar + a?)
+   (assign-operation bar - b?)
+   (assign-operation bar / c? #:end? #t)
+
+   (check-equal? (get-operator-record-for bar)
+                 `((,b? -> ,-) (,a? -> ,+) (,c? -> ,/) (any/c? (... ...) -> ,ID)))
+   
    (check-equal? (procedure-arity (make-generic-operator (arity-at-least 2)))
                  (arity-at-least 2))
    (check-equal? (procedure-arity (make-generic-operator (list 0 (arity-at-least 2))))
@@ -94,7 +133,11 @@
    (check-equal? (procedure-arity (make-generic-operator (list 1 2 (arity-at-least 2) 3)))
                  (arity-at-least 1))
    (check-equal? (procedure-arity (make-generic-operator (list 5 4 3)))
-                 '(3 4 5)))]))
+                 '(3 4 5))
+   (check-exn #px"make-generic-operator: contract violation\n  expected: procedure-arity\\?\n  given:"
+              (λ () (make-generic-operator 'false)))
+   (check-exn #px"make-generic-operator: contract violation\n  expected: symbol\\?\n  given:"
+              (λ () (make-generic-operator 1 1))))]))
 
 (provide the-tests)
 (define the-tests

@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide undefined-value undefined-value?)
+(provide (rename-out [the-undefined-value undefined-value]) undefined-value?)
 
-(define undefined-value (gensym 'undefined))
-(define (undefined-value? x) (eq? undefined-value x))
+(struct undefined-value ())
+(define the-undefined-value (undefined-value))

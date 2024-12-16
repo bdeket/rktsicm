@@ -6,11 +6,19 @@
          "units.rkt"
          "with-units.rkt"
          "../kernel-gnrc.rkt" ;using generic + - * etc...
+         "../kernel/ghelper.rkt"
          )
 (void 'INSTALL-GENERICS
       (kernel:assign-operations #t)
       (units:assign-operations #t)
       (with-units:assign-operations #t))
+
+;;bdk;; originally defined in units/load.scm
+(define (with-si-units->expression expr)
+  (with-units->expression SI expr))
+;;bdk;; new setup in kernel/express uses generic:expression instead of with-si-units->expression
+(assign-operation generic:expression with-si-units->expression with-units?)
+(assign-operation generic:expression with-si-units->expression units?)
 
 ;;bdk;; start original file
 
