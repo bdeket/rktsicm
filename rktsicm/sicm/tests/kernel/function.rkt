@@ -1,44 +1,361 @@
 #lang racket/base
 
 (require rackunit
-         "../../main.rkt"
+         "../../generic.rkt"
          "../../mechanics/universal.rkt"
+         "../../kernel/ghelper.rkt"
+         "../helper.rkt"
          )
 
 (provide the-tests)
 (define the-tests
   (test-suite
    "kernel/function"
-   (test-case "ORIG:transpose"
-              (let ()
-                (define (transpose-defining-relation T g a)
-                  ;; T is a linear transformation T:V -> W
-                  ;; the transpose of T, T^t:W* -> V* 
-                  ;; Forall a in V, g in W*,  g:W -> R
-                  ;; (T^t(g))(a) = g(T(a)).
-                  (- (((f:transpose T) g) a) (g (T a))))
+   (test-case
+    "ORIG:transpose"
+    (let ()
+      (define (transpose-defining-relation T g a)
+        ;; T is a linear transformation T:V -> W
+        ;; the transpose of T, T^t:W* -> V* 
+        ;; Forall a in V, g in W*,  g:W -> R
+        ;; (T^t(g))(a) = g(T(a)).
+        (- (((f:transpose T) g) a) (g (T a))))
 
-                (define DTf
-                  (let* ([T (literal-function 'T (-> (UP Real Real) (UP Real Real Real)))]
-                         [DT (D T)])
-                    (lambda (s)
-                      (lambda (x)
-                        (* (DT s) x)))))
+      (define DTf
+        (let* ([T (literal-function 'T (-> (UP Real Real) (UP Real Real Real)))]
+               [DT (D T)])
+          (lambda (s)
+            (lambda (x)
+              (* (DT s) x)))))
 
-                (define a (up 'a^0 'a^1))
-                (define g (lambda (w) (* (down 'g_0 'g_1 'g_2) w)))
-                (define s (up 'x 'y))
+      (define a (up 'a^0 'a^1))
+      (define g (lambda (w) (* (down 'g_0 'g_1 'g_2) w)))
+      (define s (up 'x 'y))
 
-                (check-equal? (simplify (transpose-defining-relation (DTf s) g a))
-                              0)
-                (check-equal? (simplify (((f:transpose (DTf s)) g) a))
-                              '(+ (* a^0 g_0 (((partial 0) T^0) (up x y)))
-                                  (* a^0 g_1 (((partial 0) T^1) (up x y)))
-                                  (* a^0 g_2 (((partial 0) T^2) (up x y)))
-                                  (* a^1 g_0 (((partial 1) T^0) (up x y)))
-                                  (* a^1 g_1 (((partial 1) T^1) (up x y)))
-                                  (* a^1 g_2 (((partial 1) T^2) (up x y)))))))
+      (check-equal? (simplify (transpose-defining-relation (DTf s) g a))
+                    0)
+      (check-equal? (simplify (((f:transpose (DTf s)) g) a))
+                    '(+ (* a^0 g_0 (((partial 0) T^0) (up x y)))
+                        (* a^0 g_1 (((partial 0) T^1) (up x y)))
+                        (* a^0 g_2 (((partial 0) T^2) (up x y)))
+                        (* a^1 g_0 (((partial 1) T^0) (up x y)))
+                        (* a^1 g_1 (((partial 1) T^1) (up x y)))
+                        (* a^1 g_2 (((partial 1) T^2) (up x y)))))))
+   ;; ==== main ====
+   (test-case
+    "p rename"
+    (define (Q x) x)
+    (check-equal? (rkt:object-name Q) 'Q)
+    (check-equal? (procedure-name (p-rename '$ Q)) 'f:$))
+   (test-case
+    "type / pred / arity / etc"
+    (check-equal? (f:type (λ (x)x)) function-type-tag)
+    (check-true ((f:type-predicate (λ (x)x)) (λ (x y) (+ x y))))
+    (check-true ((f:type-predicate (λ (x)x)) o:identity))
+    (define (F x) x)
+    (check-true (eq? (coerce-to-function F) F))
+    (check-true (function-quantity? (coerce-to-function 3)))
+    (check-equal? ((coerce-to-function 3) 5 6 7 8) 3)
+    (check-true (function-quantity? (coerce-to-function #(3))))
+    (check-equal? ((coerce-to-function (vector (λ (x) (+ 3 x)))) 5) (vector 8))
+    (check-equal? (f:arity (coerce-to-function (up 3))) (arity-at-least 0))
+    (check-equal? (f:arity (coerce-to-function (up 3 (λ (x) x)))) 1)
+    (check-equal? ((coerce-to-function (up 3 (λ (x) x))) 1) (up 3 1))
+    (check-equal? (f:arity (λ (x) x)) 1)
+    (check-equal? (f:arity (λ (x [y 0]) x)) '(1 2)))
+   (test-case
+    "zero / one / identity / transpose"
+    (define F (case-lambda [(x) 3][(x y z) (matrix-by-rows '(3))]))
+    (define G (case-lambda [(x) 3][(x y z . q) (matrix-by-rows '(3))]))
+    (check-equal? ((f:zero-like (λ (x) 3)) 1) 0)
+    (check-equal? ((f:zero-like (λ (x . y) 3)) 1 2 3) 0)
+    (check-equal? ((f:zero-like (λ x 3)) 1 2 3) 0)
+    (check-equal? ((f:zero-like F) 1 2 3) (matrix-by-rows '(0)))
+    (check-equal? (arity (f:zero-like F)) (arity F))
+    (check-equal? (arity (f:zero-like G)) (arity G))
+    (check-equal? ((f:one-like (λ (x) 3)) 1) 1)
+    (check-equal? ((f:one-like (λ (x . y) 3)) 1 2 3) 1)
+    (check-equal? ((f:one-like F) 1 2 3) (matrix-by-rows '(1)))
+    (check-equal? (arity (f:one-like F)) (arity F))
+    (check-equal? (arity (f:one-like G)) (arity G))
+    (check-equal? (f:identity-like (λ (x) x)) g:identity))
+   (test-case
+    "f: function-composition binary"
+    (define (F1 x) x)
+    (define (F2 x) 3)
+    (define (F3 x) (up x (* 3 x)))
+    (define (F4 x y) (+ x y))
+    (define (F5 x y) (up x y))
+    (define F (case-lambda [(x) x][(x y z) (+ x y z)]))
+    (define G (case-lambda [(x) x][(x y z . q) (apply + x y z q)]))
+    (define Fs (case-lambda [(x) (up x x x)][(x y z) (up x y z)]))
+    (define Gs (case-lambda [(x) (up x x x)][(x y z . q) (up x y z)]))
+    (define V4 (coerce-to-function 4))
+    (define U4 (up V4 V4 V4))
+    ;(assign-operation '+                  (f:binary g:+)             function? cofunction?)
+    (define f:+ (f:binary g:+))
+    (check-equal? ((f:+ F1 F2) 9) 12)
+    (check-equal? ((f:+ F2 5) 9) 8)
+    (check-equal? ((f:+ F1 5) 9) 14)
+    (check-equal? ((f:+ F4 3) 2 3) 8)
+    (check-equal? ((f:+ F3 (up (λ (x) x) (λ (x) 2))) 9) (up 18 29))
+    (check-equal? ((f:+ F5 (up (λ (x y) x) (λ (x y) y))) 2 3) (up 4 6))
+    (check-equal? ((f:+ 5 F2) 9) 8)
+    (check-equal? ((f:+ (up (λ (x) x) (λ (x) 2)) F3) 9) (up 18 29))
+    
+    (check-equal? ((f:+ rkt:+ rkt:+) 1 2 3) 12)
+    (check-equal? (arity (f:+ rkt:+ rkt:+)) (arity rkt:+))
+    (check-equal? ((f:+ F F) 1 2 3) 12)
+    (check-equal? (arity (f:+ F F)) (arity F))
+    (check-equal? ((f:+ G G) 1 2 3) 12)
+    (check-equal? (arity (f:+ G G)) (arity G))
+    
+    (check-equal? ((f:+ rkt:+ 4) 1 2 3) 10)
+    (check-equal? (arity (f:+ rkt:+ 4)) (arity rkt:+))
+    (check-equal? ((f:+ F 4) 1 2 3) 10)
+    (check-equal? (arity (f:+ F 4)) (arity F))
+    (check-equal? ((f:+ G 4) 1 2 3) 10)
+    (check-equal? (arity (f:+ G 4)) (arity G))
 
+    (check-equal? ((f:+ 4 rkt:+) 1 2 3) 10)
+    (check-equal? (arity (f:+ 4 rkt:+)) (arity rkt:+))
+    (check-equal? ((f:+ 4 F) 1 2 3) 10)
+    (check-equal? (arity (f:+ 4 F)) (arity F))
+    (check-equal? ((f:+ 4 G) 1 2 3) 10)
+    (check-equal? (arity (f:+ 4 G)) (arity G))
+
+    (check-equal? ((f:+ up U4) 1 2 3) (up 5 6 7))
+    (check-equal? (arity (f:+ up U4)) (arity up))
+    (check-equal? ((f:+ Fs U4) 1 2 3) (up 5 6 7))
+    (check-equal? (arity (f:+ Fs U4)) (arity F))
+    (check-equal? ((f:+ Gs U4) 1 2 3) (up 5 6 7))
+    (check-equal? (arity (f:+ Gs U4)) (arity G))
+
+    (check-equal? ((f:+ U4 up) 1 2 3) (up 5 6 7))
+    (check-equal? (arity (f:+ U4 up)) (arity up))
+    (check-equal? ((f:+ U4 Fs) 1 2 3) (up 5 6 7))
+    (check-equal? (arity (f:+ U4 Fs)) (arity F))
+    (check-equal? ((f:+ U4 Gs) 1 2 3) (up 5 6 7))
+    (check-equal? (arity (f:+ U4 Gs)) (arity G))
+    ;these are normally prevented by the generic dispatch
+    (check-exn #px"f:binary-nn: not possible?" (λ () (f:+ 5 6)))
+    (check-exn #px"f:binary-nS: not possible?" (λ () (f:+ 5 (up 3))))
+    (check-exn #px"f:binary-Sn: not possible?" (λ () (f:+ (up 3) 5)))
+    (check-exn #px"f:binary-SS: not possible?" (λ () (f:+ (up 3) (up 5))))
+
+    ;(assign-operation '-                  (f:binary g:-)             cofunction? function?)
+    (define f:- (f:binary g:-))
+    (check-equal? ((f:- F1 F2) 9) 6)
+    (check-equal? ((f:- F2 5) 9) -2)
+    (check-equal? ((f:- F1 5) 9) 4)
+    (check-equal? ((f:- F4 3) 2 3) 2)
+    (check-equal? ((f:- F3 (up (λ (x) x) (λ (x) 2))) 9) (up 0 25))
+    (check-equal? ((f:- F5 (up (λ (x y) x) (λ (x y) y))) 2 3) (up 0 0))
+    (check-equal? ((f:- 5 F2) 9) 2)
+    (check-equal? ((f:- (up (λ (x) x) (λ (x) 2)) F3) 9) (up 0 -25))
+
+    ;(assign-operation '*                  (f:binary g:*)             function? cofunction?)
+    (define f:* (f:binary g:*))
+    (check-equal? ((f:* F1 F2) 9) 27)
+    (check-equal? ((f:* F2 5) 9) 15)
+    (check-equal? ((f:* F1 5) 9) 45)
+    (check-equal? ((f:* F4 3) 2 3) 15)
+    (check-equal? ((f:* F3 (down (λ (x) x) (λ (x) 2))) 9) 135)
+    (check-equal? ((f:* F5 (down (λ (x y) x) (λ (x y) y))) 2 3) 13)
+    (check-equal? ((f:* 5 F2) 9) 15)
+    (check-equal? ((f:* (down (λ (x) x) (λ (x) 2)) F3) 9) 135)
+
+    ;(assign-operation '/                  (f:binary g:/)             function? cofunction?)
+    (define f:/ (f:binary g:/))
+    (check-equal? ((f:/ F1 F2) 9) 9/3)
+    (check-equal? ((f:/ F2 5) 9) 3/5)
+    (check-equal? ((f:/ F1 5) 9) 9/5)
+    (check-equal? ((f:/ F4 3) 2 3) 5/3)
+    (check-equal? ((f:/ (λ (x) (up (+ 2 x))) (up (λ (x) x))) 9) 11/9)
+    (check-equal? ((f:/ 5 F2) 9) 5/3)
+    (check-equal? ((f:/ (m:generate 2 2 (λ (i j) (λ (x y) (+ (* i x) (* j y)))))
+                        (λ (x y) (m:generate 2 2 (λ (i j) (+ i j x y)))))
+                   2 3)
+                  (matrix-by-rows '(18 -15) '(16 -13)))
+
+    ;(assign-operation 'dot-product        (f:binary g:dot-product)   function? cofunction?)
+    (define f:. (f:binary g:dot-product))
+    (check-equal? ((f:. F1 F2) 9) 27)
+    (check-equal? ((f:. F2 5) 9) 15)
+    (check-equal? ((f:. F1 5) 9) 45)
+    (check-equal? ((f:. F4 3) 2 3) 15)
+    (check-equal? ((f:. F3 (up (λ (x) x) (λ (x) 2))) 9) 135)
+    (check-equal? ((f:. F5 (up (λ (x y) x) (λ (x y) y))) 2 3) 13)
+    (check-equal? ((f:. 5 F2) 9) 15)
+    (check-equal? ((f:. (up (λ (x) x) (λ (x) 2)) F3) 9) 135)
+
+    ;(assign-operation 'cross-product      (f:binary g:cross-product)   function? cofunction?)
+    (define f:× (f:binary g:cross-product))
+    (check-equal? ((f:× (λ (x) (up x (+ x 2) (* x 2)))
+                        (up (λ (x) x) (λ (x) 2) (λ (x) 9))) 9)
+                  (up 63 81 -81))
+    (check-equal? ((f:× (up (λ (x y) x) (λ (x y) y) (λ (x y) (* x y)))
+                        (λ (x y) (up x (+ y 2) (- y x)))) 2 3)
+                  (up -27 10 4))
+
+    ;(assign-operation 'expt               (f:binary g:expt)          function? cofunction?)
+    (define f:^ (f:binary g:expt))
+    (check-equal? ((f:^ F1 F2) 9) 729)
+    (check-equal? ((f:^ F2 5) 9) 243)
+    (check-equal? ((f:^ F1 5) 9) 59049)
+    (check-equal? ((f:^ F4 3) 2 3) 125)
+    (check-equal? ((f:^ F3 2) 9) (up (up 81 243) (up 243 729)))
+    (check-equal? ((f:^ F5 2) 2 3) (up (up 4 6) (up 6 9)))
+    (check-equal? ((f:^ 5 F2) 9) 125)
+    (check-equal? ((f:^ (up (λ (x) x) (λ (x) 2)) F1) 2) (up (up 4 4) (up 4 4)))
+
+    ;(assign-operation 'gcd                (f:binary g:gcd)           function? cofunction?)
+    (define f:gcd (f:binary g:gcd))
+    (check-equal? ((f:gcd F1 F2) 9) 3)
+    (check-equal? ((f:gcd F2 5) 9) 1)
+    (check-equal? ((f:gcd F1 5) 9) 1)
+    (check-equal? ((f:gcd F4 3) 6 3) 3)
+    (check-equal? ((f:gcd 5 F2) 9) 1)
+
+    ;(assign-operation 'make-rectangular   (f:binary g:make-rectangular) function? cofunction?)
+    (define f:make-rect (f:binary g:make-rectangular))
+    (check-equal? ((f:make-rect F1 F2) 9) 9+3i)
+    (check-equal? ((f:make-rect F2 5) 9) 3+5i)
+    (check-equal? ((f:make-rect F1 5) 9) 9+5i)
+    (check-equal? ((f:make-rect F4 3) 2 3) 5+3i)
+    (check-equal? ((f:make-rect 5 F2) 9) 5+3i)
+
+    ;(assign-operation 'make-rectangular   (f:binary g:make-rectangular) function? cofunction?)
+    (define f:make-polar (f:binary g:make-polar))
+    (check-equal? ((f:make-polar F1 F2) 9) (rkt:make-polar 9 3))
+    (check-equal? ((f:make-polar F2 5) 9) (rkt:make-polar 3 5))
+    (check-equal? ((f:make-polar F1 5) 9) (rkt:make-polar 9 5))
+    (check-equal? ((f:make-polar F4 3) 2 3) (rkt:make-polar 5 3))
+    (check-equal? ((f:make-polar 5 F2) 9) (rkt:make-polar 5 3))
+
+    ;(assign-operation 'atan2              (f:binary g:atan)          function? cofunction?)
+    (define f:atan2 (f:binary g:atan2))
+    (check-equal? ((f:atan2 F1 F2) 9) (rkt:atan 9 3))
+    (check-equal? ((f:atan2 F2 5) 9) (rkt:atan 3 5))
+    (check-equal? ((f:atan2 F1 5) 9) (rkt:atan 9 5))
+    (check-equal? ((f:atan2 F4 3) 2 3) (rkt:atan 5 3))
+    (check-equal? ((f:atan2 5 F2) 9) (rkt:atan 5 3))
+
+    ;(assign-operation 'solve-linear-right      (f:binary g:solve-linear-right)  function? cofunction?)
+    (define f:slr (f:binary g:solve-linear-right))
+    (check-equal? ((f:slr F1 F2) 9) 3)
+    (check-equal? ((f:slr F2 5) 9) 3/5)
+    (check-equal? ((f:slr F1 5) 9) 9/5)
+    (check-equal? ((f:slr F4 3) 2 3) 5/3)
+    (check-equal? ((f:slr (λ (x) (up (+ 2 x))) (up (λ (x) x))) 9) 11/9)
+    (check-equal? ((f:slr 5 F2) 9) 5/3)
+    (check-equal? ((f:slr (down (λ (x y) (+ x y)) (λ (x y) (* x y)))
+                          (λ (x y) (m:generate 2 2 (λ (i j) (+ i j x y)))))
+                   2 3)
+                  (down 1 0))
+
+    ;(assign-operation 'solve-linear-left      (f:binary g:solve-linear-left)  cofunction? function?)
+    (define f:sll (f:binary g:solve-linear-left))
+    (check-equal? ((f:sll F1 F2) 9) 1/3)
+    (check-equal? ((f:sll F2 5) 9) 5/3)
+    (check-equal? ((f:sll F1 5) 9) 5/9)
+    (check-equal? ((f:sll F4 3) 2 3) 3/5)
+    (check-equal? ((f:sll (λ (x) (up (+ 2 x))) (up (λ (x) x))) 9) 9/11)
+    (check-equal? ((f:sll 5 F2) 9) 3/5)
+    (check-equal? ((f:sll (m:generate 2 2 (λ (i j) (λ (x y) (+ (* i x) (* j y)))))
+                          (λ (x y) (up (+ x y) (* x y))))
+                   2 3)
+                  (up -7/6 5/3))
+
+    ;(assign-operation 'solve-linear      (f:binary g:solve-linear)  cofunction? function?)
+    (define f:sl (f:binary g:solve-linear))
+    (check-equal? ((f:sl F1 F2) 9) 1/3)
+    (check-equal? ((f:sl F2 5) 9) 5/3)
+    (check-equal? ((f:sl F1 5) 9) 5/9)
+    (check-equal? ((f:sl F4 3) 2 3) 3/5)
+    (check-equal? ((f:sl (λ (x) (up (+ 2 x))) (up (λ (x) x))) 9) 9/11)
+    (check-equal? ((f:sl 5 F2) 9) 3/5)
+    (check-equal? ((f:sl (m:generate 2 2 (λ (i j) (λ (x y) (+ (* i x) (* j y)))))
+                         (λ (x y) (up (+ x y) (* x y))))
+                   2 3)
+                  (up -7/6 5/3)))
+   (test-case
+    "f: function-composition unary"
+    (define (Fn x) x)
+    (define (FS x) (up x))
+    (define (FM x) (m:generate 2 2 (λ (i j) (+ i j x))))
+    (define (Gn x y) (+ x y))
+
+    ;(assign-operation 'real-part          (f:unary g:real-part)      function?)
+    (define f:real-part (f:unary g:real-part))
+    (check-equal? ((f:real-part Fn) 3+5i) 3)
+    (check-equal? ((f:real-part Gn) 3+5i 2) 5)
+    ;(assign-operation 'imag-part          (f:unary g:imag-part)      function?)
+    (define f:imag-part (f:unary g:imag-part))
+    (check-equal? ((f:imag-part Fn) 3+5i) 5)
+    (check-equal? ((f:imag-part Gn) 3+5i 2) 5)
+    ;(assign-operation 'magnitude          (f:unary g:magnitude)      function?)
+    (define f:magnitude (f:unary g:magnitude))
+    (check-equal? ((f:magnitude Fn) 3+4i) 5)
+    (check-equal? ((f:magnitude FS) 7) 7)
+    (check-equal? ((f:magnitude Gn) 1+4i 2) 5)
+    (check-equal? ((f:magnitude up) 3 4) 5)
+    ;(assign-operation 'angle              (f:unary g:angle)          function?)
+    (define f:angle (f:unary g:angle))
+    (check-equal? ((f:angle Fn) 1+1i) :pi/4)
+    (check-equal? ((f:angle Gn) 3+1i -2) :pi/4)
+    ;(assign-operation 'negate          (f:unary g:negate)         function?)
+    (define f:negate (f:unary g:negate))
+    (check-equal? ((f:negate Fn) 3) -3)
+    (check-equal? ((f:negate FS) 7) (up -7))
+    (check-equal? ((f:negate Gn) 1 2) -3)
+    (check-equal? ((f:negate up) 3 4) (up -3 -4))
+    ;(assign-operation 'invert          (f:unary g:invert)         function?)
+    (define f:invert (f:unary g:invert))
+    (check-equal? ((f:invert Fn) 3) 1/3)
+    (check-equal? ((f:invert Gn) 1 2) 1/3)
+    ;(assign-operation 'sqrt            (f:unary g:sqrt)           function?)
+    (define f:sqrt (f:unary g:sqrt))
+    (check-equal? ((f:sqrt Fn) 4) 2)
+    (check-equal? ((f:sqrt Gn) 1 3) 2)
+    ;(assign-operation 'square          (f:unary g:square)         function?)
+    (define f:square (f:unary g:square))
+    (check-equal? ((f:square Fn) 3) 9)
+    (check-equal? ((f:square FS) 7) 49)
+    (check-equal? ((f:square Gn) 1 2) 9)
+    (check-equal? ((f:square up) 3 4) 25)
+    ;(assign-operation 'exp             (f:unary g:exp)            function?)
+    (define f:exp (f:unary g:exp))
+    (check-equal? ((f:exp Fn) 3) (exp 3))
+    (check-equal? (series:sum ((f:exp FM) 7) 2) (matrix-by-rows (list 129/2 72) (list 72 165/2)))
+    (check-equal? ((f:exp Gn) 1 2) (exp 3))
+    
+    )
+
+
+    
+#|
+;(assign-operation 'conjugate         (f:unary g:conjugate)      function?)
+
+(assign-operation 'log             (f:unary g:log)            function?)
+
+(assign-operation 'sin             (f:unary g:sin)            function?)
+(assign-operation 'cos             (f:unary g:cos)            function?)
+(assign-operation 'atan1              (f:unary g:atan)           function?)
+
+(assign-operation 'asin            (f:unary g:asin)           function?)
+(assign-operation 'acos            (f:unary g:acos)           function?)
+
+(assign-operation 'sinh            (f:unary g:sinh)           function?)
+(assign-operation 'cosh            (f:unary g:cosh)           function?)
+
+(assign-operation 'abs             (f:unary g:abs)            function?)
+
+(assign-operation 'determinant     (f:unary g:determinant)    function?)
+(assign-operation 'trace           (f:unary g:trace)          function?)
+
+(assign-operation 'transpose          f:transpose                function?)
+|#
 
    ))
 

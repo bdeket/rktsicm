@@ -172,6 +172,7 @@
                            *allowing-incompatible-multiplication*
                            *careful-conversion*
                            *no-rationals-in-divide*
+                           *numbers-are-constant-functions*
                            heuristic-number-canonicalizer
                            ))
 

@@ -34,12 +34,12 @@
 ;;; to be applied to arguments.  Otherwise they are considered 
 ;;; constant functions of any number of arguments.
 
-(define *numbers-are-constant-functions* #f)
+(define *numbers-are-constant-functions* (make-parameter #f))
 
 (define (n:arity m) *at-least-zero*)
 
 (define (n:self n . args)
-  (if *numbers-are-constant-functions*
+  (if (*numbers-are-constant-functions*)
       n
       (error "Application of a number not allowed in" (cons n args))))
 

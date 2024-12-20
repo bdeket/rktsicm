@@ -13,6 +13,21 @@
 (define the-tests
   (test-suite
    "kernel/diffbug/derivative-test"
+   
+   (test-case "ORIG:diff"
+              (let ()
+                (define (((f x) g) y)
+                  (g (+ x y)))
+
+                (define f-hat ((D f) 3))
+
+                (check-= ((f-hat exp) 5)
+                         2980.9579870417283
+                         1e-10)
+
+                (check-= ((f-hat (f-hat exp)) 5)
+                         59874.14171519782
+                         1e-10)))
    (check-simplified? ((literal-function 'f) 'x) '(f x))
    (check-simplified? ((D (literal-function 'f)) 'x) '((D f) x))
    (check-simplified? ((D (D (literal-function 'f))) 'x) '(((expt D 2) f) x))

@@ -1,8 +1,7 @@
 #lang s-exp "extapply.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
-         (all-from-out "cstm/diff.rkt")
-         differential-of)
+         (all-from-out "cstm/diff.rkt"))
 
 (require (only-in "../rkt/glue.rkt" if delv warn for-all?
                   fix:< fix:=)
@@ -270,25 +269,35 @@
 (define (finite-part x)
   (if (differential? x)
       (let ((dts (differential->terms x)))
-	(let ((keytag
-	       (car (last-pair
-                     (differential-tags (car (last-pair dts)))))))
-	  (terms->differential-collapse
-	   (filter (lambda (term)
-		     (not (memv keytag (differential-tags term))))
-		   dts))))
+        ;;bdk;; diff-quantitities with zero coefficients lead to errors
+        (if (null? dts)
+            :zero
+            (let* ((lt (last dts))
+                   (tag (differential-tags lt)))
+              (if (null? tag)
+                  (differential-coefficient lt)
+                  (let ((keytag (last tag)))
+                    (terms->differential-collapse
+                     (filter (lambda (term)
+                               (not (memv keytag (differential-tags term))))
+                             dts)))))))
       x))
 
 (define (infinitesimal-part x)
   (if (differential? x)
       (let ((dts (differential->terms x)))
-	(let ((keytag
-	       (car (last-pair
-                     (differential-tags (car (last-pair dts)))))))
-	  (terms->differential-collapse
-	   (filter (lambda (term)
-		     (memv keytag (differential-tags term)))
-		   dts))))
+        ;;bdk;; diff-quantitities with zero coefficients lead to errors
+        (if (null? dts)
+            :zero
+            (let* ((lt (last dts))
+                   (tag (differential-tags lt)))
+              (if (null? tag)
+                  :zero
+                  (let ((keytag (last tag)))
+                    (terms->differential-collapse
+                     (filter (lambda (term)
+                               (memv keytag (differential-tags term)))
+                             dts)))))))
       :zero))
 
 ;;; To turn a binary function into one that operates on differentials
@@ -628,7 +637,8 @@
 (define (diff:one? x)
   (assert (differential? x))
   (and (g:one? (finite-part x))
-       (diff:zero? (infinitesimal-part x))))
+       ;;bdk;; infinitesimal-part can be :zero
+       (g:zero? (infinitesimal-part x))))
 
 (assign-operation 'one? diff:one? differential?)
 

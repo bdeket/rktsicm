@@ -8,6 +8,7 @@
          "types.rkt"
          "utils.rkt"
          "cstm/make-plain-procedure.rkt"
+         (only-in "numbers.rkt" *numbers-are-constant-functions*)
          )
 (define-values (assign-operation function:assign-operations)
   (make-assign-operations 'function))
@@ -133,15 +134,32 @@
   ;;bdk;; keep same function if possible (for arity, name, etc)
   (cond ((procedure? g) g)
         ((numerical-quantity? g) (lambda x g))
-		(else (lambda x (g:apply g x)))))
+        (else
+         ;;bdk;; no advantage using make-plain-procedure since internally
+         ;;bdk;; we use g:apply again. Also if forcing to function, go all the way...
+         (procedure-reduce-arity (λ x (parameterize ([*numbers-are-constant-functions* #t])
+                                        (g:apply g x)))
+                                 (g:arity g)))))
 
 (define (f:arity f) (procedure-arity f))
 
 (define (f:zero-like f)			;want (zero-like range-element)
-  (lambda any (g:zero-like (apply f any))))
+  ;;bdk;; same arity
+  (define arity (procedure-arity f))
+  (make-plain-procedure-slct 'f:zero-like arity
+                             (λ (xs) #`(g:zero-like (f #,@xs)))
+                             (λ (xs rst) #`(g:zero-like (f #,@xs #,rst)))
+                             (λ (xs) #`(#,g:zero-like (#,f #,@xs)))
+                             (λ (xs rst) #`(#,g:zero-like (#,f #,@xs #,rst)))))
 
 (define (f:one-like f)			;want (one-like range-element)
-  (lambda any (g:one-like (apply f any))))
+  ;;bdk;; same arity
+  (define arity (procedure-arity f))
+  (make-plain-procedure-slct 'f:one-like arity
+                             (λ (xs) #`(g:one-like (f #,@xs)))
+                             (λ (xs rst) #`(g:one-like (f #,@xs #,rst)))
+                             (λ (xs) #`(#,g:one-like (#,f #,@xs)))
+                             (λ (xs rst) #`(#,g:one-like (#,f #,@xs #,rst)))))
 
 (define (f:identity-like f) g:identity)
 

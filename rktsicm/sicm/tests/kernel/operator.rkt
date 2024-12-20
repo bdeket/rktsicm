@@ -70,14 +70,14 @@
     "zero/one"
     (define O0 (o:zero-like (make-operator (λ (x) x) 'a 'b 1 'rest)))
     (operator-check O0 'zero 'b 1 '(rest))
-    (check-equal? ((O0 +) 1) 0)
-    (check-equal? ((O0 +) 8) 0)
+    (check-equal? ((O0 g:+) 1) 0)
+    (check-equal? ((O0 g:+) 8) 0)
     (check-exn #px"o:zero-like:\n\tassertion failed: \\(pair:eq\\?"
                (λ () (o:zero-like (make-operator +))))
     (define O1 (o:one-like (make-operator (λ (x) x) 'a 'b 1 'rest)))
     (operator-check O1 'identity 'b 1 '(rest))
-    (check-equal? ((O1 +) 1) 1)
-    (check-equal? ((O1 +) 9) 9)
+    (check-equal? ((O1 g:+) 1) 1)
+    (check-equal? ((O1 g:+) 9) 9)
     (check-exn #px"o:one-like:\n\tassertion failed: \\(pair:eq\\?"
                (λ () (o:one-like (make-operator +))))
     (check-equal? (o:identity +) +))
