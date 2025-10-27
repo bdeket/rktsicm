@@ -176,10 +176,13 @@
    (test-case
     "base-op"
     (local-require math/flonum)
-    (define (tst f1 f2 [R (* (random) 800)])
-      (check-equal? (f1 R) (f2 R) (format "~a(~a)" f1 R)))
+    (define (tst f1 f2 [R (* (random) 800)] #:rel [rel #f])
+      (if rel
+          (check-= (f1 R) (f2 R) (* rel (f2 R)) (format "~a(~a)" f1 R))
+          (check-equal? (f1 R) (f2 R) (format "~a(~a)" f1 R))))
     (tst square (λ (R) (expt R 2)))
-    (tst cube (λ (R) (expt R 3)))
+    ;; TODO: (* x x x) != (expt x 3) (last digit)
+    (tst cube (λ (R) (expt R 3)) #:rel 1e-15)
     (tst negate -)
     (tst invert /)
     (tst cot (λ (R) (fl/ (fltan R))))

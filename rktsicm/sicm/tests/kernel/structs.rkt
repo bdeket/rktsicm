@@ -234,8 +234,8 @@
     (check-equal? (structure:expt (up 1 2) 1) (up 1 2))
     (check-equal? (structure:expt (up 1 2) 2) (up (up 1 2) (up 2 4)))
     (check-equal? (structure:expt (up 1 2) 3) (up (up (up 1 2) (up 2 4)) (up (up 2 4) (up 4 8))))
-    (check-exn #px"Cannot:  \\(expt"(λ () (structure:expt (up 1 2) 0)))
-    (check-exn #px"Cannot:  \\(expt"(λ () (structure:expt (up 1 2) -1))))
+    (check-exn #px"Cannot:  '?\\(expt"(λ () (structure:expt (up 1 2) 0)))
+    (check-exn #px"Cannot:  '?\\(expt"(λ () (structure:expt (up 1 2) -1))))
    (test-case
     "scalar"
     (check-equal? (structure*scalar (up 1 (up 2)) 3) (up 3 (up 6)))

@@ -57,8 +57,8 @@
     (check-equal?  (lset-union eq? '(1 2 3 3) '(4 4 2 5 1 6 3 6)) '(6 5 4 1 2 3 3)))
    (test-case
     "lset-difference"
-    (check-equal? (lset-difference eq? (list (vector)) (list (vector)))
-                  (list (vector)))
+    (check-equal? (lset-difference eq? (list (vector 1)) (list (vector 1)))
+                  (list (vector 1)))
     (check-equal? (lset-difference equal? '(1 2 3 4 5 6) '(3 4 5))
                   '(1 2 6))
     (check-equal? (lset-difference eq? '(1 2 3) '(1 2 3))

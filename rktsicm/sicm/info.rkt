@@ -2,6 +2,13 @@
 
 (define collection "sicm")
 
+(define categories '(scientific))
+(define pkg-desc "Port of scmutils to racket")
+
+(define primary-file "main.rkt")
+
+(define deps '("base" "compatibility-lib"))
+
 (define compile-omit-paths '("tests"))
 (define test-omit-paths '(#rx"sicm[/|\\\\]calculus"
                           #rx"sicm[/|\\\\]display"
@@ -24,8 +31,3 @@
                           #rx".*\\.bak"
                           ))
 (define test-include-paths '("tests"))
-
-(define primary-file "main.rkt")
-
-(define categories '(scientific))
-(define pkg-desc "Port of scmutils to racket")

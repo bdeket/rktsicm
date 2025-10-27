@@ -5,6 +5,9 @@
 
 (rename-part 'derivative 'D)
 
+;; TODO: this file very seldom throws following error: "stream: reentrant or broken delay"
+;; not yet sure what is the cause, for now only triggered when run from
+;; command-line, in parallel with other tests
 (provide the-tests)
 (define the-tests
   (test-suite
