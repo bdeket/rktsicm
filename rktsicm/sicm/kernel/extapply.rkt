@@ -38,9 +38,12 @@
     [(myapp f args ...)
      (quasisyntax/loc
          stx
-       (if (and (not (procedure? f)) (*enable-generic-apply*))
-           #,(syntax/loc stx (#%app g:apply f (list args ...)))
-           #,(syntax/loc stx (#%app f args ...))))]))
+       (let ([F f])
+         (if (procedure? F)
+             #,(syntax/loc stx (#%app F args ...))
+             (if (*enable-generic-apply*)
+                 #,(syntax/loc stx (#%app g:apply F (list args ...)))
+                 #,(syntax/loc stx (#%app raise-arguments-error 'application "not a procedure;\n expected a procedure that can be applied to arguments" "given" F))))))]))
 
 #|
 (define inapplicable-object/operator

@@ -26,6 +26,10 @@
                                      (with-self-evaluating-unbound-variables
                                          (λ () (+ (f 'a) 3))))))
                               '(+ 3 (f a)))))
+   (test-case "evaluate once only"
+              (define x 0)
+              (check-equal? ((begin (set! x (+ x 1)) +) 3 4) 7)
+              (check-equal? x 1))
 
 
    ))
