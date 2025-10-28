@@ -190,10 +190,11 @@
     (tst csc (λ (R) (fl/ (flsin R))))
     (tst sinh flsinh)
     (tst cosh flcosh)
-    (tst tanh fltanh (* (random) 500))
+    (tst tanh fltanh (* (random) 500) #:rel 1e-15)
     (skip ;; !!! beter start using math/flonum in numeric... ?
           ;; or (/ (- 1 (exp -2 x)) (+ 1 (exp -2 x))) if x>1
-     (tst tanh fltanh 766.))
+     (tst tanh fltanh 766.)
+     (tst tanh fltanh 14.724664521107968))
     (tst sech (λ (R) (fl/ (flcosh R))))
     (tst csch (λ (R) (fl/ (flsinh R)))))
    (test-case

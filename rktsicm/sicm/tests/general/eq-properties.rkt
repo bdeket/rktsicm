@@ -87,6 +87,8 @@
     (check-equal? (eq-get A 'waar) '(1 2 3))
     (eq-adjoin! A 'waar 9)
     (check-equal? (eq-get A 'waar) '(9 1 2 3))
+    (eq-adjoin! A 'nief 5)
+    (check-equal? (eq-get A 'nief) '(5))
     (eq-delete! A 'waar 1)
     (check-equal? (eq-get A 'waar) '(9 2 3))
     (eq-delete! A 'waar 1)
