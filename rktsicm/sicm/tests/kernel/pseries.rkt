@@ -111,7 +111,9 @@
     (check-exn #px"Cannot yet take partial derivatives of a series" (λ () (series:derivative s1 '(0))))
     (check-exn #px"Cannot take derivative of non arity=1 " (λ () (series:derivative (make-series 5 (series->stream series:one)) '())))
     (check-equal? ((s->l 5) (*integrate-series s1 'a))
-                  '(a 1 1/2 1/3 1/4)))
+                  '(a 1 1/2 1/3 1/4))
+    (check-equal? (stream->list (series->stream (series:derivative (make-series 1 (cons-stream 3 (cons-stream 2 the-empty-stream))) '())))
+                  '(2)))
    (test-case
     "series:value ->function function->"
     (define S5 (make-series 5 (cons-stream (λ (a b c d e) e)

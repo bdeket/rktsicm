@@ -70,8 +70,7 @@
     (check-true (v:zero? #(0 0 0)))
     (check-false (v:zero? #(0 0 0 1)))
     (check-equal? (v:make-zero 5) #(0 0 0 0 0))
-    ;; TODO: this fails, should it? -> iterat:vector-forall
-    (skip (check-true (v:zero? (v:make-zero 0))))
+    (check-true (v:zero? (v:make-zero 0)))
     (check-true (v:zero? (v:make-zero 1)))
     (check-equal? (v:zero-like #(a 2 3)) #(0 0 0))
     (check-equal? (v:zero-like #(#(1) 2 3)) #(#(0) 0 0)))
@@ -94,9 +93,8 @@
     "="
     (check-true  (vector=vector #(1 2) #(1 2)))
     (check-false (vector=vector #(1 2) #(1 3)))
-    ;; TODO: this should fail or be false -> iterat:vector-forall
-    (skip (check-exn #px"TODO" (λ () (vector=vector #(1 2) #(1 2 3)))))
-    (check-exn #px"vector-ref: index is out of range\\\n  index:" (λ () (vector=vector #(1 2 3) #(1 2)))))
+    (check-exn #px"" (λ () (vector=vector #(1 2) #(1 2 3))))
+    (check-exn #px"" (λ () (vector=vector #(1 2 3) #(1 2)))))
    (test-case
     "+ / -"
     (check-equal? (vector+vector #(1 2) #(2 1)) #(3 3))
@@ -105,7 +103,7 @@
     (check-equal? (vector+vector #(2 1) (v:negate #(1 2))) #(1 -1))
     ;; TODO: this should fail -> iterat:vector-forall
     (skip (check-exn #px"TODO" (λ () (vector+vector #(1 2) #(1 2 3))))
-          (check-exn #px"TODO" (λ () (vector-vector #(1 2) #(1 2 3))))))
+          (check-exn #px"TODO" (λ () (vector-vector #(1 2 3) #(1 2))))))
    (test-case
     "* / /"
     (check-equal? ((v:scale 5) #(2 4)) #(10 20))

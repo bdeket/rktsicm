@@ -22,11 +22,12 @@
 |#
 
 (define generate-list make-initialized-list)
-(define list:generate make-initialized-list)
+;;brm;;(define list:generate make-initialized-list)
 
 (define (list-with-substituted-coord lst i x)
   (define-values (head tail) (split-at lst i))
   `(,@head ,x ,@(cdr tail))
+  #; ;;bdk;; above is slightly more efficient
   (append (list-head lst i)
 	  (list x)
 	  (cdr (list-tail lst i))))
@@ -51,6 +52,15 @@ make-initialized-vector
 (define generate-vector make-initialized-vector)
 
 (define ((vector-elementwise f) . vectors)
+  (cond
+    [(null? vectors) #()]
+    [else
+     (define len (vector-length (car vectors)))
+     (unless (andmap (λ (x) (= (vector-length x) len)) (cdr vectors))
+       (raise-argument-error (string->symbol (format "vector-elementwise:~a" (object-name f)))
+                             "same-length vectors" vectors))
+     (build-vector len (λ (i) (apply f (map (λ (v) (vector-ref v i)) vectors))))])
+  #; ;;bdk;; ^^mine does some extra checks and changes so 0 args restuls in empty vector
   (make-initialized-vector
     (vector-length (car vectors))
     (lambda (i)
@@ -59,6 +69,15 @@ make-initialized-vector
 		  vectors)))))
 
 (define (vector-forall p? . vectors)
+  (cond
+    [(null? vectors) #t]
+    [else
+     (define len (vector-length (car vectors)))
+     (unless (andmap (λ (x) (= (vector-length x) len)) (cdr vectors))
+       (raise-argument-error 'vector-forall "same-length vectors" vectors))
+     (for/and ([i (in-range len)])
+            (apply p? (map (λ (v) (vector-ref v i)) vectors)))])
+  #; ;;bdk;; ^^mine does some extra checks and changes so 0 args restuls in #t
   (let lp ((i (fix:- (vector-length (car vectors)) 1)))
     (cond ((fix:= i 0)
 	   (apply p? (map (lambda (v) (vector-ref  v i))
@@ -69,6 +88,15 @@ make-initialized-vector
 	  (else #f))))
 
 (define (vector-exists p? . vectors)
+  (cond
+    [(null? vectors) #f]
+    [else
+     (define len (vector-length (car vectors)))
+     (unless (andmap (λ (x) (= (vector-length x) len)) (cdr vectors))
+       (raise-argument-error 'vector-exists "same-length vectors" vectors))
+     (for/or ([i (in-range len)])
+            (apply p? (map (λ (v) (vector-ref v i)) vectors)))])
+  #; ;;bdk;; ^^mine does some extra checks and changes so 0 args restuls in #f
   (let lp ((i (fix:- (vector-length (car vectors)) 1)))
     (cond ((fix:= i 0)
 	   (apply p? (map (lambda (v) (vector-ref  v i))
@@ -137,7 +165,9 @@ make-initialized-vector
   (vector-length array))
 
 (define (num-cols array)
-  (vector-length (vector-ref array 0)))
+  ;;bdk;; handle 0-length array
+  (if (= (vector-length array) 0) 0
+      (vector-length (vector-ref array 0))))
 
 
 (define (nth-row M n) ;return as a vector

@@ -256,8 +256,8 @@
 (define series:derivative
   (let ()
     (define (deriv-iter s n)
-      (if (null? s)
-	  '()
+      (if (empty-stream? s)
+	  s
 	  (cons-stream (g:* n (head s))
 		       (deriv-iter (tail s) (fix:+ n 1)))))
     (define (derivative s varnums)

@@ -37,27 +37,26 @@
 	   (else
 	    (p (head s))
 	    (loop p (tail s) (int:- n 1)))))
-   (lambda (p s . optionals)
-     (loop p s
-	   (if (not (null? optionals))
-	       (car optionals)
-	       -1)))))
+;;bdk;; only one optional argument + do-for-zero
+   (lambda (p s [n -1])
+     (if (int:= n 0) (if (empty-stream? s) 'done '...)
+         (loop p s n)))))
 
 
 (define print-stream
-  (lambda (s . optionals)
-     (apply stream:for-each write-line s optionals)))
+  (lambda (s [n -1])
+     (stream:for-each write-line s n)))
 
 (define (combiner-padded-streams f pad)
   (define (lp ss)
     (cons-stream (apply f
 			(map (lambda (s)
-			       (if (null? s)
+			       (if (empty-stream? s)
 				   pad
 				   (head s)))
 			     ss))
 		 (lp (map (lambda (s)
-			    (if (null? s)
+			    (if (empty-stream? s)
 				s
 				(tail s)))
 			  ss))))
@@ -87,7 +86,7 @@
       (cons-stream (f (head s))
 		   (map-stream f (tail s)))))
 
-#; ;works only on 1 extra stream
+#; ;;bdk;;works only on 1 extra stream
 (define map-streams stream-map)
 (define (map-streams f . s)
   (let lp ([s s])
@@ -152,7 +151,7 @@
   (stream-of-iterates (lambda (y) (g:* x y))
 		      unity))
 
-#; #; #; #; ;first 3 defined in racket/stream
+#; #; #; #; ;;bdk;; first 3 defined in racket/stream
 (define stream-for-each
   (access stream-for-each (->environment '(runtime stream))))
 
