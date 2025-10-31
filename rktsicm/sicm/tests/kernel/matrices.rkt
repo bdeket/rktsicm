@@ -1,7 +1,7 @@
 #lang s-exp "../../kernel/extapply.rkt"
 
 (require rackunit
-         (only-in "../../kernel.rkt" expression g:ref g:partial-derivative g:zero? g:one? g:arity g:+) ;; necessary to load generic operators
+         (only-in "../../kernel.rkt" expression g:ref g:partial-derivative g:zero? g:one? g:arity g:+ g:dimension) ;; necessary to load generic operators
          "../../kernel/matrices.rkt"
          (only-in "../../kernel/structs.rkt" up down s:ref)
          "../../kernel/types.rkt"
@@ -32,7 +32,8 @@
 
     (check-exn #px"Not a matrix -- SIZE" (λ () (matrix-size 'any)))
     (check-equal? (matrix-size (matrix-by-rows '(1 2 3) '(4 5 6))) 6)
-    (check-equal? (matrix-size (literal-matrix 'M 6 7)) 42))
+    (check-equal? (matrix-size (literal-matrix 'M 6 7)) 42)
+    (check-equal? (g:dimension 5) 1))
    (test-case
     "col/row-matrix"
     (check-true (column-matrix? (literal-matrix 'M 6 1)))
@@ -221,7 +222,9 @@
     "determinant"
     (check-equal? (expression (m:determinant (matrix-by-rows '(d)))) 'd)
     (check-equal? (expression (m:determinant (matrix-by-rows '(a b) '(c d))))
-                  '(- (* a d) (* b c))))
+                  '(- (* a d) (* b c)))
+    (check-equal? (expression (m:determinant (matrix-by-rows '(a b c 7) '(1 3 e f) '(0 0 2 0) '(5 6 g h))))
+                  '(- (+ -126 (* a (+ (* 6 h) (* -12 f)))) (* b (+ (* 2 h) (* -10 f))))))
    (test-case
     "solve"
     (check-equal? (expression (m:solve (matrix-by-rows '(a)) (matrix-by-rows '(b))))

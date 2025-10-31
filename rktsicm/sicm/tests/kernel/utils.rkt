@@ -144,9 +144,12 @@
    (test-case
     "concat"
     (check-equal? (concatenate-names) the-null-symbol)
+    (check-equal? (concatenate-names the-null-symbol the-null-symbol) the-null-symbol)
     (check-equal? (concatenate-names 'a) 'a)
     (check-equal? (concatenate-names 'a 'b) 'a.b)
-    (check-equal? (concatenate-names 'a 'b 'c) 'a.b.c))
+    (check-equal? (concatenate-names 'a 'b 'c) 'a.b.c)
+    (check-equal? (concatenate-names the-null-symbol 'a the-null-symbol) 'a)
+    (check-equal? ((concatenate-names-maker "+") 'a the-null-symbol 'b) 'a+b))
    ))
 
 (module+ test

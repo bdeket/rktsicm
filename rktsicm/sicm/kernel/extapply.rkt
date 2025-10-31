@@ -168,9 +168,11 @@
 
 ;;; Sometimes this saves the butt of a number jockey.
 
-(define (with-underflow->zero thunk)
-  (bind-condition-handler
-      (list condition-type:floating-point-underflow)
-      (lambda (condition)
-	(use-value 0.))
-    thunk))
+;;bdk;; at least in MIT-scheme underflow doesn't seem to trigger a condition and => 0. happens
+;;bdk;; by default (or I don't know how to trigger it)
+;;brm;;(define (with-underflow->zero thunk)
+;;brm;;  (bind-condition-handler
+;;brm;;      (list condition-type:floating-point-underflow)
+;;brm;;      (lambda (condition)
+;;brm;;	(use-value 0.))
+;;brm;;    thunk))

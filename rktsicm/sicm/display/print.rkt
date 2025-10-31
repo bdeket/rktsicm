@@ -198,6 +198,5 @@
 (define pec print-expression-comment)
 
 ;;bdk;;overwriting the fct's in kernel/todo/print-simplify
-(set-simplify! simplify);used in kernel/numbers
 (set-print-expression! print-expression);used in pseries
 (set-careful-simplify! careful-simplify);used in quaternions

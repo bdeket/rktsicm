@@ -23,6 +23,3 @@
 
 ;for pseries
 (mk print-expression "display/print")
-
-;for makenumber
-(mk simplify "display/print")

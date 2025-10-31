@@ -17,7 +17,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/numerics\signals.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/numerics\statistics.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in calculus/SR-frames
- 3 difference(s) found in calculus/coord
+ 2 difference(s) found in calculus/coord
  1 difference(s) found in calculus/dgutils
  2 difference(s) found in calculus/form-fields
  3 difference(s) found in calculus/indexed
@@ -26,7 +26,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in calculus/tensors
  1 difference(s) found in calculus/vector-fields
  5 difference(s) found in calculus/wedge
- 7 difference(s) found in display/exdisplay
+ 6 difference(s) found in display/exdisplay
  3 difference(s) found in display/print
  8 difference(s) found in display/suppress-args
  4 difference(s) found in general/eq-properties
@@ -35,12 +35,11 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  2 difference(s) found in general/list-utils
  3 difference(s) found in general/logic-utils
 13 difference(s) found in general/memoize
- 1 difference(s) found in general/permute
  1 difference(s) found in general/stack-queue
  7 difference(s) found in general/table
  3 difference(s) found in general/weak
  5 difference(s) found in kernel/diff
-13 difference(s) found in kernel/express
+12 difference(s) found in kernel/express
  3 difference(s) found in kernel/extapply
  7 difference(s) found in kernel/function
  3 difference(s) found in kernel/genenv
@@ -51,8 +50,8 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  7 difference(s) found in kernel/litfun
  3 difference(s) found in kernel/mathutil
  1 difference(s) found in kernel/matrices
- 2 difference(s) found in kernel/numbers
- 6 difference(s) found in kernel/numeric
+ 5 difference(s) found in kernel/numbers
+ 5 difference(s) found in kernel/numeric
 10 difference(s) found in kernel/numsymb
  1 difference(s) found in kernel/operator
  6 difference(s) found in kernel/pseries
@@ -88,11 +87,11 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  4 difference(s) found in poly/interp-generic
  1 difference(s) found in poly/polyinterp
  1 difference(s) found in poly/polyroot
- 2 difference(s) found in simplify/default
+ 1 difference(s) found in simplify/default
  2 difference(s) found in simplify/fpf
  3 difference(s) found in simplify/matcher
  1 difference(s) found in simplify/pcf-fpf
- 5 difference(s) found in simplify/pcf
+ 4 difference(s) found in simplify/pcf
  1 difference(s) found in simplify/rcf
  1 difference(s) found in simplify/rules
 14 difference(s) found in simplify/simplify

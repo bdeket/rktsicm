@@ -47,6 +47,7 @@
     "TABLE - get-with-check / getter"
     (define table (make-table 'test assq))
     (put! table 1 'A)
+    (check-equal? (get-with-check table 'A) 1)
     (check-exn #px"can't find value in table" (λ () (get-with-check table 'B)))
     (define TG (getter-with-check table))
     (check-equal? (TG 'A) 1)

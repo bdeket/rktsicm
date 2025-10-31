@@ -177,6 +177,7 @@
                         ((0) (* dx y (expt x (+ -1 y))))
                         ((1) (* (log x) (expt x y) dy))
                         ((0 1) (* (+ (/ (* dx (expt x y)) x) (* (log x) dx y (expt x (+ -1 y)))) dy))))
+    (check-equal? (expression (diff:expt 0 (MDT (() 2) ((1) dy)))) 0)
     (check-equal? (expression (diff:expt Y X))
                   (eMDT (() (expt y x))
                         ((0) (* (log y) (expt y x) dx))

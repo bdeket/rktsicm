@@ -42,6 +42,7 @@
       rkt-unparameterize
       rkt-ignore-ignore
       define-g-in-generic
+      skip-bdk-comment
       no-square-brackets
       trim-whitespace))
 
@@ -256,6 +257,11 @@
   (for/list ([l (in-list lines)])
     (cons (regexp-replace #px"^;;brm;;" (car l) "")
           (cdr l))))
+
+(define (skip-bdk-comment lines)
+  (for/list ([l (in-list lines)]
+             #:unless (regexp-match #px"^(#;)*\\s*;;bdk;;" (car l)))
+    l))
 
 (define (define-g-in-generic lines)
   (for/list ([l (in-list lines)])

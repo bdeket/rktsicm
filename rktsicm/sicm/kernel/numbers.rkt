@@ -17,7 +17,6 @@
          "cstm/matrices.rkt"
          "cstm/numsymb.rkt"
          "cstm/structs.rkt"
-         "todo/display-print.rkt"
          )
 (define-values (assign-operation numbers:assign-operations)
   (make-assign-operations 'numbers))
@@ -470,7 +469,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 	     (apply (eval `(lambda ,evars ,ex) symbolic-environment)
 		    (map (lambda (x) (random 10000)) evars))))))
     (if (and (not (condition? val)) (exact-zero? val))
-	(exact-zero? (simplify ex))
+	(exact-zero? (g:simplify x))
 	#f)))
 
 (define (an:one? x)
@@ -485,7 +484,8 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 
 (define (abn:= x y)
   (let ((xx (expression-of x)) (yy (expression-of y)))
-    (and (number? xx) (number? yy) (= xx yy))))
+    (or (and (number? xx) (number? yy) (= xx yy))
+        (equal? xx yy))))
 
 (define (abn:zero? x)
   (let ((xx (expression-of x)))
@@ -505,8 +505,8 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
   (cond ((structure? z)
 	 (s:forall known-real? z))
 	((matrix? z)
-	 (let ((m (m:num-rows z));z was matrix
-	       (n (m:num-cols z));z was matrix
+	 (let ((m (m:num-rows z));;bdk;; z was matrix
+	       (n (m:num-cols z));;bdk;; z was matrix
 	       (mat (matrix->array z)))
 	   (let rowlp ((i 0))
 	     (if (fix:= i m)
@@ -528,7 +528,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
                               (let ((diff
                                      (ignore-errors
                                       (lambda ()
-                                        (simplify (g:- w z))))))
+                                        (g:simplify (g:- w z))))))
                                 (and (not (condition? diff))
                                      (exact-zero? diff)))))))))
 
