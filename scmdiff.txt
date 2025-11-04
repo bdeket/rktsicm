@@ -46,6 +46,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
 13 difference(s) found in kernel/generic
 11 difference(s) found in kernel/ghelper-class
 20 difference(s) found in kernel/ghelper-pro
+ 3 difference(s) found in kernel/heuristic
  6 difference(s) found in kernel/iterat
  7 difference(s) found in kernel/litfun
  3 difference(s) found in kernel/mathutil

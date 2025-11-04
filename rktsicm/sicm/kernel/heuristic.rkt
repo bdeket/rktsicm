@@ -5,8 +5,8 @@
 (require (only-in "../rkt/glue.rkt" if rationalize->exact)
          "../rkt/define.rkt"
          "cstm/generic.rkt"
-         "numeric.rkt"
-         "numsymb.rkt")
+         (only-in "numbers.rkt" literal-number)
+         "numeric.rkt")
 
 ;;bdk;; start original file
 
@@ -63,23 +63,24 @@
 	      (if (and (not (= af 0))
 		       (< (denominator af) heuristic-rounding-denominator))
 		  (if symbolize?
-		      (symb:* af (cadar ideas)) ;symbolic version
-		      (* af (caar ideas)))
+		      (g:* af (cadar ideas)) ;symbolic version
+		      (g:* af (caar ideas)))
 		  (lp (cdr ideas))))))))
   
 (define *important-numbers*
-  `((1 1)
-    (,pi :pi)
-    (,(/ 1 pi) (/ 1 :pi))
-    (,(exp 1) (exp 1))
-    (,(exp -1) (exp -1))
-    (,(sqrt 2) (sqrt 2))
-    (,(sqrt 3) (sqrt 3))
-    (,(sqrt 5) (sqrt 5))
-    (,(sqrt 7) (sqrt 7))
-    (,:euler :euler)
-    (,:phi :phi)
-    ))
+  (map (λ (x) (list (car x) (if (number? (cadr x)) (cadr x) (literal-number (cadr x)))))
+       `((1 1)
+         (,pi :pi)
+         (,(/ 1 pi) (/ 1 :pi))
+         (,(exp 1) (exp 1))
+         (,(exp -1) (exp -1))
+         (,(sqrt 2) (sqrt 2))
+         (,(sqrt 3) (sqrt 3))
+         (,(sqrt 5) (sqrt 5))
+         (,(sqrt 7) (sqrt 7))
+         (,:euler :euler)
+         (,:phi :phi)
+    )))
 
 (define (heuristic-canonicalize-complex z #:optional symbolize? zero-threshold)
   (if (default-object? symbolize?) (set! symbolize? heuristic-symbolize?))

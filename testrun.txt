@@ -56,6 +56,7 @@
    5                     0.0 ./rktsicm/sicm\tests\kernel\extapply.rkt
    6                     0.0 ./rktsicm/sicm\tests\kernel\function.rkt
    5                     0.0 ./rktsicm/sicm\tests\kernel\ghelper.rkt
+   4                     0.0 ./rktsicm/sicm\tests\kernel\heuristic.rkt
   12                  2  0.0 ./rktsicm/sicm\tests\kernel\iterat.rkt
    3                     0.0 ./rktsicm/sicm\tests\kernel\litfun.rkt
    5                  1  0.0 ./rktsicm/sicm\tests\kernel\mathutil.rkt
@@ -131,7 +132,7 @@
    4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1050             2   41 14.0 TOTAL
-runtime: 3.6166666666666667m 
+1054             2   41 14.0 TOTAL
+runtime: 3.5833333333333335m 
 Welcome to Racket v9.0.0.1-2025-10-24-3642bed91b [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 

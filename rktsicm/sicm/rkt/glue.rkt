@@ -63,7 +63,7 @@
 (define (for-each-vector-element v f) (vector-map f v))
 (define 1+ add1)
 (define unspecific (void))
-(define rationalize->exact rationalize)
+(define (rationalize->exact x t) (rationalize (inexact->exact x) (inexact->exact t)))
 (define (floor->exact x) (inexact->exact (floor x)))
 (define (round->exact x) (inexact->exact (round x)))
 (define (myrandom i) (if (flonum? i) (* i (random)) (random i)))
