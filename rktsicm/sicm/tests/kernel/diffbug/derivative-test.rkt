@@ -30,7 +30,17 @@
                          1e-10)))
    (check-simplified? ((literal-function 'f) 'x) '(f x))
    (check-simplified? ((D (literal-function 'f)) 'x) '((D f) x))
+   (check-simplified? ((D (literal-function 'g (-> (X Real Real) Real))) 'x 'y)
+                      '(down (((partial 0) g) x y) (((partial 1) g) x y)))
+   (check-simplified? ((D (literal-function 'g (-> (UP Real Real) (UP Real Real)))) (up 'x 'y))
+                      '(down
+                        (up (((partial 0) g^0) (up x y)) (((partial 0) g^1) (up x y)))
+                        (up (((partial 1) g^0) (up x y)) (((partial 1) g^1) (up x y)))))
    (check-simplified? ((D (D (literal-function 'f))) 'x) '(((expt D 2) f) x))
+   (check-simplified? ((D (D (literal-function 'g (-> (X Real Real) Real)))) 'x 'y)
+                      '(down
+                        (down (((expt (partial 0) 2) g) x y)        (((* (partial 0) (partial 1)) g) x y))
+                        (down (((* (partial 0) (partial 1)) g) x y) (((expt (partial 1) 2) g) x y))))
    (check-simplified? ((D (compose (literal-function 'f)
                                    (literal-function 'g)))
                        'x)
@@ -399,6 +409,11 @@
                           (wrapped-d-hat (wrap cube)))
                          (box 4)))
                        24))
+   (test-case
+    "applicable-literal"
+    (check-exn #px"Application of a number not allowed in" (λ () ('f 't)))
+    (parameterize ([*enable-literal-apply* #t])
+      (check-simplified? ('f 't) '(f t))))
    
    ))
 

@@ -118,8 +118,8 @@
 	 (let lp ((args rest) (curtype #f) (explicit #f) (types '()))
 	   (cond ((null? args)
 		  (if explicit (apply unstarred-proc types) (cons starred types)))
-		 ((exact-positive-integer? (car args))
-		  (if curtype
+		 ((number? (car args))
+		  (if (and (exact-positive-integer? (car args)) curtype)
 		      (lp (cdr args)
 			  #f
 			  #t
@@ -148,9 +148,10 @@
 (define Any 'Any)
 
 (define (default-function-type n #:optional type)
+  (if (default-object? type) (set! type Real))
   (if (= n 1)
-      '(-> Real Real)
-      (-> (X* Real n) Real)))
+      `(-> ,type ,type)
+      (-> (X* type n) type)))
 
 (define (permissive-function-type n)
   (-> (X* Any n) Real))
@@ -379,7 +380,7 @@
   (let ((arity (g:arity function)))
     (assert (exactly-n? arity)
 	    "I cannot handle this arity -- TYPED-FUNCTION")
-    (assert (fix:= (length domain-types) (car arity))
+    (assert (fix:= (length domain-types) (arity-min arity))
 	    "Inconsistent arity -- TYPED-FUNCTION")
     (make-apply-hook function
                      (list '*function* domain-types range-type #f))
