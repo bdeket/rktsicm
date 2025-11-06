@@ -38,6 +38,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in general/stack-queue
  7 difference(s) found in general/table
  3 difference(s) found in general/weak
+ 1 difference(s) found in kernel/deriv
  5 difference(s) found in kernel/diff
 12 difference(s) found in kernel/express
  3 difference(s) found in kernel/extapply

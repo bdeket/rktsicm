@@ -113,7 +113,8 @@
                                (set! i (+ i 1))
                                (printf "trace_~a > ~a\n" j (list* f args))
                                (define ans (apply f args))
-                               (printf "trace_~a < ~a\n" j ans))))))
+                               (printf "trace_~a < ~a\n" j ans)
+                               ans)))))
 
 ;;bdk;; insert 1 end
 

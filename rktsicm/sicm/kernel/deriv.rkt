@@ -164,8 +164,9 @@
 		  (list->up-structure (list x y))))))
 	  (else
 	   (lambda args
-	     (cond ((null? args)
-		    (error "No args passed to derivative?")
+	     (cond ((not (arity-includes? a (length args)))
+                    (error "Wrong number of args passed to derivative with arity" a))
+                   ((null? args)
 		    0)
 		   ((null? (cdr args))	; one argument
 		    ((d f) (car args)))
