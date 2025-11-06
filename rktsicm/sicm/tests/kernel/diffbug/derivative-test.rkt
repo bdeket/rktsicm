@@ -2,7 +2,7 @@
 
 (require rackunit
          "../../../main.rkt"
-         "../../helper.rkt")
+         "../../helper+scm.rkt")
 
 (rename-part 'derivative 'D)
 

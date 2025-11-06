@@ -2,7 +2,7 @@
 
 (require rackunit
          "../../../numerics/ode/interface.rkt"
-         "../../helper.rkt"
+         "../../helper+scm.rkt"
          )
 
 

@@ -119,7 +119,7 @@
     ;; operator?
     (check-equal? (expression (o:+ o:identity o:identity)) '(+ identity identity))
     ;; procedure?
-    (check-equal? (expression +) 'n:+) ;; + from racket/base
+    (check-equal? (expression +) '+) ;; + from racket/base
     ;; undefined-value
     (check-equal? (expression undefined-value) '*undefined-value*)
     ;; bool
@@ -132,7 +132,7 @@
     (local-require "../../rkt/environment.rkt"
                    "../../general/eq-properties.rkt"
                    racket/flonum)
-    (check-equal? (procedure-expression +) 'n:+)
+    (check-equal? (procedure-expression +) '+)
     (check-equal? (procedure-expression +) (object-name + generic-environment))
     (check-equal? (object-name + rule-environment) '+)
     (check-equal? (procedure-name +) '+)

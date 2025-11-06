@@ -5,7 +5,7 @@
          "../../kernel/types.rkt"
          "../../kernel/matrices.rkt"
          "../../kernel/express.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (provide the-tests)

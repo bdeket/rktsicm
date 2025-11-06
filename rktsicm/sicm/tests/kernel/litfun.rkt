@@ -3,13 +3,14 @@
 (require rackunit
          "../../kernel/litfun.rkt"
          "../../kernel/cstm/arity.rkt"
+         "../../kernel/function.rkt"
          (only-in "../../kernel/structs.rkt" up down)
          (only-in "../../kernel/express.rkt" expression)
          "../../kernel/types.rkt"
          "../helper.rkt"
          )
-(rename-part 'derivative 'D)
 
+(function:assign-operations)
 (provide the-tests)
 (define the-tests
   (test-suite

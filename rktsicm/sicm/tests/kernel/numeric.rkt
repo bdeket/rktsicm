@@ -4,7 +4,7 @@
          "../../kernel-intr.rkt"
          "../../kernel/numeric.rkt"
          "../../rkt/fixnum.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (provide the-tests)

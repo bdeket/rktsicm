@@ -3,7 +3,7 @@
 (require rackunit
          "../../main.rkt"
          "../../calculus/SR-frames.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (define :c (*c*))

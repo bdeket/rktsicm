@@ -3,7 +3,7 @@
 (require rackunit
          "../../../numerics/linear/eigen.rkt"
          "../../../numerics/linear/lu.rkt"
-         "../../helper.rkt"
+         "../../helper+scm.rkt"
          )
 
 

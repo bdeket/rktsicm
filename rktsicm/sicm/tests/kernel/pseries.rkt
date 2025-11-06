@@ -3,7 +3,7 @@
 (require rackunit
          racket/stream
          "../../kernel-intr.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (define ((s->l n) S) (stream->list (stream-take (series->stream S) n)))

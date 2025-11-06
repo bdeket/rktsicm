@@ -3,7 +3,7 @@
 (require rackunit
          "../../kernel/mathutil.rkt"
          "../../kernel/express.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (provide the-tests)

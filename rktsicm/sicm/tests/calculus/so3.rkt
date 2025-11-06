@@ -3,7 +3,7 @@
 (require rackunit
          "../../main.rkt"
          "../../calculus/so3.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (rename-part 'derivative 'D)

@@ -3,7 +3,7 @@
 (require rackunit
          (rename-in (only-in racket/base time) [time rkt:time])
          "../../main.rkt"
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (provide the-tests)

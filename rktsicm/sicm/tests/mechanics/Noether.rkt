@@ -1,7 +1,7 @@
 #lang s-exp "../../main.rkt"
 
 (require rackunit
-         "../helper.rkt")
+         "../helper+scm.rkt")
 
 (rename-part 'derivative 'D)
 

@@ -6,7 +6,7 @@
          (only-in "../../kernel/cstm/arity.rkt" *at-least-zero*)
          (only-in "../../kernel/cstm/express.rkt" expression-of)
          (only-in "../../kernel/generic.rkt" g:zero? g:solve-linear g:solve-linear-left)
-         "../helper.rkt"
+         "../helper+scm.rkt"
          )
 
 (provide the-tests)
