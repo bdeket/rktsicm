@@ -6,7 +6,7 @@
          "../../../kernel-intr.rkt"
          racket/list
          )
-(kernel:assign-operations)
+(kernel:assign-operations #t)
 
 (define pi (angle -1))
 (define 2pi (* 2 pi))

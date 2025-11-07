@@ -62,6 +62,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  8 difference(s) found in kernel/strutl
  3 difference(s) found in kernel/types
  7 difference(s) found in kernel/utils
+ 1 difference(s) found in kernel/vectors
  1 difference(s) found in mechanics/Hamiltonian
  1 difference(s) found in mechanics/Noether
  1 difference(s) found in mechanics/qualitative

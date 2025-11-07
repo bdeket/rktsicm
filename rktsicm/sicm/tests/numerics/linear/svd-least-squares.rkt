@@ -6,7 +6,7 @@
          "../../../kernel-intr.rkt"
          (only-in "../../../numerics/statistics/gauss.rkt" gaussian-random)
          )
-(kernel:assign-operations)
+(kernel:assign-operations #t)
 
 (provide the-tests)
 (define the-tests

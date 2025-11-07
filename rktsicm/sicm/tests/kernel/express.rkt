@@ -46,6 +46,7 @@
     "literals"
     (check-equal? (expression (make-numerical-literal 'f)) 'f)
     (check-equal? (expression (make-real-literal 'f)) 'f)
+    (check-true (literal-real? (make-real-literal 'f)))
     (check-equal? (get-property (make-real-literal 'f) 'real) #t)
     (check-equal? (expression (make-combination number-type-tag 'sin '(3))) '(sin 3))
     (check-equal? (expression-of (make-numerical-literal 'f)) 'f)

@@ -14,8 +14,8 @@
 ;;bdk;; insert 1 end
 
 ;;bdk;; insert 2
-(define-integrable v:generate make-initialized-vector)
-(define-integrable vector:generate make-initialized-vector)
+(define-integrable (v:generate n proc) (make-initialized-vector n (if (procedure? proc) proc (λ (i) (g:apply proc (list i))))))
+(define-integrable vector:generate v:generate)
 (define-integrable v:dimension vector-length)
 ;;bdk;; insert 2 end
 

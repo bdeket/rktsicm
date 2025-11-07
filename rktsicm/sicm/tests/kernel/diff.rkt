@@ -29,6 +29,8 @@
                                                 (make-differential-term '(1 0) 2)
                                                 (make-differential-term '(0 1) 3))))
     (check-true (differential? d))
+    (check-false (not-differential? d))
+    (check-true (not-differential? 'any))
     (define t0 (car (differential-term-list d)))
     (check-equal? (differential-tags t0) '(0 0))
     (check-equal? (differential-coefficient t0) 1)
@@ -39,6 +41,11 @@
     (check-equal? (differential->terms (MDT ((0) 0))) '())
     (check-equal? (differential->terms 2) '((() 2)))
     (check-equal? (terms->differential '((() 2))) 2))
+   (test-case
+    "structure differentials"
+    (check-true (down-quantity? (make-differential-quantity (list (make-differential-term '(0) (down 1))))))
+    (check-true (up-quantity? (make-differential-quantity (list (make-differential-term '(0) (up 1))))))
+    (check-true (matrix-quantity? (make-differential-quantity (list (make-differential-term '(0) (matrix-by-rows '(1))))))))
    ;; ==== main ====
    (test-case
     "diff-colapse"

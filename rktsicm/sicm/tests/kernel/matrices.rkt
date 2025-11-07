@@ -33,7 +33,8 @@
     (check-exn #px"Not a matrix -- SIZE" (λ () (matrix-size 'any)))
     (check-equal? (matrix-size (matrix-by-rows '(1 2 3) '(4 5 6))) 6)
     (check-equal? (matrix-size (literal-matrix 'M 6 7)) 42)
-    (check-equal? (g:dimension 5) 1))
+    (check-equal? (g:dimension 5) 1)
+    (check-true (matrix-quantity? (matrix-by-rows '(1)))))
    (test-case
     "col/row-matrix"
     (check-true (column-matrix? (literal-matrix 'M 6 1)))
@@ -283,6 +284,7 @@
     "make-abstract"
     (check-false (matrix? (abstract-matrix 'M)))
     (check-true  (abstract-matrix? (abstract-matrix 'M)))
+    (check-true  (matrix-quantity? (abstract-matrix 'M)))
     (check-equal? (expression (abstract-matrix 'M)) 'M)
     (check-equal? (am:arity (abstract-matrix 'M)) (arity-at-least 0))
     (check-false (g:zero? (abstract-matrix 'M)))

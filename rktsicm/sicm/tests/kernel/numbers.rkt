@@ -5,8 +5,6 @@
          "../../kernel/types.rkt"
          "../../kernel/cstm/arity.rkt"
          (only-in "../../kernel/generic.rkt" g:apply g:+ g:- g:*) ;; side-effect: numbers:assign-operations
-         (only-in "../../kernel/numsymb.rkt") ;; side-effect: install symbolic operators
-         ;(only-in "../../display/print.rkt") ;; side-effect: install simplify
          (only-in "../../kernel/express.rkt" expression)
          "../helper.rkt"
          )
@@ -58,6 +56,13 @@
     (check-equal? (expression ((make-numerical-combination '+) 3 4)) 7)
     (check-equal? (expression ((make-numerical-combination '+) 3 (literal-number 'b) 4)) '(+ 7 b))
     (check-equal? (expression ((make-numerical-combination '+ #t) 'a (literal-number 'b))) '(+ b a)))
+   (test-case
+    "literal/numerical-quantity?"
+    (check-true (numerical-quantity? 1))
+    (check-true (numerical-quantity? 'a))
+    (check-false (numerical-quantity? #()))
+    (add-to-numerical-quantity? (λ (x) (and (vector? x) (= (vector-length x) 0))))
+    (check-true (numerical-quantity? #())))
    (test-case
     "0/1 for literal-numbers"
     (check-equal? (an:zero-like (literal-number 'f)) 0)

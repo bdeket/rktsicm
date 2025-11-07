@@ -27,7 +27,9 @@
    (test-case
     "renamed constructors"
     (check-equal? (v:generate 4 (λ (i) i)) (vector 0 1 2 3))
-    (check-equal? (vector:generate 4 (λ (i) i)) (vector 0 1 2 3)))
+    (check-equal? (vector:generate 4 (λ (i) i)) (vector 0 1 2 3))
+    (check-equal? (v:generate 2 (vector (λ (i) i) (λ (i) (+ 2 i))))
+                  #(#(0 2) #(1 3))))
    (test-case
     "cross-product"
     (check-exn #px"Cross product of non-3-dimensional vectors\\?" (λ () (v:cross-product #(0 1 2) #())))

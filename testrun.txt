@@ -22,7 +22,7 @@
    7                     0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
    8                     0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
                          0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
-  18                  2  0.5 ./rktsicm/sicm\tests\calculus\so3.rkt
+  18                  2  1.0 ./rktsicm/sicm\tests\calculus\so3.rkt
    3                     0.5 ./rktsicm/sicm\tests\calculus\tensors.rkt
    2                     0.5 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
    3                     0.5 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
@@ -51,7 +51,7 @@
    8                     0.0 ./rktsicm/sicm\tests\kernel\cstm\arity.rkt
    5                     0.0 ./rktsicm/sicm\tests\kernel\cstm\make-plain-procedure.rkt
    4                  1  0.0 ./rktsicm/sicm\tests\kernel\deriv.rkt
-  17                     0.0 ./rktsicm/sicm\tests\kernel\diff.rkt
+  18                     0.0 ./rktsicm/sicm\tests\kernel\diff.rkt
   37                     0.0 ./rktsicm/sicm\tests\kernel\diffbug\derivative-test.rkt
   12                     0.0 ./rktsicm/sicm\tests\kernel\express.rkt
    5                     0.0 ./rktsicm/sicm\tests\kernel\extapply.rkt
@@ -65,7 +65,7 @@
    5                  1  0.0 ./rktsicm/sicm\tests\kernel\mathutil.rkt
   30                  1  0.0 ./rktsicm/sicm\tests\kernel\matrices.rkt
   10                  1  0.0 ./rktsicm/sicm\tests\kernel\modarith.rkt
-   9                     0.0 ./rktsicm/sicm\tests\kernel\numbers.rkt
+  10                     0.0 ./rktsicm/sicm\tests\kernel\numbers.rkt
   17             1    1  0.0 ./rktsicm/sicm\tests\kernel\numeric.rkt
   22                  1  0.0 ./rktsicm/sicm\tests\kernel\numsymb.rkt
    9                  1  0.0 ./rktsicm/sicm\tests\kernel\operator.rkt
@@ -74,6 +74,7 @@
   28                     0.0 ./rktsicm/sicm\tests\kernel\structs-extra.rkt
   41                  3  0.0 ./rktsicm/sicm\tests\kernel\structs.rkt
   14                  2  0.0 ./rktsicm/sicm\tests\kernel\strutl.rkt
+   2                  1  0.0 ./rktsicm/sicm\tests\kernel\types.rkt
   15                     0.0 ./rktsicm/sicm\tests\kernel\utils.rkt
   23                  1  0.0 ./rktsicm/sicm\tests\kernel\vectors.rkt
   14                     0.0 ./rktsicm/sicm\tests\mechanics\Hamiltonian.rkt
@@ -135,7 +136,7 @@
    4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1102             2   46 15.0 TOTAL
-runtime: 3.6333333333333333m 
+1106             2   47 17.5 TOTAL
+runtime: 4.233333333333333m 
 Welcome to Racket v9.0.0.1-2025-10-24-3642bed91b [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 
