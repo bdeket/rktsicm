@@ -1,8 +1,7 @@
 #lang s-exp "../generic.rkt"
 
 (provide (except-out (all-defined-out) assign-operation)
-         (all-from-out "manifold/manifold-point.rkt"
-                       "manifold/helper.rkt"))
+         (all-from-out "manifold/manifold-point.rkt"))
 
 (require (only-in "../rkt/glue.rkt" if symbol warn find generate-uninterned-symbol write-line every make-initialized-list list-head
                   fix:= fix:< fix:>= fix:+)
@@ -202,7 +201,7 @@
             ((->point) (transform-delivery 'coords->point))
             ((->coords) (transform-delivery 'point->coords))
             ((check-point) (transform-delivery 'check-point))
-            ((check-coords) (transform-delivery 'check-coords))
+            ((check-coords) (transform-delivery 'check-coordinates))
             ((typical-coords)
              (typical-object coordinate-prototype))
             ((coordinate-prototype) coordinate-prototype)
@@ -296,20 +295,21 @@
                       (the-coordinate-system
                        'coordinate-basis-1form-field-specs)))
             (else
-             (cond ((symbol? m) (manifold m))		;pass the buck.
-                   ((c:lookup m
-                              (the-coordinate-system
-                               'coordinate-function-specs))
-                    => cadr)
-                   ((c:lookup m
-                              (the-coordinate-system
-                               'coordinate-basis-vector-field-specs))
-                    => cadr)
-                   ((c:lookup m
-                              (the-coordinate-system
-                               'coordinate-basis-1form-field-specs))
-                    => cadr)
-                   (else (error "bad message" m))))))
+             (if (symbol? m)
+                 (cond ((c:lookup m
+                                  (the-coordinate-system
+                                   'coordinate-function-specs))
+                        => cadr)
+                       ((c:lookup m
+                                  (the-coordinate-system
+                                   'coordinate-basis-vector-field-specs))
+                        => cadr)
+                       ((c:lookup m
+                                  (the-coordinate-system
+                                   'coordinate-basis-1form-field-specs))
+                        => cadr)
+                       (else (manifold m)))		;pass the buck.
+                 (error "bad message" m)))))
         the-coordinate-system)))
   ((((manifold-type 'patch-setup) patch-name)
     'new-coordinate-system)
@@ -467,7 +467,7 @@
                                 ((point->coords)
                                  (lambda (point)
                                    (if (not ((me 'check-point) point))
-                                       (error "Bad point: polar/cylindrial" point me))
+                                       (error "Bad point: polar/cylindrical" point me))
                                    (get-coordinates point me
                                                     (lambda ()
                                                       (let ((prep (manifold-point-representation point)))
@@ -484,7 +484,7 @@
                                                                               (cond ((= i 0) (sqrt rsq))
                                                                                     ((= i 1) (atan y x))
                                                                                     (else (ref prep i)))))))
-                                                            (error "Bad point: polar/cylindrial"
+                                                            (error "Bad point: polar/cylindrical"
                                                                    point me)))))))
                                 ((manifold) manifold)
                                 (else
@@ -525,7 +525,7 @@
                                 ((point->coords)
                                  (lambda (point)
                                    (if (not ((me 'check-point) point))
-                                       (error "Bad point: spherical/cylindrial" point me))
+                                       (error "Bad point: spherical/cylindrical" point me))
                                    (get-coordinates point me
                                                     (lambda ()
                                                       (let ((prep (manifold-point-representation point)))
@@ -546,7 +546,7 @@
                                                                                     ((= i 1) (acos (/ z r)))
                                                                                     ((= i 2) (atan y x))
                                                                                     (else (ref prep i)))))))
-                                                            (error "Bad point: spherical/cylindrial"
+                                                            (error "Bad point: spherical/cylindrical"
                                                                    point me)))))))
                                 ((manifold) manifold)
                                 (else
@@ -1432,7 +1432,7 @@
                 (fix:= (s:dimension coords) 3)
                 (or (not (number? (ref coords 0)))
                     (and (not (<= (ref coords 0) (- pi/2)))
-                         (not (>= (ref coords pi/2))))))))
+                         (not (>= (ref coords 0) pi/2)))))))
         ((coords->point)
          (lambda (coords)
            (if (not ((me 'check-coordinates) coords))

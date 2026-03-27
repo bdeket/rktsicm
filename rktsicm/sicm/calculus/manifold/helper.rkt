@@ -18,5 +18,9 @@
              (if (up? struct)
                  (up->vector struct)
                  (down->vector struct))))
-      struct))
+      ;;bdk;; only used in manifold/coord-sys% and gave, imo, incorrect results for 1D manifolds
+      (and (list? struct)
+           (not (null? struct))
+           (equal? (car struct) m)
+           struct)))
 ;;bdk;; insert 1 end

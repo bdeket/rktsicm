@@ -1,293 +1,354 @@
-#lang racket/base
+#lang s-exp "../../generic.rkt"
 
 (require rackunit
-         "../../main.rkt"
+         "../../calculus/manifold.rkt"
+         "../../calculus/manifold/helper.rkt"
+         (only-in "../../calculus/basis.rkt" coordinate-basis?)
+         (only-in racket/list last)
          "../helper+scm.rkt"
          )
+
+(manifold:assign-operations)
+
+(define (check-method obj msg art)
+  (check-true (procedure? (obj msg)))
+  (check-equal? (arity (obj msg)) art))
+(define (check-minManifold M n d t [ptchs '()])
+  (check-equal? (M 'name) n)
+  (check-equal? (M 'manifold) M)
+  (check-subManifold M d t ptchs))
+(define (check-subManifold M d t ptchs)
+  (check-equal? (M 'type) t)
+  (check-equal? (M 'dimension) (car d))
+  (check-equal? (M 'embedding-dimension) (last d))
+  (check-equal? (M 'distinguished-points) '()) ;; no points installed
+  (check-method M 'add-distinguished-point! *exactly-two*)
+      
+  (check-equal? (M 'patch-names) ptchs) ;; no patches installed
+  (check-method M 'get-patch *exactly-one*)
+  (check-exn #px"Unknown patch" (λ () ((M 'get-patch) (gensym))))
+      
+  (check-exn #px"Unknown message: manifold generator" (λ () (M (gensym)))))
+(define (check-patch P M n d t)
+        (check-equal? (M 'patch-names) (list n))
+        (check-exn #px"Unknown patch " (λ () (patch (gensym) M)))
+        (skip #;TODO? (check-equal? (patch n M) P))
+        (check-equal? (P 'name) n)
+        (check-equal? (P 'patch) P)
+
+        (check-equal? (P 'coordinate-system-names) '()) ;; no coordinate systems installed
+        (check-method P 'get-coordinate-system *exactly-one*)
+        (check-exn #px"Unknown coordinate-system" (λ () ((P 'get-coordinate-system) (gensym))))
+
+        ;; it sends back unknown messages to the manifold so it 'acts' as a manifold
+        ;; except for the messages shadowed above
+        (check-subManifold P d t '(origin))
+        (check-equal? (P 'manifold) M))
 
 (provide the-tests)
 (define the-tests
   (test-suite
    "calculus/manifold"
+   ;; HELPER
    (test-case
-    "R2-rect"
-    (define m ((R2-rect '->point) (up 3 4)))
-    (check-simplified? ((R2-polar '->coords) m)
-                       #(5 .9272952180016122))
-    (define-coordinates (up x y) R2-rect)
-    (define-coordinates (up r theta) R2-polar)
-    (define mr ((R2-rect '->point) (up 'x0 'y0)))
-    (define mp ((R2-polar '->point) (up 'r0 'theta0)))
-    (define circular (- (* x d/dy) (* y d/dx)))
+    "c:generate"
+    (define (F x) (* 2 (+ 2 x)))
+    (check-equal? (c:generate 1 'up F) 4)
+    (check-equal? (c:generate 2 'up F) (up 4 6))
+    (check-equal? (c:generate 1 'up (down (λ (x) x) F)) (down 0 4))
+    (check-equal? (c:generate 2 'up (down (λ (x) x) F)) (up (down 0 4) (down 1 6)))
+    (check-equal? (c:generate 1 'down F) 4)
+    (check-equal? (c:generate 3 'down F) (down 4 6 8))
+    ;; todo : is this reasonable?
+    (check-equal? (c:generate 0 'up F) (up))
+    (check-equal? (c:generate 0 'down F) (down)))
+   (test-case
+    "c:lookup"
+    (check-equal? (c:lookup 1 'any) #f)
+    (check-equal? (c:lookup 1 '(2 2)) #f)
+    (check-equal? (c:lookup 1 '(1 2)) '(1 2))
+    (check-equal? (c:lookup 1 (up '(1 2) '(3 4) '(4 5))) '(1 2))
+    (check-equal? (c:lookup 3 (down '(1 2) '(3 4) '(4 5))) '(3 4))
+    (check-equal? (c:lookup 2 (down '(1 2) '(3 4) '(4 5))) #f))
+   ;; MAIN
+   ;;; SPACE
+   (test-case
+    "specify-manifold"
+    (define RTEST (specify-manifold 'rtest^n))
+    (define CTEST (specify-manifold 'ctest Complex))
+    (for ([MM (in-list (list RTEST CTEST))]
+          [d  (in-list '(    (2)   (2 3)))]
+          [n  (in-list '(rtest^2-1 ctest-1))]
+          [t  (in-list (list Real  Complex))])
+      ;; manifold generator functions
+      (check-method MM 'new-patch *exactly-three*)
+      (check-method MM 'patch-setup *exactly-one*)
+      (check-exn #px"Unknown patch" (λ () ((MM 'patch-setup) (gensym)))) ;; no patch installed
+      (check-method MM 'generator *one-or-two*)
+      (check-exn #px"Unknown message: manifold setup" (λ () (MM (gensym))))
+      ;; generated manifold functions
+      (define M (apply (MM 'generator) d))
+      (check-minManifold M n d t))
+    (check-exn #px"assertion failed: \\(and \\(exact-integer\\? embedding-dimension\\) \\(fix:>= embedding-dimension dimension\\)\\)"
+               (λ () ((RTEST 'generator) 2 1)))
+    (check-exn #px"assertion failed: \\(and \\(exact-integer\\? embedding-dimension\\) \\(fix:>= embedding-dimension dimension\\)\\)"
+               (λ () ((RTEST 'generator) 2 3.2))))
+   ;;; - PATCH
+   (test-case
+    "manifold-patch"
+    (define RTEST (specify-manifold 'rtest))
+    (define CTEST (specify-manifold 'ctest Complex))
+    (attach-patch 'origin RTEST)
+    (attach-patch 'origin CTEST)
+    (for ([MM (in-list (list RTEST CTEST))]
+          [d  (in-list '(    (2)   (2 3)))]
+          [t  (in-list (list Real  Complex))])
+      ;; patch setup
+      (define S ((MM 'patch-setup) 'origin))
+      (check-method S 'new-coordinate-system *exactly-two*)
+      (check-method S 'generator *exactly-one*)
+      (check-exn #px"Unknown message patch-setup" (λ () (S (gensym))))
 
-    (check-simplified? ((circular (+ (* 2 x) (* 3 y))) mr)
-                       '(+ (* 3 x0) (* -2 y0)))
-    (check-simplified? ((circular theta) mr) 1)
-    (check-simplified? ((dr circular) mr) 0)
-    (check-simplified? (((d r) d/dr) mr) 1)
-    (check-simplified? ((dr d/dr) mr) 1)
-    (check-simplified? ((dr (literal-vector-field 'v R2-polar)) mr)
-                       '(v^0 (up (sqrt (+ (expt x0 2) (expt y0 2))) (atan y0 x0))))
-    (check-simplified? (((d r) (literal-vector-field 'v R2-polar)) mr)
-                       '(v^0 (up (sqrt (+ (expt x0 2) (expt y0 2))) (atan y0 x0))))
-    (check-simplified? ((dr (literal-vector-field 'v R2-rect)) mr)
-                       '(+ (/ (* x0 (v^0 (up x0 y0))) (sqrt (+ (expt x0 2) (expt y0 2))))
-                           (/ (* y0 (v^1 (up x0 y0))) (sqrt (+ (expt x0 2) (expt y0 2))))))
-    (check-simplified? (((d r) (literal-vector-field 'v R2-rect)) mr)
-                       '(+ (/ (* x0 (v^0 (up x0 y0))) (sqrt (+ (expt x0 2) (expt y0 2))))
-                           (/ (* y0 (v^1 (up x0 y0))) (sqrt (+ (expt x0 2) (expt y0 2))))))
-    ;;; Consider the two following metrics on the space
-    (define (g-polar u v)
-      (+ (* (dr u) (dr v))
-         (* (* r (dtheta u)) (* r (dtheta v)))))
-    (define (g-rect u v)
-      (+ (* (dx u) (dx v))
-         (* (dy u) (dy v))))
-    (check-simplified? (((- g-polar g-rect)
-                         (literal-vector-field 'v R2-rect)
-                         (literal-vector-field 'v R2-rect))
-                        mr)
-                       0)
-    (check-simplified? (((- g-polar g-rect)
-                         (literal-vector-field 'v R2-polar)
-                         (literal-vector-field 'v R2-polar))
-                        mr)
-                       0)
-    (check-simplified? (((- g-polar g-rect)
-                         (literal-vector-field 'v R2-polar)
-                         (literal-vector-field 'v R2-polar))
-                        mp)
-                       0)
-    (check-simplified? (((- g-polar g-rect)
-                         (literal-vector-field 'v R2-rect)
-                         (literal-vector-field 'v R2-rect))
-                        mp)
-                       0)
+      ;; patch generator
+      (define M (apply (MM 'generator) d))
+      ;; get patch via manifold
+      (check-patch ((M 'get-patch) 'origin) M 'origin d t)
+      ;; get patch via generator
+      (check-patch ((S 'generator) M) M 'origin d t)
+      ))
+   ;;; COORDINATE SYSTEM
+   (test-case
+    "coordinates"
+    (define (fake-coord-sys mani)
+      (define g (gensym))
+      (λ (msg) (λ rst (cons g msg))))
+    (define RTEST (specify-manifold 'rtest))
+    (define CTEST (specify-manifold 'ctest Complex))
+    (attach-patch 'origin RTEST)
+    (attach-patch 'origin CTEST)
+    (attach-coordinate-system 'CO_1 'origin RTEST fake-coord-sys)
+    (attach-coordinate-system 'CO_1 'origin CTEST fake-coord-sys (up 'x0 'x1 'x2))
+    (for ([MM (in-list (list RTEST CTEST))]
+          [d  (in-list '(    (2)   (3 5)))]
+          [t  (in-list (list Real  Complex))])
+      (define M (apply (MM 'generator) d))
+      (define P (patch 'origin M))
+      (define C (coordinate-system-at 'CO_1 'origin M))
+      (check-equal? (C 'name) 'CO_1)
+      (check-equal? ((C 'patch) 'name) 'origin)
+      (skip #;TODO? (check-equal? (C 'patch) (P 'patch)))
+      (define fake (car ((C '->point))))
+      (check-equal? ((C '->point)) (cons fake 'coords->point))
+      (check-equal? ((C '->coords)) (cons fake 'point->coords))
+      (check-equal? ((C 'check-point)) (cons fake 'check-point))
+      (check-equal? ((C 'check-coords)) (cons fake 'check-coordinates))
+      
+      (check-equal? (g:size (C 'typical-coords)) (car d))
+      (check-equal? (C 'coordinate-prototype) (s:generate (car d) 'up (λ (i) (string->symbol (format "x~a" i)))))
+      (check-method C 'set-coordinate-prototype! *exactly-one*)
+      (check-equal? (C 'access-chains) (s:generate (car d) 'up list))
+      (check-equal? (C 'dual-chains) (s:generate (car d) 'down list))
+      (let ([cc (C 'coordinate-function-specs)])
+        (check-true (up? cc))
+        (check-equal? (car (g:ref cc (- (car d) 1))) (string->symbol (format "x~a" (- (car d) 1))))
+        (check-true (procedure? (cadr (g:ref cc (- (car d) 1))))))
+      (let ([cc (C 'coordinate-basis-vector-field-specs)])
+        (check-true (down? cc))
+        (check-equal? (car (g:ref cc (- (car d) 1))) (string->symbol (format "d/dx~a" (- (car d) 1))))
+        (check-true (procedure? (cadr (g:ref cc (- (car d) 1))))))
+      (let ([cc (C 'coordinate-basis-1form-field-specs)])
+        (check-true (up? cc))
+        (check-equal? (car (g:ref cc (- (car d) 1))) (string->symbol (format "dx~a" (- (car d) 1))))
+        (check-true (procedure? (cadr (g:ref cc (- (car d) 1))))))
+      ; not really checking: see implementation test in manifold-extra
+      (check-true (coordinate-basis? (C 'coordinate-basis)))
+      (check-true (up? (C 'coordinate-functions)))
+      (check-true (down? ((C 'coordinate-basis-vector-fields) 0)))
+      (check-true (up? (C 'coordinate-basis-1form-fields)))
+      ;;else
+      (check-subManifold C d t '(origin))
+      (check-equal? (coordinate-system-dimension C) (car d))
+      ((C 'set-coordinate-prototype!) (s:generate (car d) 'up (λ (i) (string->symbol (format "z~a" i)))))
+      (check-equal? (car (g:ref (C 'coordinate-basis-vector-field-specs) 0)) 'd/dz0)
+      (check-true (procedure? (C 'z0)))
+      (check-equal? (expression (C 'd/dz0)) 'd/dz0)
+      (check-equal? (expression (C 'dz1)) 'dz1)
+      (check-exn #px"bad message" (λ () (C "anything")))))
+   (test-case
+    "actual coordinates"
+    (check-true ((R2-rect 'check-coords) (up 1 2)))
+    (check-false ((R2-rect 'check-coords) (up 1 2 3)))
+    (check-false ((R2-rect 'check-coords) 1))
+    (check-true ((R2-rect 'check-point)  ((R2-rect '->point) (up 1 2))))
+    (check-false ((R2-rect 'check-point) ((R1-rect '->point) 1))) ;; not on same manifold
+    ;; passing from one coordinate system to another
+    (check-equal? (expression ((R2-polar '->coords) ((R2-rect '->point) (up 'x 'y))))
+                  '(up (sqrt (+ (expt x 2) (expt y 2))) (atan y x)))
+    (check-equal? (expression ((R3-spherical '->coords) ((R3-cyl'->point) (up 'r 'α 'z))))
+                  '(up (sqrt (+ (expt r 2) (expt z 2)))
+                       (acos (/ z (sqrt (+ (expt r 2) (expt z 2)))))
+                       α)))
+   
+   ;;; MANIFOLD
+   ;; MANIFOLD-POINT
+   ;; access-chains?
+   ;; coordinate-???-specs
+   (test-case
+    "install-coordinates"
+    ;; this only works ±ok at the toplevel...
+    (local-require "../../rkt/environment.rkt")
+    (eval '(define x 4) generic-environment)
+    (check-equal? (out->string (install-coordinates R2-rect (up 'x 'y))) "")
+    (check-not-exn (λ () (eval 'x))) ;; x is defined but in an otherwise empty namespace
+    (check-equal? (out->string (install-coordinates R2-rect (up 'x 'y) generic-environment)) "(clobbering x)\n")
+    (check-true (eval '(procedure? x) generic-environment))
+    (check-equal? (eval '(expression x) generic-environment) 'x)
+    (uninstall-coordinates)
+    (check-equal? (eval 'x generic-environment) 4))
+
+   (test-case
+    "public interface"
+    ;; other ???
+    ; get-coordinate-rep
+    ; my-manifold-point?
+    ; make-manifold
+    ; coordinate-system-dimension
+    ; environment-define 'coordinate-system-dimension
+    ; frame?
+    (check-false (frame? R2))
+    (check-false (frame? R2-rect))
+    (skip #;"this can not be correct")
+    (check-not-false (frame? (λ (x) #f)))
+    (define (fake-frame m)
+      (case m
+        [(coords->event) 1]
+        [(event->coords) 2]
+        [(name) 'fake]
+        [(ancestor-frame) #f]
+        [(params) '()]
+        [(manifold) #f]
+        [else (error)]))
+    (check-not-false (frame? fake-frame))
+    ; chart
+    (define P ((R2-rect '->point) #(x y)))
+    (check-equal? ((chart R2-rect) P) #(x y))
+    (check-equal? (chart fake-frame) 2)
+    ; point
+    (check-equal? ((chart R2-rect) ((point R2-rect) #(x y))) #(x y))
+    (check-equal? (point fake-frame) 1)
+    ; typical-point
+    (check-equal? (dimension ((R2-rect '->coords) (typical-point R2-rect))) 2)
+    ; typical-coords
+    (check-equal? (dimension (typical-coords R2-rect)) 2)
+    ; corresponding-velocities
+    (check-equal? (format "~s" (corresponding-velocities #(x y))) "#(v:x v:y)")
+    (check-false (equal? (corresponding-velocities #(x y)) #(v:x v:y)))
     )
    (test-case
-    "S2-shperical"
-    (define m ((S2-spherical '->point) (up 'theta 'phi)))
-    (check-simplified? ((S2-tilted '->coords) m)
-                       '(up (acos (* -1 (sin phi) (sin theta)))
-                            (atan (cos theta) (* (sin theta) (cos phi)))))
-    )
-   (test-case
-    "S1-circular"
-    (define m ((S1-circular '->point) 'theta))
-    (check-simplified? (manifold-point-representation m)
-                       '(up (cos theta) (sin theta)))
-    (check-simplified? ((compose (S1-circular '->coords) (S1-circular '->point)) 'theta)
-                       'theta)
-    (check-simplified? ((compose (S1-circular '->coords) (S1-tilted '->point)) 'theta)
-                       '(atan (cos theta) (* -1 (sin theta)))))
-   (test-case
-    "S2p-spherical"
-    (define m ((S2p-spherical '->point) (up 'theta 'phi)))
-    (check-simplified? (manifold-point-representation m)
-                       '(up (* (sin theta) (cos phi))
-                            (* (sin phi) (sin theta))
-                            (cos theta)))
-    (check-simplified? ((compose (S2p-spherical '->coords) (S2p-spherical '->point))
-                        (up 1. 0.))
-                       '(up 1. 0.))
-    (check-simplified? ((compose (S2p-spherical '->coords) (S2p-spherical '->point))
-                        (up 0. 1.));; with 0 this is an error
-                       '(up 0. 0.))
-    ;Should be warned singular!
+    "constant-manifold"
+    (define g (gensym))
+    (check-equal? ((constant-manifold-function g) ((R2-rect '->point) (up 1 2))) g)
+    (check-exn #px"" (λ () ((constant-manifold-function g) (up 1 2))))
+    (check-equal? (zero-manifold-function ((R2-rect '->point) (up 1 2))) 0)
+    (check-equal? (one-manifold-function ((R2-rect '->point) (up 1 2))) 1)
+    (check-equal? (zero-coordinate-function (up 1 2 3)) 0))
 
-    (check-simplified? ((compose (S2p-spherical '->coords) (S2p-spherical '->point))
-                        (up 'theta 'phi))
-                       '(up theta phi))
+   ;; implementations
+   ; R^n  S^n  S^2  SO3
+   (test-case
+    "R^n R1 rect"
+    (check-minManifold R1 'R^1-1 '(1) 'Real '(origin))
+    (define p1 (((coordinate-system-at 'rectangular 'origin R1) '->point) 1))
+    (define p2 ((R1-rect '->point) 2))
+    (check-true (manifold-point? p1))
+    (check-true (my-manifold-point? p1 R1))
+    (check-true (my-manifold-point? p2 R1))
+    (check-false (my-manifold-point? p1 R2))
+    (check-equal? (point->manifold p1) R1))
+
+   (test-case
+    "coordinate systems of R4"
+    (let ([P ((R4 'get-patch) 'origin)])
+      (for* ([n (in-list (P 'coordinate-system-names))]
+             [C (in-value ((P 'get-coordinate-system) n))])
+        (define PP (up 1 2 3 4))
+        (check-true ((C 'check-coords) PP))
+        (check-false ((C 'check-coords) (up 1 2 3)))
+        (define p ((C '->point) PP))
+        (check-equal? (get-coordinate-rep p) PP)
+        (check-true ((C 'check-point) p))
+        (check-equal? ((C '->coords) p) PP)
+        (check-equal? (C 'manifold) R4)
+        (check-exn (pregexp (format "Bad coordinates: ~a" n)) (λ () ((C '->point) (up 1 2 3))))
+        (check-exn (pregexp (format "Bad point: ~a" n)) (λ () ((C '->coords) #f)))
+        (check-exn (pregexp (format "Bad point: ~a" n)) (λ () ((C '->coords) (make-manifold-point #f R4 #f #f))))))
     
-    (check-simplified? ((compose (S2p-spherical '->coords) (S2p-tilted '->point))
-                        (up 'theta 'phi))
-                       '(up (atan (sqrt (+ (* (expt (sin theta) 2) (expt (cos phi) 2))
-                                           (expt (cos theta) 2)))
-                                  (* (sin phi) (sin theta)))
-                            (atan (* -1 (cos theta))
-                                  (* (sin theta) (cos phi))))))
+    (check-equal? (expression ((R4-rect '->coords) (make-manifold-point (up 't 'x 'y 'z) R4 #f #f)))
+                  '(up t x y z))
+    (check-equal? (expression ((R4-cyl '->coords) (make-manifold-point (up 't 'x 'y 'z) R4 #f #f)))
+                  '(up (sqrt (+ (expt t 2) (expt x 2))) (atan x t) y z))
+    (check-equal? (expression (((coordinate-system-at 'spherical/cylindrical 'origin R4) '->coords)
+                               (make-manifold-point (up 't 'x 'y 'z) R4 #f #f)))
+                  '(up (sqrt (+ (expt t 2) (expt x 2) (expt y 2)))
+                       (acos (/ y (sqrt (+ (expt t 2) (expt x 2) (expt y 2)))))
+                       (atan x t)
+                       z))
+    (check-equal? (expression ((spacetime-sphere '->coords) (make-manifold-point (up 't 'x 'y 'z) spacetime #f #f)))
+                  '(up t
+                       (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
+                       (acos (/ z (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))))
+                       (atan y x))))
    (test-case
-    "S3-spherical"
-    (check-simplified? ((compose (S3-spherical '->coords)
-                                 (S3-spherical '->point))
-                        (up 'a 'b 'c))
-                       '(up a b c))
-    (check-simplified? ((compose (S3-spherical '->coords)
-                                 (S3-tilted '->point))
-                        (up 'a 'b 'c))
-                       '(up
-                         (atan
-                          (sqrt
-                           (+ (* (expt (sin c) 2) (expt (sin b) 2) (expt (cos a) 2))
-                              (* (expt (sin c) 2) (expt (cos b) 2))
-                              (expt (cos c) 2)))
-                          (* (sin c) (sin b) (sin a)))
-                         (atan (sqrt (+ (* (expt (sin b) 2) (expt (sin a) 2) (expt (cos c) 2))
-                                        (expt (cos a) 2)))
-                               (* (sin a) (cos b)))
-                         (atan (* -1 (cos a)) (* (sin b) (sin a) (cos c)))))
-    (check-simplified? ((compose (S3-spherical '->coords)
-                                 (S3-spherical '->point))
-                        (up 0. 0. 0.)) ;with 0 this is an error
-                       '(up 0. 0. 0.)))
+    "coordiante systems of S3"
+    (let ([P ((S3 'get-patch) 'north-pole)])
+      (for* ([n (in-list (P 'coordinate-system-names))]
+             [C (in-value ((P 'get-coordinate-system) n))])
+        (define PP (up 1 2 3))
+        (check-true ((C 'check-coords) PP))
+        (check-false ((C 'check-coords) (up .1 .2)))
+        (define p ((C '->point) PP))
+        (check-true ((C 'check-point) p))
+        (if (equal? n 'gnomic)
+            (skip (check-equal? ((C '->coords) p) PP))
+            (check-within ((C '->coords) p) PP 1e-15))
+        (check-equal? (C 'manifold) S3)
+        (check-exn (pregexp "Bad coordinates:") (λ () ((C '->point) (up .1 .2))))
+        (check-exn (pregexp "Bad point:") (λ () ((C '->coords) #f)))))
+    ;; gnomic works with non-numeric coordinates:
+    (check-equal? (expression ((S3-gnomic '->coords) ((S3-gnomic '->point) (up 'x 0 1))))
+                  '(up (/ (* x (sqrt (+ 2 (* x x)))) (sqrt (+ 2 (* x x)))) 0 1)))
    (test-case
-    "S1"
-    (define m ((S1-slope '->point) 's))
-    (check-simplified? (manifold-point-representation m)
-                       '(up (/ (* 2 s)
-                               (+ 1 (expt s 2)))
-                            (/ (+ -1 (expt s 2))
-                               (+ 1 (expt s 2)))))
-    (check-simplified? (manifold-point-representation
-                        ((compose (S1-slope '->point)
-                                  (S1-slope '->coords))
-                         m))
-                       '(up (/ (* 2 s)
-                               (+ 1 (expt s 2)))
-                            (/ (+ -1 (expt s 2))
-                               (+ 1 (expt s 2)))))
-    (check-simplified? ((compose (S1-slope '->coords)
-                                 (S1-slope '->point))
-                        's)
-                       's))
+    "coordinate systems of SO3"
+    (for* ([C (in-list (list Euler-angles alternate-angles))])
+      (define PP (up 1 2 3))
+      (check-true ((C 'check-coords) PP))
+      (check-false ((C 'check-coords) (up .1 .2)))
+      (define p ((C '->point) PP))
+      (check-true ((C 'check-point) p))
+      (check-within ((C '->coords) p) PP 1e-15)
+      (check-equal? (C 'manifold) SO3)
+      (check-exn (pregexp "Bad coordinates:") (λ () ((C '->point) (up .1 .2))))
+      (check-exn (pregexp "Bad manifold point:") (λ () ((C '->coords) #f))))
+    (check-equal? (expression ((Euler-angles '->coords) (make-manifold-point #(#(a b c)#(0 1 0)#(e f g)) SO3 #f #f)))
+                  '(up (acos g) (atan e (* -1 f)) :pi/2))
+    (check-equal? (expression ((alternate-angles '->coords) (make-manifold-point #(#(a b c)#(0 1 0)#(e f g)) SO3 #f #f)))
+                  '(up 0 0 (atan (* -1 c) g))))
    (test-case
-    "S2p-Riemann"
-    (define m ((S2p-Riemann '->point) (up 'x 'y)))
-    (check-simplified? (manifold-point-representation m)
-                       '(up (/ (* 2 x) 
-                               (+ 1 (expt x 2) (expt y 2)))
-                            (/ (* 2 y)
-                               (+ 1 (expt y 2) (expt x 2)))
-                            (/ (+ -1 (expt x 2) (expt y 2))
-                               (+ +1 (expt x 2) (expt y 2)))))
-    (check-simplified? (manifold-point-representation
-                        ((compose (S2p-Riemann '->point) (S2p-Riemann '->coords))
-                         m))
-                       '(up (/ (* 2 x)
-                               (+ 1 (expt x 2) (expt y 2)))
-                            (/ (* 2 y)
-                               (+ 1 (expt x 2) (expt y 2)))
-                            (/ (+ -1 (expt x 2) (expt y 2))
-                               (+ 1 (expt x 2) (expt y 2)))))
-    (check-simplified? ((compose (S2p-Riemann '->coords) (S2p-Riemann '->point))
-                        (up 'x 'y))
-                       '(up x y))
-    (check-simplified? (manifold-point-representation
-                        ((S2p-Riemann '->point)
-                         (up (cos 'theta) (sin 'theta))))
-                       '(up (cos theta) (sin theta) 0)))
+    "point transfer"
+    (check-equal? (expression
+                   ((S2-spherical '->coords) ((transfer-point R3-rect S2-spherical)
+                                              ((R3-rect '->point) (up 'x 'y 'z)))))
+                  '(up (acos z) (atan y x)))
+    (check-equal? (expression
+                   ((R3-rect '->coords) ((transfer-point S2-spherical R3-rect)
+                                         ((S2-spherical '->point) (up 'x 'y)))))
+                  '(up (* (cos y) (sin x)) (* (sin x) (sin y)) (cos x))))
+
    (test-case
-    "S1-gnomic"
-    (define m ((S1-gnomic '->point) 's))
-    (check-simplified? (manifold-point-representation m)
-                       '(up (/ s (sqrt (+ 1 (expt s 2))))
-                            (/ 1 (sqrt (+ 1 (expt s 2))))))
-    (check-simplified? (manifold-point-representation
-                        ((compose (S1-gnomic '->point) (S1-gnomic '->coords)) m))
-                       '(up (/ s (sqrt (+ 1 (expt s 2))))
-                            (/ 1 (sqrt (+ 1 (expt s 2))))))
-    (check-simplified? ((compose (S1-slope '->coords) (S1-slope '->point)) 's)
-                       's))
-   (test-case
-    "S2p-gnomic"
-    (define m ((S2p-gnomic '->point) (up 'x 'y)))
-    (check-simplified? (manifold-point-representation m)
-                       '(up (/ x (sqrt (+ 1 (expt x 2) (expt y 2))))
-                            (/ y (sqrt (+ 1 (expt x 2) (expt y 2))))
-                            (/ 1 (sqrt (+ 1 (expt x 2) (expt y 2))))))
-    (check-simplified? (manifold-point-representation
-                        ((compose (S2p-gnomic '->point) (S2p-gnomic '->coords))
-                         m))
-                       '(up (/ x (sqrt (+ 1 (expt x 2) (expt y 2))))
-                            (/ y (sqrt (+ 1 (expt x 2) (expt y 2))))
-                            (/ 1 (sqrt (+ 1 (expt x 2) (expt y 2))))))
-    (check-simplified? ((compose (S2p-gnomic '->coords) (S2p-gnomic '->point))
-                        (up 'x 'y))
-                       '(up x y))
-    (check-simplified? (manifold-point-representation
-                        ((S2p-gnomic '->point)
-                         (up (cos 'theta) (sin 'theta))))
-                       '(up (/ (cos theta) (sqrt 2))
-                            (/ (sin theta) (sqrt 2)) 
-                            (/ 1 (sqrt 2)))))
-   (test-case
-    "S2p-stereographic"
-    (define q ((S2p-stereographic '->point) (up -3/2 3/2)))
-    (define p ((S2p-stereographic '->point) (up 3/2 0)))
-    (check-simplified? ((S2p-stereographic '->coords)
-                        ((S2p-gnomic '->point)
-                         (+ (* 't ((S2p-stereographic '->coords) p))
-                            (* (- 1 't) ((S2p-stereographic '->coords) q)))))
-                       '(up (/ (+ -15/10 (* 3 t))
-                               (+ -1 (sqrt (+ 55/10 (* 1125/100 (expt t 2))
-                                              (* -135/10 t)))))
-                            (/ (+ 15/10 (* -15/10 t))
-                               (+ -1 (sqrt (+ 55/10 (* 1125/100 (expt t 2))
-                                              (* -135/10 t))))))))
-   (test-case
-     "S3"
-     ;; Now a fun example synthesizing the to projective coordinates.
-     ; S3 is one-to-one with the quaternions.
-     ; We interpret the first three components of the embedding space as the
-     ;    i,j,k imaginary party and the 4th component as the real part.
-     ; The gnomic projection removes the double-cover of quaternions to rotations.
-     ; The solid unit-sphere of the stereographic projection from the south pole likewise.
-     (check-simplified? ((S3-gnomic '->coords) ((S3-stereographic '->point) (up 'x 'y 'z)))
-                        '(up (/ (* 2 x) (+ -1 (expt x 2) (expt y 2) (expt z 2)))
-                             (/ (* 2 y) (+ -1 (expt y 2) (expt x 2) (expt z 2)))
-                             (/ (* 2 z) (+ -1 (expt z 2) (expt x 2) (expt y 2)))))
-     (check-simplified? ((S3-stereographic '->coords) ((S3-gnomic '->point) (up 'x 'y 'z)))
-                        '(up (/ x (+ -1 (sqrt (+ 1 (expt x 2) (expt y 2) (expt z 2)))))
-                             (/ y (+ -1 (sqrt (+ 1 (expt y 2) (expt x 2) (expt z 2)))))
-                             (/ z (+ -1 (sqrt (+ 1 (expt z 2) (expt x 2) (expt y 2)))))))
-     
-     (check-simplified? (euclidean-norm ((S3-stereographic '->coords)
-                                         ((S3-gnomic '->point) (up 'x 'y 'z))))
-                        '(/ (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
-                            (sqrt (+ 2
-                                     (expt x 2) (expt y 2) (expt z 2)
-                                     (* -2
-                                        (sqrt (+ 1 (expt x 2) (expt y 2) (expt z 2)))))))))
-   (test-case
-    "alternate-angles"
-    (check-simplified? ((compose (alternate-angles '->coords)
-                                 (Euler-angles '->point))
-                        (up 'theta 'phi 'psi))
-                       '(up
-                         (asin (* (cos psi) (sin theta)))
-                         (atan (+ (* (cos theta) (sin phi) (cos psi)) (* (cos phi) (sin psi)))
-                               (+ (* (cos phi) (cos theta) (cos psi)) (* -1 (sin psi) (sin phi))))
-                         (atan (* -1 (sin psi) (sin theta)) (cos theta))))
-    (check-simplified? ((compose (Euler-angles '->coords)
-                                 (alternate-angles '->point)
-                                 (alternate-angles '->coords)
-                                 (Euler-angles '->point))
-                        (up 'theta 'phi 'psi))
-                       '(up theta phi psi)))
-   (test-case
-    "scalar field"
-    ;;; A scalar field can be defined by combining coordinate functions:
-    (define-coordinates (up x y z) R3-rect)
-    (define-coordinates (up r theta zeta) R3-cyl)
-    (define h (+ 5 (square x) (* -1 x (cube y)) (/ 1 y)))
-    ;;; The field, however defined, can be seen as independent of
-    ;;; coordinate system:
-    (check-simplified? (h ((R3-rect '->point) (up 3. 4. 'z))) -177.75)
-    (check-simplified? (h ((R3-cyl '->point) (up 5. (atan 4 3) 'z))) -177.74999999999997)
-    ;;; However this may be too clever, producing a traditional notation
-    ;;; that is hard to understand deeply.  Perhaps it is better to be
-    ;;; explicit about what is coordinate-system independent.  For
-    ;;; example, we can define a coordinate-free function h by composing a
-    ;;; definition in terms of coordinates with a coordinate function.
-    (define (h-concrete xy)
-      (let ((x (ref xy 0))
-            (y (ref xy 1)))
-        (+ 5
-           (square x)
-           (* -1 x (cube y))
-           (/ 1 y))))
-    (define h* (compose h-concrete (R3-rect '->coords)))
-    (check-simplified? (h* ((R3-rect '->point) (up 3. 4 5))) -177.75))
+    "dimension"
+    (check-equal? (dimension R2-rect) 2)
+    (check-equal? (dimension S3-tilted) 3))
+   
    ))
 
 (module+ test
