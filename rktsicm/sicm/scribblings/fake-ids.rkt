@@ -1,6 +1,7 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (for-label (all-defined-out))
+         (all-defined-out))
 
 (define manifold-spec% 'manifold-spec%)
 (define manifold% 'manifold%)

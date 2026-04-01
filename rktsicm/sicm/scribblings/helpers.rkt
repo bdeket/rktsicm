@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require (for-syntax racket/base)
+(require scribble/eval
+         (for-syntax racket/base)
          (only-in scribble/manual defthing* defproc*))
 (provide (all-defined-out))
 
@@ -18,3 +19,14 @@
                             (map (λ (i) (list (cons i t) r)) (syntax->list is)))
                           (syntax->list #'(type ...)) (syntax->list #'(rslt ...)) (syntax->list #'(itms ...))))])
        #'(defproc* [procs ...]))]))
+
+
+(define (make-sicm-eval)
+  (define eval (make-base-eval))
+  (eval '(require sicm))
+  eval)
+
+(define (make-sicm/plot-eval)
+  (define eval (make-base-eval))
+  (eval '(require sicm plot/pict))
+  eval)

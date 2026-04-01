@@ -7,9 +7,9 @@
 
 @defmodule[sicm #:packages ("rktsicm") #:lang]
 
-This library provides a language that is almost equivalent with scmutils as found at @hyperlink["http://groups.csail.mit.edu/mac/users/gjs/6946/installation.html" "http://groups.csail.mit.edu/mac/users/gjs/6946/installation.html"].
+This library provides a language that is almost equivalent with scmutils as found at @url{http://groups.csail.mit.edu/mac/users/gjs/6946/installation.html}.
 
-The original manual for scmutils is located at @hyperlink["http://groups.csail.mit.edu/mac/users/gjs/6946/refman.pdf" "http://groups.csail.mit.edu/mac/users/gjs/6946/refman.pdf"].
+The original manual for scmutils is located at @url{http://groups.csail.mit.edu/mac/users/gjs/6946/refman.pdf}.
 
 @para{}
 The following main language is provided:
