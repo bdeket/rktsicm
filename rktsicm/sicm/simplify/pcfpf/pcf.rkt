@@ -6,6 +6,7 @@
                   make-initialized-vector make-initialized-list error:wrong-type-argument
                   fix:< fix:= fix:> fix:+ fix:- fix:zero? fix:>= fix:fixnum?
                   int:zero? int:quotient int:-)
+         (only-in racket/list dropf)
          (only-in "../../rkt/todo.rkt" pp)
          "../../general/assert.rkt"
          "../../general/list-utils.rkt"
@@ -1045,7 +1046,8 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	 (car termlist))
 	(else
 	 (cons '*dense*
-	       (cons arity termlist)))))
+               ;;bdk;; make sure the first elements are not zero - this leads to problems in some algorithms
+	       (cons arity (dropf termlist poly/zero?))))))
 
 
 (define poly/make poly/make-from-dense)

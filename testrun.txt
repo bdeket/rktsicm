@@ -14,19 +14,19 @@
    1                     0.0 ./rktsicm/sicm\tests\calculus\exterior-derivative.rkt
    2                     0.0 ./rktsicm/sicm\tests\calculus\form-fields.rkt
                          0.0 ./rktsicm/sicm\tests\calculus\frame-maker.rkt
-   3                     1.0 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
+   3                     1.5 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
    8                     0.5 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
    3                     0.0 ./rktsicm/sicm\tests\calculus\indexed.rkt
    1                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
-  13                     0.0 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
+  13                     0.5 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
   15                  4  0.0 ./rktsicm/sicm\tests\calculus\manifold.rkt
    7                     0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
    8                     0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
                          0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
-  18                  2  0.5 ./rktsicm/sicm\tests\calculus\so3.rkt
+  18                  2  1.0 ./rktsicm/sicm\tests\calculus\so3.rkt
    3                     0.5 ./rktsicm/sicm\tests\calculus\tensors.rkt
    2                     0.5 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
-   3                     0.0 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
+   3                     0.5 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
    2                     0.0 ./rktsicm/sicm\tests\calculus\wedge.rkt
    7                  1  0.0 ./rktsicm/sicm\tests\display\exdisplay.rkt
    4                  1  0.0 ./rktsicm/sicm\tests\display\pp.rkt
@@ -81,7 +81,7 @@
   14                     0.0 ./rktsicm/sicm\tests\mechanics\Hamiltonian.rkt
    5                     0.0 ./rktsicm/sicm\tests\mechanics\Lagrangian-transformations.rkt
   11                     0.0 ./rktsicm/sicm\tests\mechanics\Lagrangian.rkt
-   3                     0.0 ./rktsicm/sicm\tests\mechanics\Lie-transform.rkt
+   3                     0.5 ./rktsicm/sicm\tests\mechanics\Lie-transform.rkt
    1                     0.0 ./rktsicm/sicm\tests\mechanics\Noether.rkt
    2                     0.0 ./rktsicm/sicm\tests\mechanics\Routhian.rkt
    1                     0.0 ./rktsicm/sicm\tests\mechanics\action.rkt
@@ -120,10 +120,19 @@
    7                     0.0 ./rktsicm/sicm\tests\numerics\signals\dft.rkt
    7                  1  0.0 ./rktsicm/sicm\tests\numerics\signals\fft.rkt
    3                     0.0 ./rktsicm/sicm\tests\numerics\signals\fourier.rkt
+   2                     0.0 ./rktsicm/sicm\tests\poly\domain.rkt
+   4                     0.0 ./rktsicm/sicm\tests\poly\hermite.rkt
    5                     0.0 ./rktsicm/sicm\tests\poly\interp-generic.rkt
+   2                     0.0 ./rktsicm/sicm\tests\poly\interp.rkt
+   4                     0.0 ./rktsicm/sicm\tests\poly\lagrange.rkt
+   1                     0.0 ./rktsicm/sicm\tests\poly\legendre.rkt
+  12                  1  0.0 ./rktsicm/sicm\tests\poly\nchebpoly.rkt
+   5                     0.0 ./rktsicm/sicm\tests\poly\polyinterp.rkt
+  21                  1  0.0 ./rktsicm/sicm\tests\poly\polyroot.rkt
+   7                     0.0 ./rktsicm/sicm\tests\poly\ppa.rkt
    9                     0.0 ./rktsicm/sicm\tests\rkt\define.rkt
    2                     0.0 ./rktsicm/sicm\tests\simplify\expand-nary.rkt
-   9                     0.5 ./rktsicm/sicm\tests\simplify\gcd-tests.rkt
+   9                     1.0 ./rktsicm/sicm\tests\simplify\gcd-tests.rkt
    8                     0.0 ./rktsicm/sicm\tests\simplify\matcher.rkt
   32                  5  0.0 ./rktsicm/sicm\tests\simplify\pcf.rkt
    7                     0.0 ./rktsicm/sicm\tests\simplify\rz-test-cases.rkt
@@ -137,7 +146,7 @@
    4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1121             2   51 13.5 TOTAL
-runtime: 3.316666666666667m 
-Welcome to Racket v9.1.0.9-2026-03-15-c42ebbf7bd [cs].
+1179             2   53 18.0 TOTAL
+runtime: 4.333333333333333m 
+Welcome to Racket v9.1.0.11-2026-03-29-afbc55a2ad [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 

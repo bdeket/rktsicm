@@ -52,7 +52,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
 11 difference(s) found in kernel/litfun
  3 difference(s) found in kernel/mathutil
  1 difference(s) found in kernel/matrices
- 5 difference(s) found in kernel/numbers
+ 6 difference(s) found in kernel/numbers
  5 difference(s) found in kernel/numeric
 10 difference(s) found in kernel/numsymb
  1 difference(s) found in kernel/operator
@@ -89,12 +89,12 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in numerics/statistics/gauss
  4 difference(s) found in poly/interp-generic
  1 difference(s) found in poly/polyinterp
- 1 difference(s) found in poly/polyroot
+ 2 difference(s) found in poly/polyroot
  1 difference(s) found in simplify/default
  2 difference(s) found in simplify/fpf
  3 difference(s) found in simplify/matcher
  1 difference(s) found in simplify/pcf-fpf
- 4 difference(s) found in simplify/pcf
+ 5 difference(s) found in simplify/pcf
  1 difference(s) found in simplify/rcf
  1 difference(s) found in simplify/rules
 14 difference(s) found in simplify/simplify

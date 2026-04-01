@@ -292,6 +292,9 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'cosh
 		  (make-numerical-combination 'cosh)
 		  abstract-number?)
+(assign-operation 'abs
+                  (make-numerical-combination 'abs)
+                  abstract-number?)
 
 ;(assign-operation 'derivative n:deriv  abstract-number?)
 

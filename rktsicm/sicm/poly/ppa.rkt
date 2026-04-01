@@ -9,6 +9,17 @@
          "../numerics/optimize/unimin.rkt"
          )
 
+(define (ppa-max-degree P)
+  (let lp ([b (ppa-body P)])
+    (cond [(ppa-terminal? b) (poly:degree (ppa-poly b))]
+          [(ppa-split? b) (max (lp (ppa-low-side b)) (lp (ppa-high-side b)))])))
+
+(define (ppa-size P)
+  (let lp ([b (ppa-body P)])
+    (cond [(ppa-terminal? b) 1]
+          [(ppa-split? b) (+ (lp (ppa-low-side b)) (lp (ppa-high-side b)))])))
+
+
 ;;bdk;; start original file
 
 ;;;;        PPA:  Piecewise polynomial approximations
@@ -101,6 +112,7 @@
   (cons (cons low high) 
         (cons 'ppa-terminal poly)))
 
+;;bdk;; TODO: use the functions from below to make this more readable
 (define (ppa-adjoin ppalow ppahigh)
   (if (= (cdar ppalow) (caar ppahigh))
       (cons (cons (caar ppalow) (cdar ppahigh))

@@ -4,13 +4,19 @@
 
 (require (only-in "../rkt/glue.rkt" if random for-all? write-line false
                   fix:= fix:< fix:+)
-         (only-in "../rkt/define.rkt" define default-object?)
+         (only-in "../rkt/define.rkt" define)
+         "../rkt/default-object.rkt"
          "../general/list-utils.rkt"
          "../kernel-intr.rkt"
          "../simplify/pcf.rkt"
          "../numerics/statistics/cluster.rkt"
          )
 
+;;bdk;; TODO make this parameterizable
+(define (set-polyroot-settings! #:wallp? [wallp? default-object]
+                               #:clustering? [clustering? default-object])
+  (unless (default-object? wallp?) (set! root-wallp wallp?))
+  (unless (default-object? clustering?) (set! clustering clustering?)))
 ;;bdk;; start original file
 
 ;;; General Polynomial Root Finder
@@ -47,7 +53,7 @@
               (write-line (list 'finder-loop deflated-poly roots)))
 	  (if (fix:< (poly:degree deflated-poly) 1)
 	      (if (not (fix:= (length roots) (poly:degree kernel-poly)))
-		  (begin (error "Root finder failed" kernel-poly) 'foo)
+		  (error "Root finder failed" kernel-poly)
                   roots)
 	      (let ((root
 		     (clean-up-root

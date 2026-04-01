@@ -315,5 +315,6 @@
            #;(scm-show-diff (cdr x)))
          _)
     (void))
+(module+ test (displayln "(scm-show-diff \"kernel/example\")"))
 
 
