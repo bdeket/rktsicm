@@ -16,6 +16,8 @@
          "simplify.rkt"
          "split-poly.rkt"
          )
+(require (only-in "../kernel-intr.rkt" kernel:assign-operations))
+(kernel:assign-operations #t) ;; for compose
 
 ;;bdk;; start original file
 

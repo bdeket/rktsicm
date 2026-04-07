@@ -1,8 +1,8 @@
 #lang racket/base
 
 (require rackunit
+         "../../../kernel.rkt" ;; generics need to be loaded
          "../../../numerics/linear/vandermonde.rkt"
-         "../../../kernel-intr.rkt"
          )
 
 

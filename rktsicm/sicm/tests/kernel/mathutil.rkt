@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require rackunit
+         (only-in "../../kernel.rkt") ;; generics need to be loaded 
          "../../kernel/mathutil.rkt"
          "../../kernel/express.rkt"
          "../helper+scm.rkt"

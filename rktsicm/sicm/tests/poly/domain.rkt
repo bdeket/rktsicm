@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require rackunit
+         (only-in "../../kernel.rkt") ;; generics need to be loaded
          "../../poly/domain.rkt"
          "../../simplify/pcf.rkt"
          "../helper.rkt")

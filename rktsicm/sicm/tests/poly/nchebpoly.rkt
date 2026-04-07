@@ -2,6 +2,7 @@
 
 (require rackunit
          racket/stream
+         (only-in "../../kernel.rkt") ;; generics need to be loaded
          "../../poly/nchebpoly.rkt"
          "../../simplify/pcf.rkt"
          "../helper.rkt")

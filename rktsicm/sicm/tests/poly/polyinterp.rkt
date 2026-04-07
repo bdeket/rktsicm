@@ -2,6 +2,7 @@
 
 (require rackunit
          racket/list
+         (only-in "../../kernel.rkt") ;; generics need to be loaded
          "../../poly/polyinterp.rkt"
          "../../simplify/pcf.rkt"
          "../helper.rkt")
