@@ -107,5 +107,6 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  8 difference(s) found in solve/solve-utils
  6 difference(s) found in solve/solve
  3 difference(s) found in units/SI-units
-12 difference(s) found in units/system
- 2 difference(s) found in units/with-units
+16 difference(s) found in units/system
+ 3 difference(s) found in units/units
+ 4 difference(s) found in units/with-units

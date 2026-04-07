@@ -63,10 +63,11 @@
 (define (same-dimensions? u1 u2)
   (let ((v1 (unit-exponents u1)) (v2 (unit-exponents u2)))
     (let ((n (vector-length v1)))
-      (let lp ((i 0))
-        (or (fix:= i n)
-            (and (n:= (vector-ref v1 i) (vector-ref v2 i))
-                 (lp (fix:+ i 1))))))))
+      (and (= n (vector-length v2))
+           (let lp ((i 0))
+             (or (fix:= i n)
+                 (and (n:= (vector-ref v1 i) (vector-ref v2 i))
+                      (lp (fix:+ i 1)))))))))
 
 (define (same-units? u1 u2)
   (assert (and (units? u1) (units? u2)))
@@ -121,6 +122,7 @@
                                   v1
                                   (n:* (unit-scale u1) (unit-scale u2))))
                       (else
+                       (assert (= (vector-length v1) (vector-length v2)))
                        (make-unit (unit-system u1)
                                   (make-initialized-vector (vector-length v1)
 							   (lambda (i)

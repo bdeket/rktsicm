@@ -28,7 +28,7 @@
                        "calculus.rkt"
                        ))
 
-(require (only-in "rkt/environment.rkt" scmutils-base-environment generic-environment)
+(require (only-in "rkt/environment.rkt" scmutils-base-environment generic-environment environment-define)
          racket/runtime-path)
 (define-runtime-path here ".")
 (define (mkpath x) `(file ,(path->string (build-path here x))))
@@ -41,6 +41,8 @@
                                    "units.rkt"
                                    )))
             scmutils-base-environment)
+      (environment-define scmutils-base-environment 'SI SI) ;; TODO ;; __really__ get rid of the environments (or find a better way)
+      ;; SI is loaded in scmutils-base-environment but SBE has a different version of the unit-system struct, so simplify-units doesn't work
       (eval `(require ,@(map mkpath
                              (list "mechanics.rkt"
                                    "calculus.rkt")))

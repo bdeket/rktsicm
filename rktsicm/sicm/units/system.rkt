@@ -41,9 +41,13 @@
                     [base-spec (for/list ([info (in-list (list (list 'u-id u-name u-type) ...))]
                                           [unit (in-list units)])
                                  (append info (list unit)))])
+               (define us (make-unit-system 'id base-spec '() '()))
+               (environment-define scmutils-base-environment 'id us)
+               (for ([unit (in-list base-spec)])
+                 (environment-define scmutils-base-environment (car unit) (cadddr unit)))
                (apply
                 values
-                (make-unit-system 'id base-spec '() '())
+                us
                 units)))))))]))
 #;
 (define (define-unit-system system-name . base-units)
@@ -149,11 +153,11 @@
 (define-syntax (define-additional-unit stx)
   (syntax-case stx (quote)
     [(_ system (quote unit-name) tex description content)
-     (syntax/loc stx (define-derived-unit system unit-name tex description content 1))]
+     (syntax/loc stx (define-additional-unit system unit-name tex description content 1))]
     [(_ system (quote unit-name) tex description content scale)
-     (syntax/loc stx (define-derived-unit system unit-name tex description content scale))]
+     (syntax/loc stx (define-additional-unit system unit-name tex description content scale))]
     [(_ system unit-name tex description content)
-     (syntax/loc stx (define-derived-unit system unit-name tex description content 1))]
+     (syntax/loc stx (define-additional-unit system unit-name tex description content 1))]
     [(_ system unit-name tex description content scale-factor)
      (syntax/loc
          #'unit-name
@@ -321,7 +325,7 @@
 
 (define *unit-constructor* '&)
 
-(define unit-environment generic-environment)
+(define unit-environment scmutils-base-environment) ;;bdk;; TODO generic does not see what happens in scmutils-base
 
 (define (express-as num target-unit-expression)
   (let ((target-unit-expression-value
@@ -349,6 +353,9 @@
                  (g:/ (expression value) (unit-scale target-unit))
                  target-unit-expression)))
         ((units? num)
+         (if (not (simple:equal? (unit-exponents num) (unit-exponents target-unit)))
+               (error "Cannot express in given units"
+                      num target-unit target-unit-expression))
          (list *unit-constructor*
                (g:/ (unit-scale num) (unit-scale target-unit))
                target-unit-expression))
@@ -380,7 +387,7 @@
                 unit-name))
         (list *unit-constructor*
               (g:simplify value)
-              (unit-expresson (vector->list exponent-vector)
+              (unit-expression (vector->list exponent-vector)
                               (map car (base-units system)))))))
 
 
@@ -394,7 +401,7 @@
   (let ((v (find-unit-description vect ulist)))
     (if v (car v) #f)))
 
-(define (unit-expresson exponents base-unit-names)
+(define (unit-expression exponents base-unit-names)
   (cons '*
         (apply append
                (map (lambda (exponent base-name)

@@ -13,6 +13,7 @@
   (make-assign-operations 'with-units))
 
 (add-to-numerical-quantity? (λ (x) (and (with-units? x) (numerical-quantity? (u:value x)))))
+(define (set-permissive-units?! x) (set! *permissive-units* x))
 ;TODO
 (define angular '*angular*)
 
@@ -167,7 +168,7 @@
 (define (u:t*u t u)
   (u:*u (with-units t &unitless) u))
 
-(define (u:u*t t u)
+(define (u:u*t u t)
   (u:u* u (with-units t &unitless)))
 
 
@@ -180,7 +181,7 @@
 (define (u:t/u t u)
   (u:/u (with-units t &unitless) u))
 
-(define (u:u/t t u)
+(define (u:u/t u t)
   (u:u/ u (with-units t &unitless)))
 
 (define (u:expt x y)
@@ -340,8 +341,9 @@
                   (lambda (f args)
                     (let ((val (g:apply (u:value f) args)))
                       (if (with-units? val)
-                          (assert (units:= val f)))
-                      (with-units val (u:units f))))
+                          (begin (assert (units:= val f))
+                                 val)
+                          (with-units val (u:units f)))))
                   with-units? any?)
 
 
