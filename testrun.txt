@@ -18,7 +18,7 @@
    8                     0.5 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
    3                     0.0 ./rktsicm/sicm\tests\calculus\indexed.rkt
    1                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
-  13                     0.5 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
+  13                     0.0 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
   15                  4  0.0 ./rktsicm/sicm\tests\calculus\manifold.rkt
    7                     0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
    8                     0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
@@ -138,7 +138,7 @@
    7                     0.0 ./rktsicm/sicm\tests\simplify\rz-test-cases.rkt
    1                     0.0 ./rktsicm/sicm\tests\simplify\simplify.rkt
   11                     0.0 ./rktsicm/sicm\tests\simplify\sparse-gcd.rkt
-   5                     0.5 ./rktsicm/sicm\tests\simplify\sparse-interpolate.rkt
+   5                     0.0 ./rktsicm/sicm\tests\simplify\sparse-interpolate.rkt
    2                     0.0 ./rktsicm/sicm\tests\simplify\sparse.rkt
    5                     0.0 ./rktsicm/sicm\tests\simplify\split-poly.rkt
   23                     0.0 ./rktsicm/sicm\tests\solve\solve-utils.rkt
@@ -146,7 +146,7 @@
    4                  1  0.0 ./rktsicm/sicm\tests\units\system.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1179             2   53 18.0 TOTAL
-runtime: 4.333333333333333m 
+1179             2   53 17.5 TOTAL
+runtime: 4.3m 
 Welcome to Racket v9.1.0.11-2026-03-29-afbc55a2ad [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 
