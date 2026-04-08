@@ -44,6 +44,6 @@ The mechanics and calculus modules are defined in this language.
 @;@include-section{numerics.scrbl}
 @include-section{poly.scrbl}
 @;@include-section{solve.scrbl}
-@;@include-section{units.scrbl}
+@include-section{units.scrbl}
 @;@include-section{mechanics.scrbl}
 @include-section{calculus.scrbl}
