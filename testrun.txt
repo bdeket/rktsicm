@@ -150,7 +150,7 @@
   19                  2  0.0 ./rktsicm/sicm\tests\units\with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1234             2   56 14.0 TOTAL
-runtime: 3.6666666666666665m 
+1234             2   56 14.5 TOTAL
+runtime: 3.5833333333333335m 
 Welcome to Racket v9.1.0.11-2026-03-29-afbc55a2ad [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 

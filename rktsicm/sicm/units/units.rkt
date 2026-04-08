@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out) assign-operation))
+(provide (except-out (all-defined-out) assign-operation) units?)
 
 (require (only-in "../rkt/glue.rkt" make-initialized-vector
                   fix:= fix:+)

@@ -79,7 +79,8 @@
    (test-case
     "expression"
     (local-require "../../kernel-intr.rkt"
-                   "../../units.rkt")
+                   ;; units?: even though it's the same binding local-require doesn't allow importing it twice
+                   (only-in "../../units.rkt" &foot))
     ;; number
     ;;;; flonum
     (parameterize ([heuristic-number-canonicalizer #f])

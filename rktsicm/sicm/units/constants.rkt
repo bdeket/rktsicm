@@ -1,6 +1,6 @@
 #lang s-exp "../generic.rkt"
 
-(provide (all-defined-out))
+(provide (all-defined-out) parsec speed-of-light)
 
 (require "../simplify/default.rkt" ;; g:simplify needs to be initialized
          "system.rkt"

@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out) assign-operation))
+(provide (except-out (all-defined-out) assign-operation) with-units?)
 
 (require (only-in "../rkt/glue.rkt" if)
          "../general/assert.rkt"
