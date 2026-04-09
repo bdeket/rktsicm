@@ -2,13 +2,108 @@
 
 (require rackunit
          "../../main.rkt"
+         "../../general/eq-properties.rkt"
          "../helper+scm.rkt"
          )
 
+(define (check-vf vf [name 'unnamed-vector-field]
+                  #:fields [fields (list function?)]
+                  #:proc [proc #f])
+  (check-true (vector-field? vf))
+  (check-true (operator? vf))
+  (check-equal? (operator-subtype vf) 'vector-field)
+  (check-equal? (operator-arity vf) *exactly-one*)
+  (when name (check-equal? (expression (operator-name vf)) name))
+  (when fields (check-equal? (eq-get vf 'argument-types) fields))
+  (when proc (check-equal? (operator-procedure vf) proc)))
 (provide the-tests)
 (define the-tests
   (test-suite
    "calculus/vector-fields"
+   (test-case
+    "procedure->vector-field"
+    (define vf (procedure->vector-field (λ (f) f)))
+    (check-vf vf)
+    (define vf2 (procedure->vector-field (λ (f) f) '∇))
+    (check-vf vf2 '∇))
+   (test-case
+    "components->vector-field"
+    (define vf
+      (components->vector-field (up (literal-function 'x (-> (UP* Real 2) Real))
+                                    (literal-function 'y (-> (UP* Real 2) Real)))
+                                R2-rect))
+    (check-vf vf '(vector-field (up x y)))
+    (define vf2 (components->vector-field (up (λ (c) (+ (* 1/2 (ref c 0)) (* 3 (ref c 1))))
+                                              (λ (c) (+ (* 2 (ref c 0)) (* 1/3 (ref c 1)))))
+                                R2-rect 'linear))
+    (check-vf vf2 'linear)
+    ;; TODO - is this how it should be used?
+    (check-equal? (expression ((vf2 (R2-rect '->coords)) ((R2-rect '->point) #(a b))))
+                  '(up (+ (* 1/2 a) (* 3 b)) (+ (* 2 a) (* 1/3 b)))))
+   (test-case
+    "vector-field->components"
+    (define vf (components->vector-field (up (λ (c) (+ (* 1/2 (ref c 0)) (* 3 (ref c 1))))
+                                             (λ (c) (+ (* 2 (ref c 0)) (* 1/3 (ref c 1)))))
+                                         R2-rect 'linear))
+    (check-equal? (simplify ((vector-field->components vf R2-rect) #(a b)))
+                  '(up (+ (* 1/2 a) (* 3 b)) (+ (* 2 a) (* 1/3 b))))
+    (check-equal? (simplify ((vector-field->components vf R2-polar) #(r α)))
+                  '(up (+ (* 1/6 r (expt (cos α) 2)) (* 5 r (cos α) (sin α)) (* 1/3 r))
+                    (+ -3 (* 5 (expt (cos α) 2)) (* -1/6 (cos α) (sin α)))))
+    (check-exn #px"Bad vector field: vector-field->components" (λ () (vector-field->components 'any R2-rect))))
+   (test-case
+    "zero"
+    (define vf (components->vector-field (up (λ (c) c)) R1-rect 'linear))
+    (check-equal? (vf:zero vf) zero-manifold-function)
+    (define vf2 (vf:zero-like vf))
+    (check-vf vf2 'vf:zero #:fields #f #:proc vf:zero)
+    (check-true (vf:zero? vf2))
+    (check-false (vf:zero? vf))
+    (check-exn #px"vf:zero-like:\n\tassertion failed: " (λ () (vf:zero-like 'any)))
+    (check-exn #px"vf:zero\\?:\n\tassertion failed:" (λ () (vf:zero? 'any))))
+   (test-case
+    "literal-vector-field"
+    (define X (literal-vector-field 'X R1-rect))
+    (check-vf X 'X)
+    (check-simplified? ((X (R1-rect '->coords)) ((R1-rect '->point) 't))
+                       '(up (X^0 t)))
+    (check-simplified? (((literal-vector-field 'R R2-rect) (R2-rect '->coords)) ((R2-polar '->point) #(x y)))
+                       '(up (R^0 (up (* x (cos y)) (* x (sin y))))
+                            (R^1 (up (* x (cos y)) (* x (sin y)))))))
+   (test-case
+    "coordinate-basis-vector-field"
+    (define vf (coordinate-basis-vector-field R1-rect 'base))
+    (define vf2 (coordinate-basis-vector-field R2-polar 'base))
+    (define vf2_1 (coordinate-basis-vector-field R2-polar 'base 1))
+    (check-vf vf 'base)
+    (check-simplified? ((vf (R1-rect '->coords)) ((R1-rect '->point) 't))
+                       1)
+    (check-simplified? ((vf2 (R2-polar '->coords)) ((R2-polar '->point) (up 'r 'α)))
+                       (down (up 1 0) (up 0 1)))
+    (check-simplified? ((vf2 (R2-rect '->coords)) ((R2-polar '->point) (up 'r 'α)))
+                       '(down (up (cos α) (sin α)) (up (* -1 r (sin α)) (* r (cos α)))))
+    (check-simplified? ((vf2_1 (R2-rect '->coords)) ((R2-polar '->point) (up 'r 'α)))
+                       '(up (* -1 r (sin α)) (* r (cos α)))))
+   (test-case
+    "coordinate-system->vector-basis"
+    (check-simplified? (coordinate-system->vector-basis R2-polar)
+                       '(down d/dx0 d/dx1))
+    (check-simplified? (coordinate-system->vector-basis R2-rect)
+                       '(down d/dx0 d/dx1)))
+   (test-case
+    "basis-components<->vector-field"
+    (define vf (basis-components->vector-field (up (compose (literal-function 'X (-> (UP* Real 2) Real))
+                                                            (R2-rect '->coords))
+                                                   (compose (literal-function 'Y (-> (UP* Real 2) Real))
+                                                            (R2-rect '->coords)))
+                                               (basis->vector-basis (coordinate-system->basis R2-rect))))
+    (check-vf vf #f)
+    (define-coordinates (up x y) R2-rect)
+    (check-simplified? ((vf (R2-rect '->coords)) ((R2-rect '->point) #(x y)))
+                       '(up (X (up x y)) (Y (up x y))))
+    (check-simplified? (((vector-field->basis-components vf (up (λ (x) (ref x 0)) (λ (y) (ref y 1)))) (R2-rect '->coords))
+                        ((R2-polar '->point) (up 'x 'y)))
+                      '(up (X (up (* x (cos y)) (* x (sin y)))) (Y (up (* x (cos y)) (* x (sin y)))))))
    (test-case
     "R3-rect"
     (define-coordinates (up x y z) R3-rect)
@@ -26,7 +121,7 @@
                        '(+ (expt x0 2) (* -1 (expt y0 2))))
     (check-simplified? ((outward (* x y)) mr) '(* 2 x0 y0)))
    (test-case
-    "cylindrical >>> failing"
+    "cylindri"
     (define-coordinates (up x y z) R3-rect)
     (define-coordinates (up r theta zeta) R3-cyl)
     (define A (+ (* 'A_r d/dr) (* 'A_theta d/dtheta) (* 'A_z d/dzeta)))

@@ -11,6 +11,24 @@
   (test-suite
    "calculus/gram-schmidt"
    (test-case
+    "Simple check"
+    (define-coordinates (up t x) R2-rect)
+    (define GS (Gram-Schmidt (basis->vector-basis (coordinate-system->basis R2-rect))
+                             (let ([c 'c])
+                               (λ (u v) (+ (* -1 c c (dt u) (dt v))
+                                           (* 1 (dx u) (dx v)))))))
+    (check-equal? (simplify (((ref GS 0) (λ (p) ((R2-rect '->coords)p))) ((R2-rect '->point) #(m n))))
+                  '(up (/ 1 c) 0))
+    (check-equal? (((ref GS 1) (λ (p) ((R2-rect '->coords)p))) ((R2-rect '->point) #(m n)))
+                  #(0 1))
+    (check-equal? (simplify (((ref GS 0) (λ (p) ((R2-rect '->coords)p))) ((R2-rect '->point) #(1 3))))
+                  '(up (/ 1 c) 0))
+    ;;TODO - do the next two even mean anything?? ...just checking that make-positive works
+    (check-equal? (Gram-Schmidt (down 1 2 3) +)
+                  (down 0.7071067811865475 0.20710678118654766 0.3587194676071504))
+    (check-equal? (Gram-Schmidt (down 1 -2 3) +)
+                  (down 0.7071067811865475 -0.7368128791039503 0.23958556461817535)))
+   (test-case
     "Orthonormalizing with respect to the Lorentz metric in 2 dimensions."
     (define-coordinates (up t x) R2-rect)
     (define R2-point ((R2-rect '->point) (up 't0 'x0)))
@@ -22,15 +40,15 @@
     (check-simplified? (accumulate pe
                                    (s:foreach (lambda (v)
                                                 (pe ((v (literal-manifold-function 'f R2-rect))
-                                                      R2-point)))
+                                                     R2-point)))
                                               L2-vector-basis))
                        '((/ (((partial 0) f) (up t0 x0)) c)
                          (((partial 1) f) (up t0 x0))))
     (check-simplified? (accumulate pe
                                    (s:foreach (lambda (omega)
                                                 (pe ((omega (literal-vector-field 'v R2-rect))
-                                                      R2-point)))
-                                    (vector-basis->dual L2-vector-basis R2-rect)))
+                                                     R2-point)))
+                                              (vector-basis->dual L2-vector-basis R2-rect)))
                        '((* c (v^0 (up t0 x0)))
                          (v^1 (up t0 x0)))))
    (test-case
@@ -138,6 +156,21 @@
                              (* (expt b 4) f)
                              (* -2 (expt b 3) c e)
                              (* (expt b 2) (expt c 2) d))))))))
+   (test-case
+    "indices"
+    (check-equal? (completely-antisymmetric '()) 1)
+    (check-equal? (completely-antisymmetric '(0)) 1)
+    (check-equal? (completely-antisymmetric '(0 1)) 1)
+    (check-equal? (completely-antisymmetric '(1 0)) -1)
+    (check-equal? (completely-antisymmetric '(0 1 2)) 1)
+    (check-equal? (completely-antisymmetric '(0 2 1)) -1)
+    (check-equal? (completely-antisymmetric '(2 0 1)) 1)
+    (check-equal? (completely-antisymmetric '(2 1 0)) -1)
+    (check-equal? (completely-antisymmetric '(1 0 2)) -1)
+    (check-equal? (completely-antisymmetric '(1 2 0)) 1)
+    (check-equal? (completely-antisymmetric '(3)) 0)
+    (check-equal? (completely-antisymmetric '(3 4)) 0)
+    (check-equal? (completely-antisymmetric '(0 1 4)) 0))
    ))
 
 (module+ test

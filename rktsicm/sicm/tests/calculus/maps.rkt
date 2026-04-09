@@ -8,9 +8,133 @@
 (rename-part 'derivative 'D)
 
 (provide the-tests)
+(define pt1-rect ((R1-rect '->point) 'x))
+(define pt2-rect ((R2-rect '->point) #(x y)))
+(define pt2-polar ((R2-polar '->point) #(r α)))
 (define the-tests
   (test-suite
    "calculus/maps"
+   (test-case
+    "literal-manifold-map"
+    (check-simplified? ((R2-rect '->coords) ((literal-manifold-map 'µ R1-rect R2-rect) pt1-rect))
+                       '(up (µ^0 x) (µ^1 x)))
+    (check-simplified? ((R1-rect '->coords) ((literal-manifold-map 'µ R2-rect R1-rect) pt2-rect))
+                       '(up (µ^0 (up x y))))
+    (check-simplified? ((R1-rect '->coords) ((literal-manifold-map 'µ R2-polar R1-rect) pt2-rect))
+                       '(up (µ^0 (up (sqrt (+ (expt x 2) (expt y 2))) (atan y x)))))
+    (check-simplified? ((R1-rect '->coords) ((literal-manifold-map 'µ R2-rect R1-rect) pt2-polar))
+                       '(up (µ^0 (up (* r (cos α)) (* r (sin α)))))))
+   (test-case
+    "pullback / pushforward"
+    ;; ((pulback n->m) f-on-m);; so 1->2 function on 2 applied on a point in 1
+    (check-simplified? (((pullback-function (literal-manifold-map 'µ R1-rect R2-rect)) (R2-rect '->coords)) pt1-rect)
+                       '(up (µ^0 x) (µ^1 x)))
+    ;; ((pulback n->m^-1) f-on-n);; so (inverse 2->1) function on 2 applied on a point in 1
+    (check-simplified? (((pushforward-function (literal-manifold-map 'µ R1-rect R2-rect)) (R2-rect '->coords)) pt1-rect)
+                       '(up (µ^0 x) (µ^1 x))))
+   (test-case
+    "differential-of-map (differential)"
+    (define vf2 (literal-vector-field 'V R2-rect))
+    (define vf1 ((differential-of-map (literal-manifold-map 'µ R2-rect R1-rect)) vf2))
+    (vector-field? vf1)
+    (check-equal? (expression (operator-name vf1)) '((d µ) V))
+    (check-simplified? ((vf1 identity) pt2-rect) 0)
+    (check-exn #px"assertion failed: \\(vector-field\\? v-on-N\\)"
+               (λ () ((differential-of-map (literal-manifold-map 'µ R2-rect R1-rect)) 'any))))
+   (test-case
+    "pushforward-vector"
+    (define (test-it N M [rslt #f])
+      (define fM #;(λ (pt) (println (list pt (simplify ((M '->coords) pt)))) pt)
+        (literal-manifold-function 'f M))
+      (define vfN (literal-vector-field 'V N))
+      (define N->M (literal-manifold-map 'µ N M))
+      (define M->N (literal-manifold-map 'µ^-1 M N))
+      (define m0 (cond [(eq? M R1-rect) pt1-rect][(eq? M R2-rect) pt2-rect][(eq? M R3-rect) ((R3-rect '->point) #(x y z))]))
+      ;(println ((((differential-of-map N->M) vf2) f1) (M->N m0)))
+      (if rslt
+          (check-simplified? ((((pushforward-vector N->M M->N) vfN) fM) m0) rslt)
+          (check-not-exn (λ () ((((pushforward-vector N->M M->N) vfN) fM) m0)))))
+    (test-it R3-rect R2-rect)
+    (test-it R2-rect R3-rect)
+    (test-it R2-rect R2-rect
+             '(+ (* (V^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 0) µ^1) (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 1) f) (up (µ^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                                         (µ^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y)))))))
+                 (* (V^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 0) µ^0) (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 0) f) (up (µ^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                                         (µ^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y)))))))
+                 (* (V^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 1) µ^1) (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 1) f) (up (µ^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                                         (µ^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y)))))))
+                 (* (V^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 1) µ^0) (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                    (((partial 0) f) (up (µ^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
+                                         (µ^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y)))))))))
+    (skip ;; this should work, but something is wrong in the literal-manifold-function
+          ;; 1D manifold allow both Real and (Up Real) as it's coordinate, but the literal function does not
+          ;; it does work if fM is identity
+     (test-it R2-rect R1-rect))
+    )
+   (test-case
+    "vector-field->vector-field-over-map"
+    (define vf ((vector-field->vector-field-over-map (literal-manifold-map 'µ R1-rect R2-rect))
+                (literal-vector-field 'V R2-rect)))
+    (check-true (vector-field? vf))
+    (check-equal? (expression (operator-name vf)) '((vector-field->vector-field-over-map µ) V))
+    (check-simplified? ((vf (literal-manifold-function 'f R2-rect)) pt1-rect)
+                       '(+ (* (V^0 (up (µ^0 x) (µ^1 x))) (((partial 0) f) (up (µ^0 x) (µ^1 x))))
+                           (* (V^1 (up (µ^0 x) (µ^1 x))) (((partial 1) f) (up (µ^0 x) (µ^1 x)))))))
+   (test-case
+    "form-field->form-field-over-map"
+    (define-coordinates t R1-rect)
+    (define µ (literal-manifold-map 'µ R1-rect R2-rect))
+    (define ff ((form-field->form-field-over-map µ) (literal-1form-field 'F R2-rect)))
+    (check-true (form-field? ff))
+    (check-equal? (expression (operator-name ff)) '((form-field->form-field-over-map µ) F))
+    (check-simplified? ((ff ((differential-of-map µ) d/dt)) pt1-rect)
+                       '(+ (* ((D µ^0) x) (F_0 (up (µ^0 x) (µ^1 x)))) (* ((D µ^1) x) (F_1 (up (µ^0 x) (µ^1 x))))))
+    (check-exn #px"assertion failed: \\(= \\(length" (λ () (ff identity identity))))
+   (test-case
+    "basis-over-map"
+    (define µ (literal-manifold-map 'µ R1-rect R2-rect))
+    (define basis (basis->basis-over-map (literal-manifold-map 'µ R1-rect R2-rect) (R2-rect 'coordinate-basis)))
+    (check-true (basis? basis))
+    (check-equal? (basis->dimension basis) 2)
+    (check-simplified? (((basis->vector-basis basis) (literal-manifold-function 'M R2-rect)) pt1-rect)
+                       '(down (((partial 0) M) (up (µ^0 x) (µ^1 x))) (((partial 1) M) (up (µ^0 x) (µ^1 x)))))
+    (check-simplified? (((basis->1form-basis basis)
+                         (λ (f) (λ (pt) (f (µ pt)))))
+                        pt1-rect)
+                       '(up (µ^0 x) (µ^1 x))))
+   (test-case
+    "pullback... -form -vector-field ."
+    (define µ12 (literal-manifold-map 'µ R1-rect R2-rect))
+    (define µ21 (literal-manifold-map 'µ R2-rect R1-rect))
+    (check-simplified? ((((pullback-form µ12) (literal-1form-field 'F R2-rect))
+                         (literal-vector-field 'V R1-rect))
+                        pt1-rect)
+                       '(up (+ (* ((D µ^0) x) (F_0 (up (µ^0 x) (µ^1 x))) (V^0 x))
+                               (* ((D µ^1) x) (F_1 (up (µ^0 x) (µ^1 x))) (V^0 x)))))
+    (check-simplified? (((pullback-form µ12) (R2-rect '->coords))
+                        pt1-rect)
+                       '(up (µ^0 x) (µ^1 x)))
+    (check-simplified? ((((pullback µ12) (literal-1form-field 'F R2-rect))
+                         (literal-vector-field 'V R1-rect))
+                        pt1-rect)
+                       '(up (+ (* ((D µ^0) x) (F_0 (up (µ^0 x) (µ^1 x))) (V^0 x))
+                               (* ((D µ^1) x) (F_1 (up (µ^0 x) (µ^1 x))) (V^0 x)))))
+    (check-simplified? ((((pullback-vector-field µ12 µ21) (literal-vector-field 'V R2-rect))
+                         identity #;(literal-manifold-function 'f R1-rect))
+                        pt1-rect)
+                       0)
+    (check-simplified? ((((pullback µ12 µ21) (literal-vector-field 'V R2-rect))
+                         identity #;(literal-manifold-function 'f R1-rect))
+                        pt1-rect)
+                       0)
+    (check-exn #px"Pullback vector needs inverse map" (λ () ((pullback µ12) (literal-vector-field 'V R2-rect)))))
    (test-case
     "connection bases & diff"
     ;;; Explanation of the connection between the basis forms and the

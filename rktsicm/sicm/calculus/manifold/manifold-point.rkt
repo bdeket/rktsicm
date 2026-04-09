@@ -18,7 +18,9 @@
          )
 
 ;;bdk;; insert 1
-(struct manifold-point (spec manifold [coordinate-representations #:mutable]))
+(struct manifold-point (spec manifold [coordinate-representations #:mutable])
+  #:methods gen:custom-write
+  [(define write-proc (λ (point port mode) (write-string (format "#<manifold-point:~a>" ((manifold-point-manifold point) 'name)) port)))])
 
 (define (make-manifold-point spec manifold coordinate-system coordinate-rep)
   (manifold-point spec manifold (list (list coordinate-system coordinate-rep))))

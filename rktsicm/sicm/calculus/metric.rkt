@@ -228,9 +228,10 @@
 	  (define (the-metric v1 v2)
 	    (* (* gcoeffs (1form-basis v1))
 	       (1form-basis v2)))
-	  (declare-argument-types! the-metric
-				   (list vector-field? vector-field?))
-	  the-metric)))))
+	  (let ([the-metric(procedure-rename the-metric name)])
+            (declare-argument-types! the-metric
+                                     (list vector-field? vector-field?))
+            the-metric))))))
 #|
 (install-coordinates R3-rect (up 'x 'y 'z))
 
@@ -563,10 +564,10 @@
 	 (dtheta (ref 1form-basis 0))
 	 (dphi (ref 1form-basis 1)))
 
-    (define (the-metric v1 v2)
+    (define (S2-metric v1 v2)
       (+ (* (dtheta v1) (dtheta v2))
 	 (* (expt (sin theta) 2)
 	    (dphi v1) (dphi v2))))
-    (declare-argument-types! the-metric
+    (declare-argument-types! S2-metric
 			     (list vector-field? vector-field?))
-    the-metric))
+    S2-metric))

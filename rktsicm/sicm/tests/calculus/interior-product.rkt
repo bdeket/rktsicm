@@ -10,6 +10,39 @@
   (test-suite
    "calculus/interior-product"
    (test-case
+    "product construction"
+    (define X (literal-vector-field 'X R3-rect))
+    (define-coordinates (up x y z) R3-rect)
+    (define int-prod ((interior-product X) (wedge dx dy)))
+    (check-true (operator? int-prod))
+    (check-equal? (operator-name int-prod) '((interior-product X) (wedge dx dy)))
+    (check-equal? (operator-subtype int-prod) wedge)
+    (check-equal? (operator-arity int-prod) 1)
+    (check-equal? (expression ((int-prod X) ((R3-rect '->point) #(x y z))))
+                  '(+ (*    (X^0 (up x y z)) (X^1 (up x y z)))
+                      (* -1 (X^0 (up x y z)) (X^1 (up x y z)))))
+    (check-equal? (expression (((interior-product X) (wedge dz)) ((R3-rect '->point) #(x y z))))
+                  '(X^2 (up x y z))))
+   (test-case
+    "bad arguments"
+    (define X (literal-vector-field 'X R3-rect))
+    (define-coordinates (up x y z) R3-rect)
+    (define int-prod ((interior-product X) (wedge dx dy)))
+    (check-exn #px"X not a vector field: interior-product"
+               (λ () (interior-product (λ (x) (vector x (* 2 x) (* x x))))))
+    (check-exn #px"alpha not a form field: interior-product"
+               (λ () ((interior-product X) (λ (x) (vector x (* 2 x) (* x x))))))
+    (check-exn #px"Rank of form not greater than zero: interior-product"
+               (λ () ((interior-product X) (make-operator (λ (x) (vector x (* 2 x) (* x x)))
+                                                          'fake-formfield
+                                                          wedge
+                                                          0))))
+    (check-exn #px"Wrong number of arguments to interior product"
+               (λ () (int-prod X X)))
+    (check-exn #px"Wrong number of arguments to interior product"
+               (λ () (int-prod)))
+    )
+   (test-case
     "Claim L_x omega = i_x d omega + d i_x omega (Cartan Homotopy Formula)"
     (define-coordinates (up x y z) R3-rect)
     (define R3-rect-point ((R3-rect '->point) (up 'x0 'y0 'z0)))

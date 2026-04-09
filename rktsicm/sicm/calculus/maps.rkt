@@ -71,16 +71,18 @@
   (let ((n (source 'dimension))
 	(m (target 'dimension)))
     (let ((sig (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
-      (compose (target '->point)
-	       (s:generate m 'up
-			   (lambda (i)
-			     (literal-function
-			      (string->symbol
-			       (string-append (symbol->string name)
-					      "^"
-					      (number->string i)))
-			      sig)))
-	       (source '->coords)))))
+      (procedure-rename ;;bdk;; nicer name for diffop
+       (compose (target '->point)
+                (s:generate m 'up
+                            (lambda (i)
+                              (literal-function
+                               (string->symbol
+                                (string-append (symbol->string name)
+                                               "^"
+                                               (number->string i)))
+                               sig)))
+                (source '->coords))
+       name))))
 
 
 #|

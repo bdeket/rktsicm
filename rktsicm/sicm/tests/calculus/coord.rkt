@@ -55,7 +55,12 @@
               (check-equal?
                (x ((R2-rect '->point) (up 'a 'b)))
                'a))
-
+   (test-case
+    "bad coordinate"
+    (local-require "../../rkt/environment.rkt")
+    (check-exn #px"bad coordinate prototype"
+               (λ () (eval-syntax #'(define-coordinates (vector x y z) R2-rect)
+                                  generic-environment))))
    ))
 
 (module+ test

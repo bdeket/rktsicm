@@ -10,6 +10,26 @@
   (test-suite
    "calculus/Lie"
    (test-case
+    "Lie - bad arguments"
+    (check-exn #px"Bad vector field -- Lie-derivative"
+               (λ () (Lie-derivative 'bad)))
+    (check-exn #px"Bad argument -- Lie-derivative"
+               (λ () ((Lie-derivative (literal-vector-field 'X R3-rect)) 'bad))))
+   (test-case
+    "Lie - function"
+    (define ((H-harmonic m k) state)
+      (+ (/ (square (momentum state)) (* 2 m))
+         (* 1/2 k (square (coordinate state)))))
+    (define (coordinate state) (ref state 1))
+    (check-simplified? (((Lie-derivative (H-harmonic 'm 'k)) coordinate) (up 't 'x 'y))
+                       '(/ y m)))
+   (test-case
+    "Lie - structure arg"
+    (define X (literal-vector-field 'X R3-rect))
+    (define Y (up (λ (pt) (ref ((R3-rect '->coords) pt) 2)) (λ (pt) (ref ((R3-rect '->coords) pt) 0))))
+    (check-simplified? (((Lie-derivative X) Y) ((R3-rect '->point) (up 'x0 'y0 'z0)))
+                       '(up (X^2 (up x0 y0 z0)) (X^0 (up x0 y0 z0)))))
+   (test-case
     "R3"
     (define-coordinates (up x y z) R3-rect)
     (define R3-rect-point ((R3-rect '->point) (up 'x0 'y0 'z0)))

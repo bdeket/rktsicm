@@ -69,10 +69,12 @@
 ;;; We can extract the components function for a vector field, given a
 ;;; coordinate system.
 
-(define ((vector-field->components vf coordinate-system) coords)
+(define (vector-field->components vf coordinate-system)
+  ;;bdk;; make curry explicit to force early error
   (assert (vector-field? vf) "Bad vector field: vector-field->components")
-  ((vf (coordinate-system '->coords)) 
-   ((coordinate-system '->point) coords)))
+  (λ (coords)
+    ((vf (coordinate-system '->coords)) 
+     ((coordinate-system '->point) coords))))
 
 (define (vf:zero f)
   ;;(assert (manifold-function? f))

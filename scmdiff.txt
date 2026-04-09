@@ -22,9 +22,11 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  2 difference(s) found in calculus/form-fields
  3 difference(s) found in calculus/indexed
 25 difference(s) found in calculus/manifold
+ 2 difference(s) found in calculus/maps
+ 5 difference(s) found in calculus/metric
  2 difference(s) found in calculus/so3
  1 difference(s) found in calculus/tensors
- 1 difference(s) found in calculus/vector-fields
+ 4 difference(s) found in calculus/vector-fields
  5 difference(s) found in calculus/wedge
  6 difference(s) found in display/exdisplay
  3 difference(s) found in display/print

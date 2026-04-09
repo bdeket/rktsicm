@@ -12,6 +12,20 @@
   (test-suite
    "calculus/hodge-star"
    (test-case
+    "extra ortho"
+    (define-coordinates (up x y) R2-rect)
+    (define (E2-metric v1 v2)
+      (+ (* (dx v1) (dx v2))
+         (* (dy v1) (dy v2))))
+    (define omega (wedge dx dy))
+    (define E2-star
+      (Hodge-star E2-metric
+                  (coordinate-system->basis R2-polar)
+                  R2-rect))
+    (check-simplified? ((E2-star omega)
+                        ((point R2-rect) (up 'x 'y)))
+                       1))
+   (test-case
     "c1"
     (define-coordinates (up x y) R2-rect)
     (define (E2-metric v1 v2)

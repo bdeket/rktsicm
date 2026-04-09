@@ -2,32 +2,32 @@
 --------------------------------------------------------------
                          0.0 ./rktsicm/sicm\generic.rkt
                          0.0 ./rktsicm/sicm\main.rkt
-   4                     0.0 ./rktsicm/sicm\tests\calculus\Lie.rkt
-   3                     0.0 ./rktsicm/sicm\tests\calculus\SR-boost.rkt
+   7                     0.0 ./rktsicm/sicm\tests\calculus\Lie.rkt
+   4                     0.0 ./rktsicm/sicm\tests\calculus\SR-boost.rkt
    3                     0.0 ./rktsicm/sicm\tests\calculus\SR-frames.rkt
-   2                     0.0 ./rktsicm/sicm\tests\calculus\basis.rkt
+   7                     0.0 ./rktsicm/sicm\tests\calculus\basis.rkt
    7             1       0.5 ./rktsicm/sicm\tests\calculus\connection.rkt
-   3                     0.0 ./rktsicm/sicm\tests\calculus\coord.rkt
+   4                     0.0 ./rktsicm/sicm\tests\calculus\coord.rkt
   15                     0.5 ./rktsicm/sicm\tests\calculus\covariant-derivative.rkt
    7                  2  0.5 ./rktsicm/sicm\tests\calculus\curvature.rkt
-   2                     0.0 ./rktsicm/sicm\tests\calculus\dgutils.rkt
+   9                     0.0 ./rktsicm/sicm\tests\calculus\dgutils.rkt
    1                     0.0 ./rktsicm/sicm\tests\calculus\exterior-derivative.rkt
-   2                     0.0 ./rktsicm/sicm\tests\calculus\form-fields.rkt
-                         0.0 ./rktsicm/sicm\tests\calculus\frame-maker.rkt
-   3                     1.5 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
-   8                     0.5 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
+  10                     0.0 ./rktsicm/sicm\tests\calculus\form-fields.rkt
+   4                     0.0 ./rktsicm/sicm\tests\calculus\frame-maker.rkt
+   5                     1.0 ./rktsicm/sicm\tests\calculus\gram-schmidt.rkt
+   9                     0.5 ./rktsicm/sicm\tests\calculus\hodge-star.rkt
    3                     0.0 ./rktsicm/sicm\tests\calculus\indexed.rkt
-   1                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
+   3                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
   13                     0.0 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
   15                  4  0.0 ./rktsicm/sicm\tests\calculus\manifold.rkt
-   7                     0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
-   8                     0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
-                         0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
+  15                  1  0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
+  20                  1  0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
+   1                     0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
   18                  2  0.5 ./rktsicm/sicm\tests\calculus\so3.rkt
-   3                     0.5 ./rktsicm/sicm\tests\calculus\tensors.rkt
+   5                     0.0 ./rktsicm/sicm\tests\calculus\tensors.rkt
    2                     0.5 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
-   3                     0.0 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
-   2                     0.0 ./rktsicm/sicm\tests\calculus\wedge.rkt
+  11                     0.0 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
+   8                     0.0 ./rktsicm/sicm\tests\calculus\wedge.rkt
    7                  1  0.0 ./rktsicm/sicm\tests\display\exdisplay.rkt
    4                  1  0.0 ./rktsicm/sicm\tests\display\pp.rkt
    3                     0.0 ./rktsicm/sicm\tests\display\suppress-args.rkt
@@ -150,7 +150,7 @@
   19                  2  0.0 ./rktsicm/sicm\tests\units\with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1234             2   56 14.5 TOTAL
-runtime: 3.5833333333333335m 
+1305             2   58 13.0 TOTAL
+runtime: 3.4m 
 Welcome to Racket v9.1.0.11-2026-03-29-afbc55a2ad [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 
