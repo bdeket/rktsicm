@@ -114,8 +114,9 @@
   (list-ref (frame-params frame) 2))
 
 
-(define make-SR-frame
-  (frame-maker coordinates->event event->coordinates))
+;;bdk;; make arguments explicit
+(define (make-SR-frame name ancestor dir v/c origin)
+  ((frame-maker coordinates->event event->coordinates) name ancestor dir v/c origin))
 
 ;;; The background frame
 

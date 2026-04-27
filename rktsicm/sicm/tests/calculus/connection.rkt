@@ -1,7 +1,6 @@
 #lang racket/base
 
 (require rackunit
-         (rename-in (only-in racket/base time) [time rkt:time])
          "../../main.rkt"
          "../helper+scm.rkt"
          )
@@ -10,6 +9,135 @@
 (define the-tests
   (test-suite
    "calculus/connection"
+   (test-case
+    "make-Christoffel-1"
+    (check-equal? (make-Christoffel-1 'symbol 'basis)
+                  '(*Christoffel-1* symbol basis)))
+   (test-case
+    "metric->Christoffel-1"
+    (define basis (R2-rect 'coordinate-basis))
+    (check-unique-match? (metric->Christoffel-1 (literal-metric 'M R2-rect) basis)
+                         (any)
+                         `(*Christoffel-1* ,any ,basis))
+    (check-simplified? ((cadr (metric->Christoffel-1 (literal-metric 'M R2-rect) basis)) ((point R2-rect) #(x y)))
+                       '(down (down (down (* 1/2 (((partial 0) M_00) (up x y)))
+                                          (+ (((partial 0) M_01) (up x y)) (* -1/2 (((partial 1) M_00) (up x y)))))
+                                    (down (* 1/2 (((partial 1) M_00) (up x y)))
+                                          (* 1/2 (((partial 0) M_11) (up x y)))))
+                              (down (down (* 1/2 (((partial 1) M_00) (up x y)))
+                                          (* 1/2 (((partial 0) M_11) (up x y))))
+                                    (down (+ (* -1/2 (((partial 0) M_11) (up x y))) (((partial 1) M_01) (up x y)))
+                                          (* 1/2 (((partial 1) M_11) (up x y)))))))
+    (check-exn #px"assertion failed: \\(coordinate-basis\\? basis\\)"
+               (λ () (metric->Christoffel-1 (literal-metric 'M R2-rect) 'not-a-basis))))
+   (test-case
+    "metric->Christoffel-2"
+    (define basis (R2-rect 'coordinate-basis))
+    (define rslt (metric->Christoffel-2 (literal-metric 'M R2-rect) basis))
+    (check-true (Christoffel? rslt))
+    (check-equal? (Christoffel->basis rslt) basis)
+    (suppress-arguments '((up x y)))
+    (check-simplified? ((Christoffel->symbols rslt) ((point R2-rect) #(x y)))
+                       '(down (down (up (/ (+ (*    ((partial 0) M_00) M_11) (* -2 ((partial 0) M_01) M_01) (*    ((partial 1) M_00) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (* -1 ((partial 0) M_00) M_01) (*  2 ((partial 0) M_01) M_00) (* -1 ((partial 1) M_00) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2)))))
+                                    (up (/ (+ (*    ((partial 1) M_00) M_11) (* -1 ((partial 0) M_11) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (* -1 ((partial 1) M_00) M_01) (*    ((partial 0) M_11) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))))
+                              (down (up (/ (+ (*    ((partial 1) M_00) M_11) (* -1 ((partial 0) M_11) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (* -1 ((partial 1) M_00) M_01) (*    ((partial 0) M_11) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2)))))
+                                    (up (/ (+ (* -1 ((partial 0) M_11) M_11) (*  2 ((partial 1) M_01) M_11) (* -1 ((partial 1) M_11) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (*    ((partial 0) M_11) M_01) (* -2 ((partial 1) M_01) M_01) (*    ((partial 1) M_11) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))))))
+    (clear-arguments)
+    (check-exn #px"assertion failed: \\(coordinate-basis\\? basis\\)"
+               (λ () (metric->Christoffel-2 (literal-metric 'M R2-rect) 'not-a-basis))))
+   
+   (test-case
+    "literal-Christoffel-names"
+    (check-equal? (literal-Christoffel-names 'n '(up up down) 0)
+                  #())
+    (check-equal? (literal-Christoffel-names 'n '(down down up) 1)
+                  (down (down (up 'n_00^0))))
+    (check-equal? (literal-Christoffel-names 'n '(up up up) 2)
+                  (up (up (up 'n^00^0 'n^00^1) (up 'n^01^0 'n^01^1))
+                      (up (up 'n^10^0 'n^10^1) (up 'n^11^0 'n^11^1))))
+    (check-equal? (literal-Christoffel-names 'q '(up up down) 3)
+                  (up (up (down 'q^00_0 'q^00_1 'q^00_2)
+                          (down 'q^01_0 'q^01_1 'q^01_2)
+                          (down 'q^02_0 'q^02_1 'q^02_2))
+                      (up (down 'q^10_0 'q^10_1 'q^10_2)
+                          (down 'q^11_0 'q^11_1 'q^11_2)
+                          (down 'q^12_0 'q^12_1 'q^12_2))
+                      (up (down 'q^20_0 'q^20_1 'q^20_2)
+                          (down 'q^21_0 'q^21_1 'q^21_2)
+                          (down 'q^22_0 'q^22_1 'q^22_2))))
+    (check-exn #px"assertion failed: \\(eq\\? \\(car scripts\\) \\(cadr scripts\\)\\)"
+               (λ () (literal-Christoffel-names 'n '(up down up) 0)))
+    (check-exn #px"Bad up/down spec -- S:STRUCTURE 'a"
+               (λ () (literal-Christoffel-names 'n '(a a b) 0))))
+   (test-case
+    "literal-Christoffel"
+    (define X (literal-Christoffel-1 'C R2-rect))
+    (define basis (R2-rect 'coordinate-basis))
+    (check-unique-match? X (any) `(*Christoffel-1* ,any ,basis))
+    (check-simplified? ((cadr X) ((point R2-rect) #(x y)))
+                       '(down (down (down (C_00_0 (up x y)) (C_00_1 (up x y)))
+                                    (down (C_01_0 (up x y)) (C_01_1 (up x y))))
+                              (down (down (C_10_0 (up x y)) (C_10_1 (up x y)))
+                                    (down (C_11_0 (up x y)) (C_11_1 (up x y))))))
+    (define Y (literal-Christoffel-2 'C R2-rect))
+    (check-true (Christoffel? Y))
+    (check-equal? (Christoffel->basis Y) basis)
+    (check-simplified? ((Christoffel->symbols Y) ((point R2-rect) #(x y)))
+                       '(down (down (up (C_00^0 (up x y)) (C_00^1 (up x y)))
+                                    (up (C_01^0 (up x y)) (C_01^1 (up x y))))
+                              (down (up (C_10^0 (up x y)) (C_10^1 (up x y)))
+                                    (up (C_11^0 (up x y)) (C_11^1 (up x y)))))))
+   (test-case
+    "literal-Cartan"
+    (define X (literal-Cartan 'C R2-rect))
+    (check-true (Cartan? X))
+    (check-equal? (Cartan->basis X) (R2-rect 'coordinate-basis))
+    (check-simplified? (((Cartan->forms X) (literal-vector-field 'v R2-rect)) ((point R2-rect) #(x y)))
+                       '(down (up (+ (* (C_00^0 (up x y)) (v^0 (up x y)))
+                                     (* (C_10^0 (up x y)) (v^1 (up x y))))
+                                  (+ (* (C_00^1 (up x y)) (v^0 (up x y)))
+                                     (* (C_10^1 (up x y)) (v^1 (up x y)))))
+                              (up (+ (* (C_01^0 (up x y)) (v^0 (up x y)))
+                                     (* (C_11^0 (up x y)) (v^1 (up x y))))
+                                  (+ (* (C_01^1 (up x y)) (v^0 (up x y)))
+                                     (* (C_11^1 (up x y)) (v^1 (up x y))))))))
+   
+   (test-case
+    "metric->connection"
+    ;; TODO: what is the difference with metric->Christoffel-1/2?
+    ;;       except that connection-1 is a Christoffel-2
+    (define basis (R2-rect 'coordinate-basis))
+    (define X (metric->connection-1 (literal-metric 'M R2-rect) basis))
+    (check-true (Christoffel? X))
+    (check-equal? (Christoffel->basis X) basis)
+    (check-simplified? ((Christoffel->symbols X) ((point R2-rect) #(x y)))
+                       '(down (down (down (* 1/2 (((partial 0) M_00) (up x y)))
+                                          (+ (((partial 0) M_01) (up x y)) (* -1/2 (((partial 1) M_00) (up x y)))))
+                                    (down (* 1/2 (((partial 1) M_00) (up x y)))
+                                          (* 1/2 (((partial 0) M_11) (up x y)))))
+                              (down (down (* 1/2 (((partial 1) M_00) (up x y)))
+                                          (* 1/2 (((partial 0) M_11) (up x y))))
+                                    (down (+ (* -1/2 (((partial 0) M_11) (up x y))) (((partial 1) M_01) (up x y)))
+                                          (* 1/2 (((partial 1) M_11) (up x y)))))))
+    (define Y (metric->connection-2 (literal-metric 'M R2-rect) basis))
+    (check-true (Christoffel? Y))
+    (check-equal? (Christoffel->basis Y) basis)
+    (suppress-arguments '((up x y)))
+    (check-simplified? ((Christoffel->symbols Y) ((point R2-rect) #(x y)))
+                       '(down (down (up (/ (+ (*    ((partial 0) M_00) M_11) (* -2 ((partial 0) M_01) M_01) (*    ((partial 1) M_00) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (* -1 ((partial 0) M_00) M_01) (*  2 ((partial 0) M_01) M_00) (* -1 ((partial 1) M_00) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2)))))
+                                    (up (/ (+ (*    ((partial 1) M_00) M_11) (* -1 ((partial 0) M_11) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (* -1 ((partial 1) M_00) M_01) (*    ((partial 0) M_11) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))))
+                              (down (up (/ (+ (*    ((partial 1) M_00) M_11) (* -1 ((partial 0) M_11) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (* -1 ((partial 1) M_00) M_01) (*    ((partial 0) M_11) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2)))))
+                                    (up (/ (+ (* -1 ((partial 0) M_11) M_11) (*  2 ((partial 1) M_01) M_11) (* -1 ((partial 1) M_11) M_01)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))
+                                        (/ (+ (*    ((partial 0) M_11) M_01) (* -2 ((partial 1) M_01) M_01) (*    ((partial 1) M_11) M_00)) (+ (* 2 M_11 M_00) (* -2 (expt M_01 2))))))))
+    (clear-arguments))
+
    (test-case "ORIG:metric->Christoffel-1"
               (define 2-sphere R2-rect)
               (define-coordinates (up theta phi) 2-sphere)
@@ -352,9 +480,7 @@
                             (list dt dr dtheta dphi)))
                ;;; 256 zeros
                (build-list 256 (λ _ 0))
-               #:timeout 3)
-              )
-
+               #:timeout 3))
    ))
 
 (module+ test

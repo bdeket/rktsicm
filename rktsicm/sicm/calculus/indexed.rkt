@@ -16,6 +16,17 @@
 (define-values (defhandler indexed:assign-operations)
   (make-assign-operations 'indexed))
 
+(define (set-simplify-coeff-function! simplifier)
+  (cond
+    [(eq? simplifier #f)
+     (set! simplify-coeff-function (λ (m) (λ (f) f)))
+     (set! simplify-coeff-functions? #f)]
+    [(procedure? simplifier)
+     (set! simplify-coeff-function simplifier)
+     (set! simplify-coeff-functions? #t)]
+    [else
+     (error 'set-simplify-coeff-functions! "not a valid simplifier: ~a" simplifier)]))
+
 ;;bdk;; start original file
 
 ;;;;    Minimal support for Indexed Objects
@@ -366,7 +377,7 @@
   ;; a stub.  see einstein/speedup.scm for ideas
   f)
 
-(define simplify-coeff-functions? #t)
+(define simplify-coeff-functions? #f)
 
 
 ;;; The following are universally ok.
