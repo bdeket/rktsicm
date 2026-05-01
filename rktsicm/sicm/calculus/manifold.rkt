@@ -323,6 +323,7 @@
                     'coordinate-system-dimension
                     coordinate-system-dimension)
 
+#; ;;bdk;; -> frame struct
 (define (frame? x)
   (and (procedure? x)
        ;; Kludge.  See frame-maker.scm

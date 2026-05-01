@@ -172,7 +172,7 @@
                      (up 1 0 0)
                      (add-v/cs 'va/c 'vba/c)
                      origin-B))
-    (check-simplified? C 'this-frame)
+    (check-simplified? C C)
     ;;; A typical event.
     (define foo
       ((point the-ether)

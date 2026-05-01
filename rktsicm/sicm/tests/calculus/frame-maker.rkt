@@ -14,13 +14,9 @@
     (define maker (frame-maker 'X 'Y))
     (check-true (procedure? maker))
     (define frame (maker 'this 'father 'para 'meter))
-    (check-true (procedure? frame))
-    (check-false (frame 'manifold))
-    ;; don't test the message passing style if not needed
     (check-equal? (frame-name frame) 'this)
     (check-equal? (ancestor-frame frame) 'father)
-    (check-equal? (frame-params frame) '(para meter))
-    (check-exn #px"Unknown message: " (λ () (frame 'bad-message))))
+    (check-equal? (frame-params frame) '(para meter)))
    (test-case
     "coords<->event"
     (define frame ((frame-maker (λ x (λ (c) (make-event `(-> ,@x ,c))))

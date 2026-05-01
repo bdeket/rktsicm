@@ -44,7 +44,7 @@
   (eq-get coords 'SR-coordinates))
 
 (define (SR-name coords)
-  ((frame-owner coords) 'name))
+  (frame-name (frame-owner coords)))
 
 ;;; SR frames
 

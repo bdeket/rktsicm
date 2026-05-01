@@ -1,11 +1,18 @@
 #lang s-exp "../generic.rkt"
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) frame->event frame->coords)
+         (rename-out [frame->event coords->event]
+                     [frame->coords event->coords]
+                     [frame-ancestor ancestor-frame]))
 
 (require (only-in "../rkt/glue.rkt" if)
          "../general/assert.rkt"
          "../general/eq-properties.rkt"
          )
+
+(struct frame (name ancestor >event >coords params)
+  #:methods gen:custom-write
+  [(define write-proc (λ (frame port mode) (write-string (format "#<frame:~a>" (frame-name frame)) port)))])
 
 ;;bdk;; start original file
 
@@ -31,6 +38,8 @@
        (assert (eq? (frame-owner coords) this-frame))
        coords))
 
+  (define this-frame (frame name ancestor-frame coordinates->event event->coordinates params))
+  #; ;;bdk;; -> frame struct
    (define (this-frame m)
      (case m
        ((coords->event) coordinates->event)
@@ -42,6 +51,7 @@
        (else (error "Unknown message: " name m))))
    this-frame)
 
+#;#;#; ;;bdk;; -> frame struct
 (define (event->coords frame) (frame 'event->coords))
 (define (coords->event frame) (frame 'coords->event))
 (define (ancestor-frame frame) (frame 'ancestor-frame))
@@ -64,6 +74,7 @@
 	(eq-put! coords 'owner owner))
     coords))
 
+#;#; ;;bdk;; -> frame struct
 (define (frame-params frame) (frame 'params))
 (define (frame-name frame) (frame 'name))
 

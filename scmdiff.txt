@@ -16,10 +16,11 @@ could not find: ../../racket/test/sicm/scmutils-20230902/numerics\signals\cph-ds
 could not find: ../../racket/test/sicm/scmutils-20230902/numerics\signals.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/numerics\statistics.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
- 2 difference(s) found in calculus/SR-frames
+ 3 difference(s) found in calculus/SR-frames
  2 difference(s) found in calculus/coord
  1 difference(s) found in calculus/dgutils
  2 difference(s) found in calculus/form-fields
+ 1 difference(s) found in calculus/frame-maker
  4 difference(s) found in calculus/indexed
 25 difference(s) found in calculus/manifold
  2 difference(s) found in calculus/maps

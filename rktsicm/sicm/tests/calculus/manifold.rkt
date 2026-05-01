@@ -4,6 +4,7 @@
          "../../calculus/manifold.rkt"
          "../../calculus/manifold/helper.rkt"
          (only-in "../../calculus/basis.rkt" coordinate-basis?)
+         (only-in "../../calculus/frame-maker.rkt" frame? frame)
          (only-in racket/list last)
          "../helper+scm.rkt"
          )
@@ -217,17 +218,7 @@
     ; frame?
     (check-false (frame? R2))
     (check-false (frame? R2-rect))
-    (skip #;"this can not be correct")
-    (check-not-false (frame? (λ (x) #f)))
-    (define (fake-frame m)
-      (case m
-        [(coords->event) 1]
-        [(event->coords) 2]
-        [(name) 'fake]
-        [(ancestor-frame) #f]
-        [(params) '()]
-        [(manifold) #f]
-        [else (error)]))
+    (define fake-frame (frame 'fake #f 1 2 '()))
     (check-not-false (frame? fake-frame))
     ; chart
     (define P ((R2-rect '->point) #(x y)))
