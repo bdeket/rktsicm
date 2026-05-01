@@ -14,6 +14,12 @@
          accumulate out->string skip
          clear-arguments suppress-arguments rename-part)
 
+;; force the first x primes to avoid the 'stream-reentrant' error
+(let ()
+  (local-require (only-in racket/stream stream-ref)
+                 (only-in "../kernel/strutl.rkt" prime-numbers-stream))
+  (void (stream-ref prime-numbers-stream 30)))
+
 ;***************************************************************************************************
 (define-syntax (check-simplified? stx)
   (syntax-case stx ()
