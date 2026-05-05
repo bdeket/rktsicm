@@ -1,6 +1,7 @@
 #lang s-exp "../../main.rkt"
 
 (require rackunit
+         "../../mechanics/Lie-transform.rkt"
          "../helper+scm.rkt")
 
 (rename-part 'derivative 'D)
@@ -9,6 +10,29 @@
 (define the-tests
   (test-suite
    "mechanics/Lie-transform"
+   (test-case
+    "Lie-transform"
+    (define LT (Lie-transform (literal-function 'H (Hamiltonian 1)) 'dt))
+    (check-true (operator? LT))
+    (check-equal? (expression (operator-name LT)) '(Lie-transform H dt))
+    (check-simplified? (accumulate pp (series:for-each pp ((LT state->q) (up 't 'q 'p)) 3))
+                       '(q
+                         (* dt (((partial 2) H) (up t q p)))
+                         (+ (*  1/2 (expt dt 2) (((partial 2) H) (up t q p)) (((* (partial 2) (partial 1)) H) (up t q p)))
+                            (* -1/2 (expt dt 2) (((partial 1) H) (up t q p)) (((expt (partial 2) 2) H) (up t q p)))))))
+   (test-case
+    "flow-transform"
+    (define FT (flow-transform (literal-function 'H (Hamiltonian 1)) 'dt))
+    (check-true (operator? FT))
+    (check-equal? (expression (operator-name FT)) '(flow-transform H dt))
+    (check-simplified? (accumulate pp (series:for-each pp ((FT state->q) (up 't 'q 'p)) 3))
+                       '(q
+                         (* dt (((partial 2) H) (up t q p)))
+                         (+ (*  1/2 (expt dt 2) (((partial 2) H) (up t q p)) (((* (partial 2) (partial 1)) H) (up t q p)))
+                            (* -1/2 (expt dt 2) (((partial 1) H) (up t q p)) (((expt (partial 2) 2) H) (up t q p)))
+                            (* 1/2 (expt dt 2) (((* (partial 2) (partial 0)) H) (up t q p)))))))
+
+   ;**************************************************************************************************
    (test-case
     "1"
     (define ((H-harmonic m k) state)

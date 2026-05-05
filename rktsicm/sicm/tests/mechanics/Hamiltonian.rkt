@@ -1,6 +1,7 @@
 #lang s-exp "../../main.rkt"
 
 (require rackunit
+         "../../mechanics/Hamiltonian.rkt"
          "../helper+scm.rkt")
 
 (rename-part 'derivative 'D)
@@ -9,20 +10,183 @@
 (define the-tests
   (test-suite
    "mechanics/Hamiltonian"
-   (check-simplified? (matrix->H-state (H-state->matrix (up 't (up 'x 'y) (down 'p_x 'p_y)))
-                                       ;;bdk;; missing argument...
-                                       (up 't (up 'x 'y) (down 'px 'py)))
-                      '(up t (up x y) (down p_x p_y)))
-   (check-simplified? (H-state->matrix
-                       (matrix->H-state
-                        (matrix-by-rows (list 't)
-                                        (list 'x)
-                                        (list 'y)
-                                        (list 'p_x)
-                                        (list 'p_y))
-                        ;;bdk;; missing argument...
-                        (up 't (up 'x 'y) (down 'px 'py))))
-                      '(matrix-by-rows (list t) (list x) (list y) (list p_x) (list p_y)))
+   (test-case
+    "H-state"
+    (check-equal? (->H-state 't 'q 'p) (up 't 'q 'p))
+    (check-true  (H-state? (up 't 'q 'p)))
+    (check-false (H-state? (down 't 'q 'p)))
+    (check-false (H-state? (up 't 'q (up 'p))))
+    (check-false (H-state? (up 't 'q (down 'p))))
+    (check-false (H-state? (up 't (up 'q) (up 'p))))
+    (check-true  (H-state? (up 't (up 'q) (down 'p))))
+    (check-false (H-state? (up 't (down 'q) (up 'p))))
+    (check-false (H-state? (up 't (down 'q) (down 'p))))
+    
+    (check-false (compatible-H-state? (up 't 'q 'p)))
+    (check-true  (compatible-H-state? (down 't 'q 'p)))
+    (check-false (compatible-H-state? (down 't 'q (up 'p))))
+    (check-false (compatible-H-state? (down 't 'q (down 'p))))
+    (check-false (compatible-H-state? (down 't (up 'q) (up 'p))))
+    (check-false (compatible-H-state? (down 't (up 'q) (down 'p))))
+    (check-true  (compatible-H-state? (down 't (down 'q) (up 'p))))
+    (check-false (compatible-H-state? (down 't (down 'q) (down 'p))))
+
+    (check-equal? (state->p (->H-state 't 'q 'p)) 'p)
+    (check-eq? state->p momentum)
+    (check-eq? state->p momenta)
+    (check-eq? state->p P)
+    (check-exn #px"Cannot extract momentum from" (λ () (state->p 'not-a-state)))
+
+    (check-equal? (state->qp (->H-state 't 'q 'p)) (vector 'q 'p)))
+   (test-case
+    "literal-Hamiltonian-state"
+    (check-equal? (zero-like (literal-Hamiltonian-state 0))
+                  (up 0 (up ) (down )))
+    (check-equal? (zero-like (literal-Hamiltonian-state 1))
+                  (up 0 (up 0) (down 0)))
+    (check-equal? (zero-like (literal-Hamiltonian-state 2))
+                  (up 0 (up 0 0) (down 0 0)))
+    (check-equal? (degrees-of-freedom (literal-Hamiltonian-state 0)) 0)
+    (check-equal? (degrees-of-freedom (literal-Hamiltonian-state 3)) 3)
+    (check-equal? (degrees-of-freedom (literal-Hamiltonian-state 5)) 5)
+    (check-exn #px"assertion failed: \\(= \\(s:length H-state\\) 3\\)"
+               (λ () (degrees-of-freedom 'wrong-input)))
+    (check-exn #px"assertion failed: \\(= \\(s:length H-state\\) 3\\)"
+               (λ () (degrees-of-freedom (up 2))))
+    (check-exn #px"assertion failed: \\(= \\(s:dimension \\(coordinate H-state\\)\\) \\(s:dimension \\(momentum H-state\\)\\)\\)"
+               (λ () (degrees-of-freedom (up 2 (up 1) (up 3 4))))))
+   (test-case
+    "L<->H state"
+    (define L (literal-function 'L (-> (UP Real Real Real) Real)))
+    (define H (literal-function 'H (-> (UP Real (UP Real Real) (DOWN Real Real)) Real)))
+    (check-simplified? ((Lstate->Hstate L) (up 't 'q 'v))
+                       (up 't 'q (((partial 2) L) (up 't 'q 'v))))
+    (check-simplified? ((Hstate->Lstate H) (up 't (up 'q0 'q1) (down 'p0 'p1)))
+                       (up 't
+                           (up 'q0 'q1)
+                           (up (((partial 2 0) H) (up 't (up 'q0 'q1) (down 'p0 'p1)))
+                               (((partial 2 1) H) (up 't (up 'q0 'q1) (down 'p0 'p1)))))))
+   (test-case
+    "H-state->matrix"
+    (check-equal? (H-state->matrix (up 't (up 'q0 'q1) (down 'p0 'p1)))
+                  (matrix-by-cols '(t q0 q1 p0 p1)))
+    (check-equal? (matrix->H-state (matrix-by-cols '(t q0 q1 q2 p0 p1 p2)) 'up)
+                  (up 't (up 'q0 'q1 'q2) (down 'p0 'p1 'p2)))
+    (check-equal? (matrix->H-state (matrix-by-cols '(t q0 q1 p0 p2)))
+                  (up 't (up 'q0 'q1) (down 'p0 'p2)))
+    (check-equal? (matrix->H-state (matrix-by-cols '(t q0 q1 q2 p0 p1 p2)) 'down)
+                  (down 't (down 'q0 'q1 'q2) (up 'p0 'p1 'p2)))
+    (check-exn #px"assertion failed: \\(= \\(m:num-cols m\\) 1\\)"
+               (λ () (matrix->H-state (matrix-by-cols '(t0 q0 p0) '(t1 q1 p1)))))
+    (check-exn #px"assertion failed: \\(and \\(odd\\? \\(m:num-rows m\\)\\) \\(> \\(m:num-rows m\\) 2\\)\\)"
+               (λ () (matrix->H-state (matrix-by-cols '(t0 q0 q1 p0)))))
+    (check-exn #px"matrix->H-state: not a valid shape: "
+               (λ () (matrix->H-state (matrix-by-cols '(t0 q0 p0)) 'other))))
+   (test-case
+    "make-Hamiltonian"
+    (check-equal? (make-Hamiltonian 'kinE 'potE) (+ 'kinE 'potE)))
+   (test-case
+    "Hamilton-equations"
+    (define H (literal-function 'H (-> (UP Real (UP* Real) (DOWN* Real)) Real)))
+    (define q (literal-function 'q))
+    (define p (literal-function 'p))
+    (define tqp (up identity q p))
+    (check-simplified? ((qp->H-state-path q p) 't) (tqp 't))
+    (check-simplified? ((Hamiltonian->state-derivative H) (tqp 't))
+                       (up 1 (((partial 2) H) (tqp 't)) (* -1 (((partial 1) H) (tqp 't)))))
+    (check-eq? Hamiltonian->state-derivative Hamiltonian->state-derivative)
+
+    (check-simplified? (((Hamilton-equations H) q p) 't)
+                       (up 0
+                           (+ (* -1 (((partial 2) H) (tqp 't))) ((D q) 't))
+                           (+ (((partial 1) H) (tqp 't)) ((D p) 't)))))
+   (test-case
+    "D-phase-space"
+    (define H (literal-function 'H (-> (UP Real (UP* Real) (DOWN* Real)) Real)))
+    (define q (literal-function 'q))
+    (define p (literal-function 'p))
+    (define tqp (up identity q p))
+    (check-simplified? ((D-phase-space H) (tqp 't))
+                       (up 0 (((partial 2) H) (tqp 't)) (* -1 (((partial 1) H) (tqp 't))))))
+   (test-case
+    "Legendre-transform"
+    (check-true (operator? Legendre-transform))
+    (check-equal? (operator-name Legendre-transform) 'Legendre-transform))
+   
+   (test-case
+    "Lagrangian->Hamiltonian"
+    (check-true (operator? Lagrangian->Hamiltonian))
+    (check-equal? (operator-name Lagrangian->Hamiltonian) 'Lagrangian->Hamiltonian)
+    (define L (literal-function 'L (-> (UP Real (UP* Real) (UP* Real)) Real)))
+    (skip ;; TODO can the literal-function be quadratic?
+     (check-simplified? ((Lagrangian->Hamiltonian L) (up 't (up 'q0 'q1) (down 'p0 'p1)))
+                       '(error -> not quadratic)))
+    (check-simplified? ((Lagrangian->Hamiltonian (λ (state) (* 1/2 (expt (velocity state) 2))))
+                       (up 't 'q 'p))
+                       '(* 1/2 (expt p 2)))
+    (check-exn #px"Legendre Transform Failure: not quadratic"
+               (λ () ((Lagrangian->Hamiltonian L) (up 't (up 'q0 'q1) (down 'p0 'p1)))))
+    (check-exn #px"Legendre Transform Failure: determinant=0 "
+               (λ () ((Lagrangian->Hamiltonian (λ (state) 0)) (up 't 'q 'p)))))
+   (test-case
+    "Hamiltonian->Lagrangian"
+    (check-true (operator? Hamiltonian->Lagrangian))
+    (check-equal? (operator-name Hamiltonian->Lagrangian) 'Hamiltonian->Lagrangian)
+    (define H (literal-function 'H (-> (UP Real (UP* Real) (DOWN* Real)) Real)))
+    (skip ;; TODO can the literal-function be quadratic?
+     (check-simplified? ((Hamiltonian->Lagrangian H) (up 't (up 'q0 'q1) (up 'p0 'p1)))
+                        '(error -> not quadratic)))
+    (check-exn #px"Legendre Transform Failure: not quadratic"
+               (λ () ((Hamiltonian->Lagrangian H) (up 't (up 'q0 'q1) (up 'p0 'p1))))))
+   
+   (test-case
+    "comm/anticom"
+    (define H (literal-function 'H (Hamiltonian 2)))
+    (check-simplified? (((commutator (partial 0) (partial 1)) H)
+                        (up 't (up 'x 'y) (down 'px 'py)))
+                       '(down 0 0))
+    (check-simplified? (((commutator (partial 1) (partial 2)) (literal-function 'L (Lagrangian 2)))
+                        (up 't (up 'x 'y) (up 'vx 'vy)))
+                       '(down (down 0
+                                    (+ (((* (partial 2 1) (partial 1 0)) L) (up t (up x y) (up vx vy)))
+                                       (* -1 (((* (partial 2 0) (partial 1 1)) L) (up t (up x y) (up vx vy))))))
+                              (down (+ (* -1 (((* (partial 2 1) (partial 1 0)) L) (up t (up x y) (up vx vy))))
+                                       (((* (partial 2 0) (partial 1 1)) L) (up t (up x y) (up vx vy))))
+                                    0)))
+    (check-simplified? (((anticommutator (partial 0) (partial 1)) H)
+                        (up 't (up 'x 'y) (down 'px 'py)))
+                       '(down (* 2 (((* (partial 0) (partial 1 0)) H) (up t (up x y) (down px py))))
+                              (* 2 (((* (partial 0) (partial 1 1)) H) (up t (up x y) (down px py)))))))
+
+   (test-case
+    "flow/Lie"
+    (define H (literal-function 'H (Hamiltonian 2)))
+    (define F (literal-function 'F (Hamiltonian 2)))
+    (define q (literal-function 'q))
+    (define p (literal-function 'p))
+    (define tqp (up identity (up q q) (down p p)))
+    (suppress-arguments (list (expression (tqp 't))))
+    (check-simplified? (((Lie-derivative H) F) (tqp 't))
+                       '(+ (* ((partial 2 0) H) ((partial 1 0) F))
+                           (* ((partial 2 1) H) ((partial 1 1) F))
+                           (* -1 ((partial 1 0) H) ((partial 2 0) F))
+                           (* -1 ((partial 1 1) H) ((partial 2 1) F))))
+    (check-simplified? (((flow-derivative H) F) (tqp 't))
+                       '(+ (* ((partial 2 0) H) ((partial 1 0) F))
+                           (* ((partial 2 1) H) ((partial 1 1) F))
+                           (* -1 ((partial 1 0) H) ((partial 2 0) F))
+                           (* -1 ((partial 1 1) H) ((partial 2 1) F))
+                           ((partial 0) F)))
+    (clear-arguments))
+   #;
+   (test-case
+    "not yet done"
+    '(Legendre-transform
+      Lagrangian->Hamiltonian
+      Hamiltonian->Lagrangian
+      Poisson-bracket))
+
+   ;**************************************************************************************************
    (test-case
     "H-rectangular"
     (define ((H-rectangular m V) H-state)
@@ -166,6 +330,20 @@
                            (* 1/2 k_2 (expt x_2 2))
                            (/ (* 1/2 (expt p_2 2)) m_2)
                            (/ (* 1/2 (expt p_1 2)) m_1)))
+    (check-simplified? ((Hamiltonian->Lagrangian
+                         (Lagrangian->Hamiltonian
+                          (L-coupled-harmonic (down (down 'm_1 0)
+                                                    (down 0 'm_2))
+                                              (down (down 'k_1 'c)
+                                                    (down 'c 'k_2)))))
+                        (->L-state 't
+                                   (up 'x_1 'x_2)
+                                   (up 'p_1 'p_2)))
+                       '(+ (* -1 c x_1 x_2)
+                           (* -1/2 k_1 (expt x_1 2))
+                           (* -1/2 k_2 (expt x_2 2))
+                           (* 1/2 m_1 (expt p_1 2))
+                           (* 1/2 m_2 (expt p_2 2))))
     (check-simplified? (((Hamilton-equations
                           (Lagrangian->Hamiltonian
                            (L-coupled-harmonic (down (down 'm_1 0)

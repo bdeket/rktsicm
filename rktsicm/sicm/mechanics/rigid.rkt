@@ -22,6 +22,7 @@
 
 (define (antisymmetric->column-matrix A)
   (assert (m:antisymmetric? A))
+  (assert (rkt:= (m:dimension A) 3))
   (column-matrix (matrix-ref A 2 1)
 		 (matrix-ref A 0 2)
 		 (matrix-ref A 1 0)))

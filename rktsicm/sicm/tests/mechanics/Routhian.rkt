@@ -10,6 +10,30 @@
   (test-suite
    "mechanics/Routhian"
    (test-case
+    "Routhian->acceleration"
+    (check-simplified? ((Routhian->acceleration (literal-function 'R (-> (UP Real (UP Real Real) (UP Real Real)) Real))
+                                                (literal-function 'd (-> (UP Real (UP Real Real) (UP Real Real)) Real)))
+                        (up 't (up 'x 'y) (up 'vx 'vy)))
+                       '(/ (+ (* -1 vx (((* (partial 1 0) (partial 2 0)) R) (up t (up x y) (up vx vy))))
+                              (* -1 (((partial 2 1) R) (up t (up x y) (up vx vy))) (((* (partial 2 0) (partial 1 1)) R) (up t (up x y) (up vx vy))))
+                              (* (((partial 1 1) R) (up t (up x y) (up vx vy))) (((* (partial 2 0) (partial 2 1)) R) (up t (up x y) (up vx vy))))
+                              (* (((partial 2 1) d) (up t (up x y) (up vx (((partial 2 1) R) (up t (up x y) (up vx vy)))))) (((* (partial 2 0) (partial 2 1)) R) (up t (up x y) (up vx vy))))
+                              (((partial 1 0) R) (up t (up x y) (up vx vy)))
+                              (((partial 2 0) d) (up t (up x y) (up vx (((partial 2 1) R) (up t (up x y) (up vx vy))))))
+                              (* -1 (((* (partial 2 0) (partial 0)) R) (up t (up x y) (up vx vy)))))
+                           (((expt (partial 2 0) 2) R) (up t (up x y) (up vx vy))))))
+   (test-case
+    "Lagrangian-state->Routhian-state"
+    (check-simplified? ((Lagrangian-state->Routhian-state (literal-function 'L (Lagrangian 2)))
+                        (up 't (up 'x 'y) (up 'vx 'vy)))
+                       '(up t (up x y) (up vx (((partial 2 1) L) (up t (up x y) (up vx vy)))))))
+   (test-case
+    "Routhian-state->Lagrangian-state"
+    (check-simplified? ((Routhian-state->Lagrangian-state (literal-function 'R (Lagrangian 2)))
+                        (up 't (up 'x 'y) (up 'vx 'vy)))
+                       '(up t (up x y) (up vx (((partial 2 1) R) (up t (up x y) (up vx vy)))))))
+   ;**************************************************************************************************
+   (test-case
     "Lag"
     (define ((Lag mx kx my ky) s)
       (let ((t (time s))

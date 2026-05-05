@@ -9,6 +9,20 @@
 (define the-tests
   (test-suite
    "mechanics/symplectic"
+   (test-case
+    "symplectic-two-form"
+    (check-simplified? (symplectic-two-form (up 't0 (up 'q0 'r0) (down 'o0 'p0))
+                                            (up 't1 (up 'q1 'r1) (down 'o1 'p1)))
+                       '(+ (* -1 o0 q1) (* o1 q0) (* -1 p0 r1) (* p1 r0))))
+   (test-case
+    "symplectic-matrix?"
+    (check-exn #px"Wrong type -- SYMPLECTIC-MATRIX?"
+               (λ () (symplectic-matrix? (matrix-by-rows '(1)))))
+    (check-exn #px"Wrong type -- SYMPLECTIC-MATRIX?"
+               (λ () (symplectic-matrix? (matrix-by-rows '(1 2 3) '(1 2 3) '(1 2 3)))))
+    (check-exn #px"Not a square matrix -- DIMENSION"
+               (λ () (symplectic-matrix? (matrix-by-rows '(1 2 3) '(1 2 3))))))
+   ;**************************************************************************************************
    (check-simplified? ((canonical-transform? (F->CT p->r))
                        (up 't
                            (up 'r 'phi)

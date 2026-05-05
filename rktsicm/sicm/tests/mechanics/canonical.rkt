@@ -9,6 +9,43 @@
 (define the-tests
   (test-suite
    "mechanics/canonical"
+   ;; canonical? -> check if H and H* are each others canonical transforms over C
+   ;; the output of these should restult in zero? like structures to be true
+   (test-case
+    "T-func"
+    (check-equal? (T-func (up 't (up 'x 'y) (down 'q 'r)))
+                  (up 1 (up 0 0) (down 0 0))))
+   (test-case
+    "canonical-H?"
+    (check-simplified? ((canonical-H? (F->CT p->r) (literal-function 'H (Hamiltonian 2)))
+                        (up 't
+                            (coordinate-tuple 'r 'phi)
+                            (momentum-tuple 'p_r 'p_phi)))
+                       (up 0 (up 0 0) (down 0 0))))
+   (test-case
+    "canonical-K?" ;; Kamiltonian
+    (check-simplified? ((canonical-K? (F->CT p->r) (literal-function 'K (Hamiltonian 2)))
+                        (up 't
+                            (coordinate-tuple 'r 'phi)
+                            (momentum-tuple 'p_r 'p_phi)))
+                       '(up 0
+                            (up (+ (* r (((partial 2 1) K) (up t (up r phi) (down p_r p_phi))) (sin phi))
+                                     (* -1 (((partial 2 0) K) (up t (up r phi) (down p_r p_phi))) (cos phi)))
+                                  (+ (* -1 r (((partial 2 1) K) (up t (up r phi) (down p_r p_phi))) (cos phi))
+                                     (* -1 (sin phi) (((partial 2 0) K) (up t (up r phi) (down p_r p_phi))))))
+                            (down (/ (+ (* p_r (expt r 2) (((partial 2 1) K) (up t (up r phi) (down p_r p_phi))) (sin phi))
+                                        (* p_phi r (((partial 2 1) K) (up t (up r phi) (down p_r p_phi))) (cos phi))
+                                        (* (expt r 2) (cos phi) (((partial 1 0) K) (up t (up r phi) (down p_r p_phi))))
+                                        (* -1 p_phi (sin phi) (((partial 2 0) K) (up t (up r phi) (down p_r p_phi))))
+                                        (* -1 r (sin phi) (((partial 1 1) K) (up t (up r phi) (down p_r p_phi)))))
+                                     (expt r 2))
+                                  (/ (+ (* -1 p_r (expt r 2) (((partial 2 1) K) (up t (up r phi) (down p_r p_phi))) (cos phi))
+                                        (* p_phi r (((partial 2 1) K) (up t (up r phi) (down p_r p_phi))) (sin phi))
+                                        (* (expt r 2) (sin phi) (((partial 1 0) K) (up t (up r phi) (down p_r p_phi))))
+                                        (* p_phi (((partial 2 0) K) (up t (up r phi) (down p_r p_phi))) (cos phi))
+                                        (* r (cos phi) (((partial 1 1) K) (up t (up r phi) (down p_r p_phi)))))
+                                     (expt r 2))))))
+   ;**************************************************************************************************
    (test-case
     "1"
     (define ((H-central m V) state)

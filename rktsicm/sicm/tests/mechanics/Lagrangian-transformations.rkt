@@ -9,6 +9,50 @@
 (define the-tests
   (test-suite
    "mechanics/Lagrangian-transformation"
+   (test-case
+    "F->C"
+    (check-simplified? ((F->C (literal-function 't (-> (UP Real (UP Real Real) (UP Real Real)) (UP Real Real))))
+                        (up 't (up 'x 'y) (up 'vx 'vy)))
+                       '(up t
+                            (up (t^0 (up t (up x y) (up vx vy))) (t^1 (up t (up x y) (up vx vy))))
+                            (up (+ (* vx (((partial 1 0) t^0) (up t (up x y) (up vx vy))))
+                                   (* vy (((partial 1 1) t^0) (up t (up x y) (up vx vy))))
+                                   (((partial 0) t^0) (up t (up x y) (up vx vy))))
+                                (+ (* vx (((partial 1 0) t^1) (up t (up x y) (up vx vy))))
+                                   (* vy (((partial 1 1) t^1) (up t (up x y) (up vx vy))))
+                                   (((partial 0) t^1) (up t (up x y) (up vx vy))))))))
+   (test-case
+    "rect->polar"
+    (check-simplified? (rectangular->polar #(x y))
+                       ((R2-polar '->coords) ((point R2-rect) #(x y))))
+    (check-simplified? (polar->rectangular #(r a))
+                       ((R2-rect '->coords) ((point R2-polar) #(r a))))
+    (check-simplified? (r->p (up 't #(x y) #(vx vy)))
+                       '(up (sqrt (+ (expt x 2) (expt y 2))) (atan y x)))
+    (check-simplified? (p->r (up 't #(r a) #(vr va)))
+                       '(up (* r (cos a)) (* r (sin a)))))
+   (test-case
+    "spherical->rect"
+    (check-simplified? (rectangular->spherical #(x y z))
+                       ((R3-spherical '->coords) ((point R3-rect) #(x y z))))
+    (check-simplified? (spherical->rectangular #(r a b))
+                       ((R3-rect '->coords) ((point R3-spherical) #(r a b))))
+    (check-simplified? (r->s (up 't #(x y z) #(vx vy vz)))
+                       '(up (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
+                            (acos (/ z (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))))
+                            (atan y x)))
+    (check-simplified? (s->r (up 't #(r a b) #(vr va vb)))
+                       '(up (* r (sin a) (cos b)) (* r (sin a) (sin b)) (* r (cos a)))))
+   (test-case
+    "Rxyz"
+    (for ([i (in-range 3)])
+      (define ang (- (* 10 (random)) 5))
+      (define vec (up (* (random) 10) (* (random) 10) (* (random) 10)))
+      (check-within ((Rx ang) vec) (* (Rx-matrix ang) vec) 1e-12)
+      (check-within ((Ry ang) vec) (* (Ry-matrix ang) vec) 1e-12)
+      (check-within ((Rz ang) vec) (* (Rz-matrix ang) vec) 1e-12)))
+
+   ;**************************************************************************************************
    (check-simplified? (velocity
                        ((F->C p->r)
                         (->local 't 

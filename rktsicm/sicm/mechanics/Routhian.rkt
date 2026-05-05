@@ -55,6 +55,7 @@ Lagrange's equations for vx, x.
    (((Hamilton-equations H) y py) t)
    ))
 
+#; ;;bdk;; old code?
 (define (((Routh-equations-bad Routhian) x y py) t)
   (define (L s)
     (let ((tau (time s))
@@ -142,6 +143,7 @@ Lagrange's equations for vx, x.
 
 |#
 
+#; ;;bdk;; old code?
 (define ((Routhian->acceleration-bad R) s)
   (let ((P ((partial 2 0) R))
 	(F ((partial 1 0) R)))

@@ -45,15 +45,28 @@
 
 (define (angle&axis->rotation-matrix theta n)
   ;; (assert (v:unit? n))
+  ;;bdk;; v:unit? check does not work well => (up a b c) is not unit?
+  ;;bdk;; also (/ (up 1 1 1) (sqrt 3)) is not unit? (due to rounding)
   (let ((x (ref n 0)) (y (ref n 1)) (z (ref n 2)))
-    (let ((colatitude (acos z))
-	  ;OK because (< colatitude :pi)
-	  (longitude (atan y x)))
-      (* (rotate-z-matrix longitude)
-	 (rotate-y-matrix colatitude)
-	 (rotate-z-matrix theta)
-	 (m:transpose (rotate-y-matrix colatitude))
-	 (m:transpose (rotate-z-matrix longitude))))))
+    (if (and (g:zero? x) (g:zero? y)) ;;bdk;; (atan 0 0) => error
+        (if (g:zero? z)
+            (error 'angle&axis->rotation-matrix "zero-vector for axis: ~a" n)
+            (Rz-matrix (* (if (< z 0) -1 1) theta)))
+        (let ((colatitude (acos z))
+              ;OK because (< colatitude :pi)
+              (longitude (atan y x)))
+          (* (rotate-z-matrix longitude)
+             (rotate-y-matrix colatitude)
+             (rotate-z-matrix theta)
+             (m:transpose (rotate-y-matrix colatitude))
+             (m:transpose (rotate-z-matrix longitude)))))))
+
+(define (angle&vector->rotation-matrix theta v)
+  (angle&axis->rotation-matrix theta (v:make-unit v)))
+
+(define (vector->rotation-matrix v)
+  (define n (euclidean-norm v))
+  (angle&axis->rotation-matrix n (/ v n)))
 
 ;;; Rotation tuples
 

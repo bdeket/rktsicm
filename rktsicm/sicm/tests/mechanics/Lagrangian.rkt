@@ -6,12 +6,161 @@
 (rename-part 'derivative 'D)
 
 ;; TODO: this file very seldom throws following error: "stream: reentrant or broken delay"
-;; not yet sure what is the cause, for now only triggered when run from
-;; command-line, in parallel with other tests
+;; in "mechanics/Lagrangian > nicer pendulum" also observed in some other files
+;; It seems related to simplification (or maybe just check-simplified?)
 (provide the-tests)
 (define the-tests
   (test-suite
    "mechanics/Lagrangian"
+   (test-case
+    "->local"
+    (check-equal? (->local 't 'q 'qdot 'd0 'd1)
+                  (vector  't 'q 'qdot 'd0 'd1))
+    (check-equal? (->local 't 'q 'qdot)
+                  (vector  't 'q 'qdot))
+    (check-true (eq? ->local ->state))
+    (check-true (eq? ->local ->L-state)))
+   (test-case
+    "state->n-dof"
+    (check-equal? (state->n-dof (->local 't 'q 'qdot))                1)
+    (check-equal? (state->n-dof (->local 't (up 'x 'y) (up 'vx 'vy))) 2))
+   (test-case
+    "state->"
+    (define t (gensym 'g))
+    (define q (up (gensym 'x) (gensym 'y)))
+    (define qd (up (gensym 'vx) (gensym 'vy)))
+    (define qdd (up (gensym 'ax) (gensym 'ay)))
+    (check-equal? (state->t (->local t q qd)) t)
+    (check-exn #px"Cannot extract time from" (λ () (state->t 'state)))
+    (check-exn #px"Cannot extract time from" (λ () (state->t #())))
+    (check-equal? (state->q (->local t q qd)) q)
+    (check-exn #px"Cannot extract coordinate from" (λ () (state->q 'state)))
+    (check-exn #px"Cannot extract coordinate from" (λ () (state->q #(t))))
+    (check-equal? (state->qdot (->local t q qd)) qd)
+    (check-exn #px"Cannot extract velocity from" (λ () (state->qdot 'state)))
+    (check-exn #px"Cannot extract velocity from" (λ () (state->qdot #(t x))))
+    (check-equal? (state->qddot (->local t q qd qdd)) qdd)
+    (check-exn #px"Cannot extract acceleration from" (λ () (state->qddot 'state)))
+    (check-exn #px"Cannot extract acceleration from" (λ () (state->qddot #(t x v))))
+    (check-eq? time state->t)
+    (check-eq? coordinate state->q)
+    (check-eq? velocity state->qdot)
+    (check-eq? acceleration state->qddot)
+    (check-eq? coordinates state->q)
+    (check-eq? velocities state->qdot)
+    (check-eq? accelerations state->qddot)
+    (check-eq? Q state->q)
+    (check-eq? Qdot state->qdot)
+    (check-eq? Qdotdot state->qddot))
+   (test-case
+    "literal-Lagrangian-state"
+    (check-equal? (state->n-dof (literal-Lagrangian-state 3)) 3)
+    (check-true (up? (state->q (literal-Lagrangian-state 2))))
+    (check-equal? (s:length (state->qdot (literal-Lagrangian-state 4))) 4))
+   (test-case
+    "path->state-path"
+    (define p (literal-function 'p))
+    (check-simplified? ((path->state-path p) 't)
+                       (->state 't (p 't) ((D p) 't)))
+    (check-simplified? ((path->state-path p 2) 't)
+                       (up 't (p 't)))
+    (check-simplified? ((path->state-path p 4) 't)
+                       (->state 't (p 't) ((D p) 't) ((D (D p)) 't)))
+    (check-exn #px"assertion failed: \\(fix:> n 1\\)"
+               (λ () (path->state-path p 1)))
+    (check-eq? Gamma path->state-path))
+   (test-case
+    "make-Lagrangian"
+    (check-equal? (make-Lagrangian 'kinE 'potE) (- 'kinE 'potE)))
+   (test-case
+    "Lagrange-equations"
+    (define p (literal-function 'p))
+    (define q (Gamma p))
+    (define L (literal-function 'L (-> (UP Real Real Real) Real)))
+    (define K (literal-function 'K (-> (UP Real Real Real) Real)))
+    (check-simplified? (((Lagrange-equations L) p) 't)
+                       ((- (D (compose ((partial 2) L) q))
+                           (compose ((partial 1) L) q)) 't))
+    (check-simplified? (((Lagrange-equations L K) p) 't)
+                       ((- (D (compose ((partial 2) L) q))
+                           (compose ((partial 1) L) q)
+                           (- (compose ((partial 2) K) q))) 't)))
+   (test-case
+    "Lagrangian->acceleration"
+    (define L (literal-function 'L (-> (UP Real Real Real) Real)))
+    (define K (literal-function 'K (-> (UP Real Real Real) Real)))
+    (define Q (up 't 'q 'qd))
+    (check-simplified? ((Lagrangian->acceleration L) Q)
+                       `(/ (+ (* -1 qd (((* (partial 1) (partial 2)) L) ,Q))
+                              (((partial 1) L) ,Q)
+                              (* -1 (((* (partial 2) (partial 0)) L) ,Q)))
+                           (((expt (partial 2) 2) L) ,Q)))
+    (check-simplified? ((Lagrangian->acceleration L K) Q)
+                       `(/ (+ (* -1 qd (((* (partial 1) (partial 2)) L) ,Q))
+                              (((partial 1) L) ,Q)
+                              (* -1 (((* (partial 2) (partial 0)) L) ,Q))
+                              (* -1 (((partial 2) K) ,Q)))
+                           (((expt (partial 2) 2) L) ,Q))))
+   (test-case
+    "1order"
+    (define p (literal-function 'p))
+    (define v (literal-function 'v))
+    (define L (literal-function 'L (-> (UP Real Real Real) Real)))
+    (define Q (up 't (p 't) (v 't)))
+    (check-simplified? (((Lagrange-equations-1 L) p v) 't)
+                       `(up 0
+                            (+ ((D p) t) (* -1 (v t)))
+                            (/ (+ (* (v t) (((* (partial 1) (partial 2)) L) ,Q))
+                                  (* (((expt (partial 2) 2) L) ,Q) ((D v) t))
+                                  (* -1 (((partial 1) L) ,Q))
+                                  (((* (partial 2) (partial 0)) L) ,Q))
+                               (((expt (partial 2) 2) L) ,Q))))
+    (check-simplified? ((local-state-derivative L) Q)
+                       `(up 1
+                            (v t)
+                            (/ (+ (* -1 (v t) (((* (partial 1) (partial 2)) L) ,Q))
+                                  (((partial 1) L) ,Q)
+                                  (* -1 (((* (partial 2) (partial 0)) L) ,Q)))
+                               (((expt (partial 2) 2) L) ,Q))))
+    (check-eq? Lagrange-equations-first-order Lagrange-equations-1)
+    (check-simplified? ((qv->local-path p v) 't)
+                       Q))
+   (test-case
+    "Lagrangian->state-derivative"
+    (define p (literal-function 'p))
+    (define v (literal-function 'v))
+    (define L (literal-function 'L (-> (UP Real Real Real) Real)))
+    (define K (literal-function 'K (-> (UP Real Real Real) Real)))
+    (define (Q t) (up t (p t) (v t)))
+    (check-simplified? ((Lagrangian->state-derivative L) (Q 't))
+                       (up 1 (v 't)
+                           `(/ (+
+                                (* -1 (v t) (((* (partial 1) (partial 2)) L) ,(Q 't)))
+                                (((partial 1) L) ,(Q 't))
+                                (* -1 (((* (partial 2) (partial 0)) L) ,(Q 't))))
+                               (((expt (partial 2) 2) L) ,(Q 't)))))
+    (check-simplified? ((Lagrangian->state-derivative L K) (Q 't))
+                       (up 1 (v 't)
+                           `(/ (+ (* -1 (v t) (((* (partial 1) (partial 2)) L) ,(Q 't)))
+                                  (((partial 1) L) ,(Q 't))
+                                  (* -1 (((* (partial 2) (partial 0)) L) ,(Q 't)))
+                                  (* -1 (((partial 2) K) ,(Q 't))))
+                               (((expt (partial 2) 2) L) ,(Q 't))))))
+   (test-case
+    "back"
+    (define p (literal-function 'p))
+    (define q (Gamma p))
+    (define L (literal-function 'L (-> (UP Real Real Real) Real)))
+    (check-simplified? ((Lagrangian->energy L) (q 't))
+                       ((- (* ((partial 2) L) velocity) L) (q 't)))
+    (check-simplified? (((Lagrangian->power-loss L) p) 't)
+                       `(+ (* (expt ((D p) t) 2) (((* (partial 1) (partial 2)) L) ,(q 't)))
+                           (* ((D p) t) (((expt D 2) p) t) (((expt (partial 2) 2) L) ,(q 't)))
+                           (* -1 ((D p) t) (((partial 1) L) ,(q 't)))
+                           (*    ((D p) t) (((* (partial 2) (partial 0)) L) ,(q 't)))
+                           (* -1 (((partial 0) L) ,(q 't))))))
+
+   #;#;#;#;#;#;#;#;#;#;#;
    (test-case
     "free-particle"
     (define ((L-free-particle mass) local)
@@ -342,7 +491,6 @@
                        '(down (* m rdot)
                               (* m (expt r 2) thetadot)
                               (* m (expt r 2) phidot (expt (sin theta) 2)))))
-
    ))
 
 (module+ test

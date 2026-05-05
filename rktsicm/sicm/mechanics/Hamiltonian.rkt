@@ -91,10 +91,20 @@
 ;; 		 (s:generate n 'down generate-uninterned-symbol))))
 ;;       (m->s (compatible-shape s) m 1))))
 
-(define (matrix->H-state m s)
+(define (matrix->H-state m [s 'up])
   (assert (= (m:num-cols m) 1))
   (assert (and (odd? (m:num-rows m))
                (> (m:num-rows m) 2)))
+  (define n (quotient (- (m:num-rows m) 1) 2))
+  (case s
+    [(up) (up (m:ref m 0 0)
+              (s:generate n 'up (λ (i) (m:ref m (+ 1 i) 0)))
+              (s:generate n 'down (λ (i) (m:ref m (+ 1 n i) 0))))]
+    [(down) (down (m:ref m 0 0)
+              (s:generate n 'down (λ (i) (m:ref m (+ 1 i) 0)))
+              (s:generate n 'up (λ (i) (m:ref m (+ 1 n i) 0))))]
+    [else (error 'matrix->H-state "not a valid shape: ~a" s)])
+  #;
   (m->s (compatible-shape s) m 1))
 
 (define (degrees-of-freedom H-state)

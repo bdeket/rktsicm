@@ -10,6 +10,29 @@
   (test-suite
    "mechanics/time-varying"
    (test-case
+    "F->K"
+    (check-simplified? ((F->K (literal-function 'F (Hamiltonian 1))) (->H-state 0 'q0 'p0))
+                       '(/ (* -1 p0 (((partial 0) F) (up 0 q0 p0))) (((partial 1) F) (up 0 q0 p0)))))
+   (test-case
+    "qp-canonical?"
+    (check-simplified? ((qp-canonical? (literal-function 'C (-> (UP Real Real Real) (UP Real Real Real))) (literal-function 'H (Hamiltonian 1))) (->H-state 0 'q 'p))
+                       '(up (+ (* (((partial 1) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 2) C^0) (up 0 q p)) (((partial 1) C^1) (up 0 q p)))
+                               (* -1 (((partial 1) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^0) (up 0 q p)) (((partial 2) C^1) (up 0 q p)))
+                               (* (((partial 2) C^0) (up 0 q p)) (((partial 2) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^2) (up 0 q p)))
+                               (* -1 (((partial 1) C^0) (up 0 q p)) (((partial 2) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 2) C^2) (up 0 q p))))
+                            (+ (* -1 (((partial 2) C^0) (up 0 q p)) (((partial 0) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^1) (up 0 q p)))
+                               (* (((partial 0) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^0) (up 0 q p)) (((partial 2) C^1) (up 0 q p)))
+                               (* (((partial 2) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 2) C^1) (up 0 q p)) (((partial 1) C^2) (up 0 q p)))
+                               (* -1 (((partial 2) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^1) (up 0 q p)) (((partial 2) C^2) (up 0 q p)))
+                               (((partial 2) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))))
+                            (+ (* -1 (((partial 1) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 2) C^1) (up 0 q p)) (((partial 1) C^2) (up 0 q p)))
+                               (* (((partial 1) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^1) (up 0 q p)) (((partial 2) C^2) (up 0 q p)))
+                               (* -1 (((partial 2) C^0) (up 0 q p)) (((partial 0) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^2) (up 0 q p)))
+                               (* (((partial 0) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))) (((partial 1) C^0) (up 0 q p)) (((partial 2) C^2) (up 0 q p)))
+                               (* -1 (((partial 1) H) (up (C^0 (up 0 q p)) (C^1 (up 0 q p)) (C^2 (up 0 q p)))))))))
+
+   ;**************************************************************************************************
+   (test-case
     "1"
     (define ((K n) s)
       (let ((q (coordinate s))
