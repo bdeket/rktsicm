@@ -109,8 +109,8 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in simplify/split-poly
  2 difference(s) found in simplify/symbenv
  1 difference(s) found in simplify/syntax
- 8 difference(s) found in solve/solve-utils
- 6 difference(s) found in solve/solve
+ 7 difference(s) found in solve/solve-utils
+11 difference(s) found in solve/solve
  3 difference(s) found in units/SI-units
 16 difference(s) found in units/system
  3 difference(s) found in units/units

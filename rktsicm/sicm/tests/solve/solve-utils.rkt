@@ -3,9 +3,18 @@
 (require rackunit)
 
 (require "../../solve.rkt"
-         "../../general/list-utils.rkt")
+         "../../general/list-utils.rkt"
+         "../helper.rkt")
 
 (define-syntax-rule (hypothetical x) (make-hypothetical 'x #f))
+
+(define Es (list (make-equation '(+ x 3) '(A))))
+(define Vs (list 'x))
+(define Ss (list (make-substitution 'y '(+ x 3) '(B))))
+(define Ts (list (make-equation '(* z 4) '(C))))
+(define (sol #:E [E Es] #:V [V Vs] #:S [S Ss] #:T [T Ts])
+  (make-solution E V S T))
+
 ;***************************************************************************************************
 ;* from solve-utils.rkt                                                                            *
 ;***************************************************************************************************
@@ -14,6 +23,289 @@
 (define the-tests
   (test-suite
    "solve/solve-utils"
+   ;; ************ predicates and accumulators ************
+   (test-case
+    "initialize-solver"
+    (define (all) (list (*complete-solutions*) (*underdetermined-solutions*) (*with-residual-equations*) (*with-tough-equations*) (*with-extra-equations*)))
+    (check-equal? (all) '(()()()()()))
+    (*complete-solutions* 1) (*underdetermined-solutions* 2) (*with-residual-equations* 3) (*with-tough-equations* 4) (*with-extra-equations* 5)
+    (check-equal? (all) '(1 2 3 4 5))
+    (initialize-solver)
+    (check-equal? (all) '(()()()()())))
+   (test-case
+    "accumulators"
+    (define (all) (list (*complete-solutions*) (*underdetermined-solutions*) (*with-residual-equations*) (*with-tough-equations*) (*with-extra-equations*)))
+    (define-syntax-rule (parm body ...)
+      (parameterize ([*complete-solutions* '()][*underdetermined-solutions* '()][*with-residual-equations* '()][*with-tough-equations* '()][*with-extra-equations* '()])
+        body ...))
+    (define-syntax-rule (pprm name (a ...) (b ...))
+      (parm (name S1)
+            (check-equal? (all) (list a ... (list S1) b ...))
+            (name S1)
+            (check-equal? (all) (list a ... (list S1) b ...))
+            (name S2)
+            (check-equal? (all) (list a ... (list S2 S1) b ...))))
+    (check-equal? (all) '(()()()()()))
+    (parm (check-equal? (all) '(()()()()())))
+    (define S1 (sol))
+    (define S2 (sol #:V '(z)))
+    (pprm accumulate-complete-solutions () ('() '() '() '()))
+    (pprm accumulate-underdetermined-solutions ('()) ('() '() '()))
+    (pprm accumulate-residual-equation-solutions ('() '()) ('() '()))
+    (pprm accumulate-tough-equations-solutions ('() '() '()) ('()))
+    (pprm accumulate-extra-equations-solutions ('() '() '() '()) ())
+    (check-equal? (all) '(()()()()())))
+   (test-case
+    "same-solution?"
+    (define S1 (sol))
+    (check-true (same-solution? S1 (sol #:E (list (make-equation '(+ 3 x) '(A)))
+                                        #:S (list (make-substitution 'y '(+ 3 x) '(B)))
+                                        #:T (list (make-equation '(* z 4.) '(C))))))
+    (check-false (same-solution? S1 (sol #:E (list (make-equation '(+ 3 x) '(D))))))
+    (check-false (same-solution? S1 (sol #:E (list (make-equation '(+ 4 x) '(A))))))
+    (check-false (same-solution? S1 (sol #:V (list 'z))))
+    (check-false (same-solution? S1 (sol #:S (list (make-substitution 'y '(+ 4 x) '(B))))))
+    (check-false (same-solution? S1 (sol #:S (list (make-substitution 'y '(+ 3 x) '(D))))))
+    (check-false (same-solution? S1 (sol #:T (list (make-equation '(* z 4.) '(D))))))
+    (check-false (same-solution? S1 (sol #:T (list (make-equation '(* z 5.) '(C)))))))
+   (test-case
+    "same-residual-equations?"
+    (define (subsol X) (make-solution X '() '() '()))
+    (define E1 (make-equation '(+ x 3) '(A)))
+    (define E2 (make-equation '(+ x 3) '(B)))
+    (define E3 (make-equation '(+ x 3.) '(A)))
+    (define E4 (make-equation '(+ y 3) '(A)))
+    (define E5 (make-equation '(* z 2) '(C)))
+    (check-true (same-residual-equations? (subsol (list E1)) (subsol (list E3))))
+    (check-true (same-residual-equations? (subsol (list E1 E5)) (subsol (list E5 E3))))
+    (check-false (same-residual-equations? (subsol (list E1)) (subsol (list E2))))
+    (check-false (same-residual-equations? (subsol (list E1)) (subsol (list E4))))
+    (check-false (same-residual-equations? (subsol (list E1)) (subsol (list E1 E5)))))
+   (test-case
+    "same-residual-variables?"
+    (define (subsol X) (make-solution '() X '() '()))
+    (check-true (same-residual-variables? (subsol (list 'x 'y 'z)) (subsol (list 'x 'z 'y))))
+    (check-false (same-residual-variables? (subsol (list 'x 'y 'z)) (subsol (list 'x 'y))))
+    (check-false (same-residual-variables? (subsol (list 'x 'y 'z)) (subsol (list 'x 'w 'z)))))
+   (test-case
+    "same-substitutions?"
+    (define S1 (make-substitution 'x 3 '(A)))
+    (define S2 (make-substitution 'x 3 '(B)))
+    (define S3 (make-substitution 'z '(+ y 3) '(A)))
+    (define S4 (make-substitution 'z '(+ y 3.) '(A)))
+    (define S5 (make-substitution 'y 3 '(A)))
+    (define (subsol X) (make-solution '() '() X '()))
+    (check-true (same-substitutions? (subsol (list S1 S3 S5)) (subsol (list S1 S4 S5))))
+    (check-false (same-substitutions? (subsol (list S1 S3 S5)) (subsol (list S2 S4 S5))))
+    (check-false (same-substitutions? (subsol (list S1 S4)) (subsol (list S2 S5))))
+    (check-false (same-substitutions? (subsol (list S1 S4)) (subsol (list S2)))))
+   (test-case
+    "same-tough-equations?"
+    (define (subsol X) (make-solution '() '() '() X))
+    (define E1 (make-equation '(+ x 3) '(A)))
+    (define E2 (make-equation '(+ x 3) '(B)))
+    (define E3 (make-equation '(+ x 3.) '(A)))
+    (define E4 (make-equation '(+ y 3) '(A)))
+    (define E5 (make-equation '(* z 2) '(C)))
+    (check-true (same-tough-equations? (subsol (list E1)) (subsol (list E3))))
+    (check-true (same-tough-equations? (subsol (list E1 E5)) (subsol (list E5 E3))))
+    (check-false (same-tough-equations? (subsol (list E1)) (subsol (list E2))))
+    (check-false (same-tough-equations? (subsol (list E1)) (subsol (list E4))))
+    (check-false (same-tough-equations? (subsol (list E1)) (subsol (list E1 E5)))))
+   (test-case
+    "same-equation?"
+    (check-true (same-equation? (make-equation '(+ x 3) '(A))
+                                (make-equation '(+ x 3.) '(A))))
+    (check-false (same-equation? (make-equation '(+ x 3) '(A))
+                                 (make-equation '(+ x 3.) '(B))))
+    (check-false (same-equation? (make-equation '(+ x 3) '(A))
+                                 (make-equation '(+ y 3) '(A)))))
+   (test-case
+    "same-expression?"
+    (check-true (same-expression? '(+ x 3) '(+ x 3.)))
+    (check-true (same-expression? '(+ x 3) '(/ (+ (* 3 x) 9.) 3)))
+    (check-false (same-expression? '(+ x 3) '(+ y 3.)))
+    (check-false (same-expression? '(+ x 3) '(+ x 2.9))))
+   (test-case
+    "same-variable?"
+    (check-true  (same-variable? 'x 'x))
+    (check-false (same-variable? 'x 'y))
+    (check-false (same-variable? 'x "x")))
+   (test-case
+    "same-substitution?"
+    (check-true (same-substitution? (make-substitution 'x 3 '(A))
+                                    (make-substitution 'x 3 '(A))))
+    (check-true (same-substitution? (make-substitution 'x '(+ y 3) '(A))
+                                    (make-substitution 'x '(+ y 3.) '(A))))
+    (check-false (same-substitution? (make-substitution 'x 3 '(A))
+                                     (make-substitution 'x 3 '(B))))
+    (check-false (same-substitution? (make-substitution 'x 3 '(A))
+                                     (make-substitution 'y 3 '(A))))
+    (check-false (same-substitution? (make-substitution 'x 3 '(A))
+                                     (make-substitution 'x 4 '(A)))))
+   (test-case
+    "same-justifications?"
+    (check-true (same-justifications? '(A B) '(B A)))
+    (check-false (same-justifications? '(A B) '(A)))
+    (check-false (same-justifications? '(A B) '(A B C))))
+   (test-case
+    "same-justification?"
+    (check-true (same-justification? 'A 'A))
+    (check-false (same-justification? 'A 'B)))
+   (test-case
+    "equivalent-solution?"
+    (define S1 (sol))
+    (check-true (equivalent-solutions? S1 (sol #:E (list (make-equation '(+ 3 x) '(A)))
+                                        #:S (list (make-substitution 'y '(+ 3 x) '(B)))
+                                        #:T (list (make-equation '(* z 4.) '(C))))))
+    (check-false (equivalent-solutions? S1 (sol #:E (list (make-equation '(+ 3 x) '(D))))))
+    (check-false (equivalent-solutions? S1 (sol #:E (list (make-equation '(+ 4 x) '(A))))))
+    (check-false (equivalent-solutions? S1 (sol #:V (list 'z))))
+    (check-false (equivalent-solutions? S1 (sol #:S (list (make-substitution 'y '(+ 4 x) '(B))))))
+    (check-true  (equivalent-solutions? S1 (sol #:S (list (make-substitution 'y '(+ 3 x) '(D))))))
+    (check-false (equivalent-solutions? S1 (sol #:T (list (make-equation '(* z 4.) '(D))))))
+    (check-false (equivalent-solutions? S1 (sol #:T (list (make-equation '(* z 5.) '(C)))))))
+   (test-case
+    "equivalent substitutions?"
+    (define S1 (make-substitution 'x 3 '(A)))
+    (define S2 (make-substitution 'x 3 '(B)))
+    (define S3 (make-substitution 'z '(+ y 3) '(A)))
+    (define S4 (make-substitution 'z '(+ y 3.) '(B)))
+    (define S5 (make-substitution 'y 3 '(A)))
+    (define (subsol X) (make-solution '() '() X '()))
+    (check-true (equivalent-substitutions? (subsol (list S1 S3 S5)) (subsol (list S2 S4 S5))))
+    (check-false (equivalent-substitutions? (subsol (list S1 S4)) (subsol (list S2 S5))))
+    (check-false (equivalent-substitutions? (subsol (list S1 S4)) (subsol (list S2)))))
+   (test-case
+    "equivalent-substitution?"
+    (check-true (equivalent-substitution? (make-substitution 'x 3 '(A))
+                                          (make-substitution 'x 3 '(B))))
+    (check-true (equivalent-substitution? (make-substitution 'x '(+ y 3) '(A))
+                                          (make-substitution 'x '(+ y 3.) '(B))))
+    (check-false (equivalent-substitution? (make-substitution 'x 3 '(A))
+                                           (make-substitution 'y 3 '(A))))
+    (check-false (equivalent-substitution? (make-substitution 'x 3 '(A))
+                                           (make-substitution 'x 4 '(A)))))
+   (test-case
+    "one-of-each"
+    (check-equal? (one-of-each '()) '())
+    (check-equal? (one-of-each '(())) '())
+    (check-equal? (one-of-each '((1 2 3))) '((1) (2) (3)))
+    (check-equal? (one-of-each '((1 2) (3 4))) '((1 3) (2 3) (1 4) (2 4)))
+    (check-equal? (one-of-each '((1 2) (3) (4))) '((1 3 4) (2 3 4)))
+    (check-equal? (one-of-each '((1 2) (3) (4 5))) '((1 3 4) (2 3 4) (1 3 5) (2 3 5))))
+   (test-case
+    "minimum-length-head"
+    (check-equal? (minimum-length-head '()) '())
+    (check-equal? (minimum-length-head '(1)) '(1))
+    (check-equal? (minimum-length-head '((1) (2))) '((2) (1)))
+    (check-equal? (minimum-length-head '((1) (2 3))) '((1)))
+    (check-equal? (minimum-length-head '((1) (2 3) (4))) '((1)))
+    (check-equal? (minimum-length-head '((1) (4) (2 3))) '((4) (1))))
+   (test-case
+    "substitution-variable-entry"
+    (check-equal? (substitution-variable-entry 'x (make-solution '() '() '() '())) #f)
+    (check-equal? (substitution-variable-entry 'x
+                                               (make-solution '() '() (list (make-substitution 'x 3 '(A))) '()))
+                  (make-substitution 'x 3 '(A)))
+    (check-equal? (substitution-variable-entry 'x
+                                               (make-solution '() '() (list (make-substitution 'y 3 '(A))) '()))
+                   #f))
+   ;; ************ actual functionality ************
+   (test-case
+    "collect-best-solutions"
+    (define S1 (sol))
+    (check-equal? (collect-best-solutions '()) '())
+    (check-equal? (collect-best-solutions (list S1)) (list S1))
+    (check-equal? (collect-best-solutions (list S1 S1)) (list S1))
+    (define S2 (sol #:E '() #:V '() #:S (cons (make-substitution 'x -3 '(A)) (substitutions S1))))
+    (check-equal? (collect-best-solutions (list S1 S2)) (list S1 S2))
+    (check-equal? (collect-best-solutions (list S2 S1)) (list S2 S1))
+    (define S3 (sol #:E (list (make-equation '(- y 0) '(B)))
+                    #:V '(y)
+                    #:S (list (make-substitution 'x -3 '(A)))))
+    (check-equal? (collect-best-solutions (list S1 S3)) (list S1 S3))
+    (check-equal? (collect-best-solutions (list S3 S1)) (list S3 S1))
+    (define S4 (sol #:S (list (make-substitution 'y '(+ x 3.) '(D)))))
+    (check-equal? (collect-best-solutions (list S1 S4)) (list (sol #:S (list (make-substitution 'y '(+ x 3) '(D)))) S1))
+    (check-equal? (collect-best-solutions (list S4 S1)) (list (sol #:S (list (make-substitution 'y '(+ x 3.) '(B)))) S4)))
+   (test-case
+    "default-fail"
+    (define S1 (sol))
+    (define-syntax-rule (parm body ...)
+      (parameterize ([*complete-solutions* '()][*underdetermined-solutions* '()][*with-residual-equations* '()][*with-tough-equations* '()][*with-extra-equations* '()][*outstanding-contradictions* '()])
+        body ...))
+    (parm (accumulate-complete-solutions S1)
+          (check-equal? (default-fail) (cons 'full-solutions (list S1))))
+    (parm (accumulate-underdetermined-solutions S1)
+          (check-equal? (default-fail) (cons 'underdetermined (list S1))))
+    (parm (accumulate-residual-equation-solutions S1)
+          (check-equal? (default-fail) (cons 'parameters-constrained (list S1))))
+    (parm (*outstanding-contradictions* 'bad)
+          (check-equal? (default-fail) (cons 'contradictions 'bad)))
+    (parm (accumulate-tough-equations-solutions S1)
+          (check-equal? (default-fail) (cons 'tough-equations (list S1))))
+    (parm (accumulate-extra-equations-solutions S1)
+          (check-equal? (default-fail) (cons 'extra-equations (list S1))))
+    (parm (check-exn #px"How did I get here?"
+                     (λ () (default-fail)))))
+   (test-case
+    "default-succeed"
+    (define (fail) 'go-to-next)
+    (define (all) (list (*complete-solutions*) (*underdetermined-solutions*) (*with-residual-equations*) (*with-tough-equations*) (*with-extra-equations*)))
+    (define-syntax-rule (parm body ...)
+      (parameterize ([*complete-solutions* '()][*underdetermined-solutions* '()][*with-residual-equations* '()][*with-tough-equations* '()][*with-extra-equations* '()][*outstanding-contradictions* '()])
+        body ...))
+    ;; real solution
+    (parm (define S (sol #:E '() #:V '() #:T '()))
+          (check-equal? (default-succeed S fail) 'go-to-next)
+          (check-equal? (all) (list (list S) '() '() '() '())))
+    (parm (define S (sol #:E '() #:V '() #:T '()
+                         #:S (list (make-substitution 'y '(+ 3 z) '(A))
+                                   (make-substitution 'x '(+ 4 z) '(B)))))
+          (define S* (sol #:E '() #:V '() #:T '()
+                         #:S (list (make-substitution 'x '(+ 4 z) '(B))
+                                   (make-substitution 'y '(+ 3 z) '(A)))))
+          ;; succeed sorts substitutions
+          (check-equal? (default-succeed S fail) 'go-to-next)
+          (check-equal? (all) (list (list S*) '() '() '() '())))
+    ;; underdetermined solution
+    (parm (define S (sol #:E '() #:V '(z) #:T '()))
+          (check-equal? (default-succeed S fail) 'go-to-next)
+          (check-equal? (all) (list '() (list S) '() '() '())))
+    ;; tough equation
+    (parm (define S (sol #:E '() #:V '(z)))
+          (check-equal? (default-succeed S fail) 'go-to-next)
+          (check-equal? (all) (list '() '() '() (list S) '())))
+    ;; residual equation
+    (parm (define S (sol #:V '() #:T '()))
+          (check-equal? (default-succeed S fail) 'go-to-next)
+          (check-equal? (all) (list '() '() (list S) '() '())))
+    ;; extra equation
+    (parm (define S (sol #:V '() #:E '()))
+          (check-equal? (default-succeed S fail) 'go-to-next)
+          (check-equal? (all) (list '() '() '() '() (list S))))
+    ;; rest
+    (parm (check-exn #px"How did I get here?" (λ () (default-succeed (sol) fail))))
+    (parm (check-exn #px"How did I get here?" (λ () (default-succeed (sol #:V '()) fail)))))
+   (test-case
+    "test-solver"
+    ;;TODO; remove this export?
+    (check-equal? (out->string (test-solver (list (make-equation '(+ (* 3 x) 5) '(A))) '(x)))
+                  "#|\n(full-solutions (() () (((= x -5/3) (A))) ()))\n|#\n"))
+   (test-case
+    "solve-equations"
+    (define (all) (list (*complete-solutions*) (*underdetermined-solutions*) (*with-residual-equations*) (*with-tough-equations*) (*with-extra-equations*)))
+    (parameterize ([*complete-solutions*        'very]
+                   [*underdetermined-solutions* 'very]
+                   [*with-residual-equations*   'very]
+                   [*with-tough-equations*      'very]
+                   [*with-extra-equations*      'bad])
+      (check-equal? (all) '(very very very very bad))
+      (check-equal? (solve-equations (list (make-equation '(+ x 3) '(A))) '(x))
+                    '(full-solutions (() () (((= x -3) (A))) ())))
+      (check-equal? (all) '(very very very very bad))))
+   ;*************************************************************************************************
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))

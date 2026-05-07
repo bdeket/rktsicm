@@ -301,7 +301,7 @@ The general strategy is:
 (define (algebra-problem var analyzed succeed fail)
   (collect-terms var analyzed
                  (lambda (c b a high)
-                   (cond ((not (g:zero? high)) (fail))
+                   (cond ((not (= 0 (hash-count high))) (fail))
                          ((not (g:zero? a)) ;a*x^2+b*x+c=0
                           (quadratic-formula a b c
                                              succeed fail))
@@ -360,10 +360,11 @@ The general strategy is:
   (assert (sum? analyzed))
   (let ((terms (operands analyzed)))
     (assert (not (null? terms)))
-    (let lp ((terms terms) (const 0) (lin 0) (quad 0) (high 0))
+    (let lp ((terms terms) (const 0) (lin 0) (quad 0) (high #hash()))
       (define (assimilate-expt t coeff)
         (let ((exponent (cadr (operands t))))
           (if (number? exponent)
+              #; ;;bdk;; wrong: if expr has, for example +3x^7 and -3x^4 => high = 0
               (cond ((= exponent 2)
                      (lp (cdr terms)
                          const
@@ -376,16 +377,27 @@ The general strategy is:
 			 lin
 			 quad
 			 (symb:sum coeff high))))
-              (lp (cdr terms)
-                  const
-                  lin
-                  quad
-                  (symb:sum coeff high)))))
+              (cond
+                [(= exponent 0)
+                 (lp (cdr terms) (symb:sum coeff const) lin quad high)]
+                [(= exponent 1)
+                 (lp (cdr terms) const (symb:sum coeff lin) quad high)]
+                [(= exponent 2)
+                 (lp (cdr terms) const lin (symb:sum coeff quad) high)]
+                [else
+                 (define e (if (and (inexact? exponent) (integer? exponent))
+                               (inexact->exact exponent)
+                               exponent))
+                 (lp (cdr terms) const lin quad (hash-update high e (λ (x) (symb:sum coeff x)) 0))])
+              (lp (cdr terms) const lin quad (hash-update high exponent (λ (x) (symb:sum coeff x)) 0)))))
       (if (null? terms)
           (cont (s:simplify const)
                 (s:simplify lin)
                 (s:simplify quad)
-                (s:simplify high))
+                (for*/hash ([(k v) (in-hash high)]
+                            [v* (in-value (s:simplify v))]
+                            #:unless (or (g:zero? v*) (and (number? v*) (~0? v*))))
+                  (values k v*)))
           (let ((t (car terms)))
             (if (occurs? var t)
                 (cond ((simple:equal? var t)

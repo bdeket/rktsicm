@@ -6,7 +6,7 @@
    4                     0.0 ./rktsicm/sicm\tests\calculus\SR-boost.rkt
    9                     0.0 ./rktsicm/sicm\tests\calculus\SR-frames.rkt
    7                     0.0 ./rktsicm/sicm\tests\calculus\basis.rkt
-  14             1       0.5 ./rktsicm/sicm\tests\calculus\connection.rkt
+  14             1       0.0 ./rktsicm/sicm\tests\calculus\connection.rkt
    4                     0.0 ./rktsicm/sicm\tests\calculus\coord.rkt
   28                     0.5 ./rktsicm/sicm\tests\calculus\covariant-derivative.rkt
   10                  2  0.5 ./rktsicm/sicm\tests\calculus\curvature.rkt
@@ -20,7 +20,7 @@
    3                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
   13                     0.0 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
   15                  3  0.0 ./rktsicm/sicm\tests\calculus\manifold.rkt
-  15                  1  0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
+  15                  1  0.0 ./rktsicm/sicm\tests\calculus\maps.rkt
   20                  1  0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
    1                     0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
   18                  2  0.5 ./rktsicm/sicm\tests\calculus\so3.rkt
@@ -145,8 +145,8 @@
    5                     0.0 ./rktsicm/sicm\tests\simplify\sparse-interpolate.rkt
    2                     0.0 ./rktsicm/sicm\tests\simplify\sparse.rkt
    5                     0.0 ./rktsicm/sicm\tests\simplify\split-poly.rkt
-  23                     0.0 ./rktsicm/sicm\tests\solve\solve-utils.rkt
-  28                  3  0.0 ./rktsicm/sicm\tests\solve\solve.rkt
+  47                     0.0 ./rktsicm/sicm\tests\solve\solve-utils.rkt
+  99                  4  0.0 ./rktsicm/sicm\tests\solve\solve.rkt
   12                     0.0 ./rktsicm/sicm\tests\stream-error.rkt
    7                     0.0 ./rktsicm/sicm\tests\units\hms-dms-radians.rkt
    2                     0.0 ./rktsicm/sicm\tests\units\system-extra.rkt
@@ -155,7 +155,7 @@
   19                  2  0.0 ./rktsicm/sicm\tests\units\with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1430             2   62 14.0 TOTAL
-runtime: 3.466666666666667m 
+1525             2   63 12.5 TOTAL
+runtime: 3.1333333333333333m 
 Welcome to Racket v9.2.0.3-2026-05-04-fe30941a60 [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 
