@@ -134,6 +134,7 @@
 	  ((pair? skeleton)
 	   (cons (compile (car skeleton))
 		 (compile (cdr skeleton))))
+          #; ;;bdk;; this is unreachable either it is a constant (= not a pair) or it is a pair
 	  (else
 	   (error "Unknown skeleton entry -- skel:compile"
 		  skeleton))))

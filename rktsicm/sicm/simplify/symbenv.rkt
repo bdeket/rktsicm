@@ -6,6 +6,7 @@
          "../rkt/environment.rkt"
          "../kernel-intr.rkt"
          )
+(module+ ALL (provide symbolic-operator symbolic-environment-maker))
 
 ;;bdk;; start original file
 
