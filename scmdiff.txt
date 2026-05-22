@@ -100,7 +100,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  3 difference(s) found in simplify/matcher
  3 difference(s) found in simplify/pcf-fpf
  7 difference(s) found in simplify/pcf
- 1 difference(s) found in simplify/rcf
+ 3 difference(s) found in simplify/rcf
  1 difference(s) found in simplify/rules
 14 difference(s) found in simplify/simplify
  4 difference(s) found in simplify/sparse-gcd

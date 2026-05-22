@@ -340,10 +340,10 @@
 (define (rcf:derivative r varnum)
   (if (ratform? r)
       (let ((u (ratform-numerator r)) (v (ratform-denominator r)))
-	(rcf:/ (poly:- (poly:* (poly:derivative u varnum) v)
-		       (poly:* u (poly:derivative v varnum)))
+	(rcf:/ (poly:- (poly:* (poly/derivative-partial u varnum) v)
+		       (poly:* u (poly/derivative-partial v varnum)))
 	       (poly:* v v)))
-      (poly:derivative r varnum)))
+      (poly/derivative-partial r varnum)))
 
 ;;; I don't know if this stuff is ever important...GJS
 

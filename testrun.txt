@@ -26,7 +26,7 @@
   18                  2  0.5 ./rktsicm/sicm\tests\calculus\so3.rkt
    5                     0.0 ./rktsicm/sicm\tests\calculus\tensors.rkt
   10                  1  1.0 ./rktsicm/sicm\tests\calculus\vector-calculus.rkt
-  11                     0.0 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
+  11                     0.5 ./rktsicm/sicm\tests\calculus\vector-fields.rkt
    8                     0.0 ./rktsicm/sicm\tests\calculus\wedge.rkt
    7                  1  0.0 ./rktsicm/sicm\tests\display\exdisplay.rkt
    4                  1  0.0 ./rktsicm/sicm\tests\display\pp.rkt
@@ -141,10 +141,11 @@
    8                     0.0 ./rktsicm/sicm\tests\simplify\matcher.rkt
    6                     0.0 ./rktsicm/sicm\tests\simplify\pcf-fpf.rkt
   32                  5  0.0 ./rktsicm/sicm\tests\simplify\pcf.rkt
+  22                  1  0.0 ./rktsicm/sicm\tests\simplify\rcf.rkt
    7                     0.0 ./rktsicm/sicm\tests\simplify\rz-test-cases.rkt
    1                     0.0 ./rktsicm/sicm\tests\simplify\simplify.rkt
   11                     0.0 ./rktsicm/sicm\tests\simplify\sparse-gcd.rkt
-   5                     0.5 ./rktsicm/sicm\tests\simplify\sparse-interpolate.rkt
+   5                     0.0 ./rktsicm/sicm\tests\simplify\sparse-interpolate.rkt
    2                     0.0 ./rktsicm/sicm\tests\simplify\sparse.rkt
    5                     0.0 ./rktsicm/sicm\tests\simplify\split-poly.rkt
   47                     0.0 ./rktsicm/sicm\tests\solve\solve-utils.rkt
@@ -157,7 +158,7 @@
   19                  2  0.0 ./rktsicm/sicm\tests\units\with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1561             2   64 14.0 TOTAL
-runtime: 3.35m 
+1583             2   65 14.0 TOTAL
+runtime: 3.4166666666666665m 
 Welcome to Racket v9.2.0.3-2026-05-04-fe30941a60 [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 
