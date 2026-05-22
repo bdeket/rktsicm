@@ -1,4 +1,4 @@
-#lang s-exp "../kernel/extapply.rkt"
+#lang racket/base
 
 (provide (all-defined-out))
 
@@ -10,7 +10,7 @@
          "../general/permute.rkt"
          "../general/resource-limit.rkt"
          "../general/equals.rkt"
-         "../kernel-gnrc.rkt"
+         "../kernel-intr.rkt"
          "pcfpf/pcf.rkt"
          "fpf.rkt"
          "pcfpf/pcf-fpf.rkt"
@@ -18,6 +18,12 @@
          "sparse-interpolate.rkt"
          "../numerics/linear/lu.rkt"
          )
+
+(define (set!-ugcd-wallp? b) (set! *ugcd-wallp* b))
+(define (set!-ugcd-testing? b) (set! *ugcd-testing* b))
+(define (set!-sgcd-wallp? b) (set! *sgcd-wallp* b))
+(define (set!-sgcd-tuning? b) (set! *sgcd-tuning* b))
+(define (set!-sgcd-restart-limit b) (set! *sgcd-restart-limit* b))
 
 ;;bdk;; start original file
 
@@ -154,7 +160,7 @@
 ;;; Effectiveness Statistics
 (define *heuristic-sparse-gcd-win* 0)
 (define *heuristic-sparse-gcd-lose* 0)
-(define *heuristic-sparse-gcd-bad-decision* 0)
+;;brm;;(define *heuristic-sparse-gcd-bad-decision* 0)
 ;;; See end of file for experiments that show this is valuable.
 
 (define (sparse-heuristic-gcd p1 p2 n ds win lose)
@@ -615,6 +621,7 @@
 ;Value: (((0) . 1))
 |#
 
+#; ;;bdk;; only for testing purposes
 (define (sparse-gcd-test n-trials arity max-order max-coeff max-terms)
   (define (random-sign)
     (if (= (random 2) 0) 1 -1))

@@ -1,4 +1,4 @@
-#lang s-exp "../kernel/extapply.rkt"
+#lang racket/base
 
 (provide (all-defined-out))
 
@@ -7,7 +7,7 @@
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          "../general/equals.rkt"
-         "../kernel-gnrc.rkt"
+         "../kernel-intr.rkt"
          "fpf.rkt"
          )
 
@@ -274,11 +274,11 @@
       (begin
 	(assert (fix:= (length x)
 		       (length (sparse-exponents (car p)))))
-	(apply +
+	(apply g:+
 	       (map (lambda (term)
-		      (* (sparse-coefficient term)
-			 (apply *
-				(map expt
+		      (g:* (sparse-coefficient term)
+			 (apply g:*
+				(map g:expt
 				     x
 				     (sparse-exponents term)))))
 		    p)))))
@@ -296,9 +296,9 @@
 	(sparse-combine-like-terms
 	 (map (lambda (term)
 		(sparse-term (list-head (sparse-exponents term) narity)
-			     (* (sparse-coefficient term)
-				(apply *
-				       (map expt
+			     (g:* (sparse-coefficient term)
+				(apply g:*
+				       (map g:expt
 					    x
 					    (list-tail (sparse-exponents term)
 						       narity))))))
@@ -319,9 +319,9 @@
 	(sparse-combine-like-terms
 	 (map (lambda (term)
 		(sparse-term (list-tail (sparse-exponents term) n)
-		  (* (sparse-coefficient term)
-		     (apply *
-			    (map expt
+		  (g:* (sparse-coefficient term)
+		     (apply g:*
+			    (map g:expt
 				 x
 				 (list-head (sparse-exponents term)
 					    n))))))
@@ -342,14 +342,14 @@
   (cond ((null? terms)
 	 '())
 	((null? (cdr terms))
-	 (if (= (sparse-coefficient (car terms)) 0)
+	 (if (g:= (sparse-coefficient (car terms)) 0)
 	     '()
 	     terms))
         ((simple:equal? (sparse-exponents (car terms))
                         (sparse-exponents (cadr terms)))
-	 (let ((coeff (+ (sparse-coefficient (car terms))
-			 (sparse-coefficient (cadr terms)))))
-	   (if (= coeff 0)
+	 (let ((coeff (g:+ (sparse-coefficient (car terms))
+                           (sparse-coefficient (cadr terms)))))
+	   (if (g:= coeff 0)
 	       (sparse-merge-adjacent-terms (cddr terms))
 	       (sparse-merge-adjacent-terms
 		(cons (sparse-term (sparse-exponents (car terms))

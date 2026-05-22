@@ -13,6 +13,72 @@
 (define the-tests
   (test-suite
    "simplify/sparse"
+   (test-case
+    "interpolate-random"
+    (set!-interpolate-size 1)
+    (check-equal? (interpolate-random 'any) 1)
+    (set!-interpolate-size 5)
+    (check-true (<= 1 (interpolate-random 'and) 5))
+    (set!-interpolate-size 10000)
+    (check-true (<= 1 (interpolate-random 'all) 10000)))
+   (test-case
+    "univariate-interpolate"
+    (check-equal? (univariate-interpolate-values '(2) '(5) vector list)
+                  (vector (list (sparse-term '(0) 5))))
+    (check-equal? (univariate-interpolate-values '(0 1) '(3 2) list vector) ;; 3-x
+                  (list (list (sparse-term '(1) -1) (sparse-term '(0) 3))))
+    (check-equal? (univariate-interpolate-values '(516 516) '(1804 3283) 
+                                                 error (λ _ 'fail))
+                  'fail)
+
+    (check-equal? (univariate-interpolate (λ (x) 3) 0)
+                  (list (sparse-term '(0) 3)))
+    (check-equal? (univariate-interpolate (λ (x) (- 3 x)) 1)
+                  (list (sparse-term '(1) -1) (sparse-term '(0) 3)))
+    (random-seed 19168436) ;; forces the first interpolation to fail (double xs generated)
+    (check-equal? (univariate-interpolate (λ (x) (- 3 x)) 1)
+                  (list (sparse-term '(1) -1) (sparse-term '(0) 3))))
+   (test-case
+    "expand-poly"
+    (check-equal? (expand-poly '() '()) '())
+    (check-equal? (expand-poly '( ((5) . 3) ) '( () )) '())
+    (check-equal? (expand-poly '( ((5) . 3) ) '( (((1) . 2)) )) '( ((5 1) . 2) ))
+    (check-equal? (expand-poly '( ((5) . 3) ) '( (((1) . 2) ((3) . 4)) )) '( ((5 3) . 4) ((5 1) . 2))))
+   (test-case
+    "interpolate-skeleton"
+    (random-seed 1)
+    (check-equal? (interpolate-skeleton (λ (x) ((λ (y) (+ (* x x) (* y y))) 3))
+                                        '(((2) . 4) ((0) . 5)))
+                  '(((2) . 1) ((0) . 9)))
+    (random-seed 14761) ;; forcing try-again
+    (check-equal? (interpolate-skeleton (λ (x) ((λ (y) (+ (* x x) (* y y))) 3))
+                                        '(((2) . 4) ((0) . 5)))
+                  '(((2) . 1) ((0) . 9)))
+    (set!-interpolate-skeleton-using-vandermonde? #f)
+    (random-seed 1)
+    (check-equal? (interpolate-skeleton (λ (x) ((λ (y) (+ (* x x) (* y y))) 3))
+                                        '(((2) . 4) ((0) . 5)))
+                  '(((2) . 1) ((0) . 9)))
+    (random-seed 7712) ;; forcing try-again
+    (check-equal? (interpolate-skeleton (λ (x) ((λ (y) (+ (* x x) (* y y))) 3))
+                                        '(((2) . 4) ((0) . 5)))
+                  '(((2) . 1) ((0) . 9)))
+    (set!-interpolate-skeleton-using-vandermonde? #t))
+   (test-case
+    "sparse-interpolate"
+    (random-seed 1)
+    (check-equal? (sparse-interpolate (λ (x y) (+ (* x x) (* y y))) 2 2)
+                  '(((2 0) . 1) ((0 2) . 1)))
+    (random-seed 3764)
+    (check-equal? (sparse-interpolate (λ (x y) (+ (* x x) (* y y))) 2 2)
+                  '(((2 0) . 1) ((0 2) . 1))))
+   ;**************************************************************************************************
+   (check-equal? (expand-poly '(((5) . 3) ((2) . 1) ((1) . 1) ((0) . 4))
+                              '( (((1) . 1) ((0) . 3))
+                                 (((1) . 1))
+                                 (((3) . 2) ((0) . 4))
+                                 (((1) . 2) ((0) . 5)) ))
+                 '(((5 1) . 1) ((5 0) . 3) ((1 3) . 2) ((2 1) . 1) ((1 0) . 4) ((0 1) . 2) ((0 0) . 5)))
    (check-equal? (sparse-interpolate
                   (lambda (x y z) (+ (* 3 (square x) (cube y)) (* x y z) (* 4 z) 1))
                   3
@@ -22,12 +88,7 @@
                   (lambda (x) (+ (* 3 (expt x 5)) (expt x 2) x 4))
                   '(((5) . 1) ((2) . 1) ((1) . 1) ((0) . 1)))
                  '(((5) . 3) ((2) . 1) ((1) . 1) ((0) . 4)))
-   (check-equal? (expand-poly '(((5) . 3) ((2) . 1) ((1) . 1) ((0) . 4))
-                              '( (((1) . 1) ((0) . 3))
-                                 (((1) . 1))
-                                 (((3) . 2) ((0) . 4))
-                                 (((1) . 2) ((0) . 5)) ))
-                 '(((5 1) . 1) ((5 0) . 3) ((1 3) . 2) ((2 1) . 1) ((1 0) . 4) ((0 1) . 2) ((0 0) . 5)))
+   
    (check-equal? (univariate-interpolate
                   (lambda (x) (+ (* 3 (expt x 5)) (expt x 2) x 4))
                   6)

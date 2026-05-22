@@ -1,16 +1,18 @@
-#lang s-exp "../kernel/extapply.rkt"
+#lang racket/base
 
 (provide (all-defined-out))
 
 (require (only-in "../rkt/glue.rkt" iota
                   fix:= fix:+ fix:-)
          "../general/list-utils.rkt"
-         "../kernel-gnrc.rkt"
+         (only-in "../kernel-intr.rkt" generate-list matrix-by-row-list)
          "sparse.rkt"
          "../numerics/linear/vandermonde.rkt"
          "../numerics/linear/lu.rkt"
          )
 
+(define (set!-interpolate-size n) (set! *interpolate-size* n))
+(define (set!-interpolate-skeleton-using-vandermonde? b) (set! *interpolate-skeleton-using-vandermonde* b))
 ;;bdk;; start original file
 
 ;;;;         Sparse Multivariate Polynomial Interpolation 
@@ -52,14 +54,18 @@
 		   (map (lambda (p)
 			  (map sparse-coefficient p))
 			ps))))
-	    (let ((cps
+            (let ((cps
 		   (let clp ((css css))
 		     (if (null? css)
 			 '()
 			 (univariate-interpolate-values xk+1s (car css)
 			  (lambda (cp) (cons cp (clp (cdr css))))
-			  (lambda () (stagelp k p rargs)))))))
-	      (stagelp (fix:+ k 1) (expand-poly p cps) (cdr rargs))))))))
+			  #; ;;bdk;; wrong - if the fail is taken the poly is fully solved before returning to the last
+                          ;;bdk;; call to stagelp resulting in an error
+                          (lambda () (stagelp k p rargs))
+                          (lambda () #f))))))
+              (if cps (stagelp (fix:+ k 1) (expand-poly p cps) (cdr rargs))
+                  (stagelp k p rargs))))))))
 
 #|
 (sparse-interpolate

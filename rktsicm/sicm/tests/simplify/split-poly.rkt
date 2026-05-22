@@ -3,6 +3,7 @@
 (require rackunit
          "../../simplify/split-poly.rkt"
          "../../simplify/simplify.rkt"
+         "../../simplify/pcf.rkt"
          "../../kernel-gnrc.rkt"
          "../../kernel/cstm/ghelper.rkt"
          "../../simplify/default.rkt"
@@ -32,6 +33,18 @@
                   '(3 (+ (expt x 2) y) 1 z))
     (check-equal? (factor-polynomial-expression (* 3 (square 'z) (+ (square 'x) 'y)))
                   '(3 (+ (expt x 2) y) z 1)))
+   (test-case
+    "pcf:->factors"
+    (check-equal? (pcf:->factors 1 '(x y)) 1)
+    (check-equal? (pcf:->factors (pcf:expression-> '(* (* y (- x 3)) (* y (+ x 5))) (λ (p v) p))
+                                 '(x y))
+                  '(* (+ -15 (* (+ 2 x) x)) (expt y 2)))
+    (check-equal? (pcf:->factors (pcf:expression-> '(* (* y (- x 3)) (* y (+ x 5))) (λ (p v) p))
+                                 '(x (* y z)))
+                  '(* (+ -15 (* (+ 2 x) x)) (expt (* y z) 2)))
+    (check-equal? (pcf:->factors (pcf:expression-> '(* x y y) (λ (p v) p))
+                                 '((* x0 x1) (* y z)))
+                  '(* x0 x1 (expt (* y z) 2))))
    (test-case
     "test-poly"
     (define test-poly
@@ -64,12 +77,19 @@
    (test-case
     "root-out-squares1"
     ;;set default simplifier to nothing...
-    (local-require )
-    simplify:assign-operations
     (check-equal? (root-out-squares
                    (default-simplify (expression (sqrt (* (square (+ 'x 'y)) (cube (- 'x 'y)))))))
                   '(+ (* (expt x 2) (sqrt (+ x (* -1 y))))
-                      (* -1 (expt y 2) (sqrt (+ x (* -1 y)))))))
+                      (* -1 (expt y 2) (sqrt (+ x (* -1 y))))))
+    (check-equal? (root-out-squares
+                   (expression (sqrt (* (square (+ 'x 'y)) (cube (- 'x 'y))))))
+                  '(* (sqrt (expt (+ x (* -1 y)) 3)) (+ x y)))
+   (check-equal? (root-out-squares '(sqrt (* (expt (+ x y) 2) 3 (expt (+ x y) 4))))
+                 '(* (sqrt 3) (expt (+ x y) 3)))
+   (check-equal? (root-out-squares '(sqrt (* (expt (+ x y) 3) 3 (expt (+ x y) 5))))
+                 '(* (sqrt 3) (expt (+ x y) 4)))
+   (check-equal? (root-out-squares '(sqrt (* (expt (+ x y) 3) 3 (expt (+ 2 z) 0) (expt (+ x y) 5))))
+                 '(* (sqrt 3) (expt (+ x y) 4))))
    (test-case
     "root-out-square2"
     (check-equal? (default-simplify
