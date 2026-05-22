@@ -14,9 +14,6 @@
 ;;;; This is the top level of polynomial gcd stuff.
 
 ;;bdk;; insert 1
-(define *gcd-cut-losses* #f)
-;;;(define *gcd-cut-losses* 1000.0)
-
 (define (poly/gcd-classical u v)
   (cond ((explicit-pcf? u)
 	 (cond ((explicit-pcf? v)
@@ -35,8 +32,6 @@
 	       (else (error "What do I do here?"))))
         (else (error "What do I do here?"))))
 
-
-(define *euclid-breakpoint-arity* 3)
 ;;bdk;; insert 1 end
 
 ;;bdk;; insert 2
@@ -94,7 +89,12 @@
 (define (sparse->pcf s)
   (if (null? s)
       poly:zero
-      (let ((v (poly:new-variables (length (sparse-exponents (car s))))))
+      (let* ([n (length (sparse-exponents (car s)))]
+             [v (poly:new-variables n)])
+        (if (= n 0)
+            (if (sparse-constant? s)
+                (sparse-coefficient (car s))
+                (error "Bad sparse -- sparse->pcf" s))
 	(a-reduce poly:+
 		  (map (lambda (sterm)
 			 (poly:* (sparse-coefficient sterm)
@@ -102,5 +102,5 @@
 					   (map poly:expt
 						v
 						(sparse-exponents sterm)))))
-		       s)))))
+		       s))))))
 ;;bdk;; insert 2 end

@@ -98,7 +98,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/poly\domain.scm
  1 difference(s) found in simplify/default
  3 difference(s) found in simplify/fpf
  3 difference(s) found in simplify/matcher
- 1 difference(s) found in simplify/pcf-fpf
+ 3 difference(s) found in simplify/pcf-fpf
  7 difference(s) found in simplify/pcf
  1 difference(s) found in simplify/rcf
  1 difference(s) found in simplify/rules

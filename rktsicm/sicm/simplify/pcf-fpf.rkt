@@ -10,7 +10,7 @@
          "fpf.rkt"
          "pcfpf/pcf.rkt"
          "sparse.rkt"
-         "sparse-gcd.ss"
+         "sparse-gcd.rkt"
          )
 
 ;;bdk;; start original file
@@ -47,7 +47,12 @@
 		       poly/one)
 		   (poly/gcd-classical u v)))))))
 
+(define *gcd-cut-losses* #f)
+;;;(define *gcd-cut-losses* 1000.0)
+
 ;;bdk;; moved to pcfpf/pcf-fpf 1
+
+(define *euclid-breakpoint-arity* 3)
 
 (define poly:gcd poly:gcd-dispatch)
 
