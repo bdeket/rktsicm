@@ -143,7 +143,7 @@
 	  (fix:= (poly/degree p) 0)
 	  (and (fix:< n (poly/arity p))
 	       (let lp ((p p))
-		 (cond ((poly/zero? p) #t)
+		 (cond #;((poly/zero? p) #t) ;;bdk;; unreachable poly/zero is base?
 		       ((poly/contractable? (fix:- n 1)
 					    (poly/leading-coefficient p))
 			(poly/contractable? n
@@ -284,6 +284,7 @@
 	 (error "Can only raise a PCF to an exact integer power" base exponent))
 	((negative? exponent)
 	 (error "No inverse (POLY/EXPT):" base exponent))
+        #;#; ;;bdk;; unreachable since both poly/one and poly/zero are base?
 	((poly/one? base) base)
 	((poly/zero? base)
 	 (if (int:zero? exponent)
@@ -1040,14 +1041,15 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
       (and (pair? p) (eq? (car p) '*dense*))))
 
 (define (poly/make-from-dense arity termlist)
+  ;;bdk;; make sure the first elements are not zero - this leads to problems in some algorithms
+  (set! termlist (dropf termlist poly/zero?))
   (cond ((null? termlist) poly/zero)
 	((and (null? (cdr termlist))
 	      (base? (car termlist)))
 	 (car termlist))
 	(else
 	 (cons '*dense*
-               ;;bdk;; make sure the first elements are not zero - this leads to problems in some algorithms
-	       (cons arity (dropf termlist poly/zero?))))))
+	       (cons arity termlist)))))
 
 
 (define poly/make poly/make-from-dense)

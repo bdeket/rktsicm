@@ -2,14 +2,16 @@
 
 (require rackunit
          "../../simplify/pcf.rkt"
+         "../../simplify/pcfpf/pcf.rkt"
          "../../simplify/pcfpf/pcf-fpf.rkt"
          "../../general/resource-limit.rkt"
          (only-in "../../kernel-intr.rkt" *machine-epsilon*)
-         (submod "../helper.rkt" runner))
+         "../helper.rkt")
 
 (define P0 (poly/make 2 (list (poly/make 1 '(2 1 0)) 1 0)))
 (define P1 (pcf:expression-> '(+ (* x y z) (* x x z) (* 3 y y)) (λ (p v) p)))
 (define bad-poly '(any 1 3))
+(define bad-dense '(*dense* 1))
 (define S0 '(*sparse* 1))
 
 (provide the-tests)
@@ -66,6 +68,14 @@
    ;;**************************************************************************
    (test-case
     "pcf:expression->"
+    (check-equal? (pcf:expression-> '(+ x 3) list) (list (poly/make 1 '(1  3)) '(x)))
+    (check-equal? (pcf:expression-> '(- x 3) list) (list (poly/make 1 '(1 -3)) '(x)))
+    (check-equal? (pcf:expression-> '(* x 3) list) (list (poly/make 1 '(3 0)) '(x)))
+    (check-equal? (pcf:expression-> '(negate x) list) (list (poly/make 1 '(-1 0)) '(x)))
+    (check-true (poly/equal? (pcf:expression-> '(expt x 3) (λ (p v) p)) (poly/make 1 '(1 0 0 0))))
+    (check-true (poly/equal? (pcf:expression-> '(square x) (λ (p v) p)) (poly/make 1 '(1 0 0))))
+    (check-equal? (pcf:expression-> '(gcd 6 (* 15 x)) list) (list 3 '(x)))
+    
     (check-equal? (pcf:expression-> '(+ (+ (* x y z) (* x x z) (* y y)))
                                     (λ (p v) (pcf:->expression p v)))
                   '(+ (* (+ (* z x) (* z y)) x) (expt y 2)))
@@ -80,12 +90,12 @@
     (check-equal? (poly/arity (poly/make-constant 1 1)) 0)
     (check-equal? (poly/arity (poly/make-constant 2 1)) 0)
     (check-equal? (poly/arity (poly/make-constant 2 (poly/make 1 '(1)))) 0)
-    (check-equal? (poly/arity (poly/make-constant 2 (poly/make 1 '(0 1)))) 2)
+    (check-equal? (poly/arity (poly/make-constant 2 (poly/make 1 '(1 0)))) 2)
     (check-equal? (pcf:->expression (poly/make-constant 3 (poly/make 1 '(1 1)))
                                     '(x y z))
                   '(+ 1 z))
     (check-exn #px"Bad constant -- POLY/MAKE-CONSTANT"
-               (λ () (poly/make-constant 2 (poly/make 3 '(0 1)))))
+               (λ () (poly/make-constant 2 (poly/make 3 '(1 0)))))
 
     (check-equal? (pcf:->expression (poly/make-c*x^n 1 5 7) '(x))
                   '(* 5 (expt x 7)))
@@ -157,6 +167,7 @@
     (check-true (poly/contractable? 0 (poly/make 1 '(1))))
     (check-false (poly/contractable? 0 (poly/make 1 '(1 0))))
     (check-true (poly/contractable? 1 (poly/make 2 '(1))))
+    (check-true (poly/contractable? 1 0))
     (let* ([A (pcf:expression-> '(+ (* x y z) (* x y y)) (λ (p v) p))]
            [B (poly/extend 1 (poly/extend 4 A))])
       (check-true (poly/contractable? 1 B))
@@ -290,7 +301,17 @@
                   P1)
     (check-equal? (poly/gcd-euclid poly/zero P0) P0)
     (check-equal? (poly/gcd-euclid P0 poly/zero) P0)
-    (check-equal? (poly/gcd-euclid 3 P0) 1))
+    (check-equal? (poly/gcd-euclid 3 P0) 1)
+    (parameterize ([euclid-wallp? #t])
+    (check-equal? (out->string (poly/gcd-euclid P1 (poly/make 3 '(5 0))))
+                  (string-append "'((*dense* 1 1 0) (*dense* 1 1 0))\n"
+                                 "'((*dense* 1 1 0) 0)\n"
+                                 "'(1 (*dense* 2 1 0))\n"
+                                 "'((*dense* 2 1 0) 1)\n"
+                                 "'(1 (*sparse* 2 (2 . 1)))\n"
+                                 "'((*sparse* 2 (2 . 1)) 1)\n"
+                                 "'((*dense* 3 (*dense* 2 (*dense* 1 1 0)) (*dense* 2 (*dense* 1 1 0) 0) (*sparse* 2 (2 . 3))) (*dense* 3 1 0))\n"
+                                 "'((*dense* 3 1 0) 1)\n"))))
    (test-case
     "poly/derivative-partial partial-derivative derivative-principal"
     (check-equal? (poly/partial-derivative P0 '(0))
@@ -490,13 +511,15 @@
     (check-equal? (poly/lowest-order P1) 0)
     (check-equal? (poly/lowest-order (poly/make-c*x^n 5 4 3)) 3)
     (check-exn #px"Bad type -- POLY/LOWEST-ORDER" (λ () (poly/lowest-order bad-poly)))
+    (check-exn #px"Should not get here -- POLY/DENSE/LOWEST-ORDER" (λ () (poly/lowest-order bad-dense)))
     (check-equal? (poly/trailing-coefficient 0) 0)
     (check-equal? (poly/trailing-coefficient 3) 3)
     (check-equal? (poly/trailing-coefficient P0) 1)
     (check-equal? (poly/trailing-coefficient P1) (poly/make-c*x^n 2 3 2))
     (check-equal? (poly/trailing-coefficient (poly/make-c*x^n 5 4 3)) 4)
     (check-equal? (poly/trailing-coefficient (poly/add 3 (poly/make-c*x^n 5 4 3))) 3)
-    (check-exn #px"Bad type -- POLY/TRAILING-COEFFICIENT" (λ () (poly/trailing-coefficient bad-poly))))
+    (check-exn #px"Bad type -- POLY/TRAILING-COEFFICIENT" (λ () (poly/trailing-coefficient bad-poly)))
+    (check-exn #px"Should not get here -- POLY/DENSE/TRAILING-COEFFICIENT" (λ () (poly/trailing-coefficient bad-dense))))
    (test-case
     "poly:dense-> ->dense ->expression ->lambda"
     (check-equal? (poly:dense-> '(1 2 3 4)) (poly/make 1 '(4 3 2 1)))

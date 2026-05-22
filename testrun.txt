@@ -20,7 +20,7 @@
    3                     0.0 ./rktsicm/sicm\tests\calculus\interior-product.rkt
   13                     0.0 ./rktsicm/sicm\tests\calculus\manifold-extra.rkt
   15                  3  0.0 ./rktsicm/sicm\tests\calculus\manifold.rkt
-  15                  1  0.5 ./rktsicm/sicm\tests\calculus\maps.rkt
+  15                  1  0.0 ./rktsicm/sicm\tests\calculus\maps.rkt
   20                  1  0.0 ./rktsicm/sicm\tests\calculus\metric.rkt
    1                     0.0 ./rktsicm/sicm\tests\calculus\ode.rkt
   18                  2  0.5 ./rktsicm/sicm\tests\calculus\so3.rkt
@@ -157,6 +157,6 @@
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
 1555             2   64 13.5 TOTAL
-runtime: 3.25m 
+runtime: 3.283333333333333m 
 Welcome to Racket v9.2.0.3-2026-05-04-fe30941a60 [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 
