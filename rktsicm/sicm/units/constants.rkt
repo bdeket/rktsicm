@@ -2,11 +2,8 @@
 
 (provide (all-defined-out) parsec speed-of-light)
 
-(require "../simplify/default.rkt" ;; g:simplify needs to be initialized
-         "system.rkt"
+(require "system.rkt"
          "SI-units.rkt")
-(void 'INSTALL-GENERICS
-      (simplify:assign-operations #t))
 
 ;;bdk;; start original file
 

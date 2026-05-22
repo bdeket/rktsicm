@@ -8,7 +8,7 @@
          "list-utils.rkt"
          "eq-properties.rkt")
 
-;;bdk;; insert 1
+;;bdk;; insert 1 : from kernel/utils
 ;;; Programs may leave notes here
 
 (define *taking-notes* #t)
@@ -38,8 +38,8 @@
   (display "|#")
   (newline))
 
-(define *last-notes*)
-(define *last-notes-shown*)
+(define *last-notes* '())
+(define *last-notes-shown* '())
 
 (define (show-notes)
   (set! *last-notes-shown* *last-notes*)

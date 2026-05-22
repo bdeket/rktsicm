@@ -18,7 +18,7 @@
 (let ()
   (local-require (only-in racket/stream stream-ref)
                  (only-in "../kernel/strutl.rkt" prime-numbers-stream))
-  (void (stream-ref prime-numbers-stream 35)))
+  (void (stream-ref prime-numbers-stream 55)))
 
 ;***************************************************************************************************
 (define-syntax (check-simplified? stx)

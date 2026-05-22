@@ -111,6 +111,12 @@
     "unify"
     (define (->d dct) (map (λ (l) (list (car l) (cadr l))) dct))
     (check-equal? (->d (unify '(+ (?? a)(? b)) '(+ 2 2))) '((b 2)(a (2)))))
+
+   (skip ;; TODO? (from the SDF book - https://mitpress.ublish.com/ebook/software-design-for-flexibility-preview/12618/27 exercise 4.19):
+    ;; is it needed?
+    (check-equal? (unify '( ( (?? x) 3 ) ( (?? x) ) )
+                         '( ( 4 (?? y) ) (  4 5   )))
+                  '( (x (4 5)) (y (5 3)))))
    ))
 
 (module+ test
