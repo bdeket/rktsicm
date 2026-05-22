@@ -14,6 +14,7 @@
          "rcf.rkt"
          )
 
+(define (set!-inhibit-expt-simplify? v) (set! *inhibit-expt-simplify* v))
 ;;bdk;; start original file
 
 ;;;;       General Recursive Simplifier Maker
@@ -99,7 +100,8 @@
       (let ((vars (sort (variables-in expr) variable<?)))
 	(uorder
 	      (append (map add-symbol! (priority))
-		      vars)))
+                      ;;bdk;; avoid double entries, otherwise both (vless? x y) and (vless? y x) can be true...
+		      (remove* (priority) vars))))
       (ianalyze expr))
 
     (define (ianalyze expr)
