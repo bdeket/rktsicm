@@ -63,8 +63,10 @@
 	 (cons '*fpf* terms))))
 
 (define (fpf:terms fpf)
-  (if (and (fpf:coeff? fpf) (fpf:coeff-zero? fpf))
-      '()
+  ;;bdk;; 5 is a fpf? (see fpf:make)
+  (if (fpf:coeff? fpf)
+      (if (fpf:coeff-zero? fpf)
+          '() (list (fpf:make-term '() fpf)))
       (cdr fpf)))
 
 
@@ -271,12 +273,10 @@
 	 (expt-iter base exponent :one))))
 
 (define (fpf:divide x y #:optional continue)
-  (let ((cont
-	 (if (default-object? continue)
-	     (lambda (q r) (list (fpf:make q) (fpf:make r)))
-	     (lambda (q r) (continue (fpf:make q) (fpf:make r))))))
+  (when (default-object? continue) (set! continue list))
+  (let ((cont (lambda (q r) (continue (fpf:make q) (fpf:make r)))))
     (if (and (fpf:coeff? x) (fpf:coeff? y))
-	(fpf:coeff-divide x y cont)
+	(fpf:coeff-divide x y continue) ;;bdk;; fpf:make works on termlists not on numbers
 	(cond ((and (fpf:coeff? x) (explicit-fpf? y))
 	       (fpf:divide-terms (fpf:terms (fpf:make-constant x (fpf:arity y)))
 				 (fpf:terms y)
