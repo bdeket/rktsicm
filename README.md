@@ -27,14 +27,14 @@ or `(require sicm)`
 
 #### goals:
 
-- [X] add tests (all tests found in the original files are in [/tests](./rktsicm/sicm/tests)) All test pass (except for 2 long-running that time out). See [testrun.txt](./testrun.txt).
-- [X] clean up code. Code is preserved as much as possible to make updating easier.
-- [ ] clean up provides (currently everything is provided)
+- [X] add tests (all tests found in the original files are in [/tests](./rktsicm/sicm/tests)) All test pass (2 long-running time out but succeed when given time). See [testrun.txt](./testrun.txt).
+      More tests were added to cover everything except the numerics folder. But the checks usually only check for the same answer as scmutils, not necessary correctness.
 - [X] turn into a 'lang'
-- [ ] make things more 'rackety'
-- [ ] use `TR` and the `math` library for number crunching
+- [ ] clean up provides (currently everything is provided)
 - [ ] add documentation
 - [ ] use logger instead of printing to `current-output-port` (partly done => rktsicm-logger)
+- [ ] make things more 'rackety'
+- [ ] use `TR` and the `math` library for number crunching
 
 #### see also
 racket libraries with a similar goal

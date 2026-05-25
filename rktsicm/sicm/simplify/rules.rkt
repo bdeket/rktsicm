@@ -18,6 +18,7 @@
          )
 (require (only-in "../kernel-intr.rkt" kernel:assign-operations))
 (kernel:assign-operations #t) ;; for compose
+(define :symb:pi ':pi) ;;TODO;; this should be in numsymb (as well as a general cleanup of pi :pi n:pi etc)
 
 ;;bdk;; start original file
 
@@ -317,7 +318,7 @@
    ( (sqrt (expt (? x) (? n odd-positive-integer?)))
      (and sqrt-expt-simplify?
 	  (let ((xs (rcf:simplify x)))
-	     (assume! `(= (sqrt (expt ,xs ,n))
+	     (assume! `(= (sqrt (expt ,xs ,(fix:- n 1)))
                           (expt ,xs ,(quotient (fix:- n 1) 2)))
                       'simsqrt2)))
      (* (sqrt (: x)) (expt (: x) (: (quotient (fix:- n 1) 2)))) )
@@ -577,6 +578,7 @@
 
 
    ;; Already some accumulation
+   #; ;;bdk;; duplicate from above
    ( ((partial (?? i)) ((* (partial (?? j)) (?? more)) (? f)))
      none
      ((* (partial (:: i)) (partial (:: j)) (:: more)) (: f)))
@@ -756,30 +758,30 @@
 ;;; Rules when :pi is symbolic.
 
 (define (zero-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ x :pi))))
+  (integer? (rcf:simplify (symb:/ x :symb:pi))))
 
 (define (pi/2-mod-2pi? x)
   (integer?
-   (rcf:simplify (symb:/ (symb:- x (symb:/ :pi 2)) (symb:* 2 :pi)))))
+   (rcf:simplify (symb:/ (symb:- x (symb:/ :symb:pi 2)) (symb:* 2 :symb:pi)))))
 
 (define (-pi/2-mod-2pi? x)
   (integer?
-   (rcf:simplify (symb:/ (symb:+ x (symb:/ :pi 2)) (symb:* 2 :pi)))))
+   (rcf:simplify (symb:/ (symb:+ x (symb:/ :symb:pi 2)) (symb:* 2 :symb:pi)))))
 
 (define (pi/2-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ :pi 2)) :pi))))
+  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ :symb:pi 2)) :symb:pi))))
 
 (define (zero-mod-2pi? x)
-  (integer? (rcf:simplify (symb:/ x (symb:* 2 :pi)))))
+  (integer? (rcf:simplify (symb:/ x (symb:* 2 :symb:pi)))))
 
 (define (pi-mod-2pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:- x :pi) (symb:* 2 :pi)))))
+  (integer? (rcf:simplify (symb:/ (symb:- x :symb:pi) (symb:* 2 :symb:pi)))))
 
 (define (pi/4-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ :pi 4)) :pi))))
+  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ :symb:pi 4)) :symb:pi))))
 
 (define (-pi/4-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:+ x (symb:/ :pi 4)) :pi))))
+  (integer? (rcf:simplify (symb:/ (symb:+ x (symb:/ :symb:pi 4)) :symb:pi))))
 
 
 (define special-trig
@@ -969,7 +971,7 @@
    ))
 
 (define (at-least-two? n)
-  (and (number? n) (>= n 2)))
+  (and (real? n) (>= n 2)))
 
 
 (define sin^2->cos^2
@@ -996,7 +998,7 @@
     (split-high-degree-cosines expression))))
 
 (define (more-than-two? n)
-  (and (number? n) (> n 2)))
+  (and (real? n) (> n 2)))
 
 (define split-high-degree-cosines
   (rule-system 
@@ -1175,6 +1177,9 @@
 
    ( (exp (* (? c1 imaginary-number?) (?? f)))
      (negative? (n:imag-part c1))
+     (+ (cos (* (: (- (n:imag-part c1))) (:: f)))
+	   (* -i (sin (* (: (- (n:imag-part c1))) (:: f)))))
+     #; ;;bdk;; real-part is always 0
      (* (exp (: (n:real-part c1)))
 	(+ (cos (* (: (- (n:imag-part c1))) (:: f)))
 	   (* -i (sin (* (: (- (n:imag-part c1))) (:: f)))))) )

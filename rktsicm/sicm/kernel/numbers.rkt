@@ -20,6 +20,9 @@
          )
 (define-values (assign-operation numbers:assign-operations)
   (make-assign-operations 'numbers))
+  
+;;bdk;; extra definitions needed in the scmutils-base-environment for assume! (together with simplify)
+(define (non-negative? x) (not (negative? x)))
 
 ;;bdk;; start original file
 

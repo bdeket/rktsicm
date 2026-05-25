@@ -66,7 +66,7 @@
    5                  1  0.0 ./rktsicm/sicm\tests\kernel\mathutil.rkt
   30                  1  0.0 ./rktsicm/sicm\tests\kernel\matrices.rkt
   10                  1  0.0 ./rktsicm/sicm\tests\kernel\modarith.rkt
-  10                     0.0 ./rktsicm/sicm\tests\kernel\numbers.rkt
+  11                     0.0 ./rktsicm/sicm\tests\kernel\numbers.rkt
   17             1    1  0.0 ./rktsicm/sicm\tests\kernel\numeric.rkt
   22                  1  0.0 ./rktsicm/sicm\tests\kernel\numsymb.rkt
    9                  1  0.0 ./rktsicm/sicm\tests\kernel\operator.rkt
@@ -135,6 +135,7 @@
   21                  1  0.0 ./rktsicm/sicm\tests\poly\polyroot.rkt
    7                     0.0 ./rktsicm/sicm\tests\poly\ppa.rkt
    9                     0.0 ./rktsicm/sicm\tests\rkt\define.rkt
+   5                     0.0 ./rktsicm/sicm\tests\simplify\default.rkt
    2                     0.0 ./rktsicm/sicm\tests\simplify\expand-nary.rkt
   18                     0.0 ./rktsicm/sicm\tests\simplify\fpf.rkt
    9                     0.5 ./rktsicm/sicm\tests\simplify\gcd-tests.rkt
@@ -144,8 +145,8 @@
   22                  1  0.0 ./rktsicm/sicm\tests\simplify\rcf.rkt
    4                     0.0 ./rktsicm/sicm\tests\simplify\rule-simplifier.rkt
    8                     0.0 ./rktsicm/sicm\tests\simplify\rule-syntax.rkt
-   2                     0.0 ./rktsicm/sicm\tests\simplify\rules-systems.rkt
-                         0.0 ./rktsicm/sicm\tests\simplify\rules.rkt
+  34                  3  0.0 ./rktsicm/sicm\tests\simplify\rules-systems.rkt
+  13                  1  0.0 ./rktsicm/sicm\tests\simplify\rules.rkt
    7                     0.0 ./rktsicm/sicm\tests\simplify\rz-test-cases.rkt
    7                     0.0 ./rktsicm/sicm\tests\simplify\simplify.rkt
   28                     0.0 ./rktsicm/sicm\tests\simplify\sparse-gcd.rkt
@@ -165,7 +166,7 @@
   19                  2  0.0 ./rktsicm/sicm\tests\units\with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1655             2   65 13.0 TOTAL
-runtime: 3.216666666666667m 
+1706             2   69 13.5 TOTAL
+runtime: 3.35m 
 Welcome to Racket v9.2.0.3-2026-05-04-fe30941a60 [cs].
 Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  6-cores  2592MHz 

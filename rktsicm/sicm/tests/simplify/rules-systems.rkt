@@ -3,7 +3,19 @@
 (require rackunit
          "../../simplify/rules.rkt"
          "../../general/notes.rkt"
+         (only-in "../../kernel.rkt") ;; we need the scmutils-base-environment loaded
          "../helper.rkt")
+
+(define X (list-ref '(x (/ x 5) (+ 2 (* 7 x))) (random 3)))
+(define Y (list-ref '(y (* y a) (- 3 (* b y))) (random 3)))
+
+(define-syntax-rule (with ([a b c]...) body ...)
+  (begin (a b) ...
+         (with-handlers ([exn:fail? (λ (e) (a c) ... (raise e))])
+           body ...
+           (a c) ...)))
+(define-syntax-rule (check-notes notes rst ...) (check-equal? (out->string (clear-notes!)(show-notes)) (format notes rst ...)))
+(define-syntax-rule (no-new-notes) (check-notes "\n#| |#"))
 
 (provide the-tests)
 (define the-tests
@@ -11,63 +23,700 @@
    "simplify/rule-simplifier"
    (test-case
     "logexp"
-    (check-equal? (logexp '(exp (* 3 (log x))))
-                  '(expt x 3))
-    (check-equal? (logexp '(exp (log x)))
+    (clear-notes!)
+    (check-equal? (logexp `(exp (* 3 (log ,X))))
+                  `(expt ,X 3))
+    (check-equal? (logexp `(exp (log ,X)))
+                  X)
+    (check-equal? (logexp `(log (exp x)))
                   'x)
-    (check-equal? (logexp '(log (exp x)))
-                  'x)
-    (check-equal? (out->string (clear-notes!)(show-notes))
-                  "\n#| \n'(assuming (= (log (exp x)) x))\n'(logexp1)\n|#")
+    (check-notes "\n#| \n'(assuming (= (log (exp x)) x))\n'(logexp1)\n|#")
+    
     (check-equal? (logexp '(log (exp (/ (* x y) (* 1 y)))))
                   '(/ (* x y) (* 1 y)))
     ;; TODO ; this internal simplify seems redundant, especially since it's only for notes - investigate
-    (check-equal? (out->string (clear-notes!)(show-notes))
-                  "\n#| \n'(assuming (= (log (exp x)) x))\n'(logexp1)\n|#")
+    (check-notes "\n#| \n'(assuming (= (log (exp x)) x))\n'(logexp1)\n|#")
+    (with ([log-exp-simplify #f #t])
+          (check-equal? (logexp '(log (exp (/ (* x y) (* 1 y)))))
+                        '(log (exp (/ (* x y) (* 1 y))))))
+    
     (check-equal? (logexp '(sqrt (exp x)))
                   '(exp (/ x 2)))
-    (check-equal? (out->string (clear-notes!)(show-notes))
-                  "\n#| \n'(assuming (= (sqrt (exp x)) (exp (/ x 2))))\n'(logexp2)\n|#")
-    (check-equal? (logexp '(log (sqrt x)))
-                  '(* 1/2 (log x))))
+    (check-notes "\n#| \n'(assuming (= (sqrt (exp x)) (exp (/ x 2))))\n'(logexp2)\n|#")
+    (with ([sqrt-expt-simplify #f #t])
+          (check-equal? (logexp '(sqrt (exp x)))
+                        '(sqrt (exp x))))
+    
+    (check-equal? (logexp `(log (sqrt ,X)))
+                  `(* 1/2 (log ,X)))
+    (no-new-notes))
    
    (test-case
-    "todo"
-    magsimp
-    miscsimp
-    simsqrt
-    sqrt-expand
-    sqrt-contract
-    specfun->logexp
-    logexp->specfun
-    log-contract
-    log-expand
-    log-extra
-    canonicalize-partials
-    trig->sincos
-    sincos->trig
-    triginv
-    special-trig
-    angular-parity
-    expand-multiangle
-    trig-sum-to-product
-    trig-product-to-sum
-    contract-expt-trig
-    half-angle
-    sin^2->cos^2
-    cos^2->sin^2
-    split-high-degree-cosines
-    split-high-degree-sines
-    flush-obvious-ones
-    sincos-random
-    sincos->exp1
-    sincos->exp2
-    exp->sincos
-    exp-contract
-    exp-expand
-    complex-rules
-    divide-numbers-through
-    clean-differentials)
+    "magsimp"
+    (clear-notes!)
+    (check-equal? (magsimp `(magnitude (* x y a)))
+                  ;; TODO ; this can be nicer, no?
+                  `(* (magnitude x) (* (magnitude y) (magnitude (* a)))))
+    (check-equal? (magsimp `(magnitude (expt ,X 1)))
+                  `(magnitude (expt ,X 1)))
+    (check-equal? (magsimp `(magnitude (expt ,X 4)))
+                  `(expt ,X 4))
+    (no-new-notes))
+   
+   (test-case
+    "miscsimp"
+    (clear-notes!)
+    (check-equal? (miscsimp `(expt ,X 0)) 1)
+    (check-equal? (miscsimp `(expt ,X 1)) X)
+    (check-equal? (miscsimp `(expt (expt x a) b))
+                  `(expt x (* a b)))
+    ;; why symb:
+    (check-notes "\n#| \n'(assuming (= (expt (expt x a) b) (expt x (symb:* a b))))\n'(exponent-product)\n|#")
+    (with ([exponent-product-simplify #f #t])
+          (check-equal? (miscsimp `(expt (expt x a) b))
+                  `(expt (expt x a) b)))
+    (check-equal? (miscsimp `(expt ,X 1/2))
+                  `(sqrt ,X))
+    (with ([^1/2->sqrt #f #t])
+          (check-equal? (miscsimp `(expt ,X 1/2))
+                  `(expt ,X 1/2)))
+    (check-equal? (miscsimp `(* a b ,X c d (expt ,X n) f g))
+                  `(* a b c d (expt ,X (+ 1 n)) f g))
+    (check-equal? (miscsimp `(* a b (expt ,X n) c d ,X f g))
+                  `(* a b (expt ,X (+ 1 n)) c d f g))
+    (check-equal? (miscsimp `(* a b (expt ,X n) c d (expt ,X m) f ,Y))
+                  `(* a b c d (expt ,X (+ n m)) f ,Y))
+    (skip ;; TODO ;
+     )
+    (no-new-notes))
+   
+   (test-case
+    "simsqrt"
+    (clear-notes!)
+    (check-equal? (simsqrt `(expt (sqrt ,X) 6))
+                  `(expt ,X 3))
+    (check-equal? (simsqrt `(sqrt (expt ,X 4)))
+                  `(expt ,X 2))
+    (check-notes "\n#| \n'(assuming (= (sqrt (expt ~a 4)) (expt ~a 2)))\n'(simsqrt1)\n|#" X X)
+    (check-equal? (simsqrt `(sqrt (expt ,X 5)))
+                  `(* (sqrt ,X) (expt ,X 2)))
+    (check-notes "\n#| \n'(assuming (= (sqrt (expt ~a 4)) (expt ~a 2)))\n'(simsqrt2)\n|#" X X)
+    (with ([sqrt-expt-simplify #f #t])
+          (check-equal? (simsqrt `(sqrt (expt ,X 4)))
+                        `(sqrt (expt ,X 4)))
+          (check-equal? (simsqrt `(sqrt (expt ,X 5)))
+                        `(sqrt (expt ,X 5))))
+    (check-equal? (simsqrt `(expt (sqrt ,X) 7))
+                  `(* (sqrt ,X) (expt ,X 3)))
+    (check-equal? (simsqrt `(/ ,X (sqrt ,X)))
+                  `(sqrt ,X))
+    (check-equal? (simsqrt `(/ (* a b ,X c) (sqrt ,X)))
+                  `(* a b (sqrt ,X) c))
+    (check-equal? (simsqrt `(/ (* a b ,X c) (* d (sqrt ,X) e f)))
+                  `(/ (* a b (sqrt ,X) c) (* d e f)))
+    (check-equal? (simsqrt `(/ (sqrt ,X) ,X))
+                  `(/ 1 (sqrt ,X)))
+    (check-equal? (simsqrt `(/ (* a b (sqrt ,X) c) ,X))
+                  `(/ (* a b c) (sqrt ,X)))
+    (check-equal? (simsqrt `(/ (* a b (sqrt ,X) c) (* d ,X e f)))
+                  `(/ (* a b c) (* d (sqrt ,X) e f)))
+    (no-new-notes))
+   
+   (test-case
+    "sqrt-expand"
+    (clear-notes!)
+    (check-equal? (sqrt-expand `(sqrt (* x y)))
+                  `(* (sqrt x) (sqrt y)))
+    (check-notes "\n#| \n'(assuming (non-negative? y))\n'(e1)\n\n'(assuming (non-negative? x))\n'(e1)\n|#")
+    (check-equal? (sqrt-expand `(sqrt (* 3 5)))
+                  `(* (sqrt 3) (sqrt 5)))
+    (check-equal? (sqrt-expand `(sqrt (* x -5)))
+                  `(sqrt (* x -5)))
+    (check-equal? (sqrt-expand `(sqrt (* x y b)))
+                  `(* (sqrt x) (* (sqrt y) (sqrt b))))
+    (check-notes "\n#| \n'(assuming (non-negative? b))\n'(e1)\n\n'(assuming (non-negative? y))\n'(e2)\n\n'(assuming (non-negative? x))\n'(e1)\n|#")
+    (check-equal? (sqrt-expand `(sqrt (* x -5 y)))
+                  `(sqrt (* x -5 y)))
+    ;; TODO ; don't log assumptions if they are not used?
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(e2)\n|#")
+
+    (check-equal? (sqrt-expand `(sqrt (/ x y)))
+                  `(/ (sqrt x) (sqrt y)))
+    (check-notes "\n#| \n'(assuming (non-negative? y))\n'(e3)\n\n'(assuming (non-negative? x))\n'(e3)\n|#")
+    (check-equal? (sqrt-expand `(sqrt (/ 3 5)))
+                  `(/ (sqrt 3) (sqrt 5)))
+    (check-equal? (sqrt-expand `(sqrt (/ x -5)))
+                  `(sqrt (/ x -5)))
+    (check-equal? (sqrt-expand `(sqrt (/ x y b)))
+                  `(/ (sqrt x) (* (sqrt y) (sqrt b))))
+    (check-notes "\n#| \n'(assuming (non-negative? b))\n'(e1)\n\n'(assuming (non-negative? y))\n'(e4)\n\n'(assuming (non-negative? x))\n'(e3)\n|#")
+    (check-equal? (sqrt-expand `(sqrt (/ x -5 y)))
+                  `(sqrt (/ x -5 y)))
+    ;; TODO ; don't log assumptions if they are not used?
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(e4)\n|#")
+    (with ([sqrt-factor-simplify #f #t])
+          (check-equal? (sqrt-expand `(sqrt (* x y)))
+                  `(sqrt (* x y)))
+          (check-equal? (sqrt-expand `(sqrt (* x y b)))
+                  `(sqrt (* x y b)))
+          (check-equal? (sqrt-expand `(sqrt (/ x y)))
+                  `(sqrt (/ x y)))
+          (check-equal? (sqrt-expand `(sqrt (/ x y b)))
+                  `(sqrt (/ x y b))))
+    (no-new-notes))
+   
+   (test-case
+    "sqrt-contract"
+    (clear-notes!)
+    (check-equal? (sqrt-contract `(* a (sqrt x) c d (sqrt y) e))
+                  `(* a c d e (sqrt (* x y))))
+    (check-notes "\n#| \n'(assuming (non-negative? y))\n'(c1)\n\n'(assuming (non-negative? x))\n'(c1)\n|#")
+    (check-equal? (sqrt-contract `(* a (sqrt -3) c d (sqrt 4) e))
+                  `(* a (sqrt -3) c d (sqrt 4) e))
+    (check-equal? (sqrt-contract `(* a (sqrt 2) c d (sqrt 5) e))
+                  `(* a c d e (sqrt (* 2 5))))
+    (check-equal? (sqrt-contract `(* a (sqrt x) c d (sqrt (/ (* x x) x)) e))
+                  `(* a x c d e))
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(c1)\n|#")
+    (check-equal? (sqrt-contract `(/ (sqrt x) (sqrt y)))
+                  `(sqrt (/ x y)))
+    (check-notes "\n#| \n'(assuming (non-negative? y))\n'(c2)\n\n'(assuming (non-negative? x))\n'(c2)\n|#")
+    (check-equal? (sqrt-contract `(/ (sqrt x) (sqrt x)))
+                  1)
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(c2)\n|#")
+    (check-equal? (sqrt-contract `(/ (* a (sqrt x) b) (sqrt y)))
+                  `(* a b (sqrt (/ x y))))
+    (check-notes "\n#| \n'(assuming (non-negative? y))\n'(c3)\n\n'(assuming (non-negative? x))\n'(c3)\n|#")
+    (check-equal? (sqrt-contract `(/ (* a (sqrt x) b) (sqrt x)))
+                  `(* a b))
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(c3)\n|#")
+    (check-equal? (sqrt-contract `(/ (sqrt y) (* a (sqrt x) b)))
+                  `(/ (sqrt (/ y x)) (* a b)))
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(c4)\n\n'(assuming (non-negative? y))\n'(c4)\n|#")
+    (check-equal? (sqrt-contract `(/ (sqrt x) (* a (sqrt x) b)))
+                  `(/ 1 (* a b)))
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(c4)\n|#")
+    (check-equal? (sqrt-contract `(/ (* a (sqrt x) b) (* c (sqrt y) d)))
+                  `(/ (* a b (sqrt (/ x y))) (* c d)))
+    (check-notes "\n#| \n'(assuming (non-negative? y))\n'(c5)\n\n'(assuming (non-negative? x))\n'(c5)\n|#")
+    (check-equal? (sqrt-contract `(/ (* a (sqrt x) b) (* c (sqrt x) d)))
+                  `(/ (* a b) (* c d)))
+    (check-notes "\n#| \n'(assuming (non-negative? x))\n'(c5)\n|#")
+    (with ([sqrt-factor-simplify #f #t])
+          (check-equal? (sqrt-contract `(* a (sqrt -3) c d (sqrt 4) e))
+                        `(* a (sqrt -3) c d (sqrt 4) e))
+          (check-equal? (sqrt-contract `(/ (* a (sqrt x) b) (sqrt y)))
+                        `(/ (* a (sqrt x) b) (sqrt y)))
+          (check-equal? (sqrt-contract `(/ (sqrt y) (* a (sqrt x) b)))
+                        `(/ (sqrt y) (* a (sqrt x) b)))
+          (check-equal? (sqrt-contract `(/ (* a (sqrt x) b) (* c (sqrt x) d)))
+                        `(/ (* a (sqrt x) b) (* c (sqrt x) d))))
+    (no-new-notes))
+   
+   (test-case
+    "specfun->logexp"
+    (clear-notes!)
+    (check-equal? (specfun->logexp `(sqrt ,X))
+                  `(exp (* 1/2 (log ,X))))
+    (check-equal? (specfun->logexp `(atan ,X))
+                  `(/ (- (log (+ 1 (* +i ,X))) (log (- 1 (* +i ,X)))) +2i))
+    (check-equal? (specfun->logexp `(asin ,X))
+                  `(* -i (log (+ (* +i ,X) (exp (* 1/2 (log (- 1 (expt ,X 2)))))))))
+    (check-equal? (specfun->logexp `(acos ,X))
+                  `(* -i (log (+ ,X (* +i (exp (* 1/2 (log (- 1 (expt ,X 2))))))))))
+    (check-equal? (specfun->logexp `(sinh ,X))
+                  `(/ (- (exp ,X) (exp (* -1 ,X))) 2))
+    (check-equal? (specfun->logexp `(cosh ,X))
+                  `(/ (+ (exp ,X) (exp (* -1 ,X))) 2))
+    (check-equal? (specfun->logexp `(expt ,X ,Y))
+                  `(exp (* ,Y (log ,X))))
+    (no-new-notes))
+   
+   (test-case
+    "logexp->specfun"
+    (clear-notes!)
+    (check-equal? (logexp->specfun `(exp (* -1 (log ,X))))
+                  `(expt ,X -1))
+    (check-equal? (logexp->specfun `(exp (* 1/2 (log ,X))))
+                  `(sqrt ,X))
+    (check-equal? (logexp->specfun `(exp (* -1/2 (log ,X))))
+                  `(/ 1 (sqrt ,X)))
+    (check-equal? (logexp->specfun `(exp (* 3/2 (log ,X))))
+                  `(expt (sqrt ,X) 3))
+    (check-equal? (logexp->specfun `(exp (* -3/2 (log ,X))))
+                  `(expt (sqrt ,X) -3))
+    (check-equal? (logexp->specfun `(exp (* a b (log ,X) c d)))
+                  `(expt ,X (* a b c d)))
+    (no-new-notes))
+   
+   (test-case
+    "log-contract"
+    (clear-notes!)
+    (check-equal? (log-contract `(+ a b (log ,X) c d (log ,Y) e f))
+                  `(+ a b c d e f (log (* ,X ,Y))))
+    (check-equal? (log-contract `(- (log ,X) (log ,Y)))
+                  `(log (/ ,X ,Y)))
+    (check-equal? (log-contract `(+ a (* b (log ,X) c) d (* (log ,Y) e) f))
+                  `(+ a (* b (log ,X) c) d (* (log ,Y) e) f))
+    (check-equal? (log-contract `(+ a (* b (log ,X) c) d (* (log ,Y) b c) f))
+                  `(+ (* (log (* ,X ,Y)) (* c b)) a  d f))
+    (no-new-notes))
+
+   (test-case
+    "log-expand"
+    (clear-notes!)
+    (check-equal? (log-expand `(log (* x y a b c)))
+                  `(+ (log x) (+ (log y) (+ (log a) (+ (log b) (log (* c)))))))
+    (check-equal? (log-expand `(log (/ x y)))
+                  `(- (log x) (log y)))
+    (skip ;;TODO ; should this work too?  (not necessary for simplify)
+     (check-equal? (log-expand `(log (/ x y a)))
+                   `(- (log x) (+ (log t) (log (* a))))))
+    (check-equal? (log-expand `(log (expt x ,Y)))
+                  `(* ,Y (log x)))
+    (no-new-notes))
+
+   (test-case
+    "log-extra"
+    (clear-notes!)
+    (check-equal? (log-extra `(* 3 a b (log ,X) c d))
+                  `(* a b (log (expt ,X 3)) c d))
+    (no-new-notes))
+
+   (test-case
+    "canonicalize-partials"
+    (clear-notes!)
+    (check-equal? (canonicalize-partials `((partial 1) ((partial 2) f)))
+                  `((* (partial 1) (partial 2)) f))
+    (check-equal? (canonicalize-partials `((partial 1) ((* (partial 2) ∇) f)))
+                  `((* (partial 1) (partial 2) ∇) f))
+    
+    (check-equal? (canonicalize-partials `((expt (partial 1) n) ((partial 2) f)))
+                  `((* (expt (partial 1) n) (partial 2)) f))
+    (check-equal? (canonicalize-partials `((partial 1) ((* (expt (partial 2) n) ∇) f)))
+                  `((* (partial 1) (expt (partial 2) n) ∇) f))
+    (check-equal? (canonicalize-partials `((expt (partial 1) n) ((* (expt (partial 2) m) ∇) f)))
+                  `((* (expt (partial 1) n) (expt (partial 2) m) ∇) f))
+
+    (check-equal? (canonicalize-partials `((expt (partial 1) n) ((* (partial 2) ∇) f)))
+                  `((* (expt (partial 1) n) (partial 2) ∇) f))
+    (check-equal? (canonicalize-partials `((partial 1) ((* (expt (partial 2) n) ∇) f)))
+                  `((* (partial 1) (expt (partial 2) n) ∇) f))
+    (check-equal? (canonicalize-partials `((expt (partial 1) n) ((* (expt (partial 2) m) ∇) f)))
+                  `((* (expt (partial 1) n) (expt (partial 2) m) ∇) f))
+
+    (check-equal? (canonicalize-partials `(((* ∇1 ∇2 (partial 5) ∇3 ∇4 (partial 2) ∇5) f) a0 a1 a2 a3 a4 a5 a6))
+                  `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) f) a0 a1 a2 a3 a4 a5 a6))
+    (check-equal? (canonicalize-partials `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) f) a0 a1 a2 a3 a4 a5 a6))
+                  `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) f) a0 a1 a2 a3 a4 a5 a6))
+    (check-exn #px"list-ref: index too large for list\n  index: 2\n  in: '\\(a0 a1\\)"
+               (λ () (canonicalize-partials `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) f) a0 a1))))
+    (skip ;;TODO; why should f be symbol?
+     (check-equal? (canonicalize-partials `(((* ∇1 ∇2 (partial 5) ∇3 ∇4 (partial 2) ∇5) (* f g)) a0 a1 a2 a3 a4 a5 a6))
+                  `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) (* f g)) a0 a1 a2 a3 a4 a5 a6)))
+    (with ([commute-partials-simplify #f #t])
+          (check-equal? (canonicalize-partials `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) f) a0 a1 a2 a3 a4 a5 a6))
+                        `(((* ∇1 ∇2 (partial 2) ∇3 ∇4 (partial 5) ∇5) f) a0 a1 a2 a3 a4 a5 a6)))
+    (no-new-notes))
+   
+   (test-case
+    "trig->sincos"
+    (clear-notes!)
+    (check-equal? (trig->sincos `(tan ,X))
+                  `(/ (sin ,X) (cos ,X)))
+    (check-equal? (trig->sincos `(cot ,X))
+                  `(/ (cos ,X) (sin ,X)))
+    (check-equal? (trig->sincos `(sec ,X))
+                  `(/ 1 (cos ,X)))
+    (check-equal? (trig->sincos `(csc ,X))
+                  `(/ 1 (sin ,X)))
+    (check-equal? (trig->sincos `(atan (/ ,Y ,X)))
+                  `(atan ,Y ,X))
+    (check-equal? (trig->sincos `(atan ,Y))
+                  `(atan ,Y 1))
+    (no-new-notes))
+   
+   (test-case
+    "sincos->trig"
+    (clear-notes!)
+    (check-equal? (sincos->trig `(/ (sin ,X) (cos ,X)))
+                  `(tan ,X))
+    (check-equal? (sincos->trig `(/ (* a (sin ,X) b c) (cos ,X)))
+                  `(* a (tan ,X) b c))
+    (check-equal? (sincos->trig `(/ (sin ,X) (* a b (cos ,X) c)))
+                  `(/ (tan ,X) (* a b c)))
+    (check-equal? (sincos->trig `(/ (* a (sin ,X) b c) (* c (cos ,X))))
+                  `(/ (* a (tan ,X) b c) (* c)))
+    (no-new-notes))
+   
+   (test-case
+    "triginv"
+    (clear-notes!)
+    (check-equal? (triginv `(atan ,X ,X)) '(/ :pi 4))
+    (check-notes "\n#| \n'(assuming (positive? ~a))\n'(aggressive-atan-1)\n|#" X)
+    (check-equal? (triginv `(atan (+ 3 4) (- 10 3))) '(/ :pi 4))
+    (check-equal? (triginv `(atan (- (+ 3 4)) (- 3 10))) '(- (/ (* 3 :pi) 4)))
+    (check-equal? (triginv `(atan 5 2)) (atan 5 2))
+    (check-equal? (triginv `(atan y ,X)) `(atan y ,X))
+    (check-equal? (triginv `(atan (* y (- x 1)) (* z (- x 1)))) `(atan y z))
+    (check-notes "\n#| \n'(assuming (positive? (+ -1 x)))\n'(aggressive-atan-2)\n|#")
+    (with ([aggressive-atan-simplify #f #t])
+          (check-equal? (triginv `(atan 5 2)) `(atan 5 2)))
+
+    (check-equal? (triginv `(sin (asin ,X))) X)
+    (check-equal? (triginv `(asin (sin ,X))) X)
+    (check-notes "\n#| \n'(assuming (= (asin (sin ~a)) ~a))\n'(asin-sin)\n|#" X X)
+    (check-equal? (triginv `(cos (acos ,X))) X)
+    (check-equal? (triginv `(acos (cos ,X))) X)
+    (check-notes "\n#| \n'(assuming (= (acos (cos ~a)) ~a))\n'(acos-cos)\n|#" X X)
+    (check-equal? (triginv `(tan (atan ,X))) X)
+    (check-equal? (triginv `(atan (tan ,X))) X)
+    (check-notes "\n#| \n'(assuming (= (atan (tan ~a)) ~a))\n'(atan-tan)\n|#" X X)
+    (check-equal? (triginv `(sin (acos ,X))) `(sqrt (- 1 (expt ,X 2))))
+    (check-equal? (triginv `(cos (asin ,X))) `(sqrt (- 1 (expt ,X 2))))
+    (check-equal? (triginv `(tan (asin ,X))) `(/ ,X (sqrt (- 1 (expt ,X 2)))))
+    (check-equal? (triginv `(tan (acos ,X))) `(/ (sqrt (- 1 (expt ,X 2))) ,X))
+    (check-equal? (triginv `(atan (sin ,X) (cos ,X))) X)
+    (check-notes "\n#| \n'(assuming (= (atan (sin ~a) (cos ~a)) ~a))\n'(atan-sin-cos)\n|#" X X X)
+    (check-equal? (triginv `(asin (cos ,X))) `(- (* 1/2 :pi) ,X))
+    (check-notes "\n#| \n'(assuming (= (asin (cos ~a)) (- (* 1/2 :pi) ~a)))\n'(asin-cos)\n|#" X X)
+    (check-equal? (triginv `(acos (sin ,X))) `(- (* 1/2 :pi) ,X))
+    (check-notes "\n#| \n'(assuming (= (acos (sin ~a)) (- (* 1/2 :pi) ~a)))\n'(acos-sin)\n|#" X X)
+    (check-equal? (triginv `(sin (atan ,Y ,X))) `(/ ,Y (sqrt (+ (expt ,Y 2) (expt ,X 2)))))
+    (check-equal? (triginv `(cos (atan ,Y ,X))) `(/ ,X (sqrt (+ (expt ,Y 2) (expt ,X 2)))))
+    (with ([inverse-simplify #f #t])
+          (check-equal? (triginv `(asin (sin ,X))) `(asin (sin ,X)))
+          (check-equal? (triginv `(acos (cos ,X))) `(acos (cos ,X)))
+          (check-equal? (triginv `(atan (tan ,X))) `(atan (tan ,X)))
+          (check-equal? (triginv `(asin (cos ,X))) `(asin (cos ,X)))
+          (check-equal? (triginv `(acos (sin ,X))) `(acos (sin ,X)))
+          (check-equal? (triginv `(atan (sin ,X) (cos ,X))) `(atan (sin ,X) (cos ,X))))
+    (no-new-notes))
+   
+   (test-case
+    "special-trig"
+    (clear-notes!)
+    (check-equal? (special-trig `(sin (* 3 :pi))) 0)
+    (check-equal? (special-trig `(sin (/ :pi 2))) 1)
+    (check-equal? (special-trig `(sin (* -5/2 :pi))) -1)
+    (check-equal? (special-trig `(sin (* -2 :pi))) 0)
+    
+    (check-equal? (special-trig `(cos (* 3 :pi))) -1)
+    (check-equal? (special-trig `(cos (/ :pi 2))) 0)
+    (check-equal? (special-trig `(cos (* -5/2 :pi))) 0)
+    (check-equal? (special-trig `(cos (* -2 :pi))) 1)
+    
+    (check-equal? (special-trig `(tan (* 3 :pi))) 0)
+    (check-equal? (special-trig `(tan (/ :pi 4))) 1)
+    (check-equal? (special-trig `(tan (* -5/4 :pi))) -1)
+    (check-equal? (special-trig `(tan (* -2 :pi))) 0)
+    (no-new-notes))
+   
+   (test-case
+    "angular-parity"
+    (clear-notes!)
+    (check-equal? (angular-parity `(cos -3)) `(cos 3))
+    (check-equal? (angular-parity `(cos (* -3 ,X 4 -5 b))) `(cos (* 3 ,X 4 -5 b)))
+    (check-equal? (angular-parity `(cos (+ (* -3 a -5) c d))) `(cos (- (* 3 a -5) c d)))
+    (check-equal? (angular-parity `(sin -3)) `(- (sin 3)))
+    (check-equal? (angular-parity `(sin (* -3 ,X 4 -5 b))) `(- (sin (* 3 ,X 4 -5 b))))
+    (check-equal? (angular-parity `(sin (+ (* -3 a -5) c d))) `(- (sin (- (* 3 a -5) c d))))
+    (no-new-notes))
+   
+   (test-case
+    "expand-multiangle"
+    (clear-notes!)
+    (check-equal? (expand-multiangle `(sin (* 2 ,X)))
+                  `(* 2 (sin (* ,X)) (cos (* ,X))))
+    (check-equal? (expand-multiangle `(cos (* 2 ,X ,Y)))
+                  `(- (* 2 (expt (cos (* ,X ,Y)) 2)) 1))
+    (check-equal? (expand-multiangle `(sin (* 3 ,X a b)))
+                  `(+ (* 3 (sin (* ,X a b))) (* -4 (expt (sin (* ,X a b)) 3))))
+    (check-equal? (expand-multiangle `(cos (* 3 ,X a b)))
+                  `(+ (* 4 (expt (cos (* ,X a b)) 3)) (* -3 (cos (* ,X a b)))))
+    (check-equal? (expand-multiangle `(sin (* 5 ,X)))
+                  `(+ (* (+ (* (+ (* 3 (sin (* ,X))) (* -4 (expt (sin (* ,X)) 3))) (cos (* ,X)))
+                            (* (+ (* 4 (expt (cos (* ,X)) 3)) (* -3 (cos (* ,X)))) (sin (* ,X))))
+                         (cos (* ,X)))
+                      (* (- (* (+ (* 4 (expt (cos (* ,X)) 3)) (* -3 (cos (* ,X)))) (cos (* ,X)))
+                            (* (+ (* 3 (sin (* ,X))) (* -4 (expt (sin (* ,X)) 3))) (sin (* ,X))))
+                         (sin (* ,X)))))
+    (check-equal? (expand-multiangle `(cos (* 4 ,X)))
+                  `(- (* (+ (* 4 (expt (cos (* ,X)) 3)) (* -3 (cos (* ,X)))) (cos (* ,X)))
+                      (* (+ (* 3 (sin (* ,X))) (* -4 (expt (sin (* ,X)) 3))) (sin (* ,X)))))
+    (check-equal? (expand-multiangle `(sin (+ x y)))
+                  `(+ (* (sin x) (cos (+ y))) (* (cos x) (sin (+ y)))))
+    (check-equal? (expand-multiangle `(cos (+ x y)))
+                  `(- (* (cos x) (cos (+ y))) (* (sin x) (sin (+ y)))))
+    (no-new-notes))
+   
+   (test-case
+    "trig-sum-to-product"
+    (clear-notes!)
+    (check-equal? (trig-sum-to-product `(+ a b (sin ,X) c (sin ,Y) d))
+                  `(+ (* 2 (sin (/ (+ ,X ,Y) 2)) (cos (/ (- ,X ,Y) 2))) a b c d))
+    (check-equal? (trig-sum-to-product `(+ a b (sin ,X) c (* -1 (sin ,Y)) d))
+                  `(+ (* 2 (sin (/ (- ,X ,Y) 2)) (cos (/ (+ ,X ,Y) 2))) a b c d))
+    (check-equal? (trig-sum-to-product `(+ a b (sin ,X) c (- (sin ,Y)) d))
+                  ;; to bad ...
+                  `(+ a b (sin ,X) c (- (sin ,Y)) d))
+    (check-equal? (trig-sum-to-product `(+ a b (* -1 (sin ,X)) c (sin ,Y) d))
+                  `(+ (* 2 (sin (/ (- ,Y ,X) 2)) (cos (/ (+ ,Y ,X) 2))) a b c d))
+    
+    (check-equal? (trig-sum-to-product `(+ a b (cos ,X) c (cos ,Y) d))
+                  `(+ (* 2 (cos (/ (+ ,X ,Y) 2)) (cos (/ (- ,X ,Y) 2))) a b c d))
+    (check-equal? (trig-sum-to-product `(+ a b (cos ,X) c (* -1 (cos ,Y)) d))
+                  `(+ (* -2 (sin (/ (+ ,X ,Y) 2)) (sin (/ (- ,X ,Y) 2))) a b c d))
+    (check-equal? (trig-sum-to-product `(+ a b (* -1 (cos ,X)) c (cos ,Y) d))
+                  `(+ (* -2 (sin (/ (+ ,Y ,X) 2)) (sin (/ (- ,Y ,X) 2))) a b c d))
+    (no-new-notes))
+   
+   (test-case
+    ""
+    (clear-notes!)
+    (no-new-notes))
+   
+   (test-case
+    "trig-product-to-sum"
+    (clear-notes!)
+    (check-equal? (trig-product-to-sum `(* a (sin ,X) b c (sin ,Y) d))
+                  `(* 1/2 (- (cos (- ,X ,Y)) (cos (+ ,X ,Y))) a b c d))
+    (check-equal? (trig-product-to-sum `(* a (cos ,X) b c (cos ,Y) d))
+                  `(* 1/2 (+ (cos (- ,X ,Y)) (cos (+ ,X ,Y))) a b c d))
+    (check-equal? (trig-product-to-sum `(* a (sin ,X) b c (cos ,Y) d))
+                  `(* 1/2 (+ (sin (+ ,X ,Y)) (sin (- ,X ,Y))) a b c d))
+    (check-equal? (trig-product-to-sum `(* a (cos ,Y) b c (sin ,X) d))
+                  `(* 1/2 (+ (sin (+ ,X ,Y)) (sin (- ,X ,Y))) a b c d))
+    (no-new-notes))
+   
+   (test-case
+    "contract-expt-trig"
+    (clear-notes!)
+    (check-equal? (contract-expt-trig `(expt (sin ,X) 1)) `(expt (sin ,X) 1))
+    (check-equal? (contract-expt-trig `(expt (sin ,X) 2))
+                  `(* 1/2 (expt (sin ,X) 0) (- 1 (cos (* 2 ,X)))))
+    (check-equal? (contract-expt-trig `(expt (sin ,X) 3))
+                  `(* 1/2 (expt (sin ,X) 1) (- 1 (cos (* 2 ,X)))))
+    (check-equal? (contract-expt-trig `(expt (cos ,X) 1)) `(expt (cos ,X) 1))
+    (check-equal? (contract-expt-trig `(expt (cos ,X) 2))
+                  `(* 1/2 (expt (cos ,X) 0) (+ 1 (cos (* 2 ,X)))))
+    (check-equal? (contract-expt-trig `(expt (cos ,X) 3))
+                  `(* 1/2 (expt (cos ,X) 1) (+ 1 (cos (* 2 ,X)))))
+    (no-new-notes))
+   
+   (test-case
+    "half-angle"
+    (clear-notes!)
+    (check-equal? (half-angle `(sin (* 1/2 x y)))
+                  `(sqrt (/ (- 1 (cos (* y x))) 2)))
+    (check-notes "\n#| \n'(assuming (non-negative? (+ (* 2 :pi) (* -1 (* y x)) (* 4 :pi (floor (/ (* y x) (* 4 :pi)))))))\n'(sin-half-angle-formula)\n|#")
+    (check-equal? (half-angle `(sin (/ (* x y) 2)))
+                  `(sqrt (/ (- 1 (cos (* y x))) 2)))
+    (check-notes "\n#| \n'(assuming (non-negative? (+ (* 2 :pi) (* -1 (* y x)) (* 4 :pi (floor (/ (* y x) (* 4 :pi)))))))\n'(sin-half-angle-formula)\n|#")
+    (check-equal? (half-angle `(cos (* 1/2 x y)))
+                  `(sqrt (/ (+ 1 (cos (* x y))) 2)))
+    (check-notes "\n#| \n'(assuming (non-negative? (+ :pi (* y x) (* 4 :pi (floor (/ (- :pi (* y x)) (* 4 :pi)))))))\n'(cos-half-angle-formula)\n|#")
+    (check-equal? (half-angle `(cos (/ (* x y) 2)))
+                  `(sqrt (/ (+ 1 (cos (* x y))) 2)))
+    (check-notes "\n#| \n'(assuming (non-negative? (+ :pi (* y x) (* 4 :pi (floor (/ (- :pi (* y x)) (* 4 :pi)))))))\n'(cos-half-angle-formula)\n|#")
+    (with ([half-angle-simplify #f #t])
+          (check-equal? (half-angle `(sin (* 1/2 x y)))
+                        `(sin (* 1/2 x y)))
+          (check-equal? (half-angle `(sin (/ (* x y) 2)))
+                        `(sin (/ (* x y) 2)))
+          (check-equal? (half-angle `(cos (* 1/2 x y)))
+                        `(cos (* 1/2 x y)))
+          (check-equal? (half-angle `(cos (/ (* x y) 2)))
+                        `(cos (/ (* x y) 2))))
+    (no-new-notes))
+   
+   (test-case
+    "sin^2<->cos^2"
+    (clear-notes!)
+    (check-equal? (sin^2->cos^2 `(expt (sin ,X) 3))
+                  `(* (expt (sin ,X) 1) (- 1 (expt (cos ,X) 2))))
+    (check-equal? (sin^2->cos^2 `(expt (sin ,X) 3+1i))
+                  `(expt (sin ,X) 3+1i))
+    (check-equal? (cos^2->sin^2 `(expt (cos ,X) 3))
+                  `(* (expt (cos ,X) 1) (- 1 (expt (sin ,X) 2))))
+    (no-new-notes))
+   
+   (test-case
+    "split-high-degree-(co)sines"
+    (clear-notes!)
+    (check-equal? (split-high-degree-cosines `(* a b (expt (cos ,X) 5) c d))
+                  `(* (expt (cos ,X) 2) (expt (cos ,X) 1) (expt (cos ,X) 2) a b c d))
+    (check-equal? (split-high-degree-cosines `(+ a b (expt (cos ,X) 3) c d))
+                  `(+ (* (expt (cos ,X) 2) (expt (cos ,X) 1)) a b c d))
+    (check-equal? (split-high-degree-sines `(* a b (expt (sin ,X) 4) c d))
+                  `(* (expt (sin ,X) 2) (expt (sin ,X) 2) a b c d))
+    (check-equal? (split-high-degree-sines `(+ (expt (sin ,X) 3)))
+                  `(+ (* (expt (sin ,X) 2) (expt (sin ,X) 1))))
+    (no-new-notes))
+   
+   (test-case
+    "flush-obvious-ones"
+    (clear-notes!)
+    (check-equal? (flush-obvious-ones `(+ a b (expt (sin ,X) 2) c d (expt (cos ,X) 2) e f))
+                  `(+ 1 a b c d e f))
+    (check-equal? (flush-obvious-ones `(+ a b (expt (cos ,X) 2) c d (expt (sin ,X) 2) e f))
+                  `(+ a b (expt (cos ,X) 2) c d (expt (sin ,X) 2) e f))
+    (no-new-notes))
+   
+   (test-case
+    ""
+    (clear-notes!)
+    (check-equal? (sincos-random `(+ a b (- (expt (cos ,X) 2)) c d (expt (cos ,X) 4) 5))
+                  `(+ a b c d 5 (* (expt (sin ,X) 2) (- (expt (cos ,X) 2)))))
+    (check-equal? (sincos-random `(+ a (expt (cos ,X) 3) b c (- (expt (cos ,X) 1)) d 5))
+                  `(+ a b c d 5 (* (expt (sin ,X) 2) (- (expt (cos ,X) 1)))))
+    (check-equal? (sincos-random `(+ a b (- (expt (cos ,X) 2)) c d (* 3 (expt (cos ,X) 4) 1/3) 5))
+                  `(+ a b c d 5 (* (- (expt (cos ,X) 2)) (expt (sin ,X) 2))))
+    (check-equal? (sincos-random `(+ a (* 1 (expt (cos ,X) 3)) b c (- (expt (cos ,X) 1)) d 5))
+                  `(+ a b c d 5 (* (- (expt (cos ,X) 1)) (expt (sin ,X) 2))))
+    
+    (check-equal? (sincos-random `(+ a b (- (expt (sin ,X) 2)) c d (expt (sin ,X) 4) 5))
+                  `(+ a b c d 5 (* (expt (cos ,X) 2) (- (expt (sin ,X) 2)))))
+    (check-equal? (sincos-random `(+ a (expt (sin ,X) 3) b c (- (expt (sin ,X) 1)) d 5))
+                  `(+ a b c d 5 (* (expt (cos ,X) 2) (- (expt (sin ,X) 1)))))
+    (check-equal? (sincos-random `(+ a b (- (expt (sin ,X) 2)) c d (* a (expt (sin ,X) 4) (/ a)) 5))
+                  `(+ a b c d 5 (* (- (expt (sin ,X) 2)) (expt (cos ,X) 2))))
+    (check-equal? (sincos-random `(+ a (* (expt (sin ,X) 3) (/ a a)) b c (- (expt (sin ,X) 1)) d 5))
+                  `(+ a b c d 5 (* (- (expt (sin ,X) 1)) (expt (cos ,X) 2))))
+    (no-new-notes))
+   
+   (test-case
+    "sincos->exp1 & 2"
+    (clear-notes!)
+    (check-equal? (sincos->exp1 `(sin ,X))
+                  `(/ (- (exp (* +i ,X)) (exp (* -i ,X))) +2i))
+    (check-equal? (sincos->exp1 `(cos ,X))
+                  `(/ (+ (exp (* +i ,X)) (exp (* -i ,X))) 2))
+    (check-equal? (sincos->exp2 `(sin ,X))
+                  `(/ (- (exp (* +i ,X)) (/ 1 (exp (* +i ,X)))) +2i))
+    (check-equal? (sincos->exp2 `(cos ,X))
+                  `(/ (+ (exp (* +i ,X)) (/ 1 (exp (* +i ,X)))) 2))
+    (no-new-notes))
+   
+   (test-case
+    "exp->sincos"
+    (clear-notes!)
+    (check-equal? (exp->sincos `(exp +5i))
+                  `(+ (cos 5) (* +i (sin 5))))
+    (check-equal? (exp->sincos `(exp -5i))
+                  `(+ (cos 5) (* -i (sin 5))))
+    (check-equal? (exp->sincos `(exp (* +5i ,X)))
+                  `(+ (cos (* 5 ,X)) (* +i (sin (* 5 ,X)))))
+    (check-equal? (exp->sincos `(exp (* -5i ,X)))
+                  `(+ (cos (* 5 ,X)) (* -i (sin (* 5 ,X)))))
+
+    (check-equal? (exp->sincos `(exp 2+5i))
+                  `(* (exp 2) (+ (cos 5) (* +i (sin 5)))))
+    (check-equal? (exp->sincos `(exp 2-5i))
+                  `(* (exp 2) (+ (cos 5) (* -i (sin 5)))))
+    (check-equal? (exp->sincos `(exp (* 2+5i ,X)))
+                  `(* (exp 2) (+ (cos (* 5 ,X)) (* +i (sin (* 5 ,X))))))
+    (check-equal? (exp->sincos `(exp (* 2-5i ,X)))
+                  `(* (exp 2) (+ (cos (* 5 ,X)) (* -i (sin (* 5 ,X))))))
+    ;; TODO: what about (exp (make-rectangular x y)) ... should not happen symb:make-rect => (+ rl (* +i im))
+    (no-new-notes))
+
+   (test-case
+    "exp-contract"
+    (clear-notes!)
+    (check-equal? (exp-contract `(* a b (exp ,X) c d (exp ,Y) e))
+                  `(* a b c d e (exp (+ ,X ,Y))))
+    (check-equal? (exp-contract `(expt (exp ,X) ,Y))
+                  `(exp (* ,Y ,X)))
+    (check-equal? (exp-contract `(/ (exp ,X) (exp ,Y)))
+                  `(exp (- ,X ,Y)))
+    (check-equal? (exp-contract `(/ (* a (exp ,X) b) (exp ,Y)))
+                  `(* a b (exp (- ,X ,Y))))
+    (check-equal? (exp-contract `(/ (exp ,X) (* c (exp ,Y) d e)))
+                  `(/ (exp (- ,X ,Y)) (* c d e)))
+    (check-equal? (exp-contract `(/ (* a b (exp ,X)) (* c d (exp ,Y) e)))
+                  `(/ (* a b (exp (- ,X ,Y))) (* c d e)))
+    (no-new-notes))
+   
+   (test-case
+    "exp-expand"
+    (clear-notes!)
+    (check-equal? (exp-expand `(exp (- x)))
+                  `(/ 1 (exp x)))
+    (check-equal? (exp-expand `(exp (- x y)))
+                  `(/ (exp x) (exp y)))
+    (check-equal? (exp-expand `(exp (+ x y a)))
+                  `(* (exp x) (* (exp y) (exp (+ a)))))
+    (check-equal? (exp-expand `(exp (* +3i x y)))
+                  `(expt (exp (* +i x y)) 3))
+    (check-equal? (exp-expand `(exp (* -4i x y)))
+                  `(expt (exp (* -i x y)) 4))
+    (check-equal? (exp-expand `(exp (* +3 x y)))
+                  `(expt (exp (* x y)) 3))
+    (check-equal? (exp-expand `(exp (* -4 x y)))
+                  `(expt (exp (* -1 x y)) 4))
+    (check-equal? (exp-expand `(exp 5+3i))
+                  `(* (exp 5) (exp +3i)))
+    (check-equal? (exp-expand `(exp (* 2-4i x y)))
+                  `(* (expt (exp (* x y)) 2) (expt (exp (* -i x y)) 4)))
+    (no-new-notes))
+   
+   (test-case
+    "complex-rules"
+    (clear-notes!)
+    (check-equal? (complex-rules `(make-rectangular (cos ,X) (sin ,X)))
+                  `(exp (* +i ,X)))
+    (check-equal? (complex-rules `(real-part (make-rectangular ,X ,Y)))
+                  X)
+    (check-equal? (complex-rules `(imag-part (make-rectangular ,X ,Y)))
+                  Y)
+    (check-equal? (complex-rules `(magnitude (make-rectangular ,X ,Y)))
+                  `(sqrt (+ (expt ,X 2) (expt ,Y 2))))
+    (check-equal? (complex-rules `(angle (make-rectangular ,X ,Y)))
+                  `(atan ,Y ,X))
+    (check-equal? (complex-rules `(real-part (make-polar ,X ,Y)))
+                  `(* ,X (cos ,Y)))
+    (check-equal? (complex-rules `(imag-part (make-polar ,X ,Y)))
+                  `(* ,X (sin ,Y)))
+    (check-equal? (complex-rules `(magnitude (make-polar ,X ,Y)))
+                  X)
+    (check-equal? (complex-rules `(angle (make-polar ,X ,Y)))
+                  Y)
+    (no-new-notes))
+   
+   (test-case
+    "divide-numbers-through"
+    (clear-notes!)
+    (check-equal? (divide-numbers-through `(* 1 x))
+                  'x)
+    (check-equal? (divide-numbers-through `(* 1 x y z))
+                  '(* x y z))
+    (check-equal? (divide-numbers-through `(/ 3 5))
+                  3/5)
+    (check-equal? (divide-numbers-through `(/ (+ 3 x 4 y) 5))
+                  `(+ 3/5 (* 1/5 x) 4/5 (* 1/5 y)))
+    (check-equal? (divide-numbers-through `(/ (* 3 x 4 y) 5))
+                  `(* 3/5 x 4 y))
+    (check-equal? (divide-numbers-through `(/ (* x 4 y) 5))
+                  `(* 1/5 x 4 y))
+    (check-equal? (divide-numbers-through `(/ 5 (* 3 x)))
+                  `(/ 5/3 x))
+    (check-equal? (divide-numbers-through `(/ 5 (* 3 x 4 y)))
+                  `(/ 5/3 (* x 4 y)))
+    (check-equal? (divide-numbers-through `(/ x 5))
+                  `(* 1/5 x))
+    (no-new-notes))
+   
+   (test-case
+    "clean-differentials"
+    (clear-notes!)
+    (check-equal? (clean-differentials `(make-differential-quantity (list a bad (make-differential-term dx 0) example)))
+                  `(make-differential-quantity (list a bad example)))
+    (check-equal? (clean-differentials `(make-differential-quantity (list (make-differential-term '() ,X))))
+                  X)
+    (check-equal? (clean-differentials `(make-differential-quantity (list)))
+                  0)
+    (no-new-notes))
    ))
 
 (module+ test

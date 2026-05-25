@@ -2,41 +2,41 @@ cpu time: 0 real time: 0 gc time: 0
 '(*number* . #hasheq((expression . (+ 4 a))))
 cpu time: 0 real time: 0 gc time: 0
 '(*number* . #hasheq((expression . (+ 4 b))))
-1
 2
+1
 REGION               MSECS   +GC        MEMK   COUNT
-  eval             1797.13   501   1,387,495       0
-    instantiate     850.71   423   1,042,078    9323
-    resolver        702.53    15     165,326   25327
-    requires        160.58    31     115,118   69128
-    module           78.80    32      62,397     562
-    top               4.48     0       2,575     712
+  eval             1788.20   546   1,387,558       0
+    instantiate     829.64   342   1,041,539    9323
+    resolver        682.41   172     165,546   25338
+    requires        169.91    32     115,509   69128
+    module          101.46     0      62,386     562
+    top               4.77     0       2,576     712
 
-  compile           197.58    61     256,851       0
-    top             197.58    61     256,851     712
-      linklet       187.60    61     252,307     712
+  compile           213.25   110     257,123       0
+    top             213.25   110     257,123     712
+      linklet       202.98   110     252,509     712
 
-  expand             77.11    16      34,911       0
-    top              72.42    16      33,015    2934
-      macro          25.08     0      15,135    3325
-    require           4.69     0       1,896     211
+  expand             77.66     0      34,961       0
+    top              71.49     0      33,060    2934
+      macro          25.23     0      15,278    3325
+    require           6.16     0       1,901     211
 
-  read               37.96    31      37,911     660
-;; schemify                  0 [+ 15] ms ; 712 times
+  read               40.34     0      37,890     660
 ;; on-demand                 0 [+  0] ms ; 471 times
-;; boot                     46 [+  0] ms
-;; compile-pass            106 [+ 30] ms
-;;   regalloc               30 [+ 15] ms ; 2059 times
-;;   other                  76 [+ 15] ms ; 2059 times
-;; compile                 125 [+ 46] ms
+;; schemify                 15 [+  0] ms ; 712 times
+;; boot                     62 [+  0] ms
+;; compile                 189 [+110] ms
 ;;   compile-nested          0 [+  0] ms
-;;   compile-linklet       125 [+ 46] ms ; 712 times
-;; read                    141 [+ 47] ms
-;;   faslin-literals         0 [+ 16] ms ; 2812 times
-;;   read-bundle            33 [+ 31] ms ; 562 times
-;;   faslin-code           108 [+  0] ms ; 2812 times
-;; run                    1687 [+486] ms
-;;   instantiate          1687 [+486] ms ; 17813 times
-;; total                  2105 [+624] ms
+;;   compile-linklet       189 [+110] ms ; 712 times
+;; read                    220 [+ 15] ms
+;;   faslin-literals        61 [+  0] ms ; 2812 times
+;;   read-bundle            63 [+  0] ms ; 562 times
+;;   faslin-code            96 [+ 15] ms ; 2812 times
+;; compile-pass            259 [+106] ms
+;;   regalloc               76 [+ 15] ms ; 2059 times
+;;   other                 183 [+ 91] ms ; 2059 times
+;; run                    1530 [+469] ms
+;;   instantiate          1530 [+469] ms ; 17813 times
+;; total                  2275 [+700] ms
 ;;
 ;; faslin-code              12 MB

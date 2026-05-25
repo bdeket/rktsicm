@@ -18,6 +18,14 @@
   (test-suite
    "kernel/numbers"
    (test-case
+    "non-negative?"
+    (check-true  (non-negative? 4))
+    (check-true  (non-negative? 8.5))
+    (check-true  (non-negative? 0))
+    (check-true  (non-negative? 0.0))
+    (check-true  (non-negative? -0.0))
+    (check-false (non-negative? -1)))
+   (test-case
     "type"
     (check-equal? (n:type 'any) number-type-tag)
     (check-equal? (n:type-predicate 'any) numerical-quantity?)
