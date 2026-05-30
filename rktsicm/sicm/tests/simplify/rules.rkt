@@ -5,7 +5,7 @@
          racket/list
          "../../simplify/rules.rkt"
          "../../general/notes.rkt"
-         (only-in "../../kernel.rkt") ;; we need the scmutils-base-environment loaded
+         (only-in "../../kernel.rkt" :pi) ;; we need the scmutils-base-environment loaded
          (only-in (submod "../../general/memoize.rkt" ALL) *memoizers* memoizer-fun memoizer-info)
          "../helper.rkt")
 
@@ -80,9 +80,22 @@
    (test-case
     "universal-reductions"
     (check-settings startup-settings)
-    (skip
-     ;;TODO;; this depends on :pi being a symbol? (or not) => fix units/constans -> symbolic-constants
-     )
+    (local-require "../../units/system.rkt" "../../units/constants.rkt")
+    (check-equal? (universal-reductions '(log (exp x))) 'x)
+    (check-notes "\n#| \n'(assuming (= (log (exp x)) x))\n'(logexp1)\n|#")
+    (check-equal? (universal-reductions '(magnitude (expt x 2))) '(expt x 2))
+    (check-equal? (universal-reductions '(sin :pi)) '(sin :pi))
+    (symbolic-constants)
+    (check-equal? (universal-reductions `(sin :pi)) 0)
+    (sin-cos-simplify #f)
+    (check-equal? (universal-reductions '(sin :pi)) '(sin :pi))
+    (sin-cos-simplify #t)
+    (numerical-constants)
+    (check-equal? (universal-reductions '(sin (asin x))) 'x)
+    (check-equal? (universal-reductions '(sqrt (expt x 2))) '(expt x 1))
+    (check-notes "\n#| \n'(assuming (= (sqrt (expt x 2)) (expt x 1)))\n'(simsqrt1)\n|#")
+    (check-equal? (universal-reductions 'any) 'any)
+    (no-new-notes)
     )
    (test-case
     "non-negative-factors"
@@ -106,8 +119,8 @@
    (test-case
     "pi-predicates"
     (check-settings startup-settings)
-    (check-predicate zero-mod-pi?   '(:pi (* 4 :pi)) '(:2pi (* 1/2 :pi) 3 x)) ;;TODO: :2pi should be translated
-    (check-predicate pi/2-mod-2pi?  '((* 1/2 :pi) (* -7/2 :pi)) '(0 :pi (* -1/2 :pi) 3 x)) ;;TODO: :pi/2 should be translated
+    (check-predicate zero-mod-pi?   '(:pi (* 4 :pi)) '(:2pi (* 1/2 :pi) 3 x))
+    (check-predicate pi/2-mod-2pi?  '((* 1/2 :pi) (* -7/2 :pi)) '(0 :pi (* -1/2 :pi) 3 x))
     (check-predicate -pi/2-mod-2pi? '((* -1/2 :pi) (* 7/2 :pi)) '(0 :pi (*  1/2 :pi) 3 x))
     (check-predicate pi/2-mod-pi?   '((* -1/2 :pi) (* -7/2 :pi)) '(0 :pi 3 x))
     (check-predicate zero-mod-2pi?  '((* 6 :pi) 0) '(:pi x 3 (* 1/2 :pi)))
@@ -249,7 +262,14 @@
     (check-equal? (easy-simplify expr) ans1)
     (check-notes "\n#| \n'(assuming (= (sqrt (expt (conjugate x) 4)) (expt (conjugate x) 2)))\n'(simsqrt1)\n\n'(assuming (= (sqrt (expt x 4)) (expt x 2)))\n'(simsqrt1)\n\n'(assuming (non-negative? (expt (conjugate x) 4)))\n'(e1)\n\n'(assuming (non-negative? (expt x 4)))\n'(e1)\n|#")
     (check-equal? (new-simplify expr) ans1)
-    (check-notes "\n#| \n'(assuming (= (sqrt (expt (conjugate x) 4)) (expt (conjugate x) 2)))\n'(simsqrt1)\n\n'(assuming (= (sqrt (expt x 4)) (expt x 2)))\n'(simsqrt1)\n\n'(assuming (non-negative? (expt (conjugate x) 4)))\n'(e1)\n\n'(assuming (non-negative? (expt x 4)))\n'(e1)\n|#"))
+    (check-notes "\n#| \n'(assuming (= (sqrt (expt (conjugate x) 4)) (expt (conjugate x) 2)))\n'(simsqrt1)\n\n'(assuming (= (sqrt (expt x 4)) (expt x 2)))\n'(simsqrt1)\n\n'(assuming (non-negative? (expt (conjugate x) 4)))\n'(e1)\n\n'(assuming (non-negative? (expt x 4)))\n'(e1)\n|#")
+
+    (check-equal? (new-simplify '(* (sin (+ 5 x)) (cos (+ 5 x))))
+                  '(* 1/2 (sin (+ 10 (* 2 x)))))
+    (trig-product-to-sum-simplify #f)
+    (check-equal? (new-simplify '(* (sin (+ 5 x)) (cos (+ 5 x))))
+                  '(* (cos (+ 5 x)) (sin (+ 5 x))))
+    (trig-product-to-sum-simplify #t))
    ))
 
 (module+ test

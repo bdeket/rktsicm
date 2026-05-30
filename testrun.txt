@@ -14,7 +14,7 @@
    1                     0.0 ./rktsicm/sicm/tests/calculus/exterior-derivative.rkt
   10                     0.0 ./rktsicm/sicm/tests/calculus/form-fields.rkt
    4                     0.0 ./rktsicm/sicm/tests/calculus/frame-maker.rkt
-   5                     1.5 ./rktsicm/sicm/tests/calculus/gram-schmidt.rkt
+   5                     2.0 ./rktsicm/sicm/tests/calculus/gram-schmidt.rkt
    9                     0.5 ./rktsicm/sicm/tests/calculus/hodge-star.rkt
   15                  2  0.0 ./rktsicm/sicm/tests/calculus/indexed.rkt
    3                     0.0 ./rktsicm/sicm/tests/calculus/interior-product.rkt
@@ -23,10 +23,10 @@
   15                  1  0.5 ./rktsicm/sicm/tests/calculus/maps.rkt
   20                  1  0.0 ./rktsicm/sicm/tests/calculus/metric.rkt
    1                     0.0 ./rktsicm/sicm/tests/calculus/ode.rkt
-  18                  2  0.5 ./rktsicm/sicm/tests/calculus/so3.rkt
-   5                     0.0 ./rktsicm/sicm/tests/calculus/tensors.rkt
-  10                  1  1.0 ./rktsicm/sicm/tests/calculus/vector-calculus.rkt
-  11                     0.0 ./rktsicm/sicm/tests/calculus/vector-fields.rkt
+  18                  2  1.0 ./rktsicm/sicm/tests/calculus/so3.rkt
+   5                     0.5 ./rktsicm/sicm/tests/calculus/tensors.rkt
+  10                  1  1.5 ./rktsicm/sicm/tests/calculus/vector-calculus.rkt
+  11                     0.5 ./rktsicm/sicm/tests/calculus/vector-fields.rkt
    8                     0.0 ./rktsicm/sicm/tests/calculus/wedge.rkt
    7                  1  0.0 ./rktsicm/sicm/tests/display/exdisplay.rkt
    4                  1  0.0 ./rktsicm/sicm/tests/display/pp.rkt
@@ -81,7 +81,7 @@
   24                  2  0.0 ./rktsicm/sicm/tests/mechanics/Hamiltonian.rkt
    9                     0.0 ./rktsicm/sicm/tests/mechanics/Lagrangian-transformations.rkt
   22                     0.0 ./rktsicm/sicm/tests/mechanics/Lagrangian.rkt
-   5                     0.0 ./rktsicm/sicm/tests/mechanics/Lie-transform.rkt
+   5                     0.5 ./rktsicm/sicm/tests/mechanics/Lie-transform.rkt
    1                     0.0 ./rktsicm/sicm/tests/mechanics/Noether.rkt
    5                     0.0 ./rktsicm/sicm/tests/mechanics/Routhian.rkt
    6                     0.0 ./rktsicm/sicm/tests/mechanics/action.rkt
@@ -146,7 +146,7 @@
    4                     0.0 ./rktsicm/sicm/tests/simplify/rule-simplifier.rkt
    8                     0.0 ./rktsicm/sicm/tests/simplify/rule-syntax.rkt
   34                  3  0.0 ./rktsicm/sicm/tests/simplify/rules-systems.rkt
-  13                  1  0.0 ./rktsicm/sicm/tests/simplify/rules.rkt
+  13                     0.0 ./rktsicm/sicm/tests/simplify/rules.rkt
    7                     0.0 ./rktsicm/sicm/tests/simplify/rz-test-cases.rkt
    7                     0.0 ./rktsicm/sicm/tests/simplify/simplify.rkt
   28                     0.0 ./rktsicm/sicm/tests/simplify/sparse-gcd.rkt
@@ -161,16 +161,16 @@
   12                     0.0 ./rktsicm/sicm/tests/stream-error.rkt
    7                     0.0 ./rktsicm/sicm/tests/units/hms-dms-radians.rkt
    2                     0.0 ./rktsicm/sicm/tests/units/system-extra.rkt
-  18                  2  0.0 ./rktsicm/sicm/tests/units/system.rkt
+  19                  2  0.0 ./rktsicm/sicm/tests/units/system.rkt
   13                     0.0 ./rktsicm/sicm/tests/units/units.rkt
   19                  2  0.0 ./rktsicm/sicm/tests/units/with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1708             2   69 16.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
-runtime: 3.8833333333333333m
+1709             2   68 19.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
+runtime: 4.466666666666667m
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1708             2   69 25.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
-runtime: 4.9m
+1709             2   68 27.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
+runtime: 4.816666666666666m
 
 Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz 12-cores 4000MHz

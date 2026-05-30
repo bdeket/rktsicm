@@ -1,6 +1,7 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (except-out (all-defined-out) :pi-setter))
+(module+ setter (provide :pi-setter))
 
 (define n:zero 0)
 (define n:one 1)
@@ -47,3 +48,7 @@
 
 (define n:ln2 (log 2.0))
 (define n:ln10 (log 10.0))
+
+(define symb:pi ':pi)
+(define :pi n:pi)
+(define (:pi-setter x) (set! :pi x))

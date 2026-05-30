@@ -18,8 +18,6 @@
          )
 (require (only-in "../kernel-intr.rkt" kernel:assign-operations))
 (kernel:assign-operations #t) ;; for compose
-(define :symb:pi ':pi) ;;TODO;; this should be in numsymb (as well as a general cleanup of pi :pi n:pi etc)
-(define :pi n:pi)
 
 ;;bdk;; start original file
 
@@ -201,7 +199,7 @@
              (e1 (if logexp? (logexp e0) e0))
              (e2 (if mag? (magsimp e1) e1))
              (e3 (if
-                  (and sincos? (symbol? :pi) sin-cos-simplify?)
+                  (and sincos? (not (number? :pi)) sin-cos-simplify?)
                   (special-trig e2)
                   e2)))
         (cond ((and sincos? invtrig?)
@@ -759,30 +757,30 @@
 ;;; Rules when :pi is symbolic.
 
 (define (zero-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ x :symb:pi))))
+  (integer? (rcf:simplify (symb:/ x symb:pi))))
 
 (define (pi/2-mod-2pi? x)
   (integer?
-   (rcf:simplify (symb:/ (symb:- x (symb:/ :symb:pi 2)) (symb:* 2 :symb:pi)))))
+   (rcf:simplify (symb:/ (symb:- x (symb:/ symb:pi 2)) (symb:* 2 symb:pi)))))
 
 (define (-pi/2-mod-2pi? x)
   (integer?
-   (rcf:simplify (symb:/ (symb:+ x (symb:/ :symb:pi 2)) (symb:* 2 :symb:pi)))))
+   (rcf:simplify (symb:/ (symb:+ x (symb:/ symb:pi 2)) (symb:* 2 symb:pi)))))
 
 (define (pi/2-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ :symb:pi 2)) :symb:pi))))
+  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ symb:pi 2)) symb:pi))))
 
 (define (zero-mod-2pi? x)
-  (integer? (rcf:simplify (symb:/ x (symb:* 2 :symb:pi)))))
+  (integer? (rcf:simplify (symb:/ x (symb:* 2 symb:pi)))))
 
 (define (pi-mod-2pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:- x :symb:pi) (symb:* 2 :symb:pi)))))
+  (integer? (rcf:simplify (symb:/ (symb:- x symb:pi) (symb:* 2 symb:pi)))))
 
 (define (pi/4-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ :symb:pi 4)) :symb:pi))))
+  (integer? (rcf:simplify (symb:/ (symb:- x (symb:/ symb:pi 4)) symb:pi))))
 
 (define (-pi/4-mod-pi? x)
-  (integer? (rcf:simplify (symb:/ (symb:+ x (symb:/ :symb:pi 4)) :symb:pi))))
+  (integer? (rcf:simplify (symb:/ (symb:+ x (symb:/ symb:pi 4)) symb:pi))))
 
 
 (define special-trig

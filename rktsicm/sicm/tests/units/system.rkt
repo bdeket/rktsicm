@@ -90,28 +90,45 @@
     (check-equal? &aL (expt 10 42)))
    (test-case
     "define-constant"
+    (define (check-register sym nval sval tex dscr unt unc)
+      (define cnst (eq-get sym 'constant))
+      (check-equal? (get-property cnst 'name) sym)
+      (check-equal? (get-property cnst 'numerical-value) nval)
+      (check-equal? (get-property cnst 'expression) sval)
+      (check-equal? (get-property cnst 'tex-string) tex)
+      (check-equal? (get-property cnst 'description) dscr)
+      (check-equal? (get-property cnst 'units) unt)
+      (check-equal? (get-property cnst 'uncertainty) unc)
+      (check-not-false (member cnst (*numerical-constants*))))
     (parameterize ([*numerical-constants* '()])
       (check-equal? (*numerical-constants*) '())
       (define-unit-system HB (&horse "H" "speed") (&bull "B" "mass"))
       (define-constant ':meaning-of-life "mol" "life" 42 &unitless 30)
       (define-constant ':pony "\\circ" "us" 0.5 &horse)
       (define-constant ':elefant "\\circ" "us" (& 3 &horse) &horse)
+      (define (setX v) (set! XX v))
+      (define XX (register-constant 'test setX 4 '(* 2 x)))
       (check-equal? :pony (& 0.5 &horse))
       (check-equal? :meaning-of-life 42)
       (check-equal? :elefant (& 3 &horse))
-      ;; TODO ;; should this really be bound to the symbol instead of the id ?
-      (check-equal? (get-property (eq-get ':pony 'constant) 'name) ':pony)
-      (check-equal? (get-property (eq-get ':pony 'constant) 'numerical-value) 0.5)
-      (check-equal? (get-property (eq-get ':pony 'constant) 'tex-string) "\\circ")
-      (check-equal? (get-property (eq-get ':pony 'constant) 'description) "us")
-      (check-equal? (get-property (eq-get ':pony 'constant) 'units) &horse)
-      (check-equal? (get-property (eq-get ':meaning-of-life 'constant) 'uncertainty) 30)
+      (check-equal? XX (void))
+      ;; Bound to the symbol instead of the id because the id is a with-unit with only
+      ;; a literal as value (and can change), so the constant is not the bound value
+      (check-register ':pony 0.5 ':pony "\\circ" "us" &horse #f)
+      (check-register ':meaning-of-life 42 ':meaning-of-life "mol" "life" &unitless 30)
+      (check-register 'test 4 '(* 2 x) "test" "test" &unitless #f)
       (check-not-false (member ':pony (map (λ (x) (get-property x 'name)) (*numerical-constants*))))
       (check-not-false (member 42 (map (λ (x) (get-property x 'numerical-value)) (*numerical-constants*))))
       (check-equal? (eval ':elefant scmutils-base-environment) :elefant)
 
+      ((eq-get ':meaning-of-life 'setter) 24)
+      (check-equal? :meaning-of-life 24)
+
       (check-equal? (get-property (get-constant-data ':elefant) 'name) ':elefant)
-      (check-equal? (get-property (get-constant-data ':elefant) 'units) &horse)))
+      (check-equal? (get-property (get-constant-data ':elefant) 'units) &horse)
+      
+      (check-exn #px"assertion failed: \\(same-units\\?"
+                 (λ () (define-constant ':pony "\\circ" "us" (& 3 &bull) &horse) 1))))
    (test-case
     "numerical-constants"
     ;; TODO ;; get rid of the environments - please don't use them
@@ -149,6 +166,7 @@
    (test-case
     "symbolic-constants"
     ;; TODO ;; get rid of the environments - please don't use them
+    ;;         the environment is not necessary anymore but not removed yet
     (parameterize ([*numerical-constants* '()])
       (check-equal? (*numerical-constants*) '())
       (define X (literal-number 'xxx))
@@ -158,21 +176,32 @@
 
       (parameterize ([*numerical-constants* (list X)])
         (symbolic-constants)
-        (check-equal? (eval 'y scmutils-base-environment) (with-units 'y (make-unit 'any #() 5)))
+        (check-equal? (eval 'y scmutils-base-environment)
+                      (with-units (literal-number 'xxx) (make-unit 'any #() 5)))
         ;; overwrite
         (symbolic-constants #f)
-        (check-equal? (eval 'y scmutils-base-environment) (g:* 5 'y)))
+        (check-equal? (eval 'y scmutils-base-environment) (g:* 5 'xxx)))
 
       ;; still defined :/
-      (check-equal? (eval 'y scmutils-base-environment) (g:* 5 'y))
+      (check-equal? (eval 'y scmutils-base-environment) (g:* 5 'xxx))
       (define Z (literal-number 'zzz))
       (add-property! Z 'name 'zzz)
       (add-property! Z 'numerical-value 1)
       (add-property! Z 'units (make-unit 'HB #(1 0) 1))
 
       (symbolic-constants #t (list Z))
-      (check-equal? (eval 'zzz scmutils-base-environment) (with-units 'zzz (make-unit 'HB #(1 0) 1)))
+      (check-equal? (eval 'zzz scmutils-base-environment)
+                    (with-units (literal-number 'zzz) (make-unit 'HB #(1 0) 1)))
     ))
+   (test-case
+    "num/symb-define"
+    (define-constant ':pi "\\Pi" "pi" (atan -1 0) &unitless)
+    (define-constant ':2pi "2\\Pi" "2pi" (symb:* 2 :pi) &unitless)
+    (numerical-constants)
+    (check-equal? :2pi (* 2 (atan -1 0)))
+    (symbolic-constants)
+    ;; this looks nicer when "generic.rkt" is loaded
+    (check-equal? :2pi (literal-number (symb:* 2 (literal-number ':pi)))))
    (test-case
     "&"
     (define &horse (make-unit 'HB #(1 0) 1))

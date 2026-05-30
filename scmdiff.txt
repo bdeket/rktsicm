@@ -132,7 +132,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
  9 difference(s) found in simplify/pcf
  3 difference(s) found in simplify/rcf
  1 difference(s) found in simplify/rule-syntax
-14 difference(s) found in simplify/rules
+15 difference(s) found in simplify/rules
 14 difference(s) found in simplify/simplify
  4 difference(s) found in simplify/sparse-gcd
  2 difference(s) found in simplify/sparse-interpolate
@@ -143,7 +143,8 @@ could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
  7 difference(s) found in solve/solve-utils
 11 difference(s) found in solve/solve
  5 difference(s) found in units/SI-units
+18 difference(s) found in units/constants
  4 difference(s) found in units/hms-dms-radians
-16 difference(s) found in units/system
+20 difference(s) found in units/system
  3 difference(s) found in units/units
  4 difference(s) found in units/with-units

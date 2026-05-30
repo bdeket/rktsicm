@@ -2,7 +2,7 @@
 
 (provide (except-out (all-defined-out) unit-system))
 
-(require (for-syntax racket/base)
+(require (for-syntax racket/base racket/syntax)
          (only-in "../rkt/glue.rkt" if find write-line warn)
          (only-in "../rkt/define.rkt" define default-object?)
          (only-in "../rkt/environment.rkt" environment-bound? environment-define environment-assign! scmutils-base-environment generic-environment)
@@ -222,84 +222,81 @@
 
 (define *numerical-constants* (make-parameter '()))
 
-(define-syntax define-constant
-  (syntax-rules (quote)
+(define (register-constant sname the-setter n:value symb:value
+                           [dunits &unitless]
+                           [dtex-string (symbol->string sname)]
+                           [ddescription (symbol->string sname)]
+                           [duncertainty #f])
+  (define constant (literal-number (if (number? symb:value)
+                                       sname
+                                       symb:value)))
+  (eq-put! sname 'constant constant)
+  (eq-put! sname 'setter   the-setter)
+  (add-property! constant 'name sname)
+  (add-property! constant 'numerical-value n:value)
+  (add-property! constant 'units dunits)
+  (add-property! constant 'tex-string dtex-string)
+  (add-property! constant 'description ddescription)
+  (if (real? n:value) (declare-known-reals sname))
+  (if duncertainty
+      (add-property! constant 'uncertainty duncertainty))
+  (*numerical-constants* (cons constant (*numerical-constants*))))
+
+(define-syntax (define-constant stx)
+  (syntax-case stx (quote)
     [(_ (quote dname) dtex-string ddescription the-value dunits duncertainty)
-     (define dname
-       (let ([sname 'dname][value the-value])
-         (if (environment-bound? scmutils-base-environment sname)
-             (warn `(clobbering ,sname)))
-         (let ((constant (literal-number sname)))
-           (cond ((with-units? value)
-                  (assert (same-units? (u:units value) dunits))))
-           (set! value (g:simplify (u:value value)))
-           (eq-put! sname 'constant constant)
-           (add-property! constant 'name sname)
-           (add-property! constant 'numerical-value value)
-           (add-property! constant 'units dunits)
-           (add-property! constant 'tex-string dtex-string)
-           (add-property! constant 'description ddescription)
-           (if (real? value) (declare-known-reals sname))
-           (if duncertainty
-               (add-property! constant 'uncertainty duncertainty))
-           (*numerical-constants* (cons constant (*numerical-constants*)))
-           (define the-unit (with-units value dunits))
-           (environment-define scmutils-base-environment
-                               sname
-                               the-unit)
-           the-unit)))]
+     (with-syntax ([the-setter (format-id stx "set-~a" (syntax-e #'dname))])
+       (syntax/loc stx
+         (begin
+           (define (the-setter v) (set! dname v))
+           (define dname
+             (let ([sname 'dname][value the-value])
+               (numerical-constants) ;; TODO ;; this switching is really inefficient (startup time)
+               (when (environment-bound? scmutils-base-environment sname)
+                 (warn `(clobbering ,sname)))
+               (when (with-units? value)
+                 (assert (same-units? (u:units value) dunits) sname))
+               (define n:value (g:simplify (u:value value)))
+               (symbolic-constants)
+               (define symb:value (g:simplify (u:value the-value)))
+               (numerical-constants)
+               (register-constant sname the-setter n:value symb:value
+                                  dunits dtex-string ddescription duncertainty)
+               (define the-unit (with-units n:value dunits))
+               (environment-define scmutils-base-environment
+                                   sname
+                                   the-unit)
+               the-unit)))))]
     [(_ (quote name) tex-string description value units)
-     (define-constant (quote name) tex-string description value units #f)]))
-#;
-(define (define-constant name tex-string description value units
-          #:optional uncertainty)
-  (if (environment-bound? scmutils-base-environment name)
-      (write-line `(clobbering ,name)))
-  (let ((constant (literal-number name)))
-    (cond ((with-units? value)
-           (assert (same-units? (u:units value) units))))
-    (set! value (g:simplify (u:value value)))
-    (eq-put! name 'constant constant)
-    (add-property! constant 'name name)
-    (add-property! constant 'numerical-value value)
-    (add-property! constant 'units units)
-    (add-property! constant 'tex-string tex-string)
-    (add-property! constant 'description description)
-    (if (real? value) (declare-known-reals name))
-    (if (not (default-object? uncertainty))
-        (add-property! constant 'uncertainty uncertainty))
-    (*numerical-constants* (cons constant (*numerical-constants*)))
-    (environment-define scmutils-base-environment
-                        name
-                        (with-units value units))
-    name))
+     (syntax/loc stx (define-constant (quote name) tex-string description value units #f))]))
 
 (define (numerical-constants #:optional units? constants)
   (if (default-object? units?) (set! units? #t))
   (if (default-object? constants) (set! constants (*numerical-constants*)))
   (for-each (lambda (c)
-              (environment-assign!
-               scmutils-base-environment
-               (get-property c 'name)
-               (if units?
-                   (with-units (get-property c 'numerical-value)
-                               (get-property c 'units))
-                   (g:* (get-property c 'numerical-value)
-                        (unit-scale (get-property c 'units))))))
+              (define name (get-property c 'name))
+              (define new-value (if units?
+                                    (with-units (get-property c 'numerical-value)
+                                                (get-property c 'units))
+                                    (g:* (get-property c 'numerical-value)
+                                         (unit-scale (get-property c 'units)))))
+              (define setter (eq-get name 'setter))
+              (when setter (setter new-value))
+              (environment-assign! scmutils-base-environment name new-value))
             constants))
 
 (define (symbolic-constants #:optional units? constants)
   (if (default-object? units?) (set! units? #t))
   (if (default-object? constants) (set! constants (*numerical-constants*)))
   (for-each (lambda (c)
-              (environment-assign!
-               scmutils-base-environment
-               (get-property c 'name)
-               (if units?
-                   (with-units (get-property c 'name)
-                               (get-property c 'units))
-                   (g:* (get-property c 'name)
-                        (unit-scale (get-property c 'units))))))
+              (define name (get-property c 'name))
+              (define nmbr (literal-number (get-property c 'expression)))
+              (define new-value (if units?
+                                    (with-units nmbr (get-property c 'units))
+                                    (g:* nmbr (unit-scale (get-property c 'units)))))
+              (define setter (eq-get name 'setter))
+              (when setter (setter new-value))
+              (environment-assign! scmutils-base-environment name new-value))
             constants))
 
 (define (get-constant-data name)

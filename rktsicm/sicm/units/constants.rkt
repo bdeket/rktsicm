@@ -1,84 +1,83 @@
 #lang s-exp "../generic.rkt"
 
-(provide (all-defined-out) parsec speed-of-light)
+(provide (all-defined-out) parsec speed-of-light :pi)
 
 (require "system.rkt"
-         "SI-units.rkt")
+         "SI-units.rkt"
+         (submod "../kernel/constants.rkt" setter))
 
 ;;bdk;; start original file
 
 ;;;; Numerical constants
 
-(define-constant ':pi "\\pi" "Pi"
-  (* 4 (atan 1 1))
-  &unitless)
+(register-constant ':pi :pi-setter n:pi symb:pi &unitless "\\pi" "Pi" )
 
 (define-constant ':2pi "2\\pi" "2*Pi"
-  (* 8 (atan 1 1))
+  (* 2 :pi)
   &unitless)
 
 (define-constant ':pi/2 "\\pi/2" "Pi/2"
-  (* 2 (atan 1 1))
+  (/ :pi 2)
   &unitless)
 
 (define-constant ':pi/4 "\\pi/4" "Pi/4"
-  (atan 1 1)
+  (/ :pi 4)
   &unitless)
 
 (define-constant ':pi/3 "\\pi/3" "Pi/3"
-  (* 4/3 (atan 1 1))
+  (/ :pi 3)
   &unitless)
 
 (define-constant ':pi/6 "\\pi/6" "Pi/6"
-  (* 2/3 (atan 1 1))
+  (/ :pi 6)
   &unitless)
 
 (define-constant ':-pi "-\\pi" "-Pi"
-  (* -4 (atan 1 1))
+  (- :pi)
   &unitless)
 
 (define-constant ':-2pi "-2\\pi" "-2*Pi"
-  (* -8 (atan 1 1))
+  (- :2pi)
   &unitless)
 
 (define-constant ':-pi/2 "-\\pi/2" "-Pi/2"
-  (* -2 (atan 1 1))
+  (- :pi/2)
   &unitless)
 
 (define-constant ':-pi/4 "-\\pi/4" "-Pi/4"
-  (- (atan 1 1))
+  (- :pi/4)
   &unitless)
 
 (define-constant ':-pi/3 "-\\pi/3" "-Pi/3"
-  (* -4/3 (atan 1 1))
+  (- :pi/3)
   &unitless)
 
 (define-constant ':-pi/6 "-\\pi/6" "-Pi/6"
-  (* -2/3 (atan 1 1))
+  (- :pi/6)
   &unitless)
 
 (define-constant ':+pi "+\\pi" "+Pi"
-  (* +4 (atan 1 1))
+  :pi
   &unitless)
 
 (define-constant ':+2pi "+2\\pi" "+2*Pi"
-  (* +8 (atan 1 1))
+  :2pi
   &unitless)
 
 (define-constant ':+pi/2 "+\\pi/2" "+Pi/2"
-  (* +2 (atan 1 1))
+  :pi/2
   &unitless)
 
 (define-constant ':+pi/4 "+\\pi/4" "+Pi/4"
-  (+ (atan 1 1))
+  :pi/4
   &unitless)
 
 (define-constant ':+pi/3 "+\\pi/3" "+Pi/3"
-  (* +4/3 (atan 1 1))
+  :pi/3
   &unitless)
 
 (define-constant ':+pi/6 "+\\pi/6" "+Pi/6"
-  (* +2/3 (atan 1 1))
+  :pi/6
   &unitless)
 
 
