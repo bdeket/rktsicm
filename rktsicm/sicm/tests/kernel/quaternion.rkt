@@ -156,7 +156,7 @@
                      (/ j (sqrt (+ (* j j) (* k k) (* l l))))
                      (/ k (sqrt (+ (* j j) (* k k) (* l l))))
                      (/ l (sqrt (+ (* j j) (* k k) (* l l)))))))
-    (check-equal? (q:->angle-axis (quaternion 1 0 0 1) vector) (vector :pi/2 #(0 0 1)))
+    (check-equal? (q:->angle-axis (quaternion 1 0 0 1) vector) (vector n:pi/2 #(0 0 1)))
     (check-equal? ((q:rotate (quaternion 1 0 0 1)) #(1 1 1)) #(-2 2 2))
     (check-within (q:rotation-matrix-> (matrix-by-rows '(1 2 3 4)
                                                        '(5 2 8 9)

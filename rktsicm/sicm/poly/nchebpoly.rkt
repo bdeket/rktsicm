@@ -100,7 +100,7 @@
 
 (define (poly->cheb-exp poly)
   (let* ((maxcoeff (apply max (map abs (poly/coefficients poly))))
-	 (zero-tolerance (* 10 maxcoeff *machine-epsilon*))
+	 (zero-tolerance (* 10 maxcoeff n:machine-epsilon))
 	 (=0?
 	  (lambda (p)
 	    (and (number? p)
@@ -160,7 +160,7 @@
     (if (and (odd? n)
 	     (fix:= (fix:* 2 i) (fix:- n 1)))
         0
-        (- (cos (/ (* (+ i 1/2) pi) n)))))
+        (- (cos (/ (* (+ i 1/2) n:pi) n)))))
   (let loop ((i 0))
     (if (fix:= i n)
         '()

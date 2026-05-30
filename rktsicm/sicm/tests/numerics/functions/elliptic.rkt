@@ -17,7 +17,7 @@
               (check-within (elliptic-integral-F-check 1. .9) 1.159661070732225  1e-13)
               
               (check-within (elliptic-integral-F 1. .9)       1.159661070732199  1e-15)
-              (check-within (elliptic-integral-F pi/2 .9)     2.2805491384227703 1e-15)
+              (check-within (elliptic-integral-F n:pi/2 .9)   2.2805491384227703 1e-15)
               (check-within (first-elliptic-integral .9)      2.2805491384227703 1e-15)
               )
 

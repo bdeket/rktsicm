@@ -3,6 +3,7 @@
 (provide (all-defined-out)
          conjugate
          (all-from-out "../general/permute.rkt")
+         (all-from-out "constants.rkt")
          )
 
 (require (only-in "../rkt/glue.rkt"
@@ -14,6 +15,7 @@
          (only-in "../general/list-utils.rkt" reduce)
          (only-in racket/math conjugate)
          (only-in "../general/permute.rkt" exact-quotient binomial-coefficient factorial)
+         "constants.rkt"
          )
 (define (exact-rational? x) (and (real? x) (exact? x)))
 (define-values (integer-divide integer-divide-quotient integer-divide-remainder)
@@ -33,59 +35,59 @@
 
 ;;; Everybody wants to know about these.
 
-(define zero 0)
-(define one 1)
-(define -one -1)
-(define two 2)
-(define three 3)
+;;brm;;(define zero 0)
+;;brm;;(define one 1)
+;;brm;;(define -one -1)
+;;brm;;(define two 2)
+;;brm;;(define three 3)
 
-(define pi (* 4 (atan 1 1)))
-(define -pi (- pi))
-(define pi/6 (/ pi 6))
-(define -pi/6 (- pi/6))
-(define pi/4 (/ pi 4))
-(define -pi/4 (- pi/4))
-(define pi/3 (/ pi 3))
-(define -pi/3 (- pi/3))
-(define pi/2 (/ pi 2))
-(define -pi/2 (- pi/2))
-(define 2pi (+ pi pi))
-(define -2pi (- 2pi))
+;;brm;;(define pi (* 4 (atan 1 1)))
+;;brm;;(define -pi (- pi))
+;;brm;;(define pi/6 (/ pi 6))
+;;brm;;(define -pi/6 (- pi/6))
+;;brm;;(define pi/4 (/ pi 4))
+;;brm;;(define -pi/4 (- pi/4))
+;;brm;;(define pi/3 (/ pi 3))
+;;brm;;(define -pi/3 (- pi/3))
+;;brm;;(define pi/2 (/ pi 2))
+;;brm;;(define -pi/2 (- pi/2))
+;;brm;;(define 2pi (+ pi pi))
+;;brm;;(define -2pi (- 2pi))
 
-(define :zero zero)
-(define :one one)
-(define :-one -one)
-(define :two two)
-(define :three three)
+;;brm;;(define n:zero 0)
+;;brm;;(define n:one 1)
+;;brm;;(define n:-one -1)
+;;brm;;(define :two two)
+;;brm;;(define :three three)
 
-(define :pi pi)
-(define :+pi pi)
-(define :-pi -pi)
-(define :pi/6 pi/6)
-(define :+pi/6 pi/6)
-(define :-pi/6 -pi/6)
-(define :pi/4 pi/4)
-(define :+pi/4 pi/4)
-(define :-pi/4 -pi/4)
-(define :pi/3 pi/3)
-(define :+pi/3 pi/3)
-(define :-pi/3 -pi/3)
-(define :pi/2 pi/2)
-(define :+pi/2 pi/2)
-(define :-pi/2 -pi/2)
-(define :2pi 2pi)
-(define :+2pi 2pi)
-(define :-2pi -2pi)
+;;brm;;(define n:pi (atan -1 0))
+;;brm;;(define n:+pi n:pi)
+;;brm;;(define n:-pi (- n:pi))
+;;brm;;(define n:pi/6 (/ n:pi 6))
+;;brm;;(define n:+pi/6 n:pi/6)
+;;brm;;(define n:-pi/6 (- n:pi/6))
+;;brm;;(define n:pi/4 (atan 1 1))
+;;brm;;(define n:+pi/4 n:pi/4)
+;;brm;;(define n:-pi/4 (- n:pi/4))
+;;brm;;(define n:pi/3 (/ n:pi 3))
+;;brm;;(define n:+pi/3 n:pi/3)
+;;brm;;(define n:-pi/3 (- n:pi/3))
+;;brm;;(define n:pi/2 (atan 0 1))
+;;brm;;(define n:+pi/2 n:pi/2)
+;;brm;;(define n:-pi/2 (- n:pi/2))
+;;brm;;(define n:2pi (* 2 n:pi))
+;;brm;;(define n:+2pi n:2pi)
+;;brm;;(define n:-2pi (- n:2pi))
 
 
-;;; *machine-epsilon* is the smallest number that when added to 1.0
+;;; n:machine-epsilon is the smallest number that when added to 1.0
 ;;;  gives a different number.
 
-(define *machine-epsilon*
-  (let loop ((e 1.0))
-     (if (= 1.0 (+ e 1.0))
-         (* 2 e)
-         (loop (/ e 2)))))
+;;brm;;(define *machine-epsilon*
+;;brm;;  (let loop ((e 1.0))
+;;brm;;     (if (= 1.0 (+ e 1.0))
+;;brm;;         (* 2 e)
+;;brm;;         (loop (/ e 2)))))
 
 ;;; In 64-bit IEEE-754 floating point 
 ;;; *machine-epsilon* = 2.220446049250313e-16 = 2^(-52)
@@ -96,9 +98,9 @@
 
 (define (ulp x)
  (let ((x (abs (exact->inexact x))))
-   (- (* x (+ 1 *machine-epsilon*)) x)))
+   (- (* x (+ 1 n:machine-epsilon)) x)))
 
-;;; (ulp 1.0) = *machine-epsilon*
+;;; (ulp 1.0) = n:machine-epsilon
 ;;; (ulp 2.0) = 2*(ulp 1.0)
 ;;; (ulp 3.0) = 4*(ulp 1.0)
 ;;; (ulp 4.0) = 4*(ulp 1.0)
@@ -109,17 +111,17 @@
 
 (define (ulpr x)
   (let ((x (exact->inexact x)))
-    (abs (/ (* x *machine-epsilon*) 2))))
+    (abs (/ (* x n:machine-epsilon) 2))))
 
-;;; (ulpr 1.0) = *machine-epsilon*/2
+;;; (ulpr 1.0) = n:machine-epsilon/2
 
 
-(define *sqrt-machine-epsilon* 
-  (sqrt *machine-epsilon*))
+;;brm;;(define *sqrt-machine-epsilon*
+;;brm;;  (sqrt *machine-epsilon*))
 
-(define :euler 0.57721566490153286)
+;;brm;;(define :euler 0.57721566490153286)
 
-(define :phi (/ (+ 1 (sqrt 5)) 2))
+;;brm;;(define :phi (/ (+ 1 (sqrt 5)) 2))
 
 (define (exact-zero? x)
   (and (number? x) (exact? x) (= x 0)))
@@ -127,14 +129,14 @@
 (define (exact-one? x)
   (and (number? x) (exact? x) (= x 1)))
 
-(define :ln2 (log 2.0))
-(define :ln10 (log 10.0))
+;;brm;;(define :ln2 (log 2.0))
+;;brm;;(define :ln10 (log 10.0))
 
 (define (log10 x)
-  (/ (log x) :ln10))
+  (/ (log x) n:ln10))
 
 (define (log2 x)
-  (/ (log x) :ln2))
+  (/ (log x) n:ln2))
 
 (define (exp10 x)
   (expt 10 x))
@@ -142,36 +144,36 @@
 (define (exp2 x)
   (expt 2 x))
 
-(define :minlog -1000.0)
+(define n:minlog -1000.0)
 
 (define (safelog x)
   (if (and (real? x) (> x 0))
-      (max (log x) :minlog)
+      (max (log x) n:minlog)
       (error "Out of range -- SAFELOG" x)))
 
 (define (principal-value cuthigh)
-  (let ((cutlow (- cuthigh :+2pi)))
+  (let ((cutlow (- cuthigh n:+2pi)))
     (define (the-principal-value x)
       (if (and (<= cutlow x) (< x cuthigh))
 	  x
-	  (let ((y (- x (* :+2pi (floor (/ x :+2pi))))))
+	  (let ((y (- x (* n:+2pi (floor (/ x n:+2pi))))))
 	    (if (< y cuthigh) 
 		y
-		(- y :+2pi)))))
+		(- y n:+2pi)))))
     the-principal-value))
 
 
 (define (principal-value-minus-pi-to-pi x)
-  (if (or (<= x :-pi) (> x :+pi))
-      (let ((y (- x (* :+2pi (floor (/ x :+2pi))))))
-	(if (< y :+pi) 
+  (if (or (<= x n:-pi) (> x n:+pi))
+      (let ((y (- x (* n:+2pi (floor (/ x n:+2pi))))))
+	(if (< y n:+pi) 
 	    y
-	    (- y :+2pi)))
+	    (- y n:+2pi)))
       x))
 
 (define (principal-value-zero-to-2pi x)
-  (if (or (< x 0.0) (>= x :+2pi))
-      (- x (* :+2pi (floor (/ x :+2pi))))
+  (if (or (< x 0.0) (>= x n:+2pi))
+      (- x (* n:+2pi (floor (/ x n:+2pi))))
       x))
 
 
@@ -293,12 +295,12 @@
           (* (if (default-object? slack)
 		         100
 				 slack)
-             *machine-epsilon*))))
+             n:machine-epsilon))))
 
 
 (define (close-enuf? h1 h2 tolerance)
   (<= (magnitude (- h1 h2))
-      (* .5 (max tolerance *machine-epsilon*)
+      (* .5 (max tolerance n:machine-epsilon)
 	 (+ (magnitude h1) (magnitude h2) 2.0))))
 
 #|
@@ -306,7 +308,7 @@
 
 (define (close-enuf? h1 h2 #:optional tolerance scale)
   (if (default-object? tolerance)
-      (set! tolerance *machine-epsilon*))
+      (set! tolerance n:machine-epsilon))
   (if (default-object? scale)
       (set! scale 1.0))
   (<= (magnitude (- h1 h2))

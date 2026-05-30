@@ -186,7 +186,7 @@
 		       (* 0.5 (magnitude x)))
 		   plausible-h)))
 	  (let* ((delta (- (f (+ x h)) (f (- x h))))
-		 (roundoff (* *machine-epsilon*
+		 (roundoff (* n:machine-epsilon
 			      (+ 1 (floor (magnitude (/ (f x)
 							(if (zero? delta)
 							    1
@@ -213,7 +213,7 @@
 	       (h (if (zero? plausible-h) 0.1 plausible-h))
                (2fx (* 2 (f x)))
 	       (delta (+ (f (+ x h h)) (- 2fx) (f (- x h h))))
-	       (roundoff (* *machine-epsilon*
+	       (roundoff (* n:machine-epsilon
 			    (+ 1 (floor (magnitude (/ 2fx
 						      (if (zero? delta)
 							  1

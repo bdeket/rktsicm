@@ -132,7 +132,7 @@
   (let ((a (g:arity f))
 	(d (lambda (f) (deriv:euclidean-structure f selectors))))
     (cond ((pair:eq? a *exactly-zero*)
-	   (lambda () :zero))
+	   (lambda () n:zero))
 	  ((pair:eq? a *at-least-one*)
 	   (lambda (x . y)
 	     ((d (lambda (s) (g:apply f (up-structure->list s))))

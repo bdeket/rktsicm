@@ -44,10 +44,10 @@
   (make-generic-operator 1 'inexact?))
 
 (define-g g:zero-like
-  (make-generic-operator 1 'zero-like (lambda (x) :zero)))
+  (make-generic-operator 1 'zero-like (lambda (x) n:zero)))
 
 (define-g g:one-like
-  (make-generic-operator 1 'one-like (lambda (x) :one)))
+  (make-generic-operator 1 'one-like (lambda (x) n:one)))
 
 ;;bdk;; insert 10 : from ../mathutil
 (define (g:identity x) x)
@@ -433,7 +433,7 @@
   (g:+:n args))
 
 (define (g:+:n args)
-  (cond ((null? args) :zero)
+  (cond ((null? args) n:zero)
 	((null? (cdr args)) (car args))
 	(else
 	 (let lp ((args (cddr args))
@@ -447,7 +447,7 @@
   (g:*:n args))
 
 (define (g:*:n args)
-  (cond ((null? args) :one)
+  (cond ((null? args) n:one)
 	((null? (cdr args)) (car args))
 	(else
 	 (let lp ((args (cddr args))
@@ -461,7 +461,7 @@
   (g:-:n args))
 
 (define (g:-:n args)
-  (cond ((null? args) :zero)
+  (cond ((null? args) n:zero)
 	((null? (cdr args)) (g:negate (car args)))
 	(else
 	 (g:-:bin (car args)
@@ -471,7 +471,7 @@
   (g:/:n args))
 
 (define (g:/:n args)
-  (cond ((null? args) :one)
+  (cond ((null? args) n:one)
 	((null? (cdr args)) (g:invert (car args)))
 	(else
 	 (g:/:bin (car args)
@@ -481,7 +481,7 @@
   (g:gcd:n args))
 
 (define (g:gcd:n args)
-  (cond ((null? args) :zero)
+  (cond ((null? args) n:zero)
 	((null? (cdr args)) (car args))
 	(else
 	 (let lp

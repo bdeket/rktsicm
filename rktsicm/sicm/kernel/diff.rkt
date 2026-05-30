@@ -271,7 +271,7 @@
       (let ((dts (differential->terms x)))
         ;;bdk;; diff-quantitities with zero coefficients lead to errors
         (if (null? dts)
-            :zero
+            n:zero
             (let* ((lt (last dts))
                    (tag (differential-tags lt)))
               (if (null? tag)
@@ -288,17 +288,17 @@
       (let ((dts (differential->terms x)))
         ;;bdk;; diff-quantitities with zero coefficients lead to errors
         (if (null? dts)
-            :zero
+            n:zero
             (let* ((lt (last dts))
                    (tag (differential-tags lt)))
               (if (null? tag)
-                  :zero
+                  n:zero
                   (let ((keytag (last tag)))
                     (terms->differential-collapse
                      (filter (lambda (term)
                                (memv keytag (differential-tags term)))
                              dts)))))))
-      :zero))
+      n:zero))
 
 ;;; To turn a binary function into one that operates on differentials
 ;;;  we must supply the partial derivatives with respect to each
@@ -375,7 +375,7 @@
 	 (filter (lambda (term)
 		   (memv keytag (differential-tags term)))
 		 dts)))
-      :zero))
+      n:zero))
 
 
 #|
@@ -463,10 +463,10 @@
       (if (and (number? x) (zero? x))
           (if (number? y)
               (if (positive? y)
-                  :zero
+                  n:zero
                   (error "Derivative undefined: EXPT"
                          x y))
-              :zero)     ;But what if y is negative later?
+              n:zero)     ;But what if y is negative later?
           (g:* (g:log x) (g:expt x y))))))
 
 
@@ -540,8 +540,8 @@
 (define (diff:type x) differential-type-tag)
 (define (diff:type-predicate x) differential?)
 
-(define (diff:zero-like n) :zero)
-(define (diff:one-like n) :one)
+(define (diff:zero-like n) n:zero)
+(define (diff:one-like n) n:one)
 
 (assign-operation 'type            diff:type             differential?)
 (assign-operation 'type-predicate  diff:type-predicate   differential?)
@@ -637,7 +637,7 @@
 (define (diff:one? x)
   (assert (differential? x))
   (and (g:one? (finite-part x))
-       ;;bdk;; infinitesimal-part can be :zero
+       ;;bdk;; infinitesimal-part can be n:zero
        (g:zero? (infinitesimal-part x))))
 
 (assign-operation 'one? diff:one? differential?)
@@ -711,7 +711,7 @@
 (define (make-x+dx x dx)
   (d:+ x
        (make-differential-quantity
-	(list (make-differential-term (list dx) :one))))) ;worry!!!
+	(list (make-differential-term (list dx) n:one))))) ;worry!!!
 
 
 ;;; For debugging, sometimes we need a differential object.
@@ -834,7 +834,7 @@
                                             (differential-coefficient term)))
                    '())))
            (differential-term-list obj))))
-        (else :zero)))
+        (else n:zero)))
 #|
 ;;; Siskind/Perlmutter/Radul hack
 
@@ -850,7 +850,7 @@
                                          (differential-coefficient term)))
                 '())))
         (differential-term-list obj)))
-      :zero))
+      n:zero))
 |#
 
 (define *active-tags* (make-parameter '()))
@@ -926,7 +926,7 @@
                            (make-differential-term
                             (remove-differential-tag newtag
                                                      (remove-differential-tag oldtag tags))
-                            :zero)
+                            n:zero)
                            (make-differential-term
                             (insert-differential-tag newtag
                                                      (remove-differential-tag oldtag tags))

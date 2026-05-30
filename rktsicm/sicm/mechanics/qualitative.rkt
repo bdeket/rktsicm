@@ -27,7 +27,7 @@
 	       (lambda (dx)
 		 (T (+ xe dx) ye 
 		    (lambda (x y)
-		      ((principal-value pi) (- x xe)))
+		      ((principal-value n:pi) (- x xe)))
 		    'failure))
 	       eps)
 	      0.0))
@@ -35,7 +35,7 @@
 	       (lambda (dx)
 		 (T xe (+ ye dx) 
 		    (lambda (x y)
-		      ((principal-value pi) (- x xe)))
+		      ((principal-value n:pi) (- x xe)))
 		    'failure))
 	       eps)
 	      0.0))
@@ -85,7 +85,7 @@
 (define (radially-mapping-points map Jmin Jmax phi eps)
   (bisect 
     (lambda (J) 
-      ((principal-value pi)
+      ((principal-value n:pi)
        (- phi (map phi J (lambda (phip Jp) phip) list))))
     Jmin Jmax eps))
 
@@ -164,11 +164,11 @@
 |#
 
 (define (which-way? rotation-number x0 y0 map)
-  (let ((pv (principal-value (+ x0 pi))))
+  (let ((pv (principal-value (+ x0 n:pi))))
     (let lp ((n 0) 
-             (z x0) (zmin (- x0 2pi)) (zmax (+ x0 2pi))
-             (x x0) (xmin (- x0 2pi)) (xmax (+ x0 2pi)) (y y0))
-      (let ((nz (pv (+ z (* 2pi rotation-number)))))
+             (z x0) (zmin (- x0 n:2pi)) (zmax (+ x0 n:2pi))
+             (x x0) (xmin (- x0 n:2pi)) (xmax (+ x0 n:2pi)) (y y0))
+      (let ((nz (pv (+ z (* n:2pi rotation-number)))))
         (map x y 
              (lambda (nx ny)
                (let ((nx (pv nx)))
@@ -201,4 +201,4 @@
     (continue (flo:pv (flo:+ x yp)) yp)))
 
 (define (flo:pv x)
-  (flo:- x (flo:* 2pi (flo:floor (flo:/ x 2pi)))))
+  (flo:- x (flo:* n:2pi (flo:floor (flo:/ x n:2pi)))))

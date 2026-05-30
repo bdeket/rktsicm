@@ -70,16 +70,16 @@
 (define *important-numbers*
   (map (λ (x) (list (car x) (if (number? (cadr x)) (cadr x) (literal-number (cadr x)))))
        `((1 1)
-         (,pi :pi)
-         (,(/ 1 pi) (/ 1 :pi))
+         (,n:pi :pi)
+         (,(/ 1 n:pi) (/ 1 :pi))
          (,(exp 1) (exp 1))
          (,(exp -1) (exp -1))
          (,(sqrt 2) (sqrt 2))
          (,(sqrt 3) (sqrt 3))
          (,(sqrt 5) (sqrt 5))
          (,(sqrt 7) (sqrt 7))
-         (,:euler :euler)
-         (,:phi :phi)
+         (,n:euler :euler)
+         (,n:phi :phi)
     )))
 
 (define (heuristic-canonicalize-complex z #:optional symbolize? zero-threshold)
@@ -119,12 +119,12 @@
 ;;; Watch out--symb:pi is now in numsymb.scm
 
 (define (heuristic-round-angle a)
-  (let* ((ag (/ a :pi))
+  (let* ((ag (/ a n:pi))
 	 (af (heuristic-round-real ag)))
     (if (< (abs (- ag af)) heuristic-rounding-tolerance)
 	(if heuristic-symbolize?
 	    (g:* af symb:pi)
-	    (* af :pi))
+	    (* af n:pi))
 	a)))
 
 (define symb:pi ':pi)

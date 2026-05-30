@@ -23,7 +23,7 @@
 
 
 (define (complex-random modulus)
-  (make-polar modulus (random :2pi)))
+  (make-polar modulus (random n:2pi)))
 
 
 ;;; Gets the value of p at x, and the error estimate, by Horners rule
@@ -109,7 +109,7 @@
 (define (bring-to-real c)
   (if (< (abs (imag-part c))
 	 (* imaginary-part-tolerance
-            *machine-epsilon*
+            n:machine-epsilon
             (abs (real-part c))))
       (real-part c)
       c))
@@ -127,16 +127,16 @@
 ;;; parts that may arise from roundoff errors.
 
 (define (clean-up-root root)
-  (let ((rt (* rationalization-tolerance *machine-epsilon*)))
+  (let ((rt (* rationalization-tolerance n:machine-epsilon)))
     (cond ((zero? root) root)
 	  ((real? root) (rationalize root rt))
 	  (else
 	   (let ((rr (rationalize (real-part root) rt))
 		 (ri (rationalize (imag-part root) rt)))
 	     (let ((ar (abs rr)) (ai (abs ri)))
-	       (cond ((> (* ar on-axis-tolerance *machine-epsilon*) ai)
+	       (cond ((> (* ar on-axis-tolerance n:machine-epsilon) ai)
 		      rr)
-		     ((> (* ai on-axis-tolerance *machine-epsilon*) ar)
+		     ((> (* ai on-axis-tolerance n:machine-epsilon) ar)
 		      (* ri +i))
 		     (else
 		      (make-rectangular rr ri)))))))))
@@ -179,7 +179,7 @@
 	      (if (< (cluster-diameter cl)
 		     (expt (* cluster-tolerance
 			       (+ 1.0 (magnitude mid))
-			       *machine-epsilon*)
+			       n:machine-epsilon)
 			   (/ 1.0 n)))
 		  (list (cons n (clean-up-root mid)))
 		  (append (mult-scan (car (cluster-subclusters cl)))
@@ -220,7 +220,7 @@
                      (write-line `(found-winner-at ,xn ,vxn ,err)))
 		 xn)			;good enuf.
 		((< (magnitude dx)
-		    (* root-searcher-minimum-progress *machine-epsilon*
+		    (* root-searcher-minimum-progress n:machine-epsilon
 		       (magnitude xn)))
 		 (if root-wallp
 		     (write-line `(found-lazy-winner-at ,xn ,vxn ,err)))
@@ -310,7 +310,7 @@
 		     (lambda (nx)
 		       (if (< (magnitude (- x nx)) ;insufficient improvement
 			      (* root-polisher-minimum-progress
-				 *machine-epsilon*
+				 n:machine-epsilon
 				 (+ (magnitude x) 1.0)))
 			   (begin
 			     (if root-wallp

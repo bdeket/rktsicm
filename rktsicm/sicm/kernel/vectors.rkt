@@ -58,7 +58,7 @@
   (vector-forall g:zero? v))
 
 (define (v:make-zero n)
-  (make-vector n :zero))
+  (make-vector n n:zero))
 
 (define (v:zero-like v)
   (v:generate (vector-length v)
@@ -74,7 +74,7 @@
 				(number->string i))))))
 
 (define (v:make-basis-unit n i)	; #(0 0 ... 1 ... 0) n long, 1 in ith position
-  (v:generate n (lambda (j) (if (fix:= j i) :one :zero))))
+  (v:generate n (lambda (j) (if (fix:= j i) n:one n:zero))))
 
 (define (v:basis-unit? v)
   (let ((n (vector-length v)))
@@ -134,7 +134,7 @@
   (let ((n (v:dimension v1)))
     (assert (fix:= n (v:dimension v2))
 	    "Not same dimension -- INNER-PRODUCT" (list v1 v2))
-    (let lp ((i 0) (ans :zero))
+    (let lp ((i 0) (ans n:zero))
       (if (fix:= i n)
 	  ans
 	  (lp (fix:+ i 1)
@@ -158,7 +158,7 @@
   (g:sqrt (v:inner-product v v)))
 
 (define (maxnorm v)
-  (vector-accumulate max g:magnitude :zero v))
+  (vector-accumulate max g:magnitude n:zero v))
 
 
 (define (v:make-unit v)
@@ -174,13 +174,13 @@
 
 ;;bdk;; moved to cstm/vectors 4
 
-(define (general-inner-product addition multiplication :zero)
+(define (general-inner-product addition multiplication n:zero)
   (define (ip v1 v2)
     (let ((n (vector-length v1)))
       (if (not (fix:= n (vector-length v2)))
 	  (error "Unequal dimensions -- INNER-PRODUCT" v1 v2))
       (if (fix:= n 0)
-	  :zero
+	  n:zero
 	  (let loop ((i 1)
 		     (ans (multiplication (vector-ref v1 0)
 					  (vector-ref v2 0))))

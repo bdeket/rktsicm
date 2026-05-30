@@ -120,22 +120,22 @@
     (check-equal? (complex-denominator 4/3+1/5i) 15))
    (test-case
     "definitions"
-    (check-equal? (+ zero one -one two three
-                     pi -pi pi/6 -pi/6 pi/4 -pi/4 pi/3 -pi/3 pi/2 -pi/2 2pi -2pi
-                     :zero :one :-one :two :three
-                     :pi :+pi :-pi :pi/6 :+pi/6 :-pi/6 :pi/4 :+pi/4 :-pi/4 :pi/3 :+pi/3 :-pi/3 :pi/2 :+pi/2 :-pi/2 :2pi :+2pi :-2pi
-                     *machine-epsilon* *sqrt-machine-epsilon*
-                     :euler :phi :ln2 :ln10 :minlog)
-                  -971.4572492801368)
-    (check-equal? (ulp 1.) *machine-epsilon*)
-    (check-equal? (ulpr 1.) (/ *machine-epsilon* 2))
+    (check-equal? (+ n:zero n:one n:-one
+                     n:pi  n:pi/6  n:pi/4  n:pi/3  n:pi/2  n:2pi
+                     n:+pi n:+pi/6 n:+pi/4 n:+pi/3 n:+pi/2 n:+2pi
+                     n:-pi n:-pi/6 n:-pi/4 n:-pi/3 n:-pi/2 n:-2pi
+                     n:machine-epsilon n:sqrt-machine-epsilon
+                     n:euler n:phi n:ln2 n:ln10 n:minlog)
+                  -981.4572492801368)
+    (check-equal? (ulp 1.) n:machine-epsilon)
+    (check-equal? (ulpr 1.) (/ n:machine-epsilon 2))
     (check-true (exact-zero? 0))
     (check-false (exact-zero? 0.))
     (check-true (exact-one? 1))
     (check-false (exact-one? 1.))
     (check-true (one? 1))
     (check-true (one? 1.))
-    (check-false (one? (+ 1 *machine-epsilon*))))
+    (check-false (one? (+ 1 n:machine-epsilon))))
    (test-case
     "sgn"
     (check-equal? (sgn -4.8) -1)
@@ -160,16 +160,16 @@
     (check-exn #px"Out of range -- SAFELOG" (λ () (safelog 0.))))
    (test-case
     "modpi (principal-value)"
-    (check-equal? ((principal-value :pi) 1) 1)
-    (check-equal? ((principal-value :pi/6) 1) (- 1 :2pi))
-    (check-equal? ((principal-value :pi) -4) (+ -4 :2pi))
+    (check-equal? ((principal-value n:pi) 1) 1)
+    (check-equal? ((principal-value n:pi/6) 1) (- 1 n:2pi))
+    (check-equal? ((principal-value n:pi) -4) (+ -4 n:2pi))
     (check-equal? (principal-value-minus-pi-to-pi 1) 1)
-    (check-equal? (principal-value-minus-pi-to-pi 4) (- 4 :2pi))
-    (check-equal? (principal-value-minus-pi-to-pi -4) (+ -4 :2pi))
-    (check-equal? (principal-value-minus-pi-to-pi -4) (+ -4 :2pi))
+    (check-equal? (principal-value-minus-pi-to-pi 4) (- 4 n:2pi))
+    (check-equal? (principal-value-minus-pi-to-pi -4) (+ -4 n:2pi))
+    (check-equal? (principal-value-minus-pi-to-pi -4) (+ -4 n:2pi))
     (check-equal? (principal-value-zero-to-2pi 1) 1)
-    (check-equal? (principal-value-zero-to-2pi -1) (+ -1 :2pi))
-    (check-equal? (principal-value-zero-to-2pi 8) (- 8 :2pi))
+    (check-equal? (principal-value-zero-to-2pi -1) (+ -1 n:2pi))
+    (check-equal? (principal-value-zero-to-2pi 8) (- 8 n:2pi))
     (check-equal? ((principal-range 2) 9/10) 9/10)
     (check-equal? ((principal-range 2) -11/10) 9/10)
     (check-equal? ((principal-range 2) 11/10) -9/10))
@@ -254,7 +254,7 @@
     (check-equal? (softmax (vector 2 2)) #(.5 .5))
     (check-true (apply < (vector->list (softmax (vector -4 2 3 4 5 6)))))
     (check-true (apply > (vector->list (softmax (vector 6 5 4 3 2 -4)))))
-    (check-= (apply + (vector->list (softmax (vector 6 5 4 3 2 -4)))) 1. (* 3 *machine-epsilon*))
+    (check-= (apply + (vector->list (softmax (vector 6 5 4 3 2 -4)))) 1. (* 3 n:machine-epsilon))
     (check-true (andmap (λ (x) (<= 0. x 1.)) (vector->list (softmax (vector 6 5 4 3 2 -4))))))
    
    ))

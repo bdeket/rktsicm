@@ -29,8 +29,8 @@
     (x1 (uniform-random))
 	(x2 (uniform-random)))
     (let ((r (sqrt (* -2.0 (log x1)))))
-      (continue (* r (cos (* 2pi x2)))
-		(* r (sin (* 2pi x2)))))))
+      (continue (* r (cos (* n:2pi x2)))
+		(* r (sin (* n:2pi x2)))))))
 
 (define (gaussian-random)
   (gaussian-random-pair (lambda (x y) x)))

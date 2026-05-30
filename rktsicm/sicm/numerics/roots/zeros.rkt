@@ -41,7 +41,7 @@
      (write-line e)
      (- e (* ecc (sin e)) m))
    0.0
-   2pi
+   n:2pi
    1e-15))
 
 (kepler .99 .01)
@@ -108,7 +108,7 @@
       (cont (- e (* ecc (sin e)) m)
 	    (- 1 (* ecc (cos e)))))
     0.0
-    2pi
+    n:2pi
     1e-15))
 
 (kepler .99 .01)

@@ -55,7 +55,7 @@
 
 
 (define (fpf:make terms)
-  (cond ((null? terms) :zero)
+  (cond ((null? terms) n:zero)
 	((and (null? (cdr terms))
 	      (fpf:constant-term? (car terms)))
 	 (fpf:coefficient (car terms)))
@@ -93,12 +93,12 @@
 	(fpf:make-term (make-list arity 0)
 		       c)))
        
-(define fpf:zero :zero)
-(define fpf:one  :one)
-(define fpf:-one :-one)
+(define fpf:zero n:zero)
+(define fpf:one  n:one)
+(define fpf:-one n:-one)
 
 (define fpf:identity
-  (fpf:make (list (fpf:make-term (list 1) :one))))
+  (fpf:make (list (fpf:make-term (list 1) n:one))))
 
 (define (fpf:new-variables n)
   (make-initialized-list n
@@ -106,7 +106,7 @@
       (fpf:make (list (fpf:make-term
 		       (make-initialized-list n
 			 (lambda (j) (if (fix:= i j) 1 0)))
-		       :one))))))
+		       n:one))))))
 
 
 (define (fpf:same-exponents? fs1 fs2)
@@ -270,7 +270,7 @@
 	((negative? exponent)
 	 (error "No inverse -- FPF:EXPT:" base exponent))
 	(else
-	 (expt-iter base exponent :one))))
+	 (expt-iter base exponent n:one))))
 
 (define (fpf:divide x y #:optional continue)
   (when (default-object? continue) (set! continue list))
@@ -333,7 +333,7 @@
 
 (define (fpf:horner-eval-general terms args add sub mul expt)
   (if (null? terms)
-      :zero
+      n:zero
       (let hloop ((terms (cdr terms))
 		  (exponents (fpf:exponents (car terms)))
 		  (sum (fpf:coefficient (car terms))))

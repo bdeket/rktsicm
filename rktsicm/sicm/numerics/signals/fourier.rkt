@@ -221,7 +221,7 @@
 
 #|
 (define ((test-cos a f phi) t)
-  (* a (cos (+ (* :2pi f t) phi))))
+  (* a (cos (+ (* n:2pi f t) phi))))
 
 (define tc
   (sigfun:make (test-cos 2 8.2 1) (sigfun:make-span -2 +2)))

@@ -932,7 +932,7 @@
 (attach-patch 'tilted S^n-type)
 (attach-coordinate-system 'spherical 'tilted S^n-type
                           (S^n-coordinates
-                           (let ((c (cos :pi/2)) (s (sin :pi/2)))
+                           (let ((c (cos n:pi/2)) (s (sin n:pi/2)))
                              (lambda (n)
                                (s:generate n 'down
                                            (lambda (col)
@@ -1432,8 +1432,8 @@
            (and (up? coords)
                 (fix:= (s:dimension coords) 3)
                 (or (not (number? (ref coords 0)))
-                    (and (not (<= (ref coords 0) (- pi/2)))
-                         (not (>= (ref coords 0) pi/2)))))))
+                    (and (not (<= (ref coords 0) (- n:pi/2)))
+                         (not (>= (ref coords 0) n:pi/2)))))))
         ((coords->point)
          (lambda (coords)
            (if (not ((me 'check-coordinates) coords))

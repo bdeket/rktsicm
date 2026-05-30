@@ -98,12 +98,12 @@
 
 (define series:one 
   (make-series *exactly-one*
-	       (cons-stream :one zero-stream)))
+	       (cons-stream n:one zero-stream)))
 
 (define series:identity
   (make-series *exactly-one*
-	       (cons-stream :zero
-			    (cons-stream :one zero-stream))))
+	       (cons-stream n:zero
+			    (cons-stream n:one zero-stream))))
 
 
 (define (constant-series c #:optional arity)
@@ -163,11 +163,11 @@
 ;;; (a0 + a1*x + a2*x^2 + ...) + (b0 + b1*x + b2*x^2 + ...)
 ;;;   = (a0+b0) + (a1+b1)*x + (a2+b2)*x^2 + ...
 
-(define add-series (combiner-padded-streams g:+ :zero))
+(define add-series (combiner-padded-streams g:+ n:zero))
 
 (define series:add (series-wrapper add-series))
 
-(define sub-series (combiner-padded-streams g:- :zero))
+(define sub-series (combiner-padded-streams g:- n:zero))
 
 (define series:sub (series-wrapper sub-series))
 
@@ -200,7 +200,7 @@
   (accumulation series:mul series:one))
 
 (define (invert-series s)
-  (let ((s0 (g:/ :one (head s))))
+  (let ((s0 (g:/ n:one (head s))))
     (define inverted
       (cons-stream s0
         (mul-series (stream:c*s (g:negate s0) (tail s)) inverted)))
@@ -223,7 +223,7 @@
 	    (series->stream series:one))
            (zuras
 	    (lambda (t e k)
-	      (cons-stream :one
+	      (cons-stream n:one
 		(stream:c*s (generic:/ e k)
 			    (mul-series t
 					(zuras t
@@ -379,7 +379,7 @@
 ;;; To go the other way we need Taylor's theorem to give us a power series:
 
 (define (series:function-> f . opt)
-  (let ((x0 (if (null? opt) :zero (car opt))))
+  (let ((x0 (if (null? opt) n:zero (car opt))))
     (make-series *exactly-one*
 		 (let lp ((i 1) (fn f) (factn 1))
 		   (cons-stream (g:/ (fn x0) factn)

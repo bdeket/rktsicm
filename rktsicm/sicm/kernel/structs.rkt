@@ -219,7 +219,7 @@
   (let ((vv (s:->vector v)))
     (let ((n (vector-length vv)))
       (if (fix:= n 0)
-          :zero
+          n:zero
           (let lp ((i 1) (sum (g:square (vector-ref vv 0))))
             (if (fix:= i n)
                 sum

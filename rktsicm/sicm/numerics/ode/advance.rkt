@@ -192,7 +192,7 @@
 
 (define (lp-norm p #:optional tolerance breakpoints weights)
   (if (default-object? tolerance)
-      (set! tolerance *machine-epsilon*))
+      (set! tolerance n:machine-epsilon))
   (if (default-object? breakpoints)
       (set! breakpoints (lambda (i) *norm-breakpoint*)))
   (if (default-object? weights)
@@ -214,7 +214,7 @@
 
 (define (max-norm #:optional tolerance breakpoints weights)
   (if (default-object? tolerance)
-      (set! tolerance *machine-epsilon*))
+      (set! tolerance n:machine-epsilon))
   (if (default-object? breakpoints)
       (set! breakpoints (lambda (i) *norm-breakpoint*)))
   (if (default-object? weights)

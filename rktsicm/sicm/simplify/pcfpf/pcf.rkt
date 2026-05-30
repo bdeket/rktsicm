@@ -34,8 +34,8 @@
 
 (define-integrable base? number?)
 
-(define-integrable base/zero :zero)
-(define-integrable base/one :one)
+(define-integrable base/zero n:zero)
+(define-integrable base/one n:one)
 
 (define-integrable base/zero? zero?)
 (define-integrable base/one? one?)
@@ -955,7 +955,7 @@ r_{j+n} = z^n r_j + n z^{n-1} q_j + 1/2 n (n-1) z^{n-2} p_j
 	    (define (finish np nq nr ne)
 	      (if (base? a)
 		  (cont np nq (* 2 nr)
-			(* *machine-epsilon* (+ (- ne (magnitude np)) ne)))
+			(* n:machine-epsilon (+ (- ne (magnitude np)) ne)))
 		  (lp next-degree np nq nr ne
 		      (poly/except-leading-term arity a))))
 	    (cond ((fix:= n 1)

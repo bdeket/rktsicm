@@ -1,13 +1,7 @@
 #lang racket/base
 
 (require "parameters.rkt"
-         (except-in "generic.rkt" ;;some constants overwritten in mechanics/../units/constants
-                     :pi   :+pi   :-pi
-                     :2pi  :+2pi  :-2pi
-                     :pi/2 :+pi/2 :-pi/2
-                     :pi/3 :+pi/3 :-pi/3
-                     :pi/4 :+pi/4 :-pi/4
-                     :pi/6 :+pi/6 :-pi/6)
+         "generic.rkt"
          "simplify.rkt"
          "numerics.rkt"
          "poly.rkt"

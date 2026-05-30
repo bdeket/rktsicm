@@ -5,7 +5,7 @@
          racket/list
          "../../simplify/rules.rkt"
          "../../general/notes.rkt"
-         (only-in "../../kernel.rkt" :pi) ;; we need the scmutils-base-environment loaded
+         (only-in "../../kernel.rkt") ;; we need the scmutils-base-environment loaded
          (only-in (submod "../../general/memoize.rkt" ALL) *memoizers* memoizer-fun memoizer-info)
          "../helper.rkt")
 

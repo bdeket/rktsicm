@@ -289,7 +289,7 @@
          (* gMR (cos theta))))
     (check-simplified? (((square derivative) (V_eff 'p_c 'A 'C 'gMR)) 0)
                        '(+ (* -1 gMR) (/ (* 1/4 (expt p_c 2)) A)))
-    (check-= (* (/ 60 2pi) (/ 7.734804457773965e-3 6.6e-5)) 1119.1203302763215 1e-10))
+    (check-= (* (/ 60 n:2pi) (/ 7.734804457773965e-3 6.6e-5)) 1119.1203302763215 1e-10))
    (test-case
     "qw-sysder"
     (define (qw-sysder A B C)

@@ -214,8 +214,8 @@
 (define (dual-zero v)
   (if (structure? v)
       (s:generate (s:length v) (s:opposite v)
-		  (lambda (i) :zero))
-      :zero))
+		  (lambda (i) n:zero))
+      n:zero))
 
 
 ;;; A better definition of Legendre transform that works for

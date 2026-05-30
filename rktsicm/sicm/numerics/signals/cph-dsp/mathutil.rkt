@@ -5,7 +5,9 @@
 (require (only-in "../../../rkt/glue.rkt" if error:wrong-type-argument
                   fix:= fix:< fix:+ fix:* fix:quotient
                   flo:flonum? flo:* flo:+ flo:-)
-         "flovec.rkt" (only-in (submod "flovec.rkt" flo:vector) flo:vector-cons))
+         "flovec.rkt"
+         (only-in (submod "flovec.rkt" flo:vector) flo:vector-cons)
+         "../../../kernel/constants.rkt")
 
 ;;bdk;; start original file
 
@@ -40,13 +42,13 @@
   (- (20log10 delta)))
 
 (define (hz->radians f sampling-rate)
-  (/ (* 2pi f) sampling-rate))
+  (/ (* n:2pi f) sampling-rate))
 
-(define pi
-  (* 4 (atan 1 1)))
+;;brm;;(define pi
+;;brm;;  (* 4 (atan 1 1)))
 
-(define 2pi
-  (* 2 pi))
+;;brm;;(define 2pi
+;;brm;;  (* 2 pi))
 
 (define (square x)
   (* x x))

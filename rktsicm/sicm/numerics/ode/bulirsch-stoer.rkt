@@ -52,7 +52,7 @@
    3					;3 dimensions
    1e-12))				;error tolerated
  #(0.0 1.0 0.0)
- 2pi
+ n:2pi
  0.1
  1.0					;no step larger than 1.0
  (lambda (ns dt h cont)

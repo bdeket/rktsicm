@@ -74,7 +74,7 @@
   (let ((ok? 
          (if (null? params)
              (lambda (a minx b fa fminx fb count)
-               (close-enuf? (max fa fb) fminx (* 10 *machine-epsilon*)))
+               (close-enuf? (max fa fb) fminx (* 10 n:machine-epsilon)))
              (let ((type (car params))
                    (value (cadr params)))
                (cond ((eq? type 'function-tol)
@@ -92,7 +92,7 @@
   (let ((ok? 
          (if (null? params)
              (lambda (a minx b fa fminx fb count)
-               (close-enuf? (max fa fb) fminx (* 10 *machine-epsilon*)))
+               (close-enuf? (max fa fb) fminx (* 10 n:machine-epsilon)))
              (let ((type (car params))
                    (value (cadr params)))
                (cond ((eq? type 'function-tol)
@@ -113,7 +113,7 @@
 (define (brent-min f a b eps)
   (let ((a (min a b)) (b (max a b))
                       (maxcount 100)
-                      (small-bugger-factor *sqrt-machine-epsilon*)
+                      (small-bugger-factor n:sqrt-machine-epsilon)
                       (g (/ (- 3 (sqrt 5)) 2))
                       (d 0) (e 0) (old-e 0) (p 0) (q 0) (u 0) (fu 0))
     (let* ((x (+ a (* g (- b a))))

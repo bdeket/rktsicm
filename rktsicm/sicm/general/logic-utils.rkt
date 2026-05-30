@@ -74,7 +74,7 @@
                (if (= (car rands) (cadr rands)) 'OK (do-false))))
       (else (default-numeric rator rands))))
   (define *assumption-tolerance*
-    (* *assumption-tolerance-multiplier* *machine-epsilon*))
+    (* *assumption-tolerance-multiplier* n:machine-epsilon))
   (cond ((pair? predicate-expression)
          (let ((rator (operator predicate-expression))
                (rands (operands predicate-expression)) )

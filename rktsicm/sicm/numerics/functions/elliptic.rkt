@@ -14,7 +14,7 @@
 
 
 (define Carlson-elliptic-1
-  (let ((eps (expt *machine-epsilon* 1/6))
+  (let ((eps (expt n:machine-epsilon 1/6))
 	(C1 (/ 1. 24.))
 	(C2 0.1)
 	(C3 (/ 3. 44.))
@@ -47,7 +47,7 @@
 
 	
 (define Carlson-elliptic-1-simple
-  (let ((eps (sqrt *machine-epsilon*)))
+  (let ((eps (sqrt n:machine-epsilon)))
     (define (rf1 x y z)
       (let ((av (/ (+ x y z) 3.0)))
 	(if (< (max (abs (/ (- x av) av))
@@ -67,7 +67,7 @@
 
 
 (define Carlson-elliptic-2
-  (let* ((eps (sqrt *machine-epsilon*))
+  (let* ((eps (sqrt n:machine-epsilon))
 	 (C1 (/ -3. 14.)) ; opposite Press
 	 (C2 (/ 1. 6.))
 	 (C3 (/ -9. 22.)) ; opposite Press
@@ -112,7 +112,7 @@
 			     1.))))
 
 (define (complete-elliptic-integral-K k)
-  (elliptic-integral-F pi/2 k))
+  (elliptic-integral-F n:pi/2 k))
 
 (define (elliptic-integral-E phi k)
   (let ((s (sin phi))
@@ -123,7 +123,7 @@
 		 (/ (Carlson-elliptic-2 cc q 1.) 3.)))))))
 
 (define (complete-elliptic-integral-E k)
-  (elliptic-integral-E pi/2 k))
+  (elliptic-integral-E n:pi/2 k))
 
 ;;; older definition of the complete elliptic integrals
 ;;; probably from A&Stegun
@@ -136,8 +136,8 @@
 		 (c k)
 		 (d 0.0)
 		 (powers-2 1.0))
-	(if (< (abs c) *machine-epsilon*)
-	    (let ((first-elliptic-integral (/ pi/2 a)))
+	(if (< (abs c) n:machine-epsilon)
+	    (let ((first-elliptic-integral (/ n:pi/2 a)))
 	      (continue first-elliptic-integral
 			(* first-elliptic-integral 
 			   (- 1.0 (/ d 2.0)))))
@@ -157,7 +157,7 @@
 
 (define (first-elliptic-integral&derivative k cont) ; (cont K dK/dk)
   (if (= k 0.0)
-      (cons pi/2 0.0)
+      (cons n:pi/2 0.0)
       (elliptic-integrals k
          (lambda (Kk Ek)
 	   (cont Kk
@@ -176,7 +176,7 @@
 
 ; (elliptic-integral-F 1. .9)
 ;Value: 1.159661070732199
-; (elliptic-integral-F pi/2 .9)
+; (elliptic-integral-F n:pi/2 .9)
 ;Value: 2.2805491384227703
 ;(first-elliptic-integral .9)
 ;Value: 2.2805491384227703
@@ -201,7 +201,7 @@
 ;;; sn cn dn
 ;;; lisptran of Press
 (define Jacobi-elliptic-functions
-  (let ((eps (sqrt *machine-epsilon*)))
+  (let ((eps (sqrt n:machine-epsilon)))
     (lambda (uu k cont)
       ;; (cont sn cn dn)
       (let ((emc (- 1. (square k)))
@@ -276,11 +276,11 @@
      (lambda (sn cn dc)
        (- phi (asin sn))))))
 
-;;; seems to work for -pi/2 < phi < pi/2 and k<1 
+;;; seems to work for n:-pi/2 < phi < n:pi/2 and k<1 
 ;;; why does the Jacobi program have a branch for k>1?
 
-;;; (elliptic-integral-F (* 40 (/ pi 180)) (sin (* 50 (/ pi 180))))
-;;; (elliptic-integral-E (* 40 (/ pi 180)) (sin (* 50 (/ pi 180))))
+;;; (elliptic-integral-F (* 40 (/ n:pi 180)) (sin (* 50 (/ n:pi 180))))
+;;; (elliptic-integral-E (* 40 (/ n:pi 180)) (sin (* 50 (/n: pi 180))))
 
 
 |#

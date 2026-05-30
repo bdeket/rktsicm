@@ -19,7 +19,6 @@
          "types.rkt"
          )
 
-
 ;;bdk;; start original file
 
 ;;;;    Derived Generic Operators
@@ -53,30 +52,30 @@
   (g:/ (g:cos x) (g:sin x)))
 
 (define (g:sec x)
-  (g:/ :one (g:cos x)))
+  (g:/ n:one (g:cos x)))
 (define (g:csc x)
-  (g:/ :one (g:sin x)))
+  (g:/ n:one (g:sin x)))
 
 
 (define (g:tanh x)
   (g:/ (g:sinh x) (g:cosh x)))
 (define (g:sech x)
-  (g:/ :one (g:cosh x)))
+  (g:/ n:one (g:cosh x)))
 (define (g:csch x)
-  (g:/ :one (g:sinh x)))
+  (g:/ n:one (g:sinh x)))
 
 (define (g:asinh z)
-  (g:log (g:+ z (g:sqrt (g:+ :one (g:square z))))))
+  (g:log (g:+ z (g:sqrt (g:+ n:one (g:square z))))))
 
 (define (g:acosh z)
-  (g:* :two
-       (g:log (g:+ (g:sqrt (g:/ (g:+ z :one) :two))
-		   (g:sqrt (g:/ (g:- z :one) :two))))))
+  (g:* 2
+       (g:log (g:+ (g:sqrt (g:/ (g:+ z n:one) 2))
+		   (g:sqrt (g:/ (g:- z n:one) 2))))))
 
 (define (g:atanh z)
-  (g:/ (g:- (g:log (g:+ :one z))
-	    (g:log (g:- :one z)))
-       :two))
+  (g:/ (g:- (g:log (g:+ n:one z))
+	    (g:log (g:- n:one z)))
+       2))
 
 (define (g:arg-shift f . shifts)
   (define (g . xs)

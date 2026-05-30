@@ -161,7 +161,7 @@
                         (up 'r0 'theta0 'z0))
                        '(up 0 1 0))
     (check-simplified? ((vector-field->components d/dy R3-cyl)
-                        (up 1 pi/2 0))
+                        (up 1 n:pi/2 0))
                        '(up 1. 6.123233995736766e-17 0))
     (check-simplified? ((vector-field->components d/dy R3-cyl)
                         (up 1 0 0))

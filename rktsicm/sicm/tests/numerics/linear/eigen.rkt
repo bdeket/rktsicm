@@ -121,7 +121,7 @@
     (check-within (map car (real-matrix->eigenvalues-eigenvectors A))
                   '(7.7348349570559485 7.9999999999982006 8.265165042945835)
                   1e-10)
-    (check-within (real-matrix->eigenvalues-eigenvectors A (* *machine-epsilon* 1e4))
+    (check-within (real-matrix->eigenvalues-eigenvectors A (* n:machine-epsilon 1e4))
                   '((7.7348349570559485 #(.5 .49999999999999994 -.7071067811865475))
                     (7.9999999999982006 #(-.7071067811865475 .7071067811865475 3.465221769689776e-27))
                     (8.265165042945835 #(-.49999999999999994 -.49999999999999967 -.7071067811865474)))

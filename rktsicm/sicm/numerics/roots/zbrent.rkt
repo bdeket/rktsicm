@@ -42,7 +42,7 @@
 	     (lp iter b fb c fc a fa d e))
 	    (else
 	     (let ((tol1
-		    (+ (* *machine-epsilon* (abs b))
+		    (+ (* n:machine-epsilon (abs b))
 		       (/ tol 2.0)))
 		   (xm (/ (- c b) 2.0)))
 	       (define (next1 p q)
@@ -79,7 +79,7 @@
 		      (next2 d xm)))))))))
 
 #|
-(define *machine-epsilon*
+(define n:machine-epsilon
   (let loop ((e 1.0))
      (if (= 1.0 (+ e 1.0))
          (* 2 e)
@@ -197,13 +197,13 @@
 
 
 (define (kepler ecc m)
-  (define 2pi (* 8 (atan 1 1)))
+  (define n:2pi (* 8 (atan 1 1)))
   (zbrent
    (lambda (e)
      (write-line e)
      (- e (* ecc (sin e)) m))
    0.0
-   2pi
+   n:2pi
    1e-15
    100))
 ;Value: kepler

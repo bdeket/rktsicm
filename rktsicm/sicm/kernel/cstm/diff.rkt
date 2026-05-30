@@ -36,7 +36,7 @@
 	(else (list (make-differential-term '() diff)))))
 
 (define (terms->differential terms)
-  (cond ((null? terms) :zero)
+  (cond ((null? terms) n:zero)
 	((and (null? (cdr terms))
 	      (null? (differential-tags (car terms))))
 	 (differential-coefficient (car terms)))

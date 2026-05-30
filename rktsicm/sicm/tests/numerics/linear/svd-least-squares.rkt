@@ -28,7 +28,7 @@
              (map (lambda (x) (list (cos x) (* 2 (sin x)))) xs)))
 
     (define (xs n)
-      (map (lambda (i) (* 2pi (/ i n))) (iota n)))
+      (map (lambda (i) (* n:2pi (/ i n))) (iota n)))
 
     (define (errors sigma var n)
       (v:generate n (lambda (i) (+ sigma (* var (gaussian-random))))))

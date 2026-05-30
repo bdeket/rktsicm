@@ -242,8 +242,8 @@
          (maxel (vector-accumulate 
                  max
                  (lambda (row)
-                   (vector-accumulate max g:magnitude :zero row))
-                 :zero
+                   (vector-accumulate max g:magnitude n:zero row))
+                 n:zero
                  AA)))
     (lu-decompose-internal AA
                            (lambda (LU permutation sign)
@@ -297,7 +297,7 @@
 
 (define heuristic-zero-test-bugger-factor
   ;; The following default number was assigned by HAL. -- GJS & MH.
-  (make-parameter (* 1000 *machine-epsilon*)))
+  (make-parameter (* 1000 n:machine-epsilon)))
 
 (define (heuristically-zero? z m)
   (< (magnitude z) (* (heuristic-zero-test-bugger-factor) (+ m 1))))

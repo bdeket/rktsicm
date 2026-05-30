@@ -21,8 +21,8 @@
 ;;;   spectrum expanded from frequencies f0 to f1 in M steps.
 
 (define (Fourier-expanded M f0 f1 data)
-  (let ((A (exp (* 2pi +i f0)))
-	(W (exp (* 2pi -i (/ (- f1 f0) M)))))
+  (let ((A (exp (* n:2pi +i f0)))
+	(W (exp (* n:2pi -i (/ (- f1 f0) M)))))
     (chirp-z M A W data)))
 
 ;;; Coded by JW in April 2017.
@@ -73,7 +73,7 @@
 	  (lp (cdr data)
 	      (+ i 1)
 	      (cons (* (car data)
-		       (square (sin (/ (* :pi i)
+		       (square (sin (/ (* n:pi i)
 				       (- N 1)))))
 		    ans))
 	  (reverse ans)))))
@@ -120,8 +120,8 @@
 (define data
   (generate-list 1024
 		 (lambda (n)
-		   (+ (cos (* 8  (/ n 1024) 2pi))
-		      (sin (* 12 (/ n 1024) 2pi))))))
+		   (+ (cos (* 8  (/ n 1024) n:2pi))
+		      (sin (* 12 (/ n 1024) n:2pi))))))
 
 (plot-data win data)
 
@@ -180,7 +180,7 @@
 		(+ i 1)
 		(cons (list (car d)
 			    (* (cadr d)
-			       (square (sin (/ (* pi i)
+			       (square (sin (/ (* n:pi i)
 					       (- N 1))))))
 		      ans)))
 	  (reverse ans)))))
@@ -193,7 +193,7 @@
 	    (lp (cdr data)
 		(+ i 1)
 		(cons (* d
-			 (square (sin (/ (* pi i)
+			 (square (sin (/ (* n:pi i)
 					 (- N 1)))))
 		      ans)))
 	  (reverse ans)))))

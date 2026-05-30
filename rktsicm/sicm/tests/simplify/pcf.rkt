@@ -5,7 +5,7 @@
          "../../simplify/pcfpf/pcf.rkt"
          "../../simplify/pcfpf/pcf-fpf.rkt"
          "../../general/resource-limit.rkt"
-         (only-in "../../kernel-intr.rkt" *machine-epsilon*)
+         (only-in "../../kernel-intr.rkt" n:machine-epsilon)
          "../helper.rkt")
 
 (define P0 (poly/make 2 (list (poly/make 1 '(2 1 0)) 1 0)))
@@ -341,7 +341,7 @@
     
     (check-equal? (poly/horner-with-error 5 1 vector) #(5 0 0 0))
     (check-equal? (poly/horner-with-error (poly/make 1 '(1 0)) 4 vector)
-                  (vector 4 1 0 (* 2 4 *machine-epsilon*)))
+                  (vector 4 1 0 (* 2 4 n:machine-epsilon)))
     (check-exn #px"Wrong arity poly -- POLY/HORNER-WITH-ERROR"
                (λ () (poly/horner-with-error P0 1+i vector)))
     (check-within (poly/horner-with-error (poly/make 1 '(1 0 0 0 1 0 1 0)) 1+i vector)

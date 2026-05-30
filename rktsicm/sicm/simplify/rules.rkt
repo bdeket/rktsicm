@@ -19,6 +19,7 @@
 (require (only-in "../kernel-intr.rkt" kernel:assign-operations))
 (kernel:assign-operations #t) ;; for compose
 (define :symb:pi ':pi) ;;TODO;; this should be in numsymb (as well as a general cleanup of pi :pi n:pi etc)
+(define :pi n:pi)
 
 ;;bdk;; start original file
 

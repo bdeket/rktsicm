@@ -228,7 +228,7 @@
 	      (gt (lineg t)))
 	  (if (or (>= ft f0)
 		  (>= (v:dot-product v gt) 0))
-	      (let* ((result (brent-min linef 0 t *sqrt-machine-epsilon*))
+	      (let* ((result (brent-min linef 0 t n:sqrt-machine-epsilon))
 		     (tstar (car result))
 		     (fstar (cadr result)))
 		(list 'ok (t->x tstar) fstar))
@@ -249,7 +249,7 @@
 (define (fletcher-powell line-search f g x est ftol maxiter)
   (let ((n (vector-length x)))
     (if (null? g) (set! g (generate-gradient-procedure 
-                            f n (* 1000 *machine-epsilon*))))
+                            f n (* 1000 n:machine-epsilon))))
     (let loop ((H (m:make-identity n))
                (x x)
                (fx (f x))
@@ -309,7 +309,7 @@
 (define (bfgs f g x est ftol maxiter)
   (let ((n (vector-length x)))
     (if (null? g) (set! g (generate-gradient-procedure 
-                            f n (* 1000 *machine-epsilon*))))
+                            f n (* 1000 n:machine-epsilon))))
     (let loop ((H (m:make-identity n))
                (x x)
                (fx (f x))

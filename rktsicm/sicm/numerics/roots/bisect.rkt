@@ -41,7 +41,7 @@
      (write-line e)
      (- e (* ecc (sin e)) m))
    0.0
-   2pi))
+   n:2pi))
 
 (kepler .99 .01)
 6.283185307179586
@@ -83,7 +83,7 @@
      (write-line e)
      (- e (* ecc (sin e)) m))
    0.0
-   2pi
+   n:2pi
    1e-15))
 
 (kepler .99 .01)
@@ -127,7 +127,7 @@
      (write-line e)
      (- e (* ecc (sin e)) m))
    0.0
-   2pi
+   n:2pi
    1e-15))
 
 (kepler .99 .01)
@@ -188,7 +188,7 @@
      (write-line e)
      (- e (* ecc (sin e)) m))
    0.0
-   2pi
+   n:2pi
    1e-15
    20))
 

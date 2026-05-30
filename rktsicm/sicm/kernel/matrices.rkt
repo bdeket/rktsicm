@@ -246,7 +246,7 @@
 
 (define (m:make-zero n #:optional m)
   (let ((m (if (default-object? m) n m)))
-    (m:generate n m (lambda (i j) :zero))))
+    (m:generate n m (lambda (i j) n:zero))))
 
 (define (m:zero-like m)
   (let ((z (g:zero-like (matrix-ref m 0 0))))
@@ -257,7 +257,7 @@
 (define (m:make-identity n)
   (m:generate n n
     (lambda (i j)
-      (if (fix:= i j) :one :zero))))
+      (if (fix:= i j) n:one n:zero))))
 
 (define (m:identity? matrix)
   (assert (matrix? matrix)
@@ -292,7 +292,7 @@
       (lambda (i j)
 	(if (fix:= i j)
 	    (vector-ref diag i)
-	    :zero)))))
+	    n:zero)))))
 
 (define (diagonal? matrix)
   (assert (matrix? matrix) "Not a matrix -- DIAGONAL?" matrix)
@@ -628,7 +628,7 @@
 	(else #f)))
 
 (define matinv-general
-  (classical-adjoint-formula :zero :one g:+ g:- g:* g:/ easy-zero?))
+  (classical-adjoint-formula n:zero n:one g:+ g:- g:* g:/ easy-zero?))
 
 (define solve-general
   (Cramers-rule g:+ g:- g:* g:/ easy-zero?))

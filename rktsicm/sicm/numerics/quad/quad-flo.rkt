@@ -4,7 +4,7 @@
 
 (require (only-in "../../rkt/glue.rkt" write-line
                   flo:+ flo:- flo:* flo:/ flo:abs)
-         "../../kernel-intr.rkt"
+         "../../kernel/constants.rkt"
          )
 
 ;;bdk;; start original file
@@ -127,8 +127,8 @@
 
 
 (define *quad-epsilon*
-  (flo:* *machine-epsilon*
-	 *machine-epsilon*))
+  (flo:* n:machine-epsilon
+	 n:machine-epsilon))
 
 (define (quad:square x)
   (quad:* x x))
@@ -244,7 +244,7 @@
 ;;; some other trig functions
 
 (define (compute-quad:pi)
-  (let lp ((guess (->quad pi)))
+  (let lp ((guess (->quad n:pi)))
     (write-line guess)
     (let ((new-guess (quad:+ guess (quad:sin guess))))
       (if (<= (abs (quad:high (quad:- new-guess guess))) *quad-epsilon*)

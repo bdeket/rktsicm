@@ -181,7 +181,7 @@
 
 
 (define-additional-unit SI '&degree
-  "$^\\circ$" "1/360 circle" &angular (/ :2pi 360))
+  "$^\\circ$" "1/360 circle" &angular (/ n:2pi 360))
 
 (define-additional-unit SI '&gram
   "gm" "CGS mass" &kilogram 1/1000)
@@ -232,7 +232,7 @@
   "AU" "Astronomical Unit" &meter 149597870700)
 
 (define-additional-unit SI '&arcsec
-  "arcsec" "arc second" &radian (/ (* 2 :pi) (* 60 60 360)))
+  "arcsec" "arc second" &radian (/ (* 2 n:pi) (* 60 60 360)))
 
 
 (define parsec

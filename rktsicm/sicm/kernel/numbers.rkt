@@ -45,7 +45,7 @@
       n
       (error "Application of a number not allowed in" (cons n args))))
 
-(define (n:deriv n . args) :zero)
+(define (n:deriv n . args) n:zero)
 
 ;;; We rename all of the standard numerical functions to make
 ;;;  it possible to reliably access them, even in a generic
@@ -244,8 +244,8 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 |#
 
 
-(define (an:zero-like n) :zero)
-(define (an:one-like n) :one)
+(define (an:zero-like n) n:zero)
+(define (an:one-like n) n:one)
 
 (assign-operation 'type             n:type             abstract-number?)
 (assign-operation 'type-predicate   n:type-predicate   abstract-number?)

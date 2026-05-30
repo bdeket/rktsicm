@@ -26,7 +26,7 @@
   (let ((n (v:dimension v1)))
     (assert (fix:= n (v:dimension v2))
 	    "Not same dimension -- V:DOT-PRODUCT" (list v1 v2))
-    (let lp ((i 0) (ans :zero))
+    (let lp ((i 0) (ans n:zero))
       (if (fix:= i n)
 	  ans
 	  (lp (fix:+ i 1)

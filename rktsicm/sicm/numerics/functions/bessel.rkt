@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require (only-in "../../rkt/glue.rkt" if fix:= fix:< fix:+ fix:-)
-         "../../kernel-intr.rkt"
+         "../../kernel/constants.rkt"
          )
 
 
@@ -21,8 +21,8 @@
 (define pi (* 4 pi/4))
 |#
 
-(define 2/pi (/ 1 2 pi/4))
-(define 3pi/4 (* 3 pi/4))
+(define n:2/pi (/ 1 2 n:pi/4))
+(define n:3pi/4 (* 3 n:pi/4))
 
 
 ;;; Utilities for special functions
@@ -70,7 +70,7 @@
 	       +.1e+1)))
 	(let* ((z (/ 8.0 ax))		
 	       (y (* z z))
-	       (xx (- ax pi/4))
+	       (xx (- ax n:pi/4))
 	       (p0			;Pzero 6546
 		(/ (poly-by-coeffs->value y
 		     +.8554822541506661710252074e+4
@@ -97,7 +97,7 @@
 		     +.921566975526530895082307e+3
 		     +.74428389741411178824152e+2
 		     +.1e1))))
-	  (* (sqrt (/ 2/pi ax))
+	  (* (sqrt (/ n:2/pi ax))
 	     (- (* (cos xx) p0)
 		(* z (sin xx) q0)))))))
 
@@ -125,7 +125,7 @@
 	       +.1e+1)))
 	(let* ((z (/ 8.0 ax))
 	       (y (* z z))
-	       (xx (- ax 3pi/4))
+	       (xx (- ax n:3pi/4))
 	       (p1			;Pone 6747
 		(/ (poly-by-coeffs->value y
 		     +.1290918471896188077350689e+5
@@ -154,7 +154,7 @@
 		     +.8522392064341340397334e+2
 		     +.1e+1)))
 	       (ans
-		(* (sqrt (/ 2/pi ax))
+		(* (sqrt (/ n:2/pi ax))
 		   (- (* (cos xx) p1)
 		      (* z (sin xx) q1)))))
 	  (if (< x 0.0)
@@ -245,10 +245,10 @@
 		     +1.0		               ;q03
 		     )))
 	  (+ (/ r0 s0)
-	     (* 2/pi (bessj0 x) (log x))))
+	     (* n:2/pi (bessj0 x) (log x))))
 	(let* ((z (/ 8.0 ax))		
 	       (y (* z z))
-	       (xx (- ax pi/4))
+	       (xx (- ax n:pi/4))
 	       (p0			;Pzero 6546
 		(/ (poly-by-coeffs->value y
 		     +.8554822541506661710252074e+4
@@ -275,7 +275,7 @@
 		     +.921566975526530895082307e+3
 		     +.74428389741411178824152e+2
 		     +.1e1))))
-	  (* (sqrt (/ 2/pi ax))
+	  (* (sqrt (/ n:2/pi ax))
 	     (+ (* (sin xx) p0)
 		(* z (cos xx) q0)))))))
 
@@ -305,12 +305,12 @@
 		     +1.0                               ;q03
 		     )))
 	  (+ (/ (* x r0) s0)
-	     (* 2/pi
+	     (* n:2/pi
 		(- (* (bessj1 x) (log x))
 		   (/ 1.0 x)))))
 	(let* ((z (/ 8.0 ax))		
 	       (y (* z z))
-	       (xx (- ax 3pi/4))
+	       (xx (- ax n:3pi/4))
 	       (p1			;Pone 6747
 		(/ (poly-by-coeffs->value y
 		     +.1290918471896188077350689e+5
@@ -337,7 +337,7 @@
 		     +.11191098527047487025919e+4
 		     +.8522392064341340397334e+2
 		     +.1e+1))))
-	  (* (sqrt (/ 2/pi ax))
+	  (* (sqrt (/ n:2/pi ax))
 	     (+ (* (sin xx) p1)
 		(* z (cos xx) q1)))))))
 

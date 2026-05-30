@@ -71,7 +71,7 @@
   '(3 1 3)
   1e-6)
  #( 0.0 1.0 0.0 )
- 2pi
+ n:2pi
  .1
  0.5
  (lambda (ns dt h cont)
@@ -101,7 +101,7 @@
   .0000001				;convergence
   true)					;implicit
  #(0.0 1.0 0.0 1.0)			;initial conditions
- 2pi					;target advance
+ n:2pi					;target advance
  0.1					;initial step
  0.5					;max step
  (lambda (ns dt h cont)

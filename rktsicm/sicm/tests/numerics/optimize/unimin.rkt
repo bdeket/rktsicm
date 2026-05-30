@@ -40,7 +40,7 @@
     (check-equal? (gsmin abs -20 90)
                   (golden-section-min abs -20 90
                                       (λ (a minx b fa fminx fb count)
-                                        (close-enuf? (max fa fb) fminx (* 10 *machine-epsilon*)))))
+                                        (close-enuf? (max fa fb) fminx (* 10 n:machine-epsilon)))))
     (check-equal? (gsmin abs -20 90 'function-tol .3)
                   (golden-section-min abs -20 90
                                       (λ (a minx b fa fminx fb count)
@@ -56,7 +56,7 @@
     (check-equal? (gsmax abs -20 90)
                   (golden-section-max abs -20 90
                                       (λ (a minx b fa fminx fb count)
-                                        (close-enuf? (max fa fb) fminx (* 10 *machine-epsilon*)))))
+                                        (close-enuf? (max fa fb) fminx (* 10 n:machine-epsilon)))))
     (check-equal? (gsmax abs -20 90 'function-tol .3)
                   (golden-section-max abs -20 90
                                       (λ (a minx b fa fminx fb count)

@@ -31,7 +31,7 @@
 
 (define (real-matrix->eigenvalues-eigenvectors matrix #:optional cutoff)
   (if (default-object? cutoff)
-      (set! cutoff (* 1000 *machine-epsilon*)))
+      (set! cutoff (* 1000 n:machine-epsilon)))
   (let ((eigenvalues (matrix->eigenvalues matrix #f)))
     (map (lambda (root)
 	   (let ((m (car root))		; multiplicity
@@ -179,7 +179,7 @@
 (real-matrix->eigenvalues-eigenvectors A)
 ;Value: ((7.7348349570559485) (7.9999999999982006) (8.265165042945835))
 
-(pp (real-matrix->eigenvalues-eigenvectors A (* *machine-epsilon* 1e4)))
+(pp (real-matrix->eigenvalues-eigenvectors A (* n:machine-epsilon 1e4)))
 ((7.7348349570559485 #(-.5 -.49999999999999994 .7071067811865475))
  (7.9999999999982006 #(.7071067811865475 -.7071067811865475 -3.465221769689776e-27))
  (8.265165042945835 #(.49999999999999994 .49999999999999967 .7071067811865474)))

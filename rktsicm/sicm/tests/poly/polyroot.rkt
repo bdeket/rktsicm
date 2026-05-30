@@ -3,7 +3,7 @@
 (require rackunit
          "../../poly/polyroot.rkt"
          "../../rkt/default-object.rkt"
-         (only-in "../../kernel-intr.rkt" *machine-epsilon*)
+         (only-in "../../kernel-intr.rkt" n:machine-epsilon)
          "../../simplify/pcf.rkt"
          "../helper.rkt")
 
@@ -46,7 +46,7 @@
     (check-equal? (cluster-multiple-roots `(1 ,(+ 1 1e-15) 2 ,(+ 2 1e-15) ,(- 2 +1e-15i)) #f) '((2 . 1.0) (3 . 2.0))))
    (test-case
     "bring-to-real"
-    (define eps (* imaginary-part-tolerance *machine-epsilon*))
+    (define eps (* imaginary-part-tolerance n:machine-epsilon))
     (check-equal? (bring-to-real (+ 1 (* +i  99/100 eps))) 1.)
     (check-equal? (bring-to-real (+ 1 (* +i 101/100 eps))) (+ 1 (* +i 101/100 eps))))
    (test-case

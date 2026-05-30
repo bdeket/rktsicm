@@ -72,7 +72,7 @@
 
 (define (roots-of-unity n)
   (let ((n/2 (quotient n 2))
-	(2pi/n (/ 2pi (exact->inexact n))))
+	(2pi/n (/ n:2pi (exact->inexact n))))
     (let loop ((k 0))
       (if (fix:= k n/2)
 	  '()
@@ -85,14 +85,14 @@
 ;;; Useful for testing FFT programs
 
 (define (m-cycles-cos-in-n-samples m n)
-  (let ((w (/ (* 2pi m) n)))
+  (let ((w (/ (* n:2pi m) n)))
     (make-initialized-list
      n
      (lambda (i)
        (cos (* w i))))))
 
 (define (m-cycles-sin-in-n-samples m n)
-  (let ((w (/ (* 2pi m) n)))
+  (let ((w (/ (* n:2pi m) n)))
     (make-initialized-list
      n
      (lambda (i)
@@ -205,7 +205,7 @@
 #|
 ;;; For example, we may:
 
-(define 2pi (* 8 (atan 1 1)))
+(define n:2pi (* 8 (atan 1 1)))
 
 (define ftsg (make-transform-pair-GJS 16))
 (define ftg (cadr ftsg))		; This gets the transform.

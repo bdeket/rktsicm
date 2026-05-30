@@ -9,10 +9,10 @@
 ;;; Some elementary unit conversions
 
 (define (degrees->radians degrees)
-  (* (/ :2pi 360) degrees))
+  (* (/ n:2pi 360) degrees))
 
 (define (radians->degrees radians)
-  (* (/ 360 :2pi) radians))
+  (* (/ 360 n:2pi) radians))
 
 
 (define (xms->x xms)
@@ -39,10 +39,10 @@
 
 
 (define (hours->radians hours)
-  (* (/ :2pi 24) hours))
+  (* (/ n:2pi 24) hours))
 
 (define (radians->hours radians)
-  (* (/ 24 :2pi) radians))
+  (* (/ 24 n:2pi) radians))
 
 
 (define hms->h xms->x)

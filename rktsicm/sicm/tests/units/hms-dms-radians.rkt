@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require rackunit
-         "../../kernel/numeric.rkt"
+         "../../kernel/constants.rkt"
          "../../units/hms-dms-radians.rkt"
          "../helper.rkt")
 
@@ -11,8 +11,8 @@
    "units/hms-dms-radians"
    (test-case
     "degrees<->radians"
-    (check-within (degrees->radians 180) :pi 1e-15)
-    (check-within (radians->degrees :pi) 180 1e-15)
+    (check-within (degrees->radians 180) n:pi 1e-15)
+    (check-within (radians->degrees n:pi) 180 1e-15)
     (for ([i (in-range 10)])
       (define x (- (* (random) 10) 5))
       (check-within (degrees->radians (radians->degrees x)) x 1e-15)))

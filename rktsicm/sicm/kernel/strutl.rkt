@@ -126,17 +126,17 @@
 
 
 (define zero-stream 
-  (cons-stream :zero zero-stream))
+  (cons-stream n:zero zero-stream))
 
 (define one-stream
-  (cons-stream :one one-stream))
+  (cons-stream n:one one-stream))
 
 (define (integers-starting-from n)
   (cons-stream n (integers-starting-from (int:+ n 1))))
 
 
 (define natural-number-stream
-  (cons-stream :one
+  (cons-stream n:one
 	       (stream:+ one-stream
 			 natural-number-stream)))
 
@@ -164,7 +164,7 @@
 (define stream-accumulate
   (access stream-accumulate (->environment '(runtime stream))))
 
-(define (stream-accumulate str [zero :zero])
+(define (stream-accumulate str [zero n:zero])
   (define (helper n str)
     (define nxt (g:+ n (head str)))
     (cons-stream nxt

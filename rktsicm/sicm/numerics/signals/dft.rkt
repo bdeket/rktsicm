@@ -32,7 +32,7 @@
 ;Value: (1 1 1 1 1 1 1 1)
 
 (define (m-cycles-cos-in-n-samples m n)
-  (let ((w (/ (* 2pi m) n)))
+  (let ((w (/ (* n:2pi m) n)))
     (make-initialized-list
      n
      (lambda (i)
@@ -53,7 +53,7 @@
 ;Value: (0 0 0 0 1 0 0 0)
 
 (define (m-cycles-sin-in-n-samples m n)
-  (let ((w (/ (* 2pi m) n)))
+  (let ((w (/ (* n:2pi m) n)))
     (make-initialized-list
      n
      (lambda (i)
@@ -102,35 +102,35 @@
   (map f (iota n (- a) (/ (* 2 a) n))))
 
 #|
-(dft (samples 8 (lambda (x) (cos (* 0 x))) pi))
+(dft (samples 8 (lambda (x) (cos (* 0 x))) n:pi))
 ;Value: (0 0 0 0 1 0 0 0)
 
-(dft (samples 8 (lambda (x) (cos (* 1 x))) pi))
+(dft (samples 8 (lambda (x) (cos (* 1 x))) n:pi))
 ;Value: (0 0 0 1/2 0 1/2 0 0)
 
-(dft (samples 8 (lambda (x) (cos (* 2 x))) pi))
+(dft (samples 8 (lambda (x) (cos (* 2 x))) n:pi))
 ;Value: (0 0 1/2 0 0 0 1/2 0)
 
-(dft (samples 8 (lambda (x) (cos (* 3 x))) pi))
+(dft (samples 8 (lambda (x) (cos (* 3 x))) n:pi))
 ;Value: (0 1/2 0 0 0 0 0 1/2)
 
-(dft (samples 8 (lambda (x) (cos (* 4 x))) pi))
+(dft (samples 8 (lambda (x) (cos (* 4 x))) n:pi))
 ;Value: (1 0 0 0 0 0 0 0)
 
 
-(dft (samples 8 (lambda (x) (sin (* 0 x))) pi))
+(dft (samples 8 (lambda (x) (sin (* 0 x))) n:pi))
 ;Value: (0 0 0 0 0 0 0 0)
 
-(dft (samples 8 (lambda (x) (sin (* 1 x))) pi))
+(dft (samples 8 (lambda (x) (sin (* 1 x))) n:pi))
 ;Value: (0 0 0 -1/2i 0 +1/2i 0 0)
 
-(dft (samples 8 (lambda (x) (sin (* 2 x))) pi))
+(dft (samples 8 (lambda (x) (sin (* 2 x))) n:pi))
 ;Value: (0 0 -1/2i 0 0 0 +1/2i 0)
 
-(dft (samples 8 (lambda (x) (sin (* 3 x))) pi))
+(dft (samples 8 (lambda (x) (sin (* 3 x))) n:pi))
 ;Value: (0 -1/2i 0 0 0 0 0 +1/2i)
 
-(dft (samples 8 (lambda (x) (sin (* 4 x))) pi))
+(dft (samples 8 (lambda (x) (sin (* 4 x))) n:pi))
 ;Value: (0 0 0 0 0 0 0 0)
 
 ;;; It even seems to work.
@@ -138,7 +138,7 @@
 (define x
   (samples 64 (lambda (x)
 		(- (random 1.0) 0.5))
-	   pi))
+	   n:pi))
 
 (define X (dft x))
 

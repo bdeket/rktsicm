@@ -209,12 +209,12 @@
 
 (define (symb:zero? x)
   (cond ((number? x) (zero? x))
-	(else `(= ,:zero ,x))))
+	(else `(= ,n:zero ,x))))
 (addto-symbolic-operator-table 'zero? symb:zero?)
 
 (define (symb:one? x)
   (cond ((number? x) (one? x))
-	(else `(= ,:one ,x))))
+	(else `(= ,n:one ,x))))
 (addto-symbolic-operator-table 'one? symb:one?)
 
 ;;; Support for addition and subtraction
@@ -250,7 +250,7 @@
       (symb:+ x y)))
 
 (define (symb:add:n args)
-  (cond ((null? args) :zero)
+  (cond ((null? args) n:zero)
 	((null? (cdr args)) (car args))
 	(else
 	 (let lp ((args (cddr args))
@@ -300,7 +300,7 @@
       (symb:* x y)))
 
 (define (symb:mul:n args)
-  (cond ((null? args) :one)
+  (cond ((null? args) n:one)
 	((null? (cdr args)) (car args))
 	(else
 	 (let lp ((args (cddr args))
@@ -349,9 +349,9 @@
       (symb:- x y)))
 
 (define (symb:dif:n args)
-  (cond ((null? args) :zero)
+  (cond ((null? args) n:zero)
 	((null? (cdr args))
-         (symb:dif :zero (car args)))
+         (symb:dif n:zero (car args)))
 	(else
 	 (symb:dif (car args)
                    (symb:add:n (cdr args))))))
@@ -404,9 +404,9 @@
       (symb:/ x y)))
 
 (define (symb:quo:n args)
-  (cond ((null? args) :one)
+  (cond ((null? args) n:one)
 	((null? (cdr args))
-         (symb:quo :one (car args)))
+         (symb:quo n:one (car args)))
 	(else
 	 (symb:quo (car args)
                    (symb:mul:n (cdr args))))))
@@ -436,11 +436,11 @@
   (cond ((and (number? b) (number? e))
 	 (expt b e))
 	((number? b)
-	 (cond ;;((zero? b) :zero) ;No! consider 0^{-1}
-	       ((one? b) :one)
+	 (cond ;;((zero? b) n:zero) ;No! consider 0^{-1}
+	       ((one? b) n:one)
 	       (else `(expt ,b ,e))))
 	((number? e)
-	 (cond ((zero? e) :one)
+	 (cond ((zero? e) n:one)
 	       ((one? e) b)
 	       ((and (integer? e) (even? e) (sqrt? b))
 		(symb:expt (car (operands b)) (quotient e 2)))
@@ -455,7 +455,7 @@
 	        (symb:expt (car (operands b))
 			   (* (cadr (operands b)) e)))
 	       ((negative? e)
-		(symb:/ :one (symb:expt b (- e))))
+		(symb:/ n:one (symb:expt b (- e))))
 	       (else `(expt ,b ,e))))
 	(else `(expt ,b ,e))))
 (addto-symbolic-operator-table 'expt symb:expt)
@@ -477,13 +477,13 @@
 (define (negate? exp)
   (and (pair? exp) (eq? (car exp) 'negate)))
 
-(define (symb:negate exp) (symb:- :zero exp))
+(define (symb:negate exp) (symb:- n:zero exp))
 (addto-symbolic-operator-table 'negate symb:negate)
 
 (define (invert? exp)
   (and (pair? exp) (eq? (car exp) 'invert)))
 
-(define (symb:invert exp) (symb:/ :one exp))
+(define (symb:invert exp) (symb:/ n:one exp))
 (addto-symbolic-operator-table 'invert symb:invert)
 
 
@@ -496,7 +496,7 @@
       (if (inexact? exp)
 	  (sqrt exp)
 	  (cond ((zero? exp) exp)
-		((one? exp) :one)
+		((one? exp) n:one)
 		(else
 		 (let ((s (n:sqrt exp)))
 		   (if (exact? s)
@@ -513,7 +513,7 @@
       (if (inexact? x)
 	  (exp x)
 	  (if (zero? x)
-	      :one
+	      n:one
 	      `(exp ,x)))
       `(exp ,x)))
 (addto-symbolic-operator-table 'exp symb:exp)
@@ -527,20 +527,20 @@
       (if (inexact? x)
 	  (log x)
 	  (if (one? x)
-	      :zero
+	      n:zero
 	      `(log ,x)))
       `(log ,x)))
 (addto-symbolic-operator-table 'log symb:log)
 
 (define heuristic-sin-cos-simplify true)
-(define relative-integer-tolerance (* 100 *machine-epsilon*))
+(define relative-integer-tolerance (* 100 n:machine-epsilon))
 (define absolute-integer-tolerance 1e-20)
-(define n:pi/4 (atan 1 1))
-(define n:pi (* 4 n:pi/4))
-(define n:2pi (* 2 n:pi))
-(define n:pi/2 (* 2 n:pi/4))
-(define n:pi/3 (/ n:pi 3))
-(define n:pi/6 (/ n:pi/2 3))
+;;brm;;(define n:pi/4 (atan 1 1))
+;;brm;;(define n:pi (* 4 n:pi/4))
+;;brm;;(define n:2pi (* 2 n:pi))
+;;brm;;(define n:pi/2 (* 2 n:pi/4))
+;;brm;;(define n:pi/3 (/ n:pi 3))
+;;brm;;(define n:pi/6 (/ n:pi/2 3))
 
 (define (almost-integer? x)
   (or (integer? x)
@@ -572,7 +572,7 @@
 (define (n:pi/4-mod-pi? x) (almost-integer? (/ (- x n:pi/4) n:pi)))
 (define (symb:pi/4-mod-pi? x) (memq x '(:pi/4 :+pi/4)))
 
-(define (n:-pi/4-mod-pi? x) (almost-integer? (/ (+ x n:pi/4) :pi)))
+(define (n:-pi/4-mod-pi? x) (almost-integer? (/ (+ x n:pi/4) n:pi)))
 (define (symb:-pi/4-mod-pi? x) (memq x '(:-pi/4)))
 
 (define (sin? exp)
@@ -663,7 +663,7 @@
       (if (inexact? x)
 	  (sec x)
 	  (if (zero? x)
-	      :one
+	      n:one
 	      `(/ 1 ,(symb:cos x))))
       `(/ 1 ,(symb:cos x))))
 (addto-symbolic-operator-table 'sec symb:sec)
@@ -678,14 +678,14 @@
 	  (if (inexact? x)
 	      (atan x)
 	      (if (zero? x)
-		  :zero
+		  n:zero
 		  `(atan ,x)))
 	  `(atan ,x))
       (let ((y x) (x (car opts)))
 	(if (number? y)
 	    (if (exact? y)
 		(if (zero? y)
-		    :zero		;check x=0?
+		    n:zero		;check x=0?
 		    (if (number? x)
 			(if (exact? x)
                             (if (zero? x)
@@ -707,7 +707,7 @@
 	  (if (inexact? x)
 	      (atan x)
 	      (if (zero? x)
-		  :zero
+		  n:zero
 		  `(atan ,x)))
 	  `(atan ,x))
       (let ((y x) (x (car opts)))
@@ -744,7 +744,7 @@
       (if (inexact? x)
 	  (asin x)
 	  (if (zero? x)
-	      :zero
+	      n:zero
 	      `(asin ,x)))
       `(asin ,x)))
 (addto-symbolic-operator-table 'asin symb:asin)
@@ -758,7 +758,7 @@
       (if (inexact? x)
 	  (acos x)
 	  (if (one? x)
-	      :zero
+	      n:zero
 	      `(acos ,x)))
       `(acos ,x)))
 (addto-symbolic-operator-table 'acos symb:acos)
@@ -771,7 +771,7 @@
       (if (inexact? x)
 	  (cosh x)
 	  (if (zero? x)
-	      :one
+	      n:one
 	      `(cosh ,x)))
       `(cosh ,x)))
 (addto-symbolic-operator-table 'cosh symb:cosh)
@@ -785,7 +785,7 @@
       (if (inexact? x)
 	  (sinh x)
 	  (if (zero? x)
-	      :zero
+	      n:zero
 	      `(sinh ,x)))
       `(sinh ,x)))
 (addto-symbolic-operator-table 'sinh symb:sinh)
@@ -889,7 +889,7 @@
     (if (zero? sum)
 	(if (null? pos)
 	    (if (null? neg)
-		:zero
+		n:zero
 		(if (null? (cdr neg))
 		    `(- ,(car neg))
 		    `(- (+ ,@neg))))
@@ -900,13 +900,13 @@
 		(if (null? (cdr pos))
 		    (if (null? (cdr neg))
                         (if (simple:equal? (car pos) (car neg))
-                            :zero
+                            n:zero
                             `(- ,(car pos) ,(car neg)))
 			`(- ,(car pos) (+ ,@neg)))
 		    (if (null? (cdr neg))
 			`(- (+ ,@pos) ,(car neg))
                         (if (simple:equal? pos neg)
-                            :zero
+                            n:zero
                             `(- (+ ,@pos) (+ ,@neg)))))))
 	(if (null? pos)
 	    (if (null? neg)
@@ -919,7 +919,7 @@
 		(if (null? (cdr neg))
 		    `(- (+ ,sum ,@pos) ,(car neg))
 		    `(- (+ ,sum ,@pos) (+ ,@neg)))))))
-  (let plp ((p pos) (sum :zero) (respos '()))
+  (let plp ((p pos) (sum n:zero) (respos '()))
     (cond ((null? p)
 	   (let nlp ((n neg) (sum sum) (resneg '()))
 	     (cond ((null? n)
@@ -994,18 +994,18 @@
       (cond ((and (number? den) (zero? den))
              (error "zero divide in mulup-args"))
             ((and (number? num) (zero? num))
-             :zero)
+             n:zero)
             ((and (number? den) (one? den))
              num)
             ((and (number? num) (number? den))
              (/ num den))
             ((simple:equal? num den)
-             :one)
+             n:one)
             (else
              `(/ ,num ,den)))))
-  (let plp ((p pos) (pfactor :one) (respos '()))
+  (let plp ((p pos) (pfactor n:one) (respos '()))
     (cond ((null? p)
-	   (let nlp ((n neg) (nfactor :one) (resneg '()))
+	   (let nlp ((n neg) (nfactor n:one) (resneg '()))
 	     (cond ((null? n)
 		    (make-answer pfactor
 				 (reverse respos)

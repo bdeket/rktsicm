@@ -35,7 +35,7 @@
 (define (pendulum-oscillating-frequency alpha beta E)
   (let ((k (sqrt (/ (+ E beta) (* 2. beta))))
 	(omega0 (sqrt (abs (/ beta alpha)))))
-    (/ (* pi omega0) (* 2. (first-elliptic-integral k)))))
+    (/ (* n:pi omega0) (* 2. (first-elliptic-integral k)))))
 
 (define (pendulum-oscillating-angle alpha beta E)
   (let ((k (sqrt (/ (+ E beta) (* 2. beta))))
@@ -69,16 +69,16 @@ omega0 period = 4 K the period of sn
 (define (pendulum-oscillating-action alpha beta E)
   (let ((k^2 (/ (+ beta E) (* 2. beta))))
     (if (= k^2 1.)
-	(* (/ 8. pi) (sqrt (* beta alpha)))
+	(* (/ 8. n:pi) (sqrt (* beta alpha)))
 	(elliptic-integrals 
 	 (sqrt k^2)
 	 (lambda (Kk Ek)
-	   (* (/ 8. pi) 
+	   (* (/ 8. n:pi) 
 	      (sqrt (* beta alpha))
 	      (- Ek (* (- 1. k^2) Kk))))))))
 
 (define ((pendulum-oscillating-action-to-E alpha beta) action)
-  (let ((f (/ action (* (/ 8. pi) (sqrt (* beta alpha))))))
+  (let ((f (/ action (* (/ 8. n:pi) (sqrt (* beta alpha))))))
     (let ((k (pendulum-inverse-f f)))
       (* beta (- (* 2. (square k)) 1.)))))
 
@@ -91,26 +91,26 @@ omega0 period = 4 K the period of sn
 	(let ((E ((Hpendulum alpha beta) state)))
 	  (if (> E (- beta))
 	      (let ((k (sqrt (/ (+ E beta) (* 2. beta))))
-		    (period (/ 2pi (pendulum-frequency alpha beta E))))
+		    (period (/ n:2pi (pendulum-frequency alpha beta E))))
 		(let* ((sin-phi (/ (sin (/ theta 2.)) k))
 		       (dt0 (/ (elliptic-integral-F (asin sin-phi) k) omega-0)))
 		  (let ((dt (if (< ptheta 0) (- (/ period 2.) dt0) dt0)))
-		    ((principal-value pi) (* 2pi (/ dt period))))))
+		    ((principal-value n:pi) (* n:2pi (/ dt period))))))
 	      (error "at the fixed point the phase is undefined")))))))
 
 ;;; time from theta=0 to state
 (define ((pendulum-oscillating-dt alpha beta) state)
   (let ((E ((Hpendulum alpha beta) state))
 	(phase ((pendulum-oscillating-phase alpha beta) state)))
-    (let ((period (/ 2pi (pendulum-frequency alpha beta E))))
-      (* phase (/ period 2pi)))))
+    (let ((period (/ n:2pi (pendulum-frequency alpha beta E))))
+      (* phase (/ period n:2pi)))))
 
 (define ((pendulum-oscillating-aa-state-to-state alpha beta) aa-state)
   (let ((angle (state->q aa-state))
 	(action (state->p aa-state)))
     (let* ((E ((pendulum-oscillating-action-to-E alpha beta) action))
-	   (period (/ 2pi (pendulum-frequency alpha beta E))))
-      (let ((dt (* (/ period 2pi) angle)))
+	   (period (/ n:2pi (pendulum-frequency alpha beta E))))
+      (let ((dt (* (/ period n:2pi) angle)))
 	(->H-state (state->t aa-state)
 		   ((pendulum-oscillating-angle alpha beta E) dt)
 		   ((pendulum-oscillating-angular-momentum alpha beta E) dt))))))
@@ -121,7 +121,7 @@ omega0 period = 4 K the period of sn
   (bisect (lambda (E) (- (pendulum-oscillating-action alpha beta E) action))
 	  (- beta)
 	  beta
-	  (* *action-to-E-bugger-factor* *machine-epsilon*)))
+	  (* *action-to-E-bugger-factor* n:machine-epsilon)))
 
 (define *action-to-E-bugger-factor* 1000.)
 
@@ -148,12 +148,12 @@ omega0 period = 4 K the period of sn
 (define (pendulum-circulating-frequency alpha beta E)
   (let ((k (sqrt (/ (* 2. beta) (+ E beta))))
 	    (omegaR (sqrt (abs (/ (+ E beta) (* 2. alpha))))))
-	(/ (* pi omegaR) (first-elliptic-integral k))))
+	(/ (* n:pi omegaR) (first-elliptic-integral k))))
 
 (define (pendulum-circulating-angle alpha beta E)
   (let ((k (sqrt (/ (* 2. beta) (+ E beta))))
 	(omega-R (sqrt (abs (/ (+ E beta) (* 2. alpha)))))
-	(period (/ 2pi (pendulum-frequency alpha beta E))))
+	(period (/ n:2pi (pendulum-frequency alpha beta E))))
     (lambda (time)
       (Jacobi-elliptic-functions 
        (* omega-R ((principal-range period) time))
@@ -164,7 +164,7 @@ omega0 period = 4 K the period of sn
 (define (pendulum-circulating-angular-momentum alpha beta E)
   (let ((k (sqrt (/ (* 2. beta) (+ E beta))))
 	(omega-R (sqrt (abs (/ (+ E beta) (* 2. alpha)))))
-	(period (/ 2pi (pendulum-frequency alpha beta E))))
+	(period (/ n:2pi (pendulum-frequency alpha beta E))))
     (lambda (time)
       (Jacobi-elliptic-functions 
        (* omega-R ((principal-range period) time))
@@ -195,12 +195,12 @@ program would not work without the principal-range call
 (define (pendulum-circulating-action alpha beta E)
   (let* ((k (sqrt (/ (* 2. beta) (+ beta E))))
 	 (Ek (second-elliptic-integral k)))
-    (* (/ 4. pi) 
+    (* (/ 4. n:pi) 
        (sqrt (* beta alpha))
        (/ Ek k))))
 
 (define ((pendulum-circulating-action-to-E alpha beta) action)
-  (let ((g (/ action (* (/ 4. pi) (sqrt (* beta alpha))))))
+  (let ((g (/ action (* (/ 4. n:pi) (sqrt (* beta alpha))))))
     (let ((k (pendulum-inverse-g g)))
       (let ((k^2 (square k)))
 	(/ (* beta (- 2. k^2)) k^2)))))  
@@ -212,25 +212,25 @@ program would not work without the principal-range call
     (let ((E ((Hpendulum alpha beta) state)))
       (let ((k (sqrt (/ (* 2. beta) (+ E beta))))
 	    (omega-R (sqrt (abs (/ (+ E beta) (* 2. alpha)))))
-	    (period (/ 2pi (pendulum-frequency alpha beta E))))
+	    (period (/ n:2pi (pendulum-frequency alpha beta E))))
 	(let ((dt (/ (elliptic-integral-F 
-		      (/ ((principal-value pi) theta) 2.) k)
+		      (/ ((principal-value n:pi) theta) 2.) k)
 		     omega-R)))
-	  ((principal-value pi) (* 2pi (/ dt period))))))))
+	  ((principal-value n:pi) (* n:2pi (/ dt period))))))))
 	  
 ;;; time from theta=0 to state
 (define ((pendulum-circulating-dt alpha beta) state)
   (let ((E ((Hpendulum alpha beta) state))
 	(phase ((pendulum-circulating-phase alpha beta) state)))
-    (let ((period (/ 2pi (pendulum-frequency alpha beta E))))
-      (* phase (/ period 2pi)))))
+    (let ((period (/ n:2pi (pendulum-frequency alpha beta E))))
+      (* phase (/ period n:2pi)))))
 
 (define ((pendulum-circulating-aa-state-to-state alpha beta) aa-state)
   (let ((angle (state->q aa-state))
 	(action (state->p aa-state)))
     (let* ((E ((pendulum-circulating-action-to-E alpha beta) action))
-	   (period (/ 2pi (pendulum-frequency alpha beta E))))
-      (let ((dt (* (/ period 2pi) angle)))
+	   (period (/ n:2pi (pendulum-frequency alpha beta E))))
+      (let ((dt (* (/ period n:2pi) angle)))
 	(->H-state (state->t aa-state)
 		   ((pendulum-circulating-angle alpha beta E) dt)
 		   ((pendulum-circulating-angular-momentum alpha beta E) dt))))))
@@ -241,7 +241,7 @@ program would not work without the principal-range call
   (bisect (lambda (E) (- (pendulum-circulating-action alpha beta E) action))
 	  beta
 	  (+ (/ (square action) (* 2. alpha)) beta)
-	  (* *action-to-E-bugger-factor* *machine-epsilon*)))
+	  (* *action-to-E-bugger-factor* n:machine-epsilon)))
 |#
 
 #|
@@ -297,15 +297,15 @@ program would not work without the principal-range call
     (sqrt (* 2. alpha beta (+ 1. (cos theta))))))
 
 (define (gudermannian x)
-  (- (* 2. (atan (exp x))) pi/2))
+  (- (* 2. (atan (exp x))) n:pi/2))
 
 (define (inverse-gudermannian x)
-  (log (tan (+ (/ x 2.) pi/4))))
+  (log (tan (+ (/ x 2.) n:pi/4))))
 
 
 ;;; area of "eye"
 (define (pendulum-separatrix-action alpha beta)
-  (* (/ 8. pi) (sqrt (* alpha beta))))
+  (* (/ 8. n:pi) (sqrt (* alpha beta))))
 
 ;;;----------------------------------------------------------------
 ;;; pendulum state advancer
@@ -342,7 +342,7 @@ program would not work without the principal-range call
 	 ((state-advancer pendulum-sysder alpha beta)
 	  state (- time (state->t state)) eps)))
     (->H-state (state->t state2)
-	     ((principal-value pi) (state->q state2))
+	     ((principal-value n:pi) (state->q state2))
 	     (state->p state2))))
   
 
@@ -548,8 +548,8 @@ Lower circulation region:
 		  ((pendulum-circulating-state-to-aa-state alpha beta)
 		   state)))
 	     (->H-state (state->t state)
-			((principal-value pi)
-			 (- pi (* 0.5 (state->q aa-state))))
+			((principal-value n:pi)
+			 (- n:pi (* 0.5 (state->q aa-state))))
 			(* 2.0 (state->p aa-state)))))
 	  ((= E beta)
 	   'go-figure))))
@@ -562,7 +562,7 @@ Lower circulation region:
 	(cond ((< action separatrix-action)
 	       ((pendulum-oscillating-aa-state-to-state alpha beta) aa-state))
 	      ((> action separatrix-action)
-	       (if (and (< angle pi/2) (>= angle -pi/2))
+	       (if (and (< angle n:pi/2) (>= angle n:-pi/2))
 		   ((pendulum-circulating-aa-state-to-state alpha beta)
 		    (->H-state (state->t aa-state)
 			       (* 2. (state->q aa-state))
