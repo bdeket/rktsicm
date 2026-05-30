@@ -8,18 +8,18 @@
 
 (define (try . n)
   (let* ((f (pcf:expression-> (expression (apply F n)) (lambda (p v) p)))
-	 (g (pcf:expression-> (expression (apply G n)) (lambda (p v) p)))
-	 (ans 'start))
+         (g (pcf:expression-> (expression (apply G n)) (lambda (p v) p)))
+         (ans 'start))
     ;(display "\n\nEuclid:\n")
     (set! ans (poly/gcd-euclid f g))
     (if (or (poly/not-divisible? f ans)
-	    (poly/not-divisible? g ans))
-	(error "Bad gcd euclid" f g ans))
+            (poly/not-divisible? g ans))
+        (error "Bad gcd euclid" f g ans))
     ;(display "\n\nSparse:\n")
     (set! ans (poly/gcd-sparse f g))
     (if (or (poly/not-divisible? f ans)
-	    (poly/not-divisible? g ans))
-	(error "Bad gcd sparse" f g ans)))
+            (poly/not-divisible? g ans))
+        (error "Bad gcd sparse" f g ans)))
   'done)
 (define (F nu)
   (* (+ 'x (sigma (lambda (i) (symbol 'y i)) 1 nu) 1)
@@ -42,7 +42,7 @@
               (* (+ (square 'x) (sigma (lambda (i) (symbol 'y i)) 1 nu) 1)
                  (+ (* -3 'y1 (square 'x)) (square 'y1) 1))))
     (rkt:time (void (try 4) (try 5) (try 6) (check-true #t))))
-   
+
    (test-case
     "Case 2: Linearly dense quartic inputs with quadratic gcd"
     (define (H nu)
@@ -54,7 +54,7 @@
               (* (H nu)
                  (square (+ 'x (sigma (lambda (i) (symbol 'y i)) 1 nu) 2)))))
     (rkt:time (void (try 5) (try 6) (try 7) (check-true #t))))
-   
+
    (test-case
     "Case 3: Sparse GCD and inputs where degrees are proportional to the number of variables"
     (define (H nu)
@@ -78,7 +78,7 @@
                            1 nu)
                     2))))
     (rkt:time (void (try 8) (try 9) (try 10) (check-true #t))))
-   
+
    (test-case
     "Case 3': Alternatively"
     (define (H nu)

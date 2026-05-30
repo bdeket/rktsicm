@@ -25,7 +25,7 @@
        #'(rule-simplifier compiled-rules))]))
 
 #;(define-syntax rule-system
-  (sc-macro-transformer
-   (lambda (form environment)
-     environment
-     `(rule-simplifier (list ,@(map rule:compile (cdr form)))))))
+    (sc-macro-transformer
+     (lambda (form environment)
+       environment
+       `(rule-simplifier (list ,@(map rule:compile (cdr form)))))))

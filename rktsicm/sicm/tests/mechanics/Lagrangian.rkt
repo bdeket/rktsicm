@@ -199,7 +199,7 @@
 ;;; For example, consider the Harmonic oscillator with
 ;;;  spring constant, k, and mass, m.
     (define ((L-harmonic m k) local)
-      (let ((q (coordinate local)) 
+      (let ((q (coordinate local))
             (v (velocity local)))
         (- (* 1/2 m (square v))
            (* 1/2 k (square q)))))
@@ -242,7 +242,7 @@
             (v (velocity local)))
         (- (* 1/2 m (square v))
            (V (sqrt (square q))))))
-    (check-simplified? (((Lagrange-equations 
+    (check-simplified? (((Lagrange-equations
                           (L-central-rectangular 'm (literal-function 'V)))
                          (coordinate-tuple (literal-function 'x) (literal-function 'y)))
                         't)
@@ -257,7 +257,7 @@
     "central-polar"
     ;;; Consider planar motion in a central force field, with an arbitrary
     ;;; potential, U, depending only on the radius.  The generalized
-    ;;; coordinates are polar. 
+    ;;; coordinates are polar.
     (define ((L-central-polar m V) local)
       (let ((q (coordinate local))
             (qdot (velocity local)))
@@ -284,7 +284,7 @@
     ;;; which turns out to be T+V.
     (check-simplified? ((compose
                           (Lagrangian->energy (L-central-polar 'm (literal-function 'U)))
-                          (Gamma 
+                          (Gamma
                            (coordinate-tuple (literal-function 'r) (literal-function 'phi))))
                          't)
                        '(+ (* 1/2 m (expt (r t) 2) (expt ((D phi) t) 2))
@@ -321,7 +321,7 @@
     "Pendulum"
     ;;; Pendulum of mass m2 and length b, hanging from a support of mass
     ;;; m1 that is free to move horizontally (from Groesberg, Advanced
-    ;;; Mechanics, p. 72) 
+    ;;; Mechanics, p. 72)
     (define ((L-sliding-pend m1 m2 b g) state)
       (let ((q (coordinate state))
             (qdot (velocity state)))
@@ -485,7 +485,7 @@
                          (* m (expt r 2) (expt phidot 2) (cos theta) (sin theta))
                          0))
     (check-simplified? (((partial 2) (L3-central 'm (literal-function 'V)))
-                        (->local 't 
+                        (->local 't
                                  (coordinate-tuple 'r 'theta 'phi)
                                  (velocity-tuple 'rdot 'thetadot 'phidot)))
                        '(down (* m rdot)

@@ -14,7 +14,7 @@
                       (* (bessj n x) (bessy (+ n 1) x))
                       (/ 2 (* n:pi x)))
                    (/ 2 (* n:pi x))))
-              
+
               (check-within (let lp ((x .0001) (worstx 0.0) (relerr 0.0))
                    (if (> x 20)
                        (list worstx relerr)

@@ -12,19 +12,19 @@
 ;;bdk;; start original file
 
 (define (interior-product X)
-  (assert (vector-field? X) "X not a vector field: interior-product")  
+  (assert (vector-field? X) "X not a vector field: interior-product")
   (define (ix alpha)
     (assert (form-field? alpha) "alpha not a form field: interior-product")
     (let ((p (get-rank alpha)))
       (assert (> p 0) "Rank of form not greater than zero: interior-product")
       (define (the-product . args)
-	(assert (= (length args) (- p 1))
-		"Wrong number of arguments to interior product")
-	(apply alpha (cons X args)))
+        (assert (= (length args) (- p 1))
+                "Wrong number of arguments to interior product")
+        (apply alpha (cons X args)))
       (procedure->nform-field the-product
-			      (- p 1)
-			      `((interior-product ,(diffop-name X))
-				,(diffop-name alpha)))))
+                              (- p 1)
+                              `((interior-product ,(diffop-name X))
+                                ,(diffop-name alpha)))))
   ix)
 
 #|
@@ -41,13 +41,13 @@
 
 (define alpha
   (compose (literal-function 'alpha (-> (UP Real Real Real) Real))
-	   (R3-rect '->coords)))
+           (R3-rect '->coords)))
 (define beta
   (compose (literal-function 'beta (-> (UP Real Real Real) Real))
-	   (R3-rect '->coords)))
+           (R3-rect '->coords)))
 (define gamma
   (compose (literal-function 'gamma (-> (UP Real Real Real) Real))
-	   (R3-rect '->coords)))
+           (R3-rect '->coords)))
 
 (define omega
   (+ (* alpha (wedge dx dy))
@@ -60,7 +60,7 @@
 
 
 (pec ((- (((Lie-derivative X) omega) Y Z)
-	 (((L1 X) omega) Y Z))
+         (((L1 X) omega) Y Z))
       ((R3-rect '->point) (up 'x0 'y0 'z0))))
 #| Result:
 0
@@ -68,16 +68,16 @@
 
 (pec (let ((omega (literal-1form-field 'omega R3-rect)))
        ((- (((Lie-derivative X) omega) Y)
-	   (((L1 X) omega) Y))
-	((R3-rect '->point) (up 'x0 'y0 'z0)))))
+           (((L1 X) omega) Y))
+        ((R3-rect '->point) (up 'x0 'y0 'z0)))))
 #| Result:
 0
 |#
 
 (pec (let ((omega (* alpha (wedge dx dy dz))))
        ((- (((Lie-derivative X) omega) Y Z W)
-	   (((L1 X) omega) Y Z W))
-	((R3-rect '->point) (up 'x0 'y0 'z0)))))
+           (((L1 X) omega) Y Z W))
+        ((R3-rect '->point) (up 'x0 'y0 'z0)))))
 #| Result:
 0
 |#

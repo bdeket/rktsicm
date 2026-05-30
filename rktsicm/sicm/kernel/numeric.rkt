@@ -89,7 +89,7 @@
 ;;brm;;         (* 2 e)
 ;;brm;;         (loop (/ e 2)))))
 
-;;; In 64-bit IEEE-754 floating point 
+;;; In 64-bit IEEE-754 floating point
 ;;; *machine-epsilon* = 2.220446049250313e-16 = 2^(-52)
 
 
@@ -97,8 +97,8 @@
 ;;;  number after x.
 
 (define (ulp x)
- (let ((x (abs (exact->inexact x))))
-   (- (* x (+ 1 n:machine-epsilon)) x)))
+  (let ((x (abs (exact->inexact x))))
+    (- (* x (+ 1 n:machine-epsilon)) x)))
 
 ;;; (ulp 1.0) = n:machine-epsilon
 ;;; (ulp 2.0) = 2*(ulp 1.0)
@@ -155,20 +155,20 @@
   (let ((cutlow (- cuthigh n:+2pi)))
     (define (the-principal-value x)
       (if (and (<= cutlow x) (< x cuthigh))
-	  x
-	  (let ((y (- x (* n:+2pi (floor (/ x n:+2pi))))))
-	    (if (< y cuthigh) 
-		y
-		(- y n:+2pi)))))
+          x
+          (let ((y (- x (* n:+2pi (floor (/ x n:+2pi))))))
+            (if (< y cuthigh)
+                y
+                (- y n:+2pi)))))
     the-principal-value))
 
 
 (define (principal-value-minus-pi-to-pi x)
   (if (or (<= x n:-pi) (> x n:+pi))
       (let ((y (- x (* n:+2pi (floor (/ x n:+2pi))))))
-	(if (< y n:+pi) 
-	    y
-	    (- y n:+2pi)))
+        (if (< y n:+pi)
+            y
+            (- y n:+2pi)))
       x))
 
 (define (principal-value-zero-to-2pi x)
@@ -184,7 +184,7 @@
         (- t period))))
 
 
-(define (one? x) (= x 1))		; Exactness?
+(define (one? x) (= x 1))                ; Exactness?
 
 (define (square x) (* x x))
 (define (cube x) (* x x x))
@@ -220,8 +220,8 @@
 (define (factorial n)
   (define (f n)
     (if (= n 0)
-	1
-	(* n (f (- n 1)))))
+        1
+        (* n (f (- n 1)))))
   (assert (and (exact-integer? n) (not (negative? n))))
   (f n))
 
@@ -235,12 +235,12 @@
     (linear-memoize
      (lambda (n k)
        (cond ((int:= n 0)
-	      (if (int:= k 0) 1 0))
-	     (else
-	      (let ((np (int:- n 1)))
-		(int:+ (lp np (int:- k 1))
-		       (int:* np
-			      (lp np k)))))))
+              (if (int:= k 0) 1 0))
+             (else
+              (let ((np (int:- n 1)))
+                (int:+ (lp np (int:- k 1))
+                       (int:* np
+                              (lp np k)))))))
      0))
   (lp n k))
 
@@ -273,11 +273,11 @@
     (linear-memoize
      (lambda (n k)
        (cond ((int:= k 1) 1)
-	     ((int:= n k) 1)
-	     (else
-	      (let ((np (int:- n 1)))
-		(int:+ (* k (lp np k))
-		       (lp np (int:- k 1)))))))
+             ((int:= n k) 1)
+             (else
+              (let ((np (int:- n 1)))
+                (int:+ (* k (lp np k))
+                       (lp np (int:- k 1)))))))
      0))
   (lp n k))
 
@@ -293,15 +293,15 @@
       (= x 0)
       (<= (magnitude x)
           (* (if (default-object? slack)
-		         100
-				 slack)
+                 100
+                 slack)
              n:machine-epsilon))))
 
 
 (define (close-enuf? h1 h2 tolerance)
   (<= (magnitude (- h1 h2))
       (* .5 (max tolerance n:machine-epsilon)
-	 (+ (magnitude h1) (magnitude h2) 2.0))))
+         (+ (magnitude h1) (magnitude h2) 2.0))))
 
 #|
 ;;; When really paranoid, put in a scale factor
@@ -314,27 +314,27 @@
   (<= (magnitude (- h1 h2))
       (* tolerance
          (+ (* 0.5
-	       (+ (magnitude h1) (magnitude h2)))
-	    scale))))
+               (+ (magnitude h1) (magnitude h2)))
+            scale))))
 |#
 
 #|
-;;; See below for the reason for using 
+;;; See below for the reason for using
 ;;;  the more complex addition formula.
 
 (define (sigma f low high)
   (let lp ((i low) (sum 0))
     (if (fix:> i high)
-	sum
-	(lp (fix:+ i 1) (+ sum (f i))))))
+        sum
+        (lp (fix:+ i 1) (+ sum (f i))))))
 
 
 (define (sigma-Kahan f low high)
   (let lp ((i low) (sum 0) (c 0))
     (if (fix:> i high)
-	sum
-	(let* ((y (- (f i) c)) (t (+ sum y)))
-	  (lp (fix:+ i 1) t (- (- t sum) y))))))
+        sum
+        (let* ((y (- (f i) c)) (t (+ sum y)))
+          (lp (fix:+ i 1) t (- (- t sum) y))))))
 
 #The following version is better.
 |#
@@ -342,7 +342,7 @@
 (define (sigma-KahanBabushkaNeumaier f low high)
   (let lp ((i low) (sum 0) (c 0))
     (if (fix:> i high)
-	(+ sum c)
+        (+ sum c)
         (let ((fv (f i)))
           (let ((t (+ sum fv)))
             (lp (+ i 1)
@@ -358,7 +358,7 @@
 (define sigma sigma-KahanBabushkaNeumaier)
 #|
 ;;; When adding up 1/n large-to-small we
-;;; get a different answer than when adding 
+;;; get a different answer than when adding
 ;;; them up small-to-large, which is more
 ;;; accurate.
 
@@ -386,9 +386,9 @@
 (define (sigma-kahan f low high)
   (let lp ((i low) (sum 0) (c 0))
     (if (fix:> i high)
-	sum
-	(let* ((y (- (f i) c)) (t (+ sum y)))
-	  (lp (fix:+ i 1) t (- (- t sum) y))))))
+        sum
+        (let* ((y (- (f i) c)) (t (+ sum y)))
+          (lp (fix:+ i 1) t (- (- t sum) y))))))
 ;Value: sigma-kahan
 
 (sigma-kahan (lambda (x) (/ 1.0 x)) 1 10000000)
@@ -430,33 +430,33 @@
   (define (sigma-KahanBabushkaNeumaier f low high)
     (let lp ((i low) (sum 0) (c 0))
       (if (fix:> i high)
-	  sum
-	  (let* ((y (- (f i) c)) (t (+ sum y)))
-	    (lp (fix:+ i 1) t (- (- t sum) y))))))
+          sum
+          (let* ((y (- (f i) c)) (t (+ sum y)))
+            (lp (fix:+ i 1) t (- (- t sum) y))))))
   (let lp> ((k 0) (sum 0.0))
     (if (> k n)
-	(write-line `(forward-order ,sum))
-	(lp> (+ k 1) (+ sum (* a (expt r k))))))
+        (write-line `(forward-order ,sum))
+        (lp> (+ k 1) (+ sum (* a (expt r k))))))
   (write-line
    `(g:sigma
-     ,(g:sigma				;generic sigma is naive
+     ,(g:sigma                                ;generic sigma is naive
        (lambda (k)
-	 (exact->inexact (* a (expt r k))))
+         (exact->inexact (* a (expt r k))))
        0 n)))
   (let lp< ((k n) (sum 0.0))
     (if (< k 0)
-	(write-line `(reverse-order ,sum))
-	(lp< (- k 1) (+ sum (* a (expt r k))))))
+        (write-line `(reverse-order ,sum))
+        (lp< (- k 1) (+ sum (* a (expt r k))))))
   (write-line
    `(sigma-KahanBabushkaNeumaier
      ,(sigma-KahanBabushkaNeumaier
        (lambda (k)
-	 (exact->inexact (* a (expt r k))))
-       0 n)))  
+         (exact->inexact (* a (expt r k))))
+       0 n)))
   (write-line
    `(explicit-formula
      ,(exact->inexact (/ (* a (- 1 (expt r (+ n 1))))
-			 (- 1 r)))))
+                         (- 1 r)))))
   'done)
 
 (geometric 1 0.5001 200)
@@ -468,18 +468,18 @@
 ;Value: done
 |#
 
-;;; The following is arbitrary, but chosen to make Euclid's algorithm 
+;;; The following is arbitrary, but chosen to make Euclid's algorithm
 ;;; for polynomials over the rationals (defined with pseudo-division)
 ;;; have only small fractions.
 
 (define make-rational
-  (λ (n d)(assert (exact-integer? n))(assert (exact-integer? d))(/ n d)) #;  
+  (λ (n d)(assert (exact-integer? n))(assert (exact-integer? d))(/ n d)) #;
   (access make-rational (->environment '(runtime number))))
 
-#| Wrong    
+#| Wrong
 (define (gcd-rational p/q r/s)
   (make-rational (gcd (numerator p/q) (numerator r/s))
-		 (lcm (denominator p/q) (denominator r/s))))
+                 (lcm (denominator p/q) (denominator r/s))))
 |#
 
 (define (gcd-rational p/q r/s)
@@ -492,7 +492,7 @@
 
 (define (round-complex z)
   (make-rectangular (round (real-part z))
-		    (round (imag-part z))))
+                    (round (imag-part z))))
 
 (define (complex-denominator z)
   (lcm (denominator (real-part z)) (denominator (imag-part z))))
@@ -511,24 +511,24 @@
 
 (define (scheme-number-gcd x y)
   (cond ((or (inexact? x) (inexact? y)) 1)
-	((and (exact-integer? x) (exact-integer? y))
-	 (gcd x y))
-	((and (exact-rational? x) (exact-rational? y))
-	 (gcd-rational x y))
-	((and (exact-complex? x) (exact-complex? y))
-	 (gcd-complex x y))
-	(else 1)))
+        ((and (exact-integer? x) (exact-integer? y))
+         (gcd x y))
+        ((and (exact-rational? x) (exact-rational? y))
+         (gcd-rational x y))
+        ((and (exact-complex? x) (exact-complex? y))
+         (gcd-complex x y))
+        (else 1)))
 
 
 (define *no-rationals-in-divide* (make-parameter #f))
 
 (define (scheme-number-divide n d c)
   (if (and (*no-rationals-in-divide*)
-	   (exact-integer? n)
-	   (exact-integer? d))
+           (exact-integer? n)
+           (exact-integer? d))
       (let ((qr (integer-divide n d)))
-	(c (integer-divide-quotient qr)
-	   (integer-divide-remainder qr)))
+        (c (integer-divide-quotient qr)
+           (integer-divide-remainder qr)))
       (c (/ n d) 0)))
 
 
@@ -536,44 +536,44 @@
 (define (sgn x)
   (if (real? x)
       (if (negative? x) -1 +1)
-      ;; This is a kludge, needed so that rational 
-      ;; functions can be canonicalized, even if 
+      ;; This is a kludge, needed so that rational
+      ;; functions can be canonicalized, even if
       ;; coefficients are complex.
       (if (negative? (real-part x)) -1 +1)))
-  
+
 
 
 ;;; From Hamming, gives roots of quadratic without bad roundoff.
 ;;; a*x^2 + b*x + c = 0
 
 (define (quadratic a b c
-		   ;; continuations for each case
-		   two-roots
-		   #:optional
-		   complex-roots
-		   double-root
-		   linear
-		   no-solution)
+                   ;; continuations for each case
+                   two-roots
+                   #:optional
+                   complex-roots
+                   double-root
+                   linear
+                   no-solution)
   (if (zero? a)
       (if (zero? b)
-	  (if (default-object? no-solution)
-	      (error "No solution -- QUADRATIC" a b c)
-	      (no-solution a b c))
-	  (if (default-object? linear)
-	      (error "Not QUADRATIC" a b c)
-	      (linear (/ (- c) b))))
+          (if (default-object? no-solution)
+              (error "No solution -- QUADRATIC" a b c)
+              (no-solution a b c))
+          (if (default-object? linear)
+              (error "Not QUADRATIC" a b c)
+              (linear (/ (- c) b))))
       (let ((d (- (* b b) (* 4 a c))))
-	(if (zero? d)
-	    (let ((root (/ b (* -2 a))))
-	      (if (default-object? double-root)
-		  (two-roots root root)
-		  (double-root root)))
-	    (let ((q (* -1/2 (+ b (* (sgn b) (sqrt d))))))
-	      (let ((r1 (/ q a)) (r2 (/ c q)))
-		(if (or (> d 0)
-			(default-object? complex-roots))
-		    (two-roots r1 r2)
-		    (complex-roots r1 r2))))))))
+        (if (zero? d)
+            (let ((root (/ b (* -2 a))))
+              (if (default-object? double-root)
+                  (two-roots root root)
+                  (double-root root)))
+            (let ((q (* -1/2 (+ b (* (sgn b) (sqrt d))))))
+              (let ((r1 (/ q a)) (r2 (/ c q)))
+                (if (or (> d 0)
+                        (default-object? complex-roots))
+                    (two-roots r1 r2)
+                    (complex-roots r1 r2))))))))
 
 
 ;;; From Numerical Recipes... for real coefficients
@@ -581,20 +581,20 @@
 
 (define (cubic a b c cont)
   (let ((q (/ (- (square a) (* 3 b)) 9))
-	(r (/ (+ (* 2 (cube a)) (* -9 a b) (* 27 c)) 54)))
+        (r (/ (+ (* 2 (cube a)) (* -9 a b) (* 27 c)) 54)))
     (let ((aa
-	   (* -1
-	      (sgn r)
-	      (expt (+ (abs r)
-		       (sqrt (- (square r) (cube q))))
-		    1/3))))
+           (* -1
+              (sgn r)
+              (expt (+ (abs r)
+                       (sqrt (- (square r) (cube q))))
+                    1/3))))
       (let ((bb (if (zero? aa) 0 (/ q aa))))
-	(let ((u (+ aa bb))
-	      (v (* -1/3 a))
-	      (w (* (/ (sqrt 3) 2) (- aa bb))))
-	  (cont (+ u v)
-		(+ (* -1/2 u) v (* +i w))
-		(+ (* -1/2 u) v (* -i w))))))))
+        (let ((u (+ aa bb))
+              (v (* -1/3 a))
+              (w (* (/ (sqrt 3) 2) (- aa bb))))
+          (cont (+ u v)
+                (+ (* -1/2 u) v (* +i w))
+                (+ (* -1/2 u) v (* -i w))))))))
 
 
 ;;; From MachineLearning stuff
@@ -603,4 +603,4 @@
   (let ((es (vector-map exp vector-of-numbers)))
     (let ((s (reduce + 0 (vector->list es))))
       (make-initialized-vector (vector-length es)
-	(lambda (i) (/ (vector-ref es i) s))))))
+                               (lambda (i) (/ (vector-ref es i) s))))))

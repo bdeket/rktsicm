@@ -17,7 +17,7 @@
                                          (up 'x 'y (sqrt (- 1 (square 'x) (square 'y)))))))
                '(theta (up x y (sqrt (+ 1 (* -1 (expt x 2)) (* -1 (expt y 2)))))))
               )
-   
+
    ;TODO: this test currently fails, but the original notes mention
    ;some assumptions that are made (shownotes)
    ;maybe this example is incomplete?

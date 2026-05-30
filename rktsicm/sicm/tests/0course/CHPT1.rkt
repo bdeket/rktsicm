@@ -20,7 +20,7 @@
    (simplify (q 't))
    '(up (x t) (y t) (z t)))
 
-              
+
   (check-equal?
    (simplify ((simple-derivative-internal
                (lambda (eps)
@@ -66,7 +66,7 @@
 
   (define ((varied-free-particle-action mass q nu t1 t2) eps)
     (let ([eta (make-eta nu t1 t2)])
-      (Lagrangian-action 	(L-free-particle mass)
+      (Lagrangian-action         (L-free-particle mass)
                                 (+ q (* eps eta))
                                 t1
                                 t2)))

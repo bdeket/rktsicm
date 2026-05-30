@@ -61,7 +61,7 @@
                          (list-no-order `(* ,x ,y)
                                         `(+ 4 ,z))
                          #:when (eq? x z)))
-  
+
   (check-exn exn:fail?
              (λ ()
                (let ([a (gensym)]

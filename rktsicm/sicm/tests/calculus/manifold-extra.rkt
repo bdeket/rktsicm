@@ -98,7 +98,7 @@
     (check-simplified? ((compose (S2p-spherical '->coords) (S2p-spherical '->point))
                         (up 'theta 'phi))
                        '(up theta phi))
-    
+
     (check-simplified? ((compose (S2p-spherical '->coords) (S2p-tilted '->point))
                         (up 'theta 'phi))
                        '(up (atan (sqrt (+ (* (expt (sin theta) 2) (expt (cos phi) 2))
@@ -154,7 +154,7 @@
     "S2p-Riemann"
     (define m ((S2p-Riemann '->point) (up 'x 'y)))
     (check-simplified? (manifold-point-representation m)
-                       '(up (/ (* 2 x) 
+                       '(up (/ (* 2 x)
                                (+ 1 (expt x 2) (expt y 2)))
                             (/ (* 2 y)
                                (+ 1 (expt y 2) (expt x 2)))
@@ -208,7 +208,7 @@
                         ((S2p-gnomic '->point)
                          (up (cos 'theta) (sin 'theta))))
                        '(up (/ (cos theta) (sqrt 2))
-                            (/ (sin theta) (sqrt 2)) 
+                            (/ (sin theta) (sqrt 2))
                             (/ 1 (sqrt 2)))))
    (test-case
     "S2p-stereographic"
@@ -240,7 +240,7 @@
                         '(up (/ x (+ -1 (sqrt (+ 1 (expt x 2) (expt y 2) (expt z 2)))))
                              (/ y (+ -1 (sqrt (+ 1 (expt y 2) (expt x 2) (expt z 2)))))
                              (/ z (+ -1 (sqrt (+ 1 (expt z 2) (expt x 2) (expt y 2)))))))
-     
+
      (check-simplified? (euclidean-norm ((S3-stereographic '->coords)
                                          ((S3-gnomic '->point) (up 'x 'y 'z))))
                         '(/ (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))

@@ -12,7 +12,7 @@
 ;;; (first-order) system of differential equations governing the
 ;;; evolution of this state be:
 
-;;;  ((D sigma) t) = (R (sigma t))  
+;;;  ((D sigma) t) = (R (sigma t))
 ;;;     or  (D sigma) = (compose R sigma)
 
 ;;; i.e. R is a system derivative.
@@ -32,4 +32,3 @@
   (define (the-LD F) (* (D F) R))
   (make-operator the-LD `(Lie-D ,R)))
 
-    

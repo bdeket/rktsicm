@@ -86,12 +86,12 @@
     [else
      (let inner ([s2 s2]
                  [rst s1])
-    (cond
-      [(empty? s2) rst]
-      [(member (car s2) rst comp?)
-       (inner (cdr s2) rst)]
-      [else
-       (inner (cdr s2) (cons (car s2) rst))]))]))
+       (cond
+         [(empty? s2) rst]
+         [(member (car s2) rst comp?)
+          (inner (cdr s2) rst)]
+         [else
+          (inner (cdr s2) (cons (car s2) rst))]))]))
 
 (define (lset-difference comp? s1 s2)
   (let lp ([s1 s1])
@@ -114,10 +114,10 @@
 ;;; Ok to pass it an improper list
 (define (safe-map f pairs)
   (cond ((null? pairs) '())
-	((pair? pairs)
-	 (cons (f (car pairs))
-	       (safe-map f (cdr pairs))))
-	(else (f pairs))))
+        ((pair? pairs)
+         (cons (f (car pairs))
+               (safe-map f (cdr pairs))))
+        (else (f pairs))))
 
 (define (count-elements p? l)
   (let loop ((count 0) (l l))
@@ -127,18 +127,18 @@
 
 (define (find-first pred lst)
   (cond ((null? lst) #f)
-	((pred (car lst)) (car lst))
-	(else (find-first pred (cdr lst)))))
+        ((pred (car lst)) (car lst))
+        (else (find-first pred (cdr lst)))))
 
 (define (countsymbols exp)
   (cond ((pair? exp)
-	 (fix:+ (countsymbols (car exp))
-		(countsymbols (cdr exp))))
-	((symbol? exp) 1)
-	(else 0)))
+         (fix:+ (countsymbols (car exp))
+                (countsymbols (cdr exp))))
+        ((symbol? exp) 1)
+        (else 0)))
 
 (define (butlast l)
-  (if (null? (cdr l)) 
+  (if (null? (cdr l))
       '()
       (cons (car l)
             (butlast (cdr l)))))
@@ -151,15 +151,15 @@
 
 (define (list-index-of x lst)
   (cond ((null? lst)
-	 (error "Not in list -- LIST-INDEX-OF" x))
-	((eqv? x (car lst)) 0)
-	(else (fix:+ (list-index-of x (cdr lst)) 1))))
+         (error "Not in list -- LIST-INDEX-OF" x))
+        ((eqv? x (car lst)) 0)
+        (else (fix:+ (list-index-of x (cdr lst)) 1))))
 
 (define (delete-nth n list)
   (if (fix:= n 0)
       (cdr list)
       (cons (car list)
-	    (delete-nth (fix:- n 1) (cdr list)))))
+            (delete-nth (fix:- n 1) (cdr list)))))
 
 (define ((list:elementwise proc) . lists)
   (apply map proc lists))
@@ -176,34 +176,34 @@
   (if (null? lst)
       '()
       (let ((f (car lst))
-	    (r (distinct-pairs (cdr lst))))
-	(let loop ((left (cdr lst)))
-	  (if (null? left)
-	      r
-	      (cons (list f (car left))
-		    (loop (cdr left))))))))
+            (r (distinct-pairs (cdr lst))))
+        (let loop ((left (cdr lst)))
+          (if (null? left)
+              r
+              (cons (list f (car left))
+                    (loop (cdr left))))))))
 
 (define (for-each-distinct-pair proc list)
   (if (not (null? list))
       (let loop ((first (car list)) (rest (cdr list)))
-	(for-each (lambda (other-element)
-		    (proc first other-element))
-		  rest)
-	(if (not (null? rest))
-	    (loop (car rest) (cdr rest))))))
+        (for-each (lambda (other-element)
+                    (proc first other-element))
+                  rest)
+        (if (not (null? rest))
+            (loop (car rest) (cdr rest))))))
 
 
 (define ((fringe-smaller-than? n) expr)
   (define (walk expr count next)
     (cond ((int:> count n) #f)
-	  ((pair? expr)
-	   (walk (car expr) count
-		 (lambda (count)
-		   (walk (cdr expr) count next))))
-	  ((null? expr)
-	   (next count))
-	  (else
-	   (next (int:+ count 1)))))
+          ((pair? expr)
+           (walk (car expr) count
+                 (lambda (count)
+                   (walk (cdr expr) count next))))
+          ((null? expr)
+           (next count))
+          (else
+           (next (int:+ count 1)))))
   (walk expr 0 (lambda (count) count)))
 
 #|
@@ -219,56 +219,56 @@
 
 (define (split-list list predicate recvr)
   (let split ((list list)
-	      (recvr recvr))
+              (recvr recvr))
     (if (not (pair? list))
-	(recvr '() '())
-	(split (cdr list)
-	       (lambda (win lose)
-		 (if (predicate (car list))
-		     (recvr (cons (car list) win)
-			    lose)
-		     (recvr win
-			    (cons (car list) lose))))))))
+        (recvr '() '())
+        (split (cdr list)
+               (lambda (win lose)
+                 (if (predicate (car list))
+                     (recvr (cons (car list) win)
+                            lose)
+                     (recvr win
+                            (cons (car list) lose))))))))
 
 (define (find-infimum list predicate)
   (if (null? list)
       (error "find-infimum: empty list" list))
   (let loop ((current (car list))
-	     (left (cdr list)))
+             (left (cdr list)))
     (cond ((null? left)
-	   current)
-	  ((predicate (car left) current)
-	   (loop (car left) (cdr left)))
-	  (else
-	   (loop current (cdr left))))))
+           current)
+          ((predicate (car left) current)
+           (loop (car left) (cdr left)))
+          (else
+           (loop current (cdr left))))))
 
 (define (subst new old where)
   (cond ((eq? where old)
-	 new)
-	((not (pair? where))
-	 where)
-	(else
-	 (cons (subst new old (car where))
-	       (subst new old (cdr where))))))
+         new)
+        ((not (pair? where))
+         where)
+        (else
+         (cons (subst new old (car where))
+               (subst new old (cdr where))))))
 
 (define (delq-once element list)
   (cond ((null? list)
-	 '())
-	((eq? (car list) element)
-	 (cdr list))
-	(else
-	 (cons (car list)
-	       (delq-once element (cdr list))))))
+         '())
+        ((eq? (car list) element)
+         (cdr list))
+        (else
+         (cons (car list)
+               (delq-once element (cdr list))))))
 #|
 ;;; Grrrr dumb!
 (define (substitute-multiple expression dictionary)
   (define (walk e)
     (if (pair? e)
-	(cons (walk (car e)) (walk (cdr e)))
-	(let ((v (assoc e dictionary simple:equal?)))
-	  (if v
-	      (cadr v)
-	      e))))
+        (cons (walk (car e)) (walk (cdr e)))
+        (let ((v (assoc e dictionary simple:equal?)))
+          (if v
+              (cadr v)
+              e))))
   (walk expression))
 
 
@@ -309,37 +309,37 @@
 (define (map&reduce procedure combiner null-value list1 #:optional list2 . lists)
   ;; (reduce combiner null-value (map procedure list1 list2 . lists))
   (cond ((default-object? list2)
-	 (let loop ((result null-value)
-		    (l list1))
-	   (if (null? l)
-	       result
-	       (loop (combiner (procedure (car l))
-			       result)
-		     (cdr l)))))
-	((null? lists)
-	 (let loop ((result null-value)
-		    (l1 list1)
-		    (l2 list2))
-	   (if (or (null? l1) (null? l2))
-	       result
-	       (loop (combiner (procedure (car l1) (car l2))
-			       result)
-		     (cdr l1)
-		     (cdr l2)))))
-	(else
-	 (let loop ((result null-value)
-		    (l (cons* list1 list2 lists)))
-	   (if (there-exists? l null?)
-	       result
-	       (loop (combiner (apply procedure (map car l))
-			       result)
-		     (map cdr l)))))))
+         (let loop ((result null-value)
+                    (l list1))
+           (if (null? l)
+               result
+               (loop (combiner (procedure (car l))
+                               result)
+                     (cdr l)))))
+        ((null? lists)
+         (let loop ((result null-value)
+                    (l1 list1)
+                    (l2 list2))
+           (if (or (null? l1) (null? l2))
+               result
+               (loop (combiner (procedure (car l1) (car l2))
+                               result)
+                     (cdr l1)
+                     (cdr l2)))))
+        (else
+         (let loop ((result null-value)
+                    (l (cons* list1 list2 lists)))
+           (if (there-exists? l null?)
+               result
+               (loop (combiner (apply procedure (map car l))
+                               result)
+                     (map cdr l)))))))
 
 (define (%append x y)
   (if (null? x)
       y
       (%reverse! (%reverse x '()) y)))
-  
+
 (define (%reverse! l #:optional tail)
   (error "TODO")#;
   (let loop ((current l)
@@ -361,63 +361,63 @@
                         '()
                         tail)))
     (cond ((pair? l)
-	   (loop (cdr l)
-		 (cons (car l) accum)))
-	  ((null? l)
-	   accum)
-	  (else
-	   (error "%REVERSE: Argument not a list" ol)))))  
+           (loop (cdr l)
+                 (cons (car l) accum)))
+          ((null? l)
+           accum)
+          (else
+           (error "%REVERSE: Argument not a list" ol)))))
 
 (define (%map f ol1 #| #:optional ol2 . rest |#)
   ;; Important: The circular list hack for multi-argument
   ;; map does not work here.
   (error "TODO")#;
   (cond ((default-object? l2)
-	 (%map-1 f ol1))
-	((null? rest)
-	 (%map-2 f ol1 ol2))
-	(else
-	 (let outer ((result '())
-		     (ls (reverse (%map-1 reverse (cons* ol1 ol2 rest)))))
-	   (cond ((pair? (car ls))
-		  (let inner ((args (list (caar ls)))
-			      (next (list (cdar ls)))
-			      (rest (cdr ls)))
-		    (cond ((null? rest)
-			   (outer (cons (apply f args) result)
-				  (reverse! next)))
-			  ((not (pair? (car rest)))
-			   (error "%map: Arguments have different lengths"
-				  (cons* ol1 ol2 rest)))
-			  (else
-			   (inner (cons (caar rest) args)
-				  (cons (cdar rest) next)
-				  (cdr rest))))))
-		 ((there-exists? ls (lambda (x) (not (null? x))))
-		  (error "%map:Arguments have different lengths"))
-		 (else
-		  result))))))
+         (%map-1 f ol1))
+        ((null? rest)
+         (%map-2 f ol1 ol2))
+        (else
+         (let outer ((result '())
+                     (ls (reverse (%map-1 reverse (cons* ol1 ol2 rest)))))
+           (cond ((pair? (car ls))
+                  (let inner ((args (list (caar ls)))
+                              (next (list (cdar ls)))
+                              (rest (cdr ls)))
+                    (cond ((null? rest)
+                           (outer (cons (apply f args) result)
+                                  (reverse! next)))
+                          ((not (pair? (car rest)))
+                           (error "%map: Arguments have different lengths"
+                                  (cons* ol1 ol2 rest)))
+                          (else
+                           (inner (cons (caar rest) args)
+                                  (cons (cdar rest) next)
+                                  (cdr rest))))))
+                 ((there-exists? ls (lambda (x) (not (null? x))))
+                  (error "%map:Arguments have different lengths"))
+                 (else
+                  result))))))
 
 (define-integrable (%map-1 f ol)
   (let loop ((result '()) (l1 (reverse ol)))
     (cond ((pair? l1)
-	   (loop (cons (f (car l1)) result)
-		 (cdr l1)))
-	  ((null? l1)
-	   result)
-	  (else
-	   (error "%map: Argument not a list" ol)))))      
+           (loop (cons (f (car l1)) result)
+                 (cdr l1)))
+          ((null? l1)
+           result)
+          (else
+           (error "%map: Argument not a list" ol)))))
 
 (define-integrable (%map-2 f ol1 ol2)
   (let loop ((result '())
-	     (l1 (reverse ol1))
-	     (l2 (reverse ol2)))
+             (l1 (reverse ol1))
+             (l2 (reverse ol2)))
     (cond ((and (pair? l1) (pair? l2))
-	   (loop (cons (f (car l1) (car l2)) result)
-		 (cdr l1)
-		 (cdr l2)))
-	  ((and (null? l1) (null? l2))
-	   result)
-	  (else
-	   (error "%map: Arguments have different lengths"
-		  ol1 ol2)))))
+           (loop (cons (f (car l1) (car l2)) result)
+                 (cdr l1)
+                 (cdr l2)))
+          ((and (null? l1) (null? l2))
+           result)
+          (else
+           (error "%map: Arguments have different lengths"
+                  ol1 ol2)))))

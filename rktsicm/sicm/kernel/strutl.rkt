@@ -27,50 +27,50 @@
 
 
 (define stream:for-each
- (let ()
-   (define (loop p s n)
-     (cond ((empty-stream? s)
-	    'done)
-	   ((int:= n 1)
-	    (p (head s))
-	    '...)
-	   (else
-	    (p (head s))
-	    (loop p (tail s) (int:- n 1)))))
-;;bdk;; only one optional argument + do-for-zero
-   (lambda (p s [n -1])
-     (if (int:= n 0) (if (empty-stream? s) 'done '...)
-         (loop p s n)))))
+  (let ()
+    (define (loop p s n)
+      (cond ((empty-stream? s)
+             'done)
+            ((int:= n 1)
+             (p (head s))
+             '...)
+            (else
+             (p (head s))
+             (loop p (tail s) (int:- n 1)))))
+    ;;bdk;; only one optional argument + do-for-zero
+    (lambda (p s [n -1])
+      (if (int:= n 0) (if (empty-stream? s) 'done '...)
+          (loop p s n)))))
 
 
 (define print-stream
   (lambda (s [n -1])
-     (stream:for-each write-line s n)))
+    (stream:for-each write-line s n)))
 
 (define (combiner-padded-streams f pad)
   (define (lp ss)
     (cons-stream (apply f
-			(map (lambda (s)
-			       (if (empty-stream? s)
-				   pad
-				   (head s)))
-			     ss))
-		 (lp (map (lambda (s)
-			    (if (empty-stream? s)
-				s
-				(tail s)))
-			  ss))))
+                        (map (lambda (s)
+                               (if (empty-stream? s)
+                                   pad
+                                   (head s)))
+                             ss))
+                 (lp (map (lambda (s)
+                            (if (empty-stream? s)
+                                s
+                                (tail s)))
+                          ss))))
   (lambda args (lp args)))
 
 
 (define (stream-of-iterates next value)
   (cons-stream value
-	       (stream-of-iterates next (next value))))
+               (stream-of-iterates next (next value))))
 
 
 (define (infinite-stream-of x)
   (cons-stream x
-	       (infinite-stream-of x)))
+               (infinite-stream-of x)))
 
 
 (define (stream-evaluate s x)
@@ -84,7 +84,7 @@
   (if (empty-stream? s)
       the-empty-stream
       (cons-stream (f (head s))
-		   (map-stream f (tail s)))))
+                   (map-stream f (tail s)))))
 
 #; ;;bdk;;works only on 1 extra stream
 (define map-streams stream-map)
@@ -100,16 +100,16 @@
 
 (define (merge-streams s1 s2)
   (cons-stream (stream-car s1)
-	       (cons-stream (stream-car s2)
-			    (merge-streams (stream-cdr s1)
-					   (stream-cdr s2)))))
+               (cons-stream (stream-car s2)
+                            (merge-streams (stream-cdr s1)
+                                           (stream-cdr s2)))))
 
 (define (shorten-stream n s)
   (if (or (fix:= n 0) (empty-stream? s))
       the-empty-stream
       (cons-stream (head s)
-		   (shorten-stream (fix:- n 1)
-				   (tail s)))))
+                   (shorten-stream (fix:- n 1)
+                                   (tail s)))))
 
 (define (stream:+ s1 s2)
   (map-streams g:+ s1 s2))
@@ -125,7 +125,7 @@
 
 
 
-(define zero-stream 
+(define zero-stream
   (cons-stream n:zero zero-stream))
 
 (define one-stream
@@ -137,19 +137,19 @@
 
 (define natural-number-stream
   (cons-stream n:one
-	       (stream:+ one-stream
-			 natural-number-stream)))
+               (stream:+ one-stream
+                         natural-number-stream)))
 
 (define factorial-stream
   (let ()
     (define (fact-helper n! n+1)
       (cons-stream n!
-		   (fact-helper (g:* n+1 n!) (g:+ n+1 1))))
+                   (fact-helper (g:* n+1 n!) (g:+ n+1 1))))
     (fact-helper 1 1)))
 
 (define (stream-of-powers x unity)
   (stream-of-iterates (lambda (y) (g:* x y))
-		      unity))
+                      unity))
 
 #; #; #; #; ;;bdk;; first 3 defined in racket/stream
 (define stream-for-each
@@ -171,24 +171,24 @@
                  (helper nxt (tail str))))
   (helper zero str))
 
-;;; MIT Scheme system provides 
+;;; MIT Scheme system provides
 ;;;  PRIME-NUMBERS-STREAM
 
 ;;; expands a stream with zeros interpolated between given values.
 
 (define (stream:inflate stream n-interpolated-zeros)
   (cons-stream (head stream)
-	       (stream:list-append (make-list n-interpolated-zeros
-					      (g:zero-like (head stream)))
-				   (stream:inflate (tail stream)
-						   n-interpolated-zeros))))
+               (stream:list-append (make-list n-interpolated-zeros
+                                              (g:zero-like (head stream)))
+                                   (stream:inflate (tail stream)
+                                                   n-interpolated-zeros))))
 
 (define (stream:list-append list stream)
   (if (null? list)
       stream
       (cons-stream (car list)
-		   (stream:list-append (cdr list)
-				       stream))))
+                   (stream:list-append (cdr list)
+                                       stream))))
 
 ;;bdk;; not defined anywhere...
 (define prime-numbers-stream

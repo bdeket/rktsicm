@@ -13,26 +13,26 @@
 
 ;;bdk;; start original file
 
-;;; A metric induces a torsion-free connection			       
+;;; A metric induces a torsion-free connection
 
 ;;; We reserve *Christoffel* and Christoffel? for Christoffel type 2
 
 (define (make-Christoffel-1 symbols basis)
   (list '*Christoffel-1* symbols basis))
-	       
+
 (define (metric->Christoffel-1 metric basis)
   (assert (coordinate-basis? basis))
   (let ((vector-basis (basis->vector-basis basis)))
     (make-Christoffel-1
      (s:map/r (lambda (e_k)
-		(s:map/r (lambda (e_j)
-			   (s:map/r (lambda (e_i)
-				      (* 1/2 (- (+ (e_k (metric e_i e_j))
-						   (e_j (metric e_i e_k)))
-						(e_i (metric e_j e_k)))))
-				    vector-basis))
-			 vector-basis))
-	      vector-basis)
+                (s:map/r (lambda (e_j)
+                           (s:map/r (lambda (e_i)
+                                      (* 1/2 (- (+ (e_k (metric e_i e_j))
+                                                   (e_j (metric e_i e_k)))
+                                                (e_i (metric e_j e_k)))))
+                                    vector-basis))
+                         vector-basis))
+              vector-basis)
      basis)))
 
 #|
@@ -42,13 +42,13 @@
 (define ((g-sphere R) u v)
   (* (square R)
      (+ (* (dtheta u) (dtheta v))
-	(* (compose (square sin) theta)
-	   (dphi u)
-	   (dphi v)))))
+        (* (compose (square sin) theta)
+           (dphi u)
+           (dphi v)))))
 
 (pec ((Christoffel->symbols
        (metric->Christoffel-1 (g-sphere 'R)
-			      (coordinate-system->basis 2-sphere)))
+                              (coordinate-system->basis 2-sphere)))
       ((2-sphere '->point) (up 'theta0 'phi0))))
 #| Result:
 (down
@@ -63,47 +63,47 @@
 
 (define (metric->Christoffel-2 metric basis)
   (let ((gi (metric:invert metric basis))
-	(G1 (metric->Christoffel-1 metric basis)))
+        (G1 (metric->Christoffel-1 metric basis)))
     (let ((vector-basis (basis->vector-basis basis))
-	  (1form-basis (basis->1form-basis basis))
-	  (G1S (Christoffel->symbols G1)))
+          (1form-basis (basis->1form-basis basis))
+          (G1S (Christoffel->symbols G1)))
       (define ((Gamma-Bar v w) u)
-	(let ((stuff
-	       (s:map/r (lambda (e_k)
-			  (s:map/r (lambda (e_j)
-				     (s:map/r (lambda (e_i)
-						(* (e_i u) (e_j v) (e_k w)))
-					      1form-basis))
-				   1form-basis))
-			1form-basis)))
-	  (apply + (ultra-flatten (s:map/r * G1S stuff)))))
+        (let ((stuff
+               (s:map/r (lambda (e_k)
+                          (s:map/r (lambda (e_j)
+                                     (s:map/r (lambda (e_i)
+                                                (* (e_i u) (e_j v) (e_k w)))
+                                              1form-basis))
+                                   1form-basis))
+                        1form-basis)))
+          (apply + (ultra-flatten (s:map/r * G1S stuff)))))
       (define (Gamma-hat v w)
-	(apply +
-	       (ultra-flatten
-		(s:map/r
-		 (lambda (e~i e_i)
-		   (* (gi (Gamma-Bar v w) e~i) e_i))
-		 1form-basis vector-basis))))
+        (apply +
+               (ultra-flatten
+                (s:map/r
+                 (lambda (e~i e_i)
+                   (* (gi (Gamma-Bar v w) e~i) e_i))
+                 1form-basis vector-basis))))
       (make-Christoffel
        (s:map/r (lambda (e_k)
-		  (s:map/r (lambda (e_j)
-			     (s:map/r (lambda (e~i)
-					(e~i (Gamma-hat e_j e_k)))
-				      1form-basis))
-			   vector-basis))
-		vector-basis)       
+                  (s:map/r (lambda (e_j)
+                             (s:map/r (lambda (e~i)
+                                        (e~i (Gamma-hat e_j e_k)))
+                                      1form-basis))
+                           vector-basis))
+                vector-basis)
        basis))))
 
 
 (pec ((Christoffel->symbols
        (metric->Christoffel-2 (g-sphere 'R)
-			      (coordinate-system->basis 2-sphere)))
+                              (coordinate-system->basis 2-sphere)))
       ((2-sphere '->point) (up 'theta0 'phi0))))
 #| Result:
 (down (down (up 0 0)
-	    (up 0 (/ (cos theta0) (sin theta0))))
+            (up 0 (/ (cos theta0) (sin theta0))))
       (down (up 0 (/ (cos theta0) (sin theta0)))
-	    (up (* -1 (cos theta0) (sin theta0)) 0)))
+            (up (* -1 (cos theta0) (sin theta0)) 0)))
 |#
 ;;; As expected!
 |#
@@ -115,13 +115,13 @@
 
 (define fa
   (compose (literal-function 'a (-> (UP Real Real) Real))
-	   (R2-rect '->coords)))
+           (R2-rect '->coords)))
 (define fb
   (compose (literal-function 'b (-> (UP Real Real) Real))
-	   (R2-rect '->coords)))
+           (R2-rect '->coords)))
 (define fc
   (compose (literal-function 'c (-> (UP Real Real) Real))
-	   (R2-rect '->coords)))
+           (R2-rect '->coords)))
 
 (define ((g-R2 g_00 g_01 g_11) u v)
   (+ (* g_00 (dx u) (dx v))
@@ -148,15 +148,15 @@
 (down
  (down
   (down (* 1/2 (((partial 0) a) (up x0 y0)))
-	(+ (* -1/2 (((partial 1) a) (up x0 y0)))
-	   (((partial 0) b) (up x0 y0))))
+        (+ (* -1/2 (((partial 1) a) (up x0 y0)))
+           (((partial 0) b) (up x0 y0))))
   (down (* 1/2 (((partial 1) a) (up x0 y0)))
         (* 1/2 (((partial 0) c) (up x0 y0)))))
  (down
   (down (* 1/2 (((partial 1) a) (up x0 y0)))
         (* 1/2 (((partial 0) c) (up x0 y0))))
   (down (+ (((partial 1) b) (up x0 y0))
-	   (* -1/2 (((partial 0) c) (up x0 y0))))
+           (* -1/2 (((partial 0) c) (up x0 y0))))
         (* 1/2 (((partial 1) c) (up x0 y0))))))
 |#
 |#
@@ -165,28 +165,28 @@
   (assert (coordinate-basis? basis))
   (let ((gi (metric:invert metric basis)))
     (let ((vector-basis (basis->vector-basis basis))
-	  (1form-basis (basis->1form-basis basis)))
+          (1form-basis (basis->1form-basis basis)))
       (make-Christoffel
        (s:map/r (lambda (e_k)
-		  (s:map/r (lambda (e_j)
-			     (s:map/r (lambda (w_i)
-					(contract
-					 (lambda (e_m w_m)
-					   (* (gi w_i w_m)
-					      (* 1/2
-						 (- (+ (e_k (metric e_m e_j))
-						       (e_j (metric e_m e_k)))
-						    (e_m (metric e_j e_k))))))
-					 basis))
-				      1form-basis))
-			   vector-basis))
-		vector-basis)
+                  (s:map/r (lambda (e_j)
+                             (s:map/r (lambda (w_i)
+                                        (contract
+                                         (lambda (e_m w_m)
+                                           (* (gi w_i w_m)
+                                              (* 1/2
+                                                 (- (+ (e_k (metric e_m e_j))
+                                                       (e_j (metric e_m e_k)))
+                                                    (e_m (metric e_j e_k))))))
+                                         basis))
+                                      1form-basis))
+                           vector-basis))
+                vector-basis)
        basis))))
 
 #|
 (pec ((Christoffel->symbols
        (metric->Christoffel-2 (g-sphere 'R)
-			      (coordinate-system->basis 2-sphere)))
+                              (coordinate-system->basis 2-sphere)))
       ((2-sphere '->point) (up 'theta0 'phi0))))
 #| Result:
 (down
@@ -200,38 +200,38 @@
   (define (Gijk i j k)
     (define (tex s)
       (cond ((eq? s 'up) "^")
-	    ((eq? s 'down) "_")
-	    (else (error "Bad scripts"))))
+            ((eq? s 'down) "_")
+            (else (error "Bad scripts"))))
     (string->symbol
      (string-append (symbol->string name)
-		    (tex (car scripts))
-		    (number->string i)
-		    (number->string j)
-		    (tex (caddr scripts))
-		    (number->string k))))
+                    (tex (car scripts))
+                    (number->string i)
+                    (number->string j)
+                    (tex (caddr scripts))
+                    (number->string k))))
   (assert (eq? (car scripts) (cadr scripts)))
   (s:generate n (car scripts)
-    (lambda (i)
-      (s:generate n (cadr scripts)
-	(lambda (j)
-	  (s:generate n (caddr scripts)
-	    (lambda (k)
-	      (Gijk i j k))))))))
+              (lambda (i)
+                (s:generate n (cadr scripts)
+                            (lambda (j)
+                              (s:generate n (caddr scripts)
+                                          (lambda (k)
+                                            (Gijk i j k))))))))
 
 (define (literal-Christoffel-1 name coordsys)
   (let ((n (coordinate-system-dimension coordsys)))
     (make-Christoffel-1
      (s:map/r (lambda (name)
-		(literal-manifold-function name coordsys))
-	      (literal-Christoffel-names name '(down down down) n))
+                (literal-manifold-function name coordsys))
+              (literal-Christoffel-names name '(down down down) n))
      (coordinate-system->basis coordsys))))
 
 (define (literal-Christoffel-2 name coordsys)
   (let ((n (coordinate-system-dimension coordsys)))
     (make-Christoffel
      (s:map/r (lambda (name)
-		(literal-manifold-function name coordsys))
-	      (literal-Christoffel-names name '(down down up) n))
+                (literal-manifold-function name coordsys))
+              (literal-Christoffel-names name '(down down up) n))
      (coordinate-system->basis coordsys))))
 
 (define (literal-Cartan name coordsys)
@@ -250,7 +250,7 @@
 
 (install-coordinates polar (up 'r 'theta))
 
-(define polar-point 
+(define polar-point
   ((polar '->point) (up 'r 'theta)))
 
 (define polar-basis
@@ -259,7 +259,7 @@
 (define (polar-metric v1 v2)
   (+ (* (dr v1) (dr v2))
      (* (square r)
-	(* (dtheta v1) (dtheta v2)))))
+        (* (dtheta v1) (dtheta v2)))))
 
 (define foo
   ((Christoffel->symbols
@@ -281,7 +281,7 @@
 
 (install-coordinates polar (up 'r 'theta))
 
-(define polar-point 
+(define polar-point
   ((polar '->point) (up 'r 'theta)))
 
 (define polar-Gamma
@@ -289,28 +289,28 @@
    (let ((O (lambda x 0)))
      (down
       (down (up O O)
-	    (up O (/ 1 r)))
+            (up O (/ 1 r)))
       (down (up O (/ 1 r))
-	    (up (* -1 r) O))))
+            (up (* -1 r) O))))
    (coordinate-system->basis polar)))
 
 ;;; Now look at curvature
 (let* ((nabla
-	(covariant-derivative (Christoffel->Cartan polar-Gamma)))
+        (covariant-derivative (Christoffel->Cartan polar-Gamma)))
        (curvature (Riemann nabla)))
   (for-each
    (lambda (alpha)
      (for-each
       (lambda (beta)
-	(for-each
-	 (lambda (gamma)
-	   (for-each
-	    (lambda (delta)
-	      (newline)
-	      (pe `(,alpha ,beta ,gamma ,delta))
-	      (pe ((curvature alpha beta gamma delta) polar-point)))
-	    (list d/dr d/dtheta)))
-	 (list d/dr d/dtheta)))
+        (for-each
+         (lambda (gamma)
+           (for-each
+            (lambda (delta)
+              (newline)
+              (pe `(,alpha ,beta ,gamma ,delta))
+              (pe ((curvature alpha beta gamma delta) polar-point)))
+            (list d/dr d/dtheta)))
+         (list d/dr d/dtheta)))
       (list d/dr d/dtheta)))
    (list dr dtheta)))
 ;;; 16 zeros
@@ -320,7 +320,7 @@
 (define spherical R3-rect)
 (install-coordinates spherical (up 'r 'theta 'phi))
 
-(define spherical-point 
+(define spherical-point
   ((spherical '->point) (up 'r 'theta 'phi)))
 
 (define spherical-basis
@@ -329,9 +329,9 @@
 (define (spherical-metric v1 v2)
   (+ (* (dr v1) (dr v2))
      (* (square r)
-	(+ (* (dtheta v1) (dtheta v2))
-	   (* (expt (sin theta) 2)
-	      (dphi v1) (dphi v2))))))
+        (+ (* (dtheta v1) (dtheta v2))
+           (* (expt (sin theta) 2)
+              (dphi v1) (dphi v2))))))
 
 (define foo
   ((Christoffel->symbols
@@ -357,29 +357,29 @@
       (down (up O O O) (up O (/ 1 r) O) (up O O (/ 1 r)))
       (down (up O (/ 1 r) O) (up (* -1 r) O O) (up O O (/ (cos theta) (sin theta))))
       (down (up O O (/ 1 r))
-	    (up O O (/ (cos theta) (sin theta)))
-	    (up (* -1 r (expt (sin theta) 2)) (* -1 (sin theta) (cos theta)) O))))
+            (up O O (/ (cos theta) (sin theta)))
+            (up (* -1 r (expt (sin theta) 2)) (* -1 (sin theta) (cos theta)) O))))
    (coordinate-system->basis spherical)))
 
 ;;; Now look at curvature
 
 (let* ((nabla
-	(covariant-derivative (Christoffel->Cartan spherical-Gamma)))
+        (covariant-derivative (Christoffel->Cartan spherical-Gamma)))
        (curvature (Riemann nabla)))
   (for-each
    (lambda (alpha)
      (for-each
       (lambda (beta)
-	(for-each
-	 (lambda (gamma)
-	   (for-each
-	    (lambda (delta)
-	      (newline)
-	      (pe `(,alpha ,beta ,gamma ,delta))
-	      (pe ((curvature alpha beta gamma delta)
-		   spherical-point)))
-	    (list d/dr d/dtheta d/dphi)))
-	 (list d/dr d/dtheta d/dphi)))
+        (for-each
+         (lambda (gamma)
+           (for-each
+            (lambda (delta)
+              (newline)
+              (pe `(,alpha ,beta ,gamma ,delta))
+              (pe ((curvature alpha beta gamma delta)
+                   spherical-point)))
+            (list d/dr d/dtheta d/dphi)))
+         (list d/dr d/dtheta d/dphi)))
       (list d/dr d/dtheta d/dphi)))
    (list dr dtheta dphi)))
 ;;; 81 zeros
@@ -393,27 +393,27 @@
   (contract
    (lambda (e_l w_l)
      (* (metric e_k e_l)
-	(w_l (commutator e_i e_j))))
+        (w_l (commutator e_i e_j))))
    basis))
 
 (define (metric->connection-1 metric basis)
   (let ((vector-basis (basis->vector-basis basis))
-	(1form-basis (basis->1form-basis basis)))
+        (1form-basis (basis->1form-basis basis)))
     (make-Christoffel
      (s:map/r
       (lambda (e_k)
-	(s:map/r
-	 (lambda (e_j)
-	   (s:map/r
-	    (lambda (e_i)
-	      (* 1/2 (+ (- (+ (e_k (metric e_i e_j))
-			      (e_j (metric e_i e_k)))
-			   (e_i (metric e_j e_k)))
-			(- (+ (structure-constant e_i e_j e_k basis metric)
-			      (structure-constant e_i e_k e_j basis metric))
-			   (structure-constant e_j e_k e_i basis metric)))))
-	    vector-basis))
-	 vector-basis))
+        (s:map/r
+         (lambda (e_j)
+           (s:map/r
+            (lambda (e_i)
+              (* 1/2 (+ (- (+ (e_k (metric e_i e_j))
+                              (e_j (metric e_i e_k)))
+                           (e_i (metric e_j e_k)))
+                        (- (+ (structure-constant e_i e_j e_k basis metric)
+                              (structure-constant e_i e_k e_j basis metric))
+                           (structure-constant e_j e_k e_i basis metric)))))
+            vector-basis))
+         vector-basis))
       vector-basis)
      basis)))
 
@@ -424,27 +424,27 @@
 (define (metric->connection-2 metric basis)
   (let ((metric (samritchie-memoizer metric))
         (vector-basis (basis->vector-basis basis))
-	(1form-basis (basis->1form-basis basis))
-	(inverse-metric (metric:invert metric basis)))
+        (1form-basis (basis->1form-basis basis))
+        (inverse-metric (metric:invert metric basis)))
     (make-Christoffel
      (s:map/r
       (lambda (e_k)
-	(s:map/r
-	 (lambda (e_j)
-	   (s:map/r
-	    (lambda (w_i)
-	      (contract
-	       (lambda (e_m w_m)
-		 (* (inverse-metric w_i w_m)
-		    (* 1/2 (+ (- (+ (e_k (metric e_m e_j))
-				    (e_j (metric e_m e_k)))
-				 (e_m (metric e_j e_k)))
-			      (- (+ (structure-constant e_m e_j e_k basis metric)
-				    (structure-constant e_m e_k e_j basis metric))
-				 (structure-constant e_j e_k e_m basis metric))))))
-	       basis))
-	    1form-basis))
-	 vector-basis))
+        (s:map/r
+         (lambda (e_j)
+           (s:map/r
+            (lambda (w_i)
+              (contract
+               (lambda (e_m w_m)
+                 (* (inverse-metric w_i w_m)
+                    (* 1/2 (+ (- (+ (e_k (metric e_m e_j))
+                                    (e_j (metric e_m e_k)))
+                                 (e_m (metric e_j e_k)))
+                              (- (+ (structure-constant e_m e_j e_k basis metric)
+                                    (structure-constant e_m e_k e_j basis metric))
+                                 (structure-constant e_j e_k e_m basis metric))))))
+               basis))
+            1form-basis))
+         vector-basis))
       vector-basis)
      basis)))
 
@@ -461,31 +461,31 @@
   (+ (* -1 c^2 (* (dt v1) (dt v2)))
      (* (dr v1) (dr v2))
      (* (square r)
-	(+ (* (dtheta v1) (dtheta v2))
-	   (* (square (sin theta))
-	      (* (dphi v1) (dphi v2)))))))
+        (+ (* (dtheta v1) (dtheta v2))
+           (* (square (sin theta))
+              (* (dphi v1) (dphi v2)))))))
 
-(define spherical-Lorentz-point 
+(define spherical-Lorentz-point
   ((spherical-Lorentz '->point) (up 't 'r 'theta 'phi)))
 
 (define (orthonormal-spherical-Lorentz-vector-basis c^2)
   (down (* (/ 1 (sqrt c^2)) d/dt)
-	d/dr
-	(* (/ 1 r) d/dtheta)
-	(* (/ 1 (* r (sin theta))) d/dphi)))
+        d/dr
+        (* (/ 1 r) d/dtheta)
+        (* (/ 1 (* r (sin theta))) d/dphi)))
 
 (define (orthonormal-spherical-Lorentz-1form-basis c^2)
   (let ((orthonormal-spherical-Lorentz-vectors
-	 (orthonormal-spherical-Lorentz-vector-basis c^2)))
-    (vector-basis->dual orthonormal-spherical-Lorentz-vectors 
-			spherical-Lorentz)))
+         (orthonormal-spherical-Lorentz-vector-basis c^2)))
+    (vector-basis->dual orthonormal-spherical-Lorentz-vectors
+                        spherical-Lorentz)))
 
 (define (orthonormal-spherical-Lorentz-basis c^2)
   (make-basis (orthonormal-spherical-Lorentz-vector-basis c^2)
-	      (orthonormal-spherical-Lorentz-1form-basis c^2)))
+              (orthonormal-spherical-Lorentz-1form-basis c^2)))
 
 (pec ((s:map/r (orthonormal-spherical-Lorentz-1form-basis 'c^2)
-	       (orthonormal-spherical-Lorentz-vector-basis 'c^2))
+               (orthonormal-spherical-Lorentz-vector-basis 'c^2))
       spherical-Lorentz-point))
 #| Result:
 (down (up 1 0 0 0) (up 0 1 0 0) (up 0 0 1 0) (up 0 0 0 1))
@@ -525,7 +525,7 @@
 
 (pec ((Christoffel->symbols
        (metric->connection-1 (spherical-Lorentz-metric 'c^2)
-			     (orthonormal-spherical-Lorentz-basis 'c^2)))
+                             (orthonormal-spherical-Lorentz-basis 'c^2)))
       spherical-Lorentz-point))
 #| Result:
 (down
@@ -543,7 +543,7 @@
    (lambda ()
      ((Christoffel->symbols
        (metric->connection-2 (spherical-Lorentz-metric 'c^2)
-			     (orthonormal-spherical-Lorentz-basis 'c^2)))
+                             (orthonormal-spherical-Lorentz-basis 'c^2)))
       spherical-Lorentz-point))))
 
 (pec foo)
@@ -588,24 +588,24 @@
    (let ((zero (lambda (point) 0)))
      (down
       (down (up zero zero zero zero)
-	    (up zero zero zero zero)
-	    (up zero zero zero zero)
-	    (up zero zero zero zero))
+            (up zero zero zero zero)
+            (up zero zero zero zero)
+            (up zero zero zero zero))
       (down (up zero zero zero zero)
-	    (up zero zero zero zero)
-	    (up zero zero zero zero)
-	    (up zero zero zero zero))
+            (up zero zero zero zero)
+            (up zero zero zero zero)
+            (up zero zero zero zero))
       (down (up zero zero zero zero)
-	    (up zero zero (/ 1 r) zero)
-	    (up zero (/ -1 r) zero zero)
-	    (up zero zero zero zero))
+            (up zero zero (/ 1 r) zero)
+            (up zero (/ -1 r) zero zero)
+            (up zero zero zero zero))
       (down (up zero zero zero zero)
-	    (up zero zero zero (/ 1 r))
-	    (up zero zero zero (/ (cos theta) (* r (sin theta))))
-	    (up zero
-		(/ -1 r)
-		(/ (* -1 (cos theta)) (* r (sin theta)))
-		zero))))
+            (up zero zero zero (/ 1 r))
+            (up zero zero zero (/ (cos theta) (* r (sin theta))))
+            (up zero
+                (/ -1 r)
+                (/ (* -1 (cos theta)) (* r (sin theta)))
+                zero))))
    (orthonormal-spherical-Lorentz-basis c^2)))
 
 ;;; Look at curvature
@@ -615,17 +615,17 @@
     (lambda (beta)
       (for-each
        (lambda (gamma)
-	 (for-each
-	  (lambda (delta)
-	    (newline)
-	    (pe `(,alpha ,beta ,gamma ,delta))
-	    (pe (((Riemann
+         (for-each
+          (lambda (delta)
+            (newline)
+            (pe `(,alpha ,beta ,gamma ,delta))
+            (pe (((Riemann
                    (covariant-derivative
-		    (Christoffel->Cartan
-		     (orthonormal-spherical-Lorentz-second-connection 'c^2))))
-		  alpha beta gamma delta)
-		 spherical-Lorentz-point)))
-	  (list d/dt d/dr d/dtheta d/dphi)))
+                    (Christoffel->Cartan
+                     (orthonormal-spherical-Lorentz-second-connection 'c^2))))
+                  alpha beta gamma delta)
+                 spherical-Lorentz-point)))
+          (list d/dt d/dr d/dtheta d/dphi)))
        (list d/dt d/dr d/dtheta d/dphi)))
     (list d/dt d/dr d/dtheta d/dphi)))
  (list dt dr dtheta dphi))

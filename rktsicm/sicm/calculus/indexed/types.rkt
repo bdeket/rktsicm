@@ -21,8 +21,8 @@
   (assert (procedure? proc))
   (eq-put! proc 'argument-types argument-types))
 
-;;; argument-types are, for example 
-;;;    (list 1form-field? vector-field? vector-field?), 
+;;; argument-types are, for example
+;;;    (list 1form-field? vector-field? vector-field?),
 ;;; for a Christoffel-2: it takes one 1form field and two vector fields.
 
 (define (index-types proc)

@@ -12,7 +12,7 @@
 
 ;;bdk;; start original file
 
-;;; The following give us dual bases 
+;;; The following give us dual bases
 ;;; Basis objects have a dimension, a basis, a dual basis.
 
 
@@ -24,10 +24,10 @@
 
 (define (coordinate-system->basis coordinate-system)
   (list '*coordinate-basis*
-	(coordinate-system->vector-basis coordinate-system)
-	(coordinate-system->1form-basis coordinate-system)
-	(coordinate-system 'dimension)
-	coordinate-system))
+        (coordinate-system->vector-basis coordinate-system)
+        (coordinate-system->1form-basis coordinate-system)
+        (coordinate-system 'dimension)
+        coordinate-system))
 
 (define (basis->coordinate-system x)
   (assert (coordinate-basis? x) "Not a coordinate basis")
@@ -39,7 +39,7 @@
 (define (basis? x)
   (or (coordinate-basis? x)
       (and (pair? x)
-	   (eq? (car x) '*basis*))))
+           (eq? (car x) '*basis*))))
 
 (define (make-basis vector-basis 1form-basis)
   (let ((n (length (s:fringe vector-basis))))
@@ -61,43 +61,43 @@
 ;;; sigma (proc e_i w^i)
 (define (contract proc basis)
   (let ((vector-basis (basis->vector-basis basis))
-	(1form-basis (basis->1form-basis basis)))
+        (1form-basis (basis->1form-basis basis)))
     (s:sigma/r proc
-	       vector-basis
-	       1form-basis)))    
+               vector-basis
+               1form-basis)))
 
 ;;; Has a dependence on flat basis sets.  Experimental stuff kills system!
 
 (define (vector-basis->dual vector-basis coordinate-system)
   (let* ((typical-coords (coordinate-system 'typical-coords))
-	 (vector-basis-coefficient-functions
-	  #|
-	  (compose (vector-basis (coordinate-system '->coords))
-		   (coordinate-system '->point))
-	  |#
-	  (s:map/r (lambda (basis-vector)
-		     (vector-field->components basis-vector coordinate-system))
-		   vector-basis)
-	  )
-	 (guts
-	  (lambda (coords)
-	    (s:transpose (compatible-shape typical-coords)
-			 (s:inverse
-			  (compatible-shape typical-coords)
-			  (s:map (lambda (fn) (fn coords))
-				 vector-basis-coefficient-functions)
-			  typical-coords)
-			 typical-coords)))
-	 (1form-basis-coefficient-functions #| guts |#
-	  (c:generate (coordinate-system 'dimension)
-		      'up
-		      (lambda (i)
-			(compose (component i) guts))))
-	 (1form-basis
-	  (s:map/r (lambda (1form-basis-coefficient-function)
-		     (components->1form-field 1form-basis-coefficient-function
-					      coordinate-system))
-		   1form-basis-coefficient-functions)))
+         (vector-basis-coefficient-functions
+          #|
+          (compose (vector-basis (coordinate-system '->coords))
+                   (coordinate-system '->point))
+          |#
+          (s:map/r (lambda (basis-vector)
+                     (vector-field->components basis-vector coordinate-system))
+                   vector-basis)
+          )
+         (guts
+          (lambda (coords)
+            (s:transpose (compatible-shape typical-coords)
+                         (s:inverse
+                          (compatible-shape typical-coords)
+                          (s:map (lambda (fn) (fn coords))
+                                 vector-basis-coefficient-functions)
+                          typical-coords)
+                         typical-coords)))
+         (1form-basis-coefficient-functions #| guts |#
+          (c:generate (coordinate-system 'dimension)
+                      'up
+                      (lambda (i)
+                        (compose (component i) guts))))
+         (1form-basis
+          (s:map/r (lambda (1form-basis-coefficient-function)
+                     (components->1form-field 1form-basis-coefficient-function
+                                              coordinate-system))
+                   1form-basis-coefficient-functions)))
     1form-basis))
 
 #|
@@ -128,10 +128,10 @@
 
 (define (((make-constant-vector-field basis m0) v) f)
   (let ((vector-basis (basis->vector-basis basis))
-	(1form-basis (basis->1form-basis basis)))
+        (1form-basis (basis->1form-basis basis)))
     (* (vector-basis f)
        (s:map/r (lambda (1fb) (lambda (m) ((1fb v) m0)))
-		1form-basis))))
+                1form-basis))))
 
 ;;; Change of basis: The Jacobian is a structure of manifold
 ;;; functions.  The outer index is the from-basis index, so this
@@ -141,14 +141,14 @@
 
 (define (Jacobian to-basis from-basis)
   (s:map/r (basis->1form-basis to-basis)
-	   (basis->vector-basis from-basis)))
+           (basis->vector-basis from-basis)))
 
 #|
 (define v (literal-vector-field 'v R2-rect))
 
 (define vjp
   (* (Jacobian (R2-polar 'coordinate-basis)
-	       (R2-rect 'coordinate-basis))
+               (R2-rect 'coordinate-basis))
      ((R2-rect 'coordinate-basis-1form-fields)
       v)))
 

@@ -12,26 +12,26 @@
 ;;;; Root finding by successive bisection
 
 
-;;; Simple bisection search 
+;;; Simple bisection search
 ;;;   In IEEE 754 binary floating point I think this will always
 ;;;   converge to full precision, but I have not proved it.  GJS
 
 (define (bisect-1 f x0 x1)
   (let ((fx0 (f x0)) (fx1 (f x1)))
     (if (> (* fx0 fx1) 0.0)
-      (error "root not bounded" x0 x1 fx0 fx1))
+        (error "root not bounded" x0 x1 fx0 fx1))
     (let loop ((x0 x0) (fx0 fx0) (x1 x1) (fx1 fx1))
       (cond ((= fx0 0.0) x0)
-	    ((= fx1 0.0) x1)
-	    (else
-	     (let ((xm (/ (+ x0 x1) 2.0)))
-	       (cond ((= x0 xm) x0)
-		     ((= x1 xm) x1)
-		     (else
-		      (let ((fxm (f xm)))
-			(if (< (* fx1 fxm) 0.0)
-			    (loop xm fxm x1 fx1)
-			    (loop x0 fx0 xm fxm)))))))))))
+            ((= fx1 0.0) x1)
+            (else
+             (let ((xm (/ (+ x0 x1) 2.0)))
+               (cond ((= x0 xm) x0)
+                     ((= x1 xm) x1)
+                     (else
+                      (let ((fxm (f xm)))
+                        (if (< (* fx1 fxm) 0.0)
+                            (loop xm fxm x1 fx1)
+                            (loop x0 fx0 xm fxm)))))))))))
 #|
 ;;; for example, this took 51 evaluations of f.
 
@@ -56,24 +56,24 @@
 
 |#
 
-;;; Simple bisection search 
+;;; Simple bisection search
 ;;;  terminating when x0 close to x1.
 
 (define (bisect-2 f x0 x1 eps)
   (let loop ((x0 x0) (fx0 (f x0)) (x1 x1) (fx1 (f x1)))
-    (if (= fx0 0.0) 
-	x0
-	(if (= fx1 0.0)
-	    x1
-	    (if (> (* fx1 fx0) 0.0)
-		(error "root not bounded")
-		(let ((xm (/ (+ x0 x1) 2.0)))
-		  (if (close-enuf? x0 x1 eps)
-		      xm
-		      (let ((fxm (f xm)))
-			(if (< (* fx1 fxm) 0.0)
-			    (loop xm fxm x1 fx1)
-			    (loop x0 fx0 xm fxm))))))))))
+    (if (= fx0 0.0)
+        x0
+        (if (= fx1 0.0)
+            x1
+            (if (> (* fx1 fx0) 0.0)
+                (error "root not bounded")
+                (let ((xm (/ (+ x0 x1) 2.0)))
+                  (if (close-enuf? x0 x1 eps)
+                      xm
+                      (let ((fxm (f xm)))
+                        (if (< (* fx1 fxm) 0.0)
+                            (loop xm fxm x1 fx1)
+                            (loop x0 fx0 xm fxm))))))))))
 #|
 ;;; for example
 
@@ -104,19 +104,19 @@
 
 (define (bisect-fp f x0 x1 eps)
   (let loop ((x0 x0) (fx0 (f x0)) (x1 x1) (fx1 (f x1)))
-    (if (= fx0 0.0) 
-	x0
-	(if (= fx1 0.0)
-	    x1
-	    (if (> (* fx1 fx0) 0.0)
-		(error "root not bounded")
-		(let ((xm (/ (- (* fx1 x0) (* fx0 x1)) (- fx1 fx0))))
-		  (if (close-enuf? x0 x1 eps)
-		      xm
-		      (let ((fxm (f xm)))
-			(if (< (* fx1 fxm) 0.0)
-			    (loop xm fxm x1 fx1)
-			    (loop x0 fx0 xm fxm))))))))))
+    (if (= fx0 0.0)
+        x0
+        (if (= fx1 0.0)
+            x1
+            (if (> (* fx1 fx0) 0.0)
+                (error "root not bounded")
+                (let ((xm (/ (- (* fx1 x0) (* fx0 x1)) (- fx1 fx0))))
+                  (if (close-enuf? x0 x1 eps)
+                      xm
+                      (let ((fxm (f xm)))
+                        (if (< (* fx1 fxm) 0.0)
+                            (loop xm fxm x1 fx1)
+                            (loop x0 fx0 xm fxm))))))))))
 
 #|
 ;;; for example
@@ -148,7 +148,7 @@
 |#
 
 ;;; Mixed strategy
-;;;   for iterations up to *bisect-break* uses midpoint 
+;;;   for iterations up to *bisect-break* uses midpoint
 ;;;   for iterations after *bisect-break* uses linear interpolation
 
 (define *bisect-break* 60)
@@ -161,7 +161,7 @@
   (let ((n-break (if (default-object? n-break) *bisect-break* n-break)))
     (let loop ((x0 x0) (fx0 (f x0)) (x1 x1) (fx1 (f x1)) (iter 0))
       (if *bisect-wallp* (write-line (list x0 x1)))
-      (if (= fx0 0.0) 
+      (if (= fx0 0.0)
           x0
           (if (= fx1 0.0)
               x1
@@ -169,7 +169,7 @@
                   (if *bisect-error?*
                       (error "root not bounded")
                       #f)
-                  (let ((xm (if (< iter n-break) 
+                  (let ((xm (if (< iter n-break)
                                 (/ (+ x0 x1) 2.)
                                 (/ (- (* fx1 x0) (* fx0 x1)) (- fx1 fx0)))))
                     (if (close-enuf? x0 x1 eps)
@@ -221,20 +221,20 @@
 ;Value: .34227031649177553
 |#
 
-;;; If we don't know anything, it is usually a good idea to 
-;;;   break the interval into dx-sized pieces and look for 
+;;; If we don't know anything, it is usually a good idea to
+;;;   break the interval into dx-sized pieces and look for
 ;;;   roots in each interval.
 
 (define (find-a-root f x0 x1 dx eps continue failure)
   (define (find x0 x1)
     (if (> (abs (- x0 x1)) dx)
-	(let ((f1 (f x1)) (f0 (f x0)))
-	  (if (< (* f0 f1) 0)
-	      (continue (bisect f x0 x1 eps))
-	      (let ((xm (/ (+ x0 x1) 2)))
-		(find x0 xm)
-		(find xm x1))))
-	failure))
+        (let ((f1 (f x1)) (f0 (f x0)))
+          (if (< (* f0 f1) 0)
+              (continue (bisect f x0 x1 eps))
+              (let ((xm (/ (+ x0 x1) 2)))
+                (find x0 xm)
+                (find xm x1))))
+        failure))
   (find x0 x1))
 
 
@@ -244,10 +244,10 @@
   (define (find-roots x0 x1)
     (let ((f1 (f x1)) (f0 (f x0)))
       (if (< (abs (- x1 x0)) small)
-	  (if (< (* f0 f1) 0)
-	      (list (bisect f x0 x1 eps))
-	      '())
-	  (let ((xm (/ (+ x0 x1) 2)))
-	    (append (find-roots x0 xm)
-		    (find-roots xm x1))))))
+          (if (< (* f0 f1) 0)
+              (list (bisect f x0 x1 eps))
+              '())
+          (let ((xm (/ (+ x0 x1) 2)))
+            (append (find-roots x0 xm)
+                    (find-roots xm x1))))))
   (find-roots x0 x1))

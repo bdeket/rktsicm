@@ -37,7 +37,7 @@
     "joint-arity"
     (check-equal? (joint-arity (exact-arity 2) (exact-arity 2)) (exact-arity 2))
     (check-equal? (joint-arity (exact-arity 2) (exact-arity 6)) #f)
-    
+
     (check-equal? (joint-arity (exact-arity 2) (arity-at-least 4)) #f)
     (check-equal? (joint-arity (arity-at-least 4) (exact-arity 2)) #f)
     (check-equal? (joint-arity (exact-arity 2) (arity-at-least 1)) 2)
@@ -64,7 +64,7 @@
     (check-equal? (joint-arity `(2 4 ,(arity-at-least 7)) `(2 3 ,(arity-at-least 8))) `(2 ,(arity-at-least 8)))
     (check-equal? (joint-arity `(2 4 ,(arity-at-least 7)) `(2 ,(arity-at-least 3))) `(2 4 ,(arity-at-least 7)))
     (check-equal? (joint-arity #f 3) #f))
-   
+
    (test-case
     "combine-arity"
     (check-exn #px"combine-arity: contract violation\n  expected: procedure-arity?" (λ () (combine-arity #f 3)))
@@ -106,7 +106,7 @@
                   (vector '() (arity-at-least 7) '(5 6)))
     (check-equal? (arity-intersect (arity-at-least 6) (list 2 6 8))
                   (vector (list 7 (arity-at-least 9)) '(6 8) 2))
-  
+
     (check-equal? (arity-intersect (list 2 5 (arity-at-least 7)) (list 4 5 (arity-at-least 9)))
                   (vector (list 2 7 8) (list 5 (arity-at-least 9)) 4))
     (check-equal? (arity-intersect (list 2 5 (arity-at-least 7)) (arity-at-least 4))

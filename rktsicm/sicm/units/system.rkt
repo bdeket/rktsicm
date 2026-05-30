@@ -34,36 +34,36 @@
                           (build-vector len
                                         (lambda (j) (if (= i j) 1 0))))])
          (syntax/loc
-           stx
-         (begin
-           (define-values (id u-id ...)
-             (let* ([units (list (make-unit 'id expo 1) ...)]
-                    [base-spec (for/list ([info (in-list (list (list 'u-id u-name u-type) ...))]
-                                          [unit (in-list units)])
-                                 (append info (list unit)))])
-               (define us (make-unit-system 'id base-spec '() '()))
-               (environment-define scmutils-base-environment 'id us)
-               (for ([unit (in-list base-spec)])
-                 (environment-define scmutils-base-environment (car unit) (cadddr unit)))
-               (apply
-                values
-                us
-                units)))))))]))
+             stx
+           (begin
+             (define-values (id u-id ...)
+               (let* ([units (list (make-unit 'id expo 1) ...)]
+                      [base-spec (for/list ([info (in-list (list (list 'u-id u-name u-type) ...))]
+                                            [unit (in-list units)])
+                                   (append info (list unit)))])
+                 (define us (make-unit-system 'id base-spec '() '()))
+                 (environment-define scmutils-base-environment 'id us)
+                 (for ([unit (in-list base-spec)])
+                   (environment-define scmutils-base-environment (car unit) (cadddr unit)))
+                 (apply
+                  values
+                  us
+                  units)))))))]))
 #;
 (define (define-unit-system system-name . base-units)
   (if (environment-bound? scmutils-base-environment system-name)
-    (write-line `(clobbering ,system-name)))
-  (let ((n (length base-units)))    
+      (write-line `(clobbering ,system-name)))
+  (let ((n (length base-units)))
     (let ((base-specs
            (map (lambda (base-spec i)
                   (let* ((unit-name (car base-spec))
                          (exponents
                           (make-initialized-vector n
-                                        (lambda (j) (if (fix:= i j) 1 0))))
+                                                   (lambda (j) (if (fix:= i j) 1 0))))
                          (unit (make-unit system-name exponents 1)))
                     (if (environment-bound? scmutils-base-environment
-                                              unit-name)
-                      (write-line `(clobbering ,unit-name)))
+                                            unit-name)
+                        (write-line `(clobbering ,unit-name)))
                     (environment-define scmutils-base-environment
                                         unit-name
                                         unit)
@@ -71,13 +71,13 @@
                 base-units
                 (iota n))))
       (environment-define scmutils-base-environment
-			  system-name
-			  (list '*unit-system*
-				system-name
-				base-specs          ;base units
-				'()	            ;derived units
-				'()	            ;additional units
-				))))
+                          system-name
+                          (list '*unit-system*
+                                system-name
+                                base-specs          ;base units
+                                '()                    ;derived units
+                                '()                    ;additional units
+                                ))))
   system-name)
 
 (struct unit-system (name base [derived #:mutable] [alternate #:mutable])
@@ -175,7 +175,7 @@
           #:optional scale-factor)
   (assert (unit-system? system))
   (if (environment-bound? scmutils-base-environment unit-name)
-    (write-line `(clobbering ,unit-name)))
+      (write-line `(clobbering ,unit-name)))
   (if (default-object? scale-factor)
       (set! scale-factor 1))
   (set! content
@@ -189,8 +189,8 @@
 
 (define (define-additional-unit! system unit-spec)
   (set-unit-system-alternate! system
-                               (append (alternate-units system)
-                                       (list unit-spec))))
+                              (append (alternate-units system)
+                                      (list unit-spec))))
 
 
 (define *multiplier-names* '())
@@ -267,7 +267,7 @@
     (add-property! constant 'description description)
     (if (real? value) (declare-known-reals name))
     (if (not (default-object? uncertainty))
-      (add-property! constant 'uncertainty uncertainty))
+        (add-property! constant 'uncertainty uncertainty))
     (*numerical-constants* (cons constant (*numerical-constants*)))
     (environment-define scmutils-base-environment
                         name
@@ -283,7 +283,7 @@
                (get-property c 'name)
                (if units?
                    (with-units (get-property c 'numerical-value)
-                     (get-property c 'units))
+                               (get-property c 'units))
                    (g:* (get-property c 'numerical-value)
                         (unit-scale (get-property c 'units))))))
             constants))
@@ -297,14 +297,14 @@
                (get-property c 'name)
                (if units?
                    (with-units (get-property c 'name)
-                     (get-property c 'units))
+                               (get-property c 'units))
                    (g:* (get-property c 'name)
                         (unit-scale (get-property c 'units))))))
             constants))
 
 (define (get-constant-data name)
   (find (lambda (c) (eq? (get-property c 'name) name))
-         (*numerical-constants*)))
+        (*numerical-constants*)))
 
 ;;; & is used to attach units to a number, or to check that a number
 ;;; has the given units.
@@ -319,9 +319,9 @@
             value
             (error "Units do not match: &" value units))
         (with-units (g:* scale (unit-scale units) value)
-          (make-unit (u:unit-system units)
-                     (unit-exponents units)
-                     1)))))
+                    (make-unit (u:unit-system units)
+                               (unit-exponents units)
+                               1)))))
 
 (define *unit-constructor* '&)
 
@@ -354,8 +354,8 @@
                  target-unit-expression)))
         ((units? num)
          (if (not (simple:equal? (unit-exponents num) (unit-exponents target-unit)))
-               (error "Cannot express in given units"
-                      num target-unit target-unit-expression))
+             (error "Cannot express in given units"
+                    num target-unit target-unit-expression))
          (list *unit-constructor*
                (g:/ (unit-scale num) (unit-scale target-unit))
                target-unit-expression))
@@ -388,14 +388,14 @@
         (list *unit-constructor*
               (g:simplify value)
               (unit-expression (vector->list exponent-vector)
-                              (map car (base-units system)))))))
+                               (map car (base-units system)))))))
 
 
 (define (find-unit-description vect ulist)
   (find (lambda (entry)
-           (simple:equal? (unit-exponents (list-ref entry 3))
-                          vect))
-         ulist))
+          (simple:equal? (unit-exponents (list-ref entry 3))
+                         vect))
+        ulist))
 
 (define (find-unit-name vect ulist)
   (let ((v (find-unit-description vect ulist)))
@@ -441,8 +441,8 @@
 
 (define (foosh x)
   (let* ((logscale (round->exact (log10 x)))
-	 (scale (expt 10 logscale))
-	 )
+         (scale (expt 10 logscale))
+         )
     (list (/ x scale) scale)
   ))
 

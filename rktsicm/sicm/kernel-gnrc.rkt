@@ -31,7 +31,7 @@
 
   [g:square square]
   [g:cube cube]
-          
+
   [g:sqrt sqrt]
 
   [g:exp exp]

@@ -14,19 +14,19 @@
 
 ;;bdk;; start original file
 
-;;;; Interface system for QUADRATURE 
+;;;; Interface system for QUADRATURE
 
 
 ;;bdk;; moved to infinities 1
 
-#| 
+#|
 ;;; Bugs:
 
 ;;; The following should be pi.
 ;;; Unfortunately it converges so slowly that
-;;; we never get a  reasonable answer.  
-;;; The functions that we can integrate must 
-;;; decay at least as fast as 1/x^2 
+;;; we never get a  reasonable answer.
+;;; The functions that we can integrate must
+;;; decay at least as fast as 1/x^2
 ;;;  as x->infinity.
 
 (* 2
@@ -120,19 +120,19 @@
          (method
           (if (default-object? method) 'open method)))
 
-    
+
     (define (the-integrator-control message . rest-of-arguments)
 
       (case (symbol-upcase message)
-	
+
         ((INTEGRAL)
          (evaluate-definite-integral
           method
           integrand
           lower-limit
           upper-limit
-          allowable-error))	  
-	
+          allowable-error))
+
         ((INTEGRAND) integrand)
         ((SET-INTEGRAND!)
          (let ((x (car rest-of-arguments)))
@@ -152,7 +152,7 @@
         ((SET-ERROR!)
          (let ((x (car rest-of-arguments)))
            (set! allowable-error x)))
-	
+
         ((METHOD) method)
         ((SET-METHOD!)
          (let ((x (car rest-of-arguments)))
@@ -162,131 +162,131 @@
          (error "Unknown message -- ODE-INTEGRATOR" message))
         ))
 
-  the-integrator-control))
+    the-integrator-control))
 
 (define (evaluate-definite-integral method
-				    integrand
-				    lower-limit
-				    upper-limit
-				    allowable-error)
+                                    integrand
+                                    lower-limit
+                                    upper-limit
+                                    allowable-error)
   (if (not (and integrand lower-limit upper-limit))
       (error "Missing parameter for definite integral"
-	     `(integrand ,integrand
-	       lower-limit ,lower-limit
-	       upper-limit ,upper-limit)))
+             `(integrand ,integrand
+                         lower-limit ,lower-limit
+                         upper-limit ,upper-limit)))
 
   (let ((lower-limit (if (memq lower-limit *infinities*)
-			 lower-limit
-			 (exact->inexact lower-limit)))
-	(upper-limit (if (memq upper-limit *infinities*)
-			 upper-limit
-			 (exact->inexact upper-limit)))
-	(allowable-error (exact->inexact allowable-error)))
-    
+                         lower-limit
+                         (exact->inexact lower-limit)))
+        (upper-limit (if (memq upper-limit *infinities*)
+                         upper-limit
+                         (exact->inexact upper-limit)))
+        (allowable-error (exact->inexact allowable-error)))
+
     (if (or (memq lower-limit *infinities*)
-	    (memq upper-limit *infinities*))
-	(evaluate-improper-integral method
-				    integrand
-				    lower-limit
-				    upper-limit
-				    allowable-error)
-	  
-	(case (symbol-upcase method)
+            (memq upper-limit *infinities*))
+        (evaluate-improper-integral method
+                                    integrand
+                                    lower-limit
+                                    upper-limit
+                                    allowable-error)
 
-	  ((OPEN)
-	   (integrate-open integrand
-			   lower-limit upper-limit
-			   allowable-error))
+        (case (symbol-upcase method)
 
-	  ((CLOSED-CLOSED)
-	   (integrate-closed-closed integrand
+          ((OPEN)
+           (integrate-open integrand
+                           lower-limit upper-limit
+                           allowable-error))
+
+          ((CLOSED-CLOSED)
+           (integrate-closed-closed integrand
                                     lower-limit upper-limit
                                     allowable-error))
 
-	  ((CLOSED-OPEN)
-	   (integrate-closed-open integrand
+          ((CLOSED-OPEN)
+           (integrate-closed-open integrand
                                   lower-limit upper-limit
                                   allowable-error))
 
-	  ((OPEN-CLOSED)
-	   (integrate-open-closed integrand
+          ((OPEN-CLOSED)
+           (integrate-open-closed integrand
                                   lower-limit upper-limit
                                   allowable-error))
 
-	  ((OPEN-OPEN)
-	   (integrate-open-open integrand
-				lower-limit upper-limit
-				allowable-error))
+          ((OPEN-OPEN)
+           (integrate-open-open integrand
+                                lower-limit upper-limit
+                                allowable-error))
 
-	  ((ROMBERG)
-	   (romberg-quadrature integrand
-			       lower-limit upper-limit
-			       allowable-error))
+          ((ROMBERG)
+           (romberg-quadrature integrand
+                               lower-limit upper-limit
+                               allowable-error))
 
-	  ((BULIRSCH-STOER)
-	   (bulirsch-stoer-quadrature integrand
-				      lower-limit upper-limit
-				      allowable-error))
-	  (else
-	   (error "Unknown method -- DEFINITE-INTEGRAL" method))))))
+          ((BULIRSCH-STOER)
+           (bulirsch-stoer-quadrature integrand
+                                      lower-limit upper-limit
+                                      allowable-error))
+          (else
+           (error "Unknown method -- DEFINITE-INTEGRAL" method))))))
 
 
 #|
 (define (evaluate-improper-integral method integrand lower-limit upper-limit allowable-error)
   (let ((new-integrand
-	 (lambda (theta)
-	   (/ (integrand (tan theta))
-	      (square (cos theta))))))
-	
+         (lambda (theta)
+           (/ (integrand (tan theta))
+              (square (cos theta))))))
+
     (case lower-limit
       ((:-infinity)
        (case upper-limit
-	 ((:+infinity)
-	  (integrate-open-open new-integrand
-			       :-pi/2 :+pi/2
-			       allowable-error))
-	 ((:-infinity) 0.0)
-	 (else
-	  (if (memq method '(open-open closed-open))
-	      (integrate-open-open new-integrand
-				   :-pi/2 (atan upper-limit)
-				   allowable-error)
-	      (integrate-open-closed new-integrand
-				     :-pi/2 (atan upper-limit)
-				     allowable-error)))))
+         ((:+infinity)
+          (integrate-open-open new-integrand
+                               :-pi/2 :+pi/2
+                               allowable-error))
+         ((:-infinity) 0.0)
+         (else
+          (if (memq method '(open-open closed-open))
+              (integrate-open-open new-integrand
+                                   :-pi/2 (atan upper-limit)
+                                   allowable-error)
+              (integrate-open-closed new-integrand
+                                     :-pi/2 (atan upper-limit)
+                                     allowable-error)))))
       ((:+infinity)
        (case upper-limit
-	 ((:+infinity) 0.0)
-	 ((:-infinity)
-	  (- (integrate-open-open new-integrand
-				  :-pi/2 :+pi/2
-				  allowable-error)))
-	 (else
-	  (if (memq method '(open-open open-closed))
-	      (- (integrate-open-open new-integrand
-				      (atan upper-limit) :+pi/2
-				      allowable-error))
-	      (- (integrate-closed-open new-integrand
-					(atan upper-limit) :+pi/2
-					allowable-error))))))
+         ((:+infinity) 0.0)
+         ((:-infinity)
+          (- (integrate-open-open new-integrand
+                                  :-pi/2 :+pi/2
+                                  allowable-error)))
+         (else
+          (if (memq method '(open-open open-closed))
+              (- (integrate-open-open new-integrand
+                                      (atan upper-limit) :+pi/2
+                                      allowable-error))
+              (- (integrate-closed-open new-integrand
+                                        (atan upper-limit) :+pi/2
+                                        allowable-error))))))
       (else
        (case upper-limit
-	 ((:+infinity)
-	  (if (memq method '(open-open open-closed))
-	      (integrate-open-open new-integrand
-				   (atan lower-limit) :+pi/2
-				   allowable-error)
-	      (integrate-closed-open new-integrand
-				     (atan lower-limit) :+pi/2
-				     allowable-error)))
-	 ((:-infinity)
-	  (if (memq method '(open-open open-closed))
-	      (- (integrate-open-open new-integrand
-				      :-pi/2 (atan lower-limit)
-				      allowable-error))
-	      (- (integrate-closed-open new-integrand
-					:-pi/2 (atan lower-limit)
-					allowable-error)))))))))
+         ((:+infinity)
+          (if (memq method '(open-open open-closed))
+              (integrate-open-open new-integrand
+                                   (atan lower-limit) :+pi/2
+                                   allowable-error)
+              (integrate-closed-open new-integrand
+                                     (atan lower-limit) :+pi/2
+                                     allowable-error)))
+         ((:-infinity)
+          (if (memq method '(open-open open-closed))
+              (- (integrate-open-open new-integrand
+                                      :-pi/2 (atan lower-limit)
+                                      allowable-error))
+              (- (integrate-closed-open new-integrand
+                                        :-pi/2 (atan lower-limit)
+                                        allowable-error)))))))))
 |#
 
 ;;; Simpler version, from Press, et al.
@@ -296,103 +296,103 @@
 (define (evaluate-improper-integral method integrand lower-limit upper-limit allowable-error)
   ;; method is ignored here
   (let ((new-integrand
-	 (lambda (t)
-	   (/ (integrand (/ 1.0 t))
-	      (* t t)))))
-	
+         (lambda (t)
+           (/ (integrand (/ 1.0 t))
+              (* t t)))))
+
     (case lower-limit
       ((:-infinity)
        (case upper-limit
-	 ((:-infinity) 0.0)
-	 ((:+infinity)
-	  (+ (integrate-closed-open new-integrand
-				    (/ -1.0 *improper-integral-breakpoint*)
-				    0.0
-				    allowable-error)
-	     (integrate-closed-closed integrand
-				      (- *improper-integral-breakpoint*)
-				      *improper-integral-breakpoint*
-				      allowable-error)
-	     (integrate-open-closed new-integrand
-				    0.0
-				    (/ 1.0 *improper-integral-breakpoint*)
-				    allowable-error)))
-	 (else
-	  (if (<= upper-limit (- *improper-integral-breakpoint*))
-	      (integrate-open-open new-integrand
-				   (/ -1.0 upper-limit)
-				   0.0
-				   allowable-error)
-	      (+ (integrate-closed-open new-integrand
-					(/ -1.0 *improper-integral-breakpoint*)
-					0.0
-					allowable-error)
-		 (integrate-closed-open integrand
-					(- *improper-integral-breakpoint*)
-					upper-limit
-					allowable-error))))))
+         ((:-infinity) 0.0)
+         ((:+infinity)
+          (+ (integrate-closed-open new-integrand
+                                    (/ -1.0 *improper-integral-breakpoint*)
+                                    0.0
+                                    allowable-error)
+             (integrate-closed-closed integrand
+                                      (- *improper-integral-breakpoint*)
+                                      *improper-integral-breakpoint*
+                                      allowable-error)
+             (integrate-open-closed new-integrand
+                                    0.0
+                                    (/ 1.0 *improper-integral-breakpoint*)
+                                    allowable-error)))
+         (else
+          (if (<= upper-limit (- *improper-integral-breakpoint*))
+              (integrate-open-open new-integrand
+                                   (/ -1.0 upper-limit)
+                                   0.0
+                                   allowable-error)
+              (+ (integrate-closed-open new-integrand
+                                        (/ -1.0 *improper-integral-breakpoint*)
+                                        0.0
+                                        allowable-error)
+                 (integrate-closed-open integrand
+                                        (- *improper-integral-breakpoint*)
+                                        upper-limit
+                                        allowable-error))))))
       ((:+infinity)
        (case upper-limit
-	 ((:-infinity)
-	  (- (+ (integrate-closed-open new-integrand
-				       (/ -1.0 *improper-integral-breakpoint*)
-				       0.0
-				       allowable-error)
-		(integrate-closed-closed integrand
-					 (- *improper-integral-breakpoint*)
-					 *improper-integral-breakpoint*
-					 allowable-error)
-		(integrate-open-closed new-integrand
-				       0.0
-				       (/ 1.0 *improper-integral-breakpoint*)
-				       allowable-error))))
-	 ((:+infinity) 0.0)
-	 (else
-	  (if (>= upper-limit *improper-integral-breakpoint*)
-	      (- (integrate-open-open new-integrand
-				      (/ 1.0 upper-limit)
-				      0.0
-				      allowable-error))
-	      (- (+ (integrate-closed-open new-integrand
-					   (/ 1.0 *improper-integral-breakpoint*)
-					   0.0
-					   allowable-error)
-		    (integrate-closed-open integrand
-					   *improper-integral-breakpoint*
-					   upper-limit
-					   allowable-error)))))))
+         ((:-infinity)
+          (- (+ (integrate-closed-open new-integrand
+                                       (/ -1.0 *improper-integral-breakpoint*)
+                                       0.0
+                                       allowable-error)
+                (integrate-closed-closed integrand
+                                         (- *improper-integral-breakpoint*)
+                                         *improper-integral-breakpoint*
+                                         allowable-error)
+                (integrate-open-closed new-integrand
+                                       0.0
+                                       (/ 1.0 *improper-integral-breakpoint*)
+                                       allowable-error))))
+         ((:+infinity) 0.0)
+         (else
+          (if (>= upper-limit *improper-integral-breakpoint*)
+              (- (integrate-open-open new-integrand
+                                      (/ 1.0 upper-limit)
+                                      0.0
+                                      allowable-error))
+              (- (+ (integrate-closed-open new-integrand
+                                           (/ 1.0 *improper-integral-breakpoint*)
+                                           0.0
+                                           allowable-error)
+                    (integrate-closed-open integrand
+                                           *improper-integral-breakpoint*
+                                           upper-limit
+                                           allowable-error)))))))
       (else
        (case upper-limit
-	 ((:-infinity)
-	  (if (<= lower-limit (- *improper-integral-breakpoint*))
-	      (integrate-open-open new-integrand
-				   (/ -1.0 lower-limit)
-				   0.0
-				   allowable-error)
-	      (+ (integrate-closed-open new-integrand
-					(/ -1.0 *improper-integral-breakpoint*)
-					0.0
-					allowable-error)
-		 (integrate-closed-open integrand
-					*improper-integral-breakpoint*
-					lower-limit
-					allowable-error))))
-	 ((:+infinity)
-	  (if (>= lower-limit *improper-integral-breakpoint*)
-	      (integrate-open-open new-integrand
-				   0.0
-				   (/ 1.0 lower-limit)
-				   allowable-error)
-	      (+ (integrate-open-closed integrand
-					lower-limit
-					*improper-integral-breakpoint*
-					allowable-error)
-		 (integrate-open-closed new-integrand
-					0.0
-					(/ 1.0 *improper-integral-breakpoint*)
-					allowable-error))))
-	 (else
-	  (error "Should not get here -- IMPROPER-INTEGRAL")))))))
+         ((:-infinity)
+          (if (<= lower-limit (- *improper-integral-breakpoint*))
+              (integrate-open-open new-integrand
+                                   (/ -1.0 lower-limit)
+                                   0.0
+                                   allowable-error)
+              (+ (integrate-closed-open new-integrand
+                                        (/ -1.0 *improper-integral-breakpoint*)
+                                        0.0
+                                        allowable-error)
+                 (integrate-closed-open integrand
+                                        *improper-integral-breakpoint*
+                                        lower-limit
+                                        allowable-error))))
+         ((:+infinity)
+          (if (>= lower-limit *improper-integral-breakpoint*)
+              (integrate-open-open new-integrand
+                                   0.0
+                                   (/ 1.0 lower-limit)
+                                   allowable-error)
+              (+ (integrate-open-closed integrand
+                                        lower-limit
+                                        *improper-integral-breakpoint*
+                                        allowable-error)
+                 (integrate-open-closed new-integrand
+                                        0.0
+                                        (/ 1.0 *improper-integral-breakpoint*)
+                                        allowable-error))))
+         (else
+          (error "Should not get here -- IMPROPER-INTEGRAL")))))))
 
 (define (bulirsch-stoer-quadrature f t1 t2 allowable-error)
   ((advance-generator
@@ -401,10 +401,10 @@
      (lambda (state dstate)
        (vector-set! dstate 0 1.0)
        (vector-set! dstate 1
-		    (f (vector-ref state 0))))
+                    (f (vector-ref state 0))))
      2
      allowable-error))
-   (vector t1 0.0)			;initial state
+   (vector t1 0.0)                        ;initial state
    (- t2 t1)
    (/ (- t2 t1) 2)
    (- t2 t1)

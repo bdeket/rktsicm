@@ -126,7 +126,7 @@
                     (7.9999999999982006 #(-.7071067811865475 .7071067811865475 3.465221769689776e-27))
                     (8.265165042945835 #(-.49999999999999994 -.49999999999999967 -.7071067811865474)))
                   1e-10)
-    ;;; Indeed 
+    ;;; Indeed
     (check-within (/ (* A (vector -1/2 -1/2 (/ (sqrt 2) 2))) 7.7348349570559485)
                   #(-.49999999999994155 -.49999999999994155 .707106781186465)
                   1e-15)
@@ -142,18 +142,18 @@
     ;;; Problem is roots are not good enuf for null-space test
     (check-simplified? (determinant (- A (* 'lam (m:identity-like A))))
                        '(+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
-    (check-equal? ((lambda (lam) 
+    (check-equal? ((lambda (lam)
                      (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
                    8)
                   0)
-    (check-= ((lambda (lam) 
+    (check-= ((lambda (lam)
                 (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
               7.9999999999982006)
              -1.1368683772161603e-13
              1e-15)
     ;;; ugh!
     ;;; but I can generally not do better:
-    (check-within (zbrent (lambda (lam) 
+    (check-within (zbrent (lambda (lam)
                        (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
                      7.9999999999982006
                      8.0003)

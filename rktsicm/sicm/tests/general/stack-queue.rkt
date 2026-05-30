@@ -66,7 +66,7 @@
     (check-equal? (pop! stq) 2)
     (check-equal? (pop! stq) 3)
     (check-equal? (pop! stq) 4))
-   
+
    ))
 
 (module+ test

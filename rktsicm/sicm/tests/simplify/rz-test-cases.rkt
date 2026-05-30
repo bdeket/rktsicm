@@ -8,10 +8,10 @@
 
 (define (gcd-test d f g)
   (let ((pd (pcf:expression-> d (lambda (p v) p)))
-	(pf (pcf:expression-> f (lambda (p v) p)))
-	(pg (pcf:expression-> g (lambda (p v) p))))
+        (pf (pcf:expression-> f (lambda (p v) p)))
+        (pg (pcf:expression-> g (lambda (p v) p))))
     (poly:= (poly:gcd (poly:* pd pf) (poly:* pd pg))
-	    pd)))
+            pd)))
 
 (provide the-tests)
 (define the-tests

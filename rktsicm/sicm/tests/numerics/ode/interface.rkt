@@ -47,9 +47,9 @@
                     (lambda ()
                       (lambda (x)
                         (vector 1.0 (vector-ref x 1)))))
-                   #(0.0 1.0)				;initial conditions
-                   1.0					;target advance
-                   .000000000001				;lte
+                   #(0.0 1.0)                                ;initial conditions
+                   1.0                                        ;target advance
+                   .000000000001                                ;lte
                    list))
                   #(.999999999999987 2.7182818284594377)
                   #;(list #(.999999999999987 2.7182818284594377) 1. 5.010573747095126e-4)
@@ -63,9 +63,9 @@
                     (lambda ()
                       (lambda (x)
                         (vector 1.0 (vector-ref x 1)))))
-                   #(0.0 1.0)				;initial conditions
-                   1.0					;target advance
-                   .000000000001				;lte
+                   #(0.0 1.0)                                ;initial conditions
+                   1.0                                        ;target advance
+                   .000000000001                                ;lte
                    list))
                   #(.999999999999987 2.7182818284594377)
                   #;(list #(.999999999999987 2.7182818284594377) 1. 5.010573747095126e-4)

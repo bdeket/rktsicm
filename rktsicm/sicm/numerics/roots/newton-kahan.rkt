@@ -10,20 +10,20 @@
 ;;bdk;; start original file
 
 ;;; In simple cases, if one knows the function and its derivative,
-;;;  Newton's method is a quick-and-dirty way to find a root.  
+;;;  Newton's method is a quick-and-dirty way to find a root.
 ;;;  However, one must start close to the root to get it to converge.
 
 
-(define (newton-search f&df x0 eps) 
+(define (newton-search f&df x0 eps)
   (define (newton-improve xn)
     (f&df xn
-	  (lambda (fn dfn)
-	    (- xn (/ fn dfn)))))
+          (lambda (fn dfn)
+            (- xn (/ fn dfn)))))
   (let lp ((xn x0))
     (let ((xn+1 (newton-improve xn)))
       (if (close-enuf? xn xn+1 eps)
-	  (average xn xn+1)
-	  (lp xn+1)))))
+          (average xn xn+1)
+          (lp xn+1)))))
 #|
 (newton-search
  (lambda (x cont)
@@ -39,7 +39,7 @@
 ;Value: 1.5707963267948966
 
 
-;;; If the root is multiple, the convergence is much slower 
+;;; If the root is multiple, the convergence is much slower
 ;;;  and much less accurate.
 
 (newton-search
@@ -62,22 +62,22 @@
 ;;; Kahan's hack speeds up search for multiple roots, but costs
 ;;;  a bit for simple roots.
 
-(define (newton-kahan-search f&df x0 x1 eps) 
+(define (newton-kahan-search f&df x0 x1 eps)
   (define (kahan-trick x)
     (let ((z (round (abs x))))
       (if *kahan-wallp* (write-line `(kahan ,z)))
       z))
   (define (psi x) (f&df x /))
   (define (secant-improve xn psn xn-1 psn-1)
-    (- xn 
-       (* psn 
-	  (kahan-trick (/ (- xn xn-1)
-			  (- psn psn-1))))))
+    (- xn
+       (* psn
+          (kahan-trick (/ (- xn xn-1)
+                          (- psn psn-1))))))
   (let lp ((xn x1) (psn (psi x1)) (xn-1 x0) (psn-1 (psi x0)))
     (if (close-enuf? xn xn-1 eps)
-	(average xn xn-1)
-	(let ((xn+1 (secant-improve xn psn xn-1 psn-1)))
-	  (lp xn+1 (psi xn+1) xn psn)))))
+        (average xn xn-1)
+        (let ((xn+1 (secant-improve xn psn xn-1 psn-1)))
+          (lp xn+1 (psi xn+1) xn psn)))))
 
 (define *kahan-wallp* #f)
 #|

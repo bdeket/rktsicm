@@ -20,7 +20,7 @@
 
 (define (enable-constructor-simplifications doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
-  (clear-memoizer-tables) 
+  (clear-memoizer-tables)
   (enable-constructor-simplifications? doit?))
 
 ;;; Disable intermediate simplification -- wastes time.
@@ -32,12 +32,12 @@
   (let ((operand-expressions (map numerical-expression operands)))
     (let ((v (hash-table/get symbolic-operator-table operator-symbol #f)))
       (if v
-	  (let ((newexp (apply v operand-expressions)))
-	    (make-literal number-type-tag
-			  (if (incremental-simplifier)
-			      ((incremental-simplifier) newexp)
-			      newexp)))
-	  (make-combination number-type-tag operator-symbol operands)))))
+          (let ((newexp (apply v operand-expressions)))
+            (make-literal number-type-tag
+                          (if (incremental-simplifier)
+                              ((incremental-simplifier) newexp)
+                              newexp)))
+          (make-combination number-type-tag operator-symbol operands)))))
 
 (define (addto-symbolic-operator-table operator procedure)
   (set! symbolic-operators (cons operator symbolic-operators))
@@ -57,19 +57,19 @@
 
 (define (numerical-expression expr)
   (cond ((number? expr)
-	 (if (and (inexact? expr) (heuristic-number-canonicalizer))
-	     ((heuristic-number-canonicalizer) expr)
-	     expr))
-	((symbol? expr) expr)
-	((literal-number? expr)
-	 (if numerical-expression-canonicalizer
-	     (numerical-expression-canonicalizer (expression-of expr))
-	     (expression-of expr))
-	 (expression-of expr))
-	((pair? expr)
-	 (cond ((memq (car expr) type-tags) expr)
-	       (numerical-expression-canonicalizer
-		(numerical-expression-canonicalizer expr))
-	       (else expr)))
-	(else expr)))
+         (if (and (inexact? expr) (heuristic-number-canonicalizer))
+             ((heuristic-number-canonicalizer) expr)
+             expr))
+        ((symbol? expr) expr)
+        ((literal-number? expr)
+         (if numerical-expression-canonicalizer
+             (numerical-expression-canonicalizer (expression-of expr))
+             (expression-of expr))
+         (expression-of expr))
+        ((pair? expr)
+         (cond ((memq (car expr) type-tags) expr)
+               (numerical-expression-canonicalizer
+                (numerical-expression-canonicalizer expr))
+               (else expr)))
+        (else expr)))
 ;;bdk;; insert 1 end

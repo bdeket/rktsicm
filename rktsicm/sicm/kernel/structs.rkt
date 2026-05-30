@@ -157,7 +157,7 @@
            struct1))
 #|
 (pe (s:outer-product (up 'a0 'a1)
-		     (down 'b0 'b1 'b2)))
+                     (down 'b0 'b1 'b2)))
 (down (up (* a0 b0) (* a1 b0))
       (up (* a0 b1) (* a1 b1))
       (up (* a0 b2) (* a1 b2)))
@@ -165,9 +165,9 @@
 ;;; cf.
 
 (pe (m:outer-product (column-matrix 'a0 'a1)
-		     (row-matrix 'b0 'b1 'b2)))
+                     (row-matrix 'b0 'b1 'b2)))
 (matrix-by-rows (list (* a0 b0) (* a0 b1) (* a0 b2))
-		(list (* a1 b0) (* a1 b1) (* a1 b2)))
+                (list (* a1 b0) (* a1 b1) (* a1 b2)))
 
 
 
@@ -228,7 +228,7 @@
 
 (define (s:dot-product v1 v2)
   (if (not (and (eq? (s:same v1) (s:same v2)) (= (s:dimension v1) (s:dimension v2))))
-    (error "Incompatible structures -- S:DOT-PRODUCT" v1 v2))
+      (error "Incompatible structures -- S:DOT-PRODUCT" v1 v2))
   (apply g:+ (map g:* (s:fringe v1) (s:fringe v2))))
 
 
@@ -280,8 +280,8 @@
 #| ;;; Should be subsumed by deriv:pd in deriv.scm.
 
 (assign-operation 'partial-derivative
-		  s:partial-derivative
-		  structure? any?)
+                  s:partial-derivative
+                  structure? any?)
 |#
 (assign-operation 'apply       s:apply           structure? any?)
 
@@ -309,19 +309,19 @@
 
 (define (make-up-combination operator #:optional reverse?)
   (if (default-object? reverse?)
-      (lambda operands 
+      (lambda operands
         (make-combination up-type-tag
                           operator operands))
-      (lambda operands 
+      (lambda operands
         (make-combination up-type-tag
                           operator (reverse operands)))))
 
 (define (make-down-combination operator #:optional reverse?)
   (if (default-object? reverse?)
-      (lambda operands 
+      (lambda operands
         (make-combination abstract-down-type-tag
                           operator operands))
-      (lambda operands 
+      (lambda operands
         (make-combination abstract-down-type-tag
                           operator (reverse operands)))))
 
@@ -400,16 +400,16 @@
  '*  (make-down-combination '* 'r)    abstract-down?    scalar?)
 
 (assign-operation
-   '*  (make-up-combination '*)    operator? abstract-up?)
+ '*  (make-up-combination '*)    operator? abstract-up?)
 (assign-operation
-   '*  (make-up-combination '* 'r) abstract-up? operator?)
+ '*  (make-up-combination '* 'r) abstract-up? operator?)
 
 (assign-operation
-   '*  (make-down-combination '*)       operator?    abstract-down?)
+ '*  (make-down-combination '*)       operator?    abstract-down?)
 (assign-operation
  '*  (make-down-combination '* 'r)    abstract-down?    operator?)
 
-		     
+
 (assign-operation
  '/  (make-up-combination '/)    abstract-up? scalar?)
 
@@ -440,7 +440,7 @@
 ;;bdk;; moved to cstm/structs 4
 
 ;;; In the following procedures there are extra arguments, ls and rs.
-;;; If the input is multiplied by an object of the ls shape on the 
+;;; If the input is multiplied by an object of the ls shape on the
 ;;; left and the rs shape on the right, the result is a numerical quantity.
 
 ;;; Would like one of these...
@@ -463,42 +463,42 @@
 (define (transpose-test left-multiplier thing right-multiplier)
   ;; Should produce numerical zero and a zero structure
   (list (- (* left-multiplier (* thing right-multiplier))
-	   (* (* (s:transpose2 thing) left-multiplier) right-multiplier))
-	(- (s:transpose left-multiplier thing right-multiplier)
-	   (s:transpose1 thing right-multiplier))))
+           (* (* (s:transpose2 thing) left-multiplier) right-multiplier))
+        (- (s:transpose left-multiplier thing right-multiplier)
+           (s:transpose1 thing right-multiplier))))
 
 ;;; down down
 (transpose-test (up 'a 'b)
-		(down (down 'c 'd) (down 'e 'f) (down 'g 'h))
-		(up 'i 'j 'k))
+                (down (down 'c 'd) (down 'e 'f) (down 'g 'h))
+                (up 'i 'j 'k))
 #| (0 (down (down 0 0 0) (down 0 0 0))) |#
 
 ;;; up up
 (transpose-test (down 'a 'b)
-		(up (up 'c 'd) (up 'e 'f) (up 'g 'h))
-		(down 'i 'j 'k))
+                (up (up 'c 'd) (up 'e 'f) (up 'g 'h))
+                (down 'i 'j 'k))
 #| (0 (up (up 0 0 0) (up 0 0 0))) |#
 
 ;;; up down
 (transpose-test (up 'a 'b)
-		(up (down 'c 'd) (down 'e 'f) (down 'g 'h))
-		(down 'i 'j 'k))
+                (up (down 'c 'd) (down 'e 'f) (down 'g 'h))
+                (down 'i 'j 'k))
 #| (0 (down (up 0 0 0) (up 0 0 0))) |#
 
 ;;; down up
 (transpose-test (down 'a 'b)
-		(down (up 'c 'd) (up 'e 'f) (up 'g 'h))
-		(up 'i 'j 'k))
+                (down (up 'c 'd) (up 'e 'f) (up 'g 'h))
+                (up 'i 'j 'k))
 #| (0 (up (down 0 0 0) (down 0 0 0))) |#
 |#
 
-(define (s:inverse ls ms rs)		;but see s:invert...
+(define (s:inverse ls ms rs)                ;but see s:invert...
   (m->s (compatible-shape rs)
         (m:invert
          (s->m ls ms rs))
         (compatible-shape ls)))
 
-(define (s:inverse1 ms rs)		;but see s:invert...
+(define (s:inverse1 ms rs)                ;but see s:invert...
   (let ((ls (compatible-shape (g:* ms rs))))
     (m->s (compatible-shape rs)
           (m:invert
@@ -538,8 +538,8 @@
 |#
 
 ;;; Sometimes a 2-tensor must be viewed as a matrix for some purpose,
-;;; for example to invert it.  The following are the required coercions 
-;;; between tensor structures and matrices.  This can not work for 
+;;; for example to invert it.  The following are the required coercions
+;;; between tensor structures and matrices.  This can not work for
 ;;; general structures, such as a 2-down with substructure.
 
 ;;; Convention for A^m_n: rightmost index, n, is length of outermost
@@ -547,7 +547,7 @@
 
 ;;; a down of n downs each m long -> n downs X m ups
 
-(define (A_mn->Mnm s)			
+(define (A_mn->Mnm s)
   (if (and (down? s) (down? (s:ref s 0)))
       (let ((ndowns (s:length s))
             (ncols (s:length (s:ref s 0))))
@@ -809,14 +809,14 @@
 #|
 (define (s:transpose2 s)
   (cond ((2-down? s)
-	 (Mnm->A_mn (m:transpose (A_mn->Mnm s))))
-	((2-up? s)
-	 (Mmn->A^mn (m:transpose (A^mn->Mmn s))))
-	((up-of-downs? s)
-	 (Mmn->A^m_n (A_m^n->Mnm s)))
-	((down-of-ups? s)
-	 (Mnm->A_m^n (A^m_n->Mmn s)))
-	(else (error "s:transpose2" s))))
+         (Mnm->A_mn (m:transpose (A_mn->Mnm s))))
+        ((2-up? s)
+         (Mmn->A^mn (m:transpose (A^mn->Mmn s))))
+        ((up-of-downs? s)
+         (Mmn->A^m_n (A_m^n->Mnm s)))
+        ((down-of-ups? s)
+         (Mnm->A_m^n (A^m_n->Mmn s)))
+        (else (error "s:transpose2" s))))
 
 (define (s:transpose-up->down s)
   (vector->down (up->vector s)))
@@ -828,34 +828,34 @@
 (define (transpose-test left-multiplier thing right-multiplier)
   ;; Should produce numerical zero and a zero structure
   (list (- (* left-multiplier (* thing right-multiplier))
-	   (* (* (s:transpose2 thing) left-multiplier) right-multiplier))
-	(- (s:transpose left-multiplier thing right-multiplier)
-	   (s:transpose2 thing))))
+           (* (* (s:transpose2 thing) left-multiplier) right-multiplier))
+        (- (s:transpose left-multiplier thing right-multiplier)
+           (s:transpose2 thing))))
 
 ;;; down down
 (transpose-test (up 'a 'b)
-		(down (down 'c 'd) (down 'e 'f) (down 'g 'h))
-		(up 'i 'j 'k))
+                (down (down 'c 'd) (down 'e 'f) (down 'g 'h))
+                (up 'i 'j 'k))
 #| (0 (down (down 0 0 0) (down 0 0 0))) |#
 
 ;;; up up
 (transpose-test (down 'a 'b)
-		(up (up 'c 'd) (up 'e 'f) (up 'g 'h))
-		(down 'i 'j 'k))
+                (up (up 'c 'd) (up 'e 'f) (up 'g 'h))
+                (down 'i 'j 'k))
 (0 (up (up 0 0 0) (up 0 0 0)))
 
 ;;; up down
 (transpose-test (up 'a 'b)
-		(up (down 'c 'd) (down 'e 'f) (down 'g 'h))
-		(down 'i 'j 'k))
+                (up (down 'c 'd) (down 'e 'f) (down 'g 'h))
+                (down 'i 'j 'k))
 #|
 (0 (down (up 0 0 0) (up 0 0 0)))
 |#
 
 ;;; down up
 (transpose-test (down 'a 'b)
-		(down (up 'c 'd) (up 'e 'f) (up 'g 'h))
-		(up 'i 'j 'k))
+                (down (up 'c 'd) (up 'e 'f) (up 'g 'h))
+                (up 'i 'j 'k))
 #|
 (0 (up (down 0 0 0) (down 0 0 0)))
 |#
@@ -1016,21 +1016,21 @@
                               (s:ref (s:ref struct j)
                                      i))))))
 #|
-;;; used only in symmetrize-Christoffel in 
+;;; used only in symmetrize-Christoffel in
 ;;; src/calculus/covariant-derivative.scm
 
 (define foo
   (down (down (up 'x 'y)
-	      (up 'z 'w))
-	(down (up 'a 'b)
-	      (up 'c 'd))))
+              (up 'z 'w))
+        (down (up 'a 'b)
+              (up 'c 'd))))
 
 (s:transpose-outer foo)
 #|
 (down (down (up x y)
-	    (up a b))
+            (up a b))
       (down (up z w)
-	    (up c d)))
+            (up c d)))
 |#
 |#
 
@@ -1044,8 +1044,8 @@
                      (lp (s:ref s 0)))
                '()))))
     (assert (every (lambda (x)
-                      (or (eq? (car x) 'up) (eq? (car x) 'down)))
-                    scripts))
+                     (or (eq? (car x) 'up) (eq? (car x) 'down)))
+                   scripts))
     (assert (not (eq? (car (list-ref scripts index1))
                       (car (list-ref scripts index2)))))
 
@@ -1064,7 +1064,7 @@
                                    (fix:+ index-number 1))))))
           (g:sigma (lambda (i)
                      (ref-internal struct
-                                   (list-with-substituted-coord 
+                                   (list-with-substituted-coord
                                     (list-with-substituted-coord
                                      indices index1 i)
                                     index2 i)))
@@ -1121,8 +1121,8 @@
 ;Value 30: #(1 2 a (*down* #(3 4)) #((*down* #(c d)) e))
 
 (pe (- (ultra-unflatten
-	(up 'x 'x 'x (down 'x 'x) (up (down 'x 'x) 'x))
-	(list 1 2 'a 3 4 'c 'd 'e))
+        (up 'x 'x 'x (down 'x 'x) (up (down 'x 'x) 'x))
+        (list 1 2 'a 3 4 'c 'd 'e))
        (up 1 2 'a (down 3 4) (up (down 'c 'd) 'e))))
 (up 0 0 0 (down 0 0) (up (down 0 0) 0))
 |#
@@ -1136,7 +1136,7 @@
 
 (define (L1 vs)
   (let ((v1 (ref vs 0))
-	(v2 (ref vs 1)))
+        (v2 (ref vs 1)))
     (+ (* 1/2 'm1 (square v1))
        (* 1/2 'm2 (square v2)))))
 
@@ -1198,7 +1198,7 @@
 |#
 
 ;;; Any one argument function of a structure can be seen
-;;; as a matrix.  This is only useful if the function 
+;;; as a matrix.  This is only useful if the function
 ;;; has a linear multiplier (e.g. derivative)
 
 (define ((as-matrix F) s)
@@ -1213,11 +1213,11 @@
 (define C-general
   (literal-function 'C
     (-> (UP Real
-	    (UP Real Real)
-	    (DOWN Real Real))
-	(UP Real
-	    (UP Real Real)
-	    (DOWN Real Real)))))
+            (UP Real Real)
+            (DOWN Real Real))
+        (UP Real
+            (UP Real Real)
+            (DOWN Real Real)))))
 
 
 (define s (up 't (up 'x 'y) (down 'px 'py)))
@@ -1257,9 +1257,9 @@
  s)
 #|
 (matrix-by-rows (list 0 0 0 0 0)
-		(list 0 0 0 0 0)
-		(list 0 0 0 0 0)
-		(list 0 0 0 0 0)
-		(list 0 0 0 0 0))
+                (list 0 0 0 0 0)
+                (list 0 0 0 0 0)
+                (list 0 0 0 0 0)
+                (list 0 0 0 0 0))
 |#
 |#

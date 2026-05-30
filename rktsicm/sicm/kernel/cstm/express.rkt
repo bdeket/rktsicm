@@ -44,7 +44,7 @@
          default)]
     [else
      (error "Bad abstract quantity")]))
-	 
+
 ;;bdk;; this is potentially different: originally new properties were added
 ;;bdk;; at the back of the list (even if they already existed)
 ;;bdk;; so a lookup would find the first added, not the last
@@ -71,17 +71,17 @@
 
 (define (make-literal type-tag expression)
   (cons type-tag (make-hasheq (list (cons 'expression expression)))))
-(define (make-combination type-tag operator operands) 
+(define (make-combination type-tag operator operands)
   (make-literal type-tag (cons operator operands)))
 
 (define (expression-of abstract-quantity)
   (cond ((pair? abstract-quantity)
-	 (let ((v (get-property abstract-quantity 'expression)))
-	   (or v
-	       (error "No expression for abstract quantity"
-		      abstract-quantity))))
-	((symbol? abstract-quantity)
-	 abstract-quantity)
-	(else
-	 (error "Bad abstract quantity"))))
+         (let ((v (get-property abstract-quantity 'expression)))
+           (or v
+               (error "No expression for abstract quantity"
+                      abstract-quantity))))
+        ((symbol? abstract-quantity)
+         abstract-quantity)
+        (else
+         (error "Bad abstract quantity"))))
 ;;bdk;; insert 3 end

@@ -147,7 +147,7 @@
                                               0))))))
    (test-case
     "General torsion"
-    ;;; General torsion is not too complicated to compute 
+    ;;; General torsion is not too complicated to compute
     (define-coordinates (up x y) R2-rect)
     (define R2-rect-basis
       (coordinate-system->basis R2-rect))
@@ -162,7 +162,7 @@
                        (number->string j)
                        (number->string k)))
        R2-rect))
-				    
+
     (define G
       (down (down (up (Gijk 0 0 0)
                       (Gijk 1 0 0))
@@ -189,7 +189,7 @@
                            (* -1 G^1_10 w^0 ((partial 1) f) v^1)
                            (* G^0_10 v^0 ((partial 0) f) w^1)
                            (* -1 G^0_10 w^0 ((partial 0) f) v^1)))
-    ;;; Unfortunately, this says only that the 
+    ;;; Unfortunately, this says only that the
     ;;; Christoffel symbols are symmetric in the
     ;;; lower two indices iff the torsion is zero.
     )
@@ -203,7 +203,7 @@
     ;;; (the up-down-down Christoffel symbols do not depend on R)
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))
@@ -264,7 +264,7 @@
     (define a-function (literal-scalar-field 'f M-rect))
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))
@@ -355,7 +355,7 @@
                               (d1 (nablau (nablau variation)))
                               (d2 (((Riemann-curvature nabla) variation U) U))
                               (deviation (+ d1 d2)))
-                         (s:map/r 
+                         (s:map/r
                           (lambda (w)
                             ((w deviation) ((the-real-line '->point) 'tau)))
                           1form-basis))))))
@@ -382,7 +382,7 @@
               (d2 (((Riemann-curvature nabla) d/dn d/dt)
                    ((differential mu:N->M) d/dt)))
               (deviation (+ d1 d2)))
-         (s:map/r 
+         (s:map/r
           (lambda (w)
             ((w deviation) ((R2-rect '->point) (up 'tau 0))))
           1form-basis))))
@@ -417,7 +417,7 @@
     (define n0
       (simplify
        (let* ( ;; d/dt and d/dn exist
-              (mu:N->M (compose 
+              (mu:N->M (compose
                         (M-rect '->point)
                         (up f^theta f^phi)
                         (R2-rect '->coords)))
@@ -428,7 +428,7 @@
               (nablau (nabla d/dt))
               (nablan (nabla d/dn))
               (deviation (nablan (nablau ((differential mu:N->M) d/dt)))))
-         (s:map/r 
+         (s:map/r
           (lambda (w)
             ((w deviation) ((R2-rect '->point) (up 'tau 0))))
           1form-basis))))
@@ -486,7 +486,7 @@
     ;;; The Christoffel symbols (for r=1) (p.341 MTW) are:
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))
@@ -501,7 +501,7 @@
                          (let* ((basis-over-mu (basis->basis-over-map mu:N->M S2-spherical-basis))
                                 (1form-basis (basis->1form-basis basis-over-mu))
                                 (Cartan (Christoffel->Cartan G-S2-1)))
-                           (s:map/r 
+                           (s:map/r
                             (lambda (w)
                               ((w (((covariant-derivative Cartan mu:N->M) U)
                                    ((differential mu:N->M) U)))
@@ -524,14 +524,14 @@
                                 (1form-basis (basis->1form-basis basis-over-mu))
                                 (vector-basis (basis->vector-basis basis-over-mu))
                                 (Cartan (Christoffel->Cartan G-S2-1))
-                                (transported-vector-over-map 
+                                (transported-vector-over-map
                                  (basis-components->vector-field
                                   (up (compose (literal-function 'w^0)
                                                (the-real-line '->coords))
                                       (compose (literal-function 'w^1)
                                                (the-real-line '->coords)))
                                   vector-basis)))
-                           (s:map/r 
+                           (s:map/r
                             (lambda (w)
                               ((w
                                 (((covariant-derivative Cartan mu:N->M) U)
@@ -561,14 +561,14 @@
                                 (1form-basis (basis->1form-basis basis-over-mu))
                                 (vector-basis (basis->vector-basis basis-over-mu))
                                 (Cartan (Christoffel->Cartan G-S2-1))
-                                (transported-vector-over-map 
+                                (transported-vector-over-map
                                  (basis-components->vector-field
                                   (up (compose (osculating-path (up 'tau 'w^0 'dw^0/dt))
                                                (the-real-line '->coords))
                                       (compose (osculating-path (up 'tau 'w^1 'dw^1/dt))
                                                (the-real-line '->coords)))
                                   vector-basis)))
-                           (s:map/r 
+                           (s:map/r
                             (lambda (w)
                               ((w
                                 (((covariant-derivative Cartan mu:N->M)
@@ -615,7 +615,7 @@
                                                (up (literal-function 'f^theta)
                                                    (literal-function 'f^phi))
                                                (the-real-line '->coords))))
-                         (solve 
+                         (solve
                           (lambda (v)
                             (let ((dw^0/dt (ref v 0))
                                   (dw^1/dt (ref v 1)))
@@ -623,14 +623,14 @@
                                      (1form-basis (basis->1form-basis basis-over-mu))
                                      (vector-basis (basis->vector-basis basis-over-mu))
                                      (Cartan (Christoffel->Cartan G-S2-1))
-                                     (transported-vector-over-map 
+                                     (transported-vector-over-map
                                       (basis-components->vector-field
                                        (up (compose (osculating-path (up 'tau 'w^0 dw^0/dt))
                                                     (the-real-line '->coords))
                                            (compose (osculating-path (up 'tau 'w^1 dw^1/dt))
                                                     (the-real-line '->coords)))
                                        vector-basis)))
-                                (s:map/r 
+                                (s:map/r
                                  (lambda (w)
                                    ((w
                                      (((covariant-derivative Cartan mu:N->M)
@@ -655,7 +655,7 @@
     (define M-basis (coordinate-system->basis M-rect))
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))
@@ -675,7 +675,7 @@
                             (the-real-line '->coords)))
                (basis->vector-basis basis-over-mu)))
     (check-simplified? (let ((Cartan (Christoffel->Cartan G-S2-1)))
-                         (s:map/r 
+                         (s:map/r
                           (lambda (omega)
                             ((omega
                               (((covariant-derivative Cartan mu:N->M) d/dt) w))

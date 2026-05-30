@@ -13,7 +13,7 @@
 (define the-tests
   (test-suite
    "kernel/diffbug/derivative-test"
-   
+
    (test-case "ORIG:diff"
               (let ()
                 (define (((f x) g) y)
@@ -63,7 +63,7 @@
                        'x)
                       '(+ (* (((partial 0) h) (f x) (g x)) ((D f) x))
                           (* (((partial 1) h) (f x) (g x)) ((D g) x))))
-   
+
    (test-case
     "foo-square"
     (define (foo x y)
@@ -71,7 +71,7 @@
     (check-simplified? (((partial 0) foo) 'x 'y) '(+ (* 4 (expt x 3)) (* 4 x y)))
     (check-simplified? (((partial 1) foo) 'x 'y) '(+ (* 2 (expt x 2)) (* 2 y)))
     (check-simplified? (((partial 1) ((partial 0) foo)) 'x 'y) '(* 4 x)))
-   
+
    (check-simplified? ((D (lambda (x) (* x x x))) 'a) '(* 3 (expt a 2)))
    (check-simplified? (((D (lambda (x)
                              (lambda (y z)
@@ -86,7 +86,7 @@
                         2) 3 4)
                       '(((partial 0) f) 2 3 4))
    (check-simplified? ((D (lambda (x)
-                            (((partial 1) 
+                            (((partial 1)
                               (literal-function 'f Real^2->Real))
                              x 'v))) 'u)
                       '(((partial 0) ((partial 1) f)) u v))
@@ -114,7 +114,7 @@
                          'u) 'v)
                        '(* 2 v)))
    (check-simplified? (((D (lambda (x)
-                             (lambda (y) 
+                             (lambda (y)
                                ((literal-function 'f Real^2->Real)
                                 x y))))
                         'u) 'v)
@@ -139,7 +139,7 @@
     (check-simplified? ((f-hat (f-hat cube)) 'a) '(+ 36 (* 6 a)))
     (check-simplified? ((f-hat (literal-function 'g)) 5) '((D g) 8))
     (check-simplified? ((f-hat (f-hat (literal-function 'g))) 'a) '(((expt D 2) g) (+ 6 a))))
-   
+
    (check-simplified? ((Legendre-transform (lambda (x)
                                              (* 'c (square x))))
                        'y)
@@ -198,7 +198,7 @@
                       '(/ (+ (* (cos a) (expt a 2))
                              (* -1 a (sin a)))
                           (expt a 3)))
-   (check-simplified? ((D (lambda (x) 
+   (check-simplified? ((D (lambda (x)
                             (/ (- 1 (exp (expt x 2))) x)))
                        'a)
                       '(/ (+ -1
@@ -235,20 +235,20 @@
    (test-case
     "May 2019.  Siskind found a new bug!"
     (define S
-      (lambda (u) 
+      (lambda (u)
         (lambda (f1)
           (lambda (f2)
             (lambda (x)
               ((f1 f2)
                (+ x u)))))))
     (define d-hat ((D S) 0))
-    (check-simplified? (((((D S) 0) 
+    (check-simplified? (((((D S) 0)
                           (((D S) 0)
                            identity))
                          exp)
                         1)
                        2.718281828459045)
-    
+
     (check-simplified? (((d-hat (d-hat identity))
                          exp)
                         1)
@@ -299,10 +299,10 @@
     (check-simplified? (len (-p p2 p1))
                        '(sqrt (+ (square (- x2 x1))
                                  (square (- y2 y1)))))
-    
+
     (define (f z) (len (- (n*p z p2) p1)))
     (check-simplified? (f 'a)
-                       '(sqrt (+ (square (- (* a x2) x1)) 
+                       '(sqrt (+ (square (- (* a x2) x1))
                                  (square (- (* a y2) y1)))))
     (check-simplified? ((D f) 'a)
                        '(* (/ 1
@@ -348,7 +348,7 @@
 |#
     (check-simplified? (((partial 1) ((partial 0) ((partial 1) g))) 'a 'b)
                        '(/ (+ (* -4 a)
-                              (* 48 
+                              (* 48
                                  a
                                  (expt b 2)
                                  (expt (* 2 (sqrt (+ (expt a 2) (expt b 2)))) -2)))
@@ -399,12 +399,12 @@
     ;;; These give the wrong answer (0) without double substitution on
     ;;; functions but gives the correct answer with substitution on
     ;;; functions.
-    (check-simplified? (unbox ((((derivative (wrap2-result s)) 0) 
+    (check-simplified? (unbox ((((derivative (wrap2-result s)) 0)
                                 (((derivative (wrap2-result s)) 0)
                                  (wrap cube)))
                                (box 4)))
                        24)
-    (check-simplified? (unbox 
+    (check-simplified? (unbox
                         ((wrapped-d-hat
                           (wrapped-d-hat (wrap cube)))
                          (box 4)))
@@ -414,7 +414,7 @@
     (check-exn #px"Application of a number not allowed in" (λ () ('f 't)))
     (parameterize ([*enable-literal-apply* #t])
       (check-simplified? ('f 't) '(f t))))
-   
+
    ))
 
 (module+ test

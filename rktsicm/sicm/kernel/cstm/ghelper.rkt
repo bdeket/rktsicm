@@ -116,9 +116,9 @@
       (when (null? (vector-ref (arity-intersect (vector-ref intersect-ao 1)
                                                 (vector-ref intersect-ah 1))
                                1))
-      (raise-argument-error (assign-name record)
-                            (format "handler is within operator arity <~a>" o-arity)
-                            (list h-arity '<-- handler))))
+        (raise-argument-error (assign-name record)
+                              (format "handler is within operator arity <~a>" o-arity)
+                              (list h-arity '<-- handler))))
     (for ([p (in-list argument-predicates)])
       (unless (and (procedure? p) (arity-includes? (procedure-arity p) 1))
         (raise-argument-error (assign-name record) "predicate?" p)))
@@ -140,7 +140,7 @@
        (when (equal? (tree-rst? tree) (not rest?)) (set-tree-rst?! tree rest?))
        (when (tree-han tree)
          (log-generics-warning (format "Replacing handler for generic ~a: ~a -> ~a"
-                       (operator-record-name record) (tree-han tree) handler)))
+                                       (operator-record-name record) (tree-han tree) handler)))
        (set-tree-han! tree handler)]
       [(assq (car keys) (tree-branch tree))
        =>

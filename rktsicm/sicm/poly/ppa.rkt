@@ -30,7 +30,7 @@
 
 
 ;;;   To make a piecewise polynomial approximation of a function, f,
-;;;   we specify the range, [low, high], the maximum order of polynomial 
+;;;   we specify the range, [low, high], the maximum order of polynomial
 ;;;   that fits may be made with, and the accuracy required.
 
 (define (make-ppa f low high max-order accuracy)
@@ -42,9 +42,9 @@
          (eps (cadr result)))
     (if (< eps accuracy)
         (ppa-make-from-poly low high
-			    (cheb-econ p (- d) d (- accuracy eps)))
+                            (cheb-econ p (- d) d (- accuracy eps)))
         (ppa-adjoin (make-ppa f low c max-order accuracy)
-		    (make-ppa f c high max-order accuracy)))))
+                    (make-ppa f c high max-order accuracy)))))
 
 
 ;;; PPA-VALUE will evaluate a PPA at any given point, x.
@@ -76,8 +76,8 @@
 ;;; be used to increase the accuracy easily achievable in the piecewise
 ;;; approximating process. The first argument is a list of the numerical
 ;;; procedure f and as many of its successive derivative procedures as
-;;; we care to use. For example, 
-;;; 		(make-smooth-ppa (list sin cos) 0 pi/2 1e-7)
+;;; we care to use. For example,
+;;;                 (make-smooth-ppa (list sin cos) 0 pi/2 1e-7)
 ;;; will use Hermite fitting with first derivative contact, employing
 ;;; piecewise cubics for the process.
 
@@ -89,7 +89,7 @@
       (let* ((c (/ (+ a b) 2))
              (d (/ (- b a) 2))
              (-d (- d))
-	     (avals (map (lambda (f) (f a)) flist))
+             (avals (map (lambda (f) (f a)) flist))
              (bvals (map (lambda (f) (f b)) flist))
              (p (herm (cons -d avals) (cons d bvals)))
              (g (lambda (x) (f (+ c x))))
@@ -109,7 +109,7 @@
 ;;; Implementation of PPA data structures
 
 (define (ppa-make-from-poly low high poly)
-  (cons (cons low high) 
+  (cons (cons low high)
         (cons 'ppa-terminal poly)))
 
 ;;bdk;; TODO: use the functions from below to make this more readable

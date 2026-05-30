@@ -12,7 +12,7 @@
 ;inside representation
 (module flo:vector racket/base
   (require racket/flonum)
-  
+
   (provide flo:vector
            flo:vector-length
            flo:vector-ref
@@ -22,7 +22,7 @@
            for/flo:vector
            set-<flo:vector>-l!
            ->flonum)
-  
+
   (define (->flonum x) (if (flonum? x) x (exact->inexact x)))
 
   (struct <flo:vector> (v [l #:mutable]) #:transparent
@@ -42,7 +42,7 @@
   (define (flo:vector-ref FV n)    (flvector-ref  (<flo:vector>-v FV) n))
   (define (flo:vector-set! FV n v) (flvector-set! (<flo:vector>-v FV) n v))
   (define flo:vector? <flo:vector>?)
-  
+
   (define (in-flo:vector FV [start 0] [end (<flo:vector>-l FV)] [step 1])
     (unless (<= end (<flo:vector>-l FV))
       (raise-argument-error in-flo:vector (format "end-in-range [0;~a]" (<flo:vector>-l FV)) end))
@@ -64,12 +64,12 @@
 
 (define (vector->flonum-vector vector)
   (when (not (vector? vector))
-      (raise-argument-error 'VECTOR->FLONUM-VECTOR "vector" vector))
+    (raise-argument-error 'VECTOR->FLONUM-VECTOR "vector" vector))
   (for/flo:vector ([i (in-vector vector)]) (->flonum i)))
 
 (define (list->flonum-vector lst)
   (when (not (list? lst))
-      (raise-argument-error 'LIST->FLONUM-VECTOR "list" lst))
+    (raise-argument-error 'LIST->FLONUM-VECTOR "list" lst))
   (for/flo:vector ([i (in-list lst)]) (->flonum i)))
 
 (define (flo:make-vector n [value 0.0])
@@ -96,14 +96,14 @@
         flval)))
 
 (define (flo:subvector-move! source start-source end-source
-			     target start-target)
+                             target start-target)
   (guarantee-flonum-subvector source start-source end-source
-			      'FLO:SUBVECTOR-MOVE!)
+                              'FLO:SUBVECTOR-MOVE!)
   (guarantee-flonum-vector target 'FLO:SUBVECTOR-MOVE!)
   (guarantee-nonnegative-fixnum start-target 'FLO:SUBVECTOR-MOVE!)
   (let ((end-target (fix:+ start-target (fix:- end-source start-source))))
     (guarantee-flonum-subvector-range target start-target end-target
-				      'FLO:SUBVECTOR-MOVE!)
+                                      'FLO:SUBVECTOR-MOVE!)
     (cond
       [(eq? source target)
        (define up? (fix:< start-source start-target))
@@ -162,17 +162,17 @@
 |#
 
 
-  (define (flo:set-vector-length! vector n)
-    (guarantee-flonum-vector vector 'FLO:SET-VECTOR-LENGTH!)
-    (guarantee-nonnegative-fixnum n 'FLO:SET-VECTOR-LENGTH!)
-    (when (not (fix:<= n (flo:vector-length vector)))
-      (raise-range-error 'FLO:SET-VECTOR-LENGTH!
-                         "FLO:VECTOR"
-                         "length "
-                         n
-                         (flonum-vector->vector vector)
-                         0 (flo:vector-length vector)))
-    (set-<flo:vector>-l! vector n))
+(define (flo:set-vector-length! vector n)
+  (guarantee-flonum-vector vector 'FLO:SET-VECTOR-LENGTH!)
+  (guarantee-nonnegative-fixnum n 'FLO:SET-VECTOR-LENGTH!)
+  (when (not (fix:<= n (flo:vector-length vector)))
+    (raise-range-error 'FLO:SET-VECTOR-LENGTH!
+                       "FLO:VECTOR"
+                       "length "
+                       n
+                       (flonum-vector->vector vector)
+                       0 (flo:vector-length vector)))
+  (set-<flo:vector>-l! vector n))
 
 (define (guarantee-flonum-vector object procedure)
   (when (not (flo:vector? object))

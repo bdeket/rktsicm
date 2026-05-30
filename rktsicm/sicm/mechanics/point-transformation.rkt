@@ -7,7 +7,7 @@
          )
 ;;bdk;; start original file
 
-;;; Makes a canonical point transformation from a 
+;;; Makes a canonical point transformation from a
 ;;;  time-invariant coordinate transformation T(q)
 
 (define ((F->CH F) H-state)
@@ -34,15 +34,15 @@
 
 (define ((F->K F) H-state)
   (- (* (* (momentum H-state)
-	   (invert (((partial 1) F) H-state)))
-	(((partial 0) F) H-state))))
+           (invert (((partial 1) F) H-state)))
+        (((partial 0) F) H-state))))
 
 |#
 #|
 
 (define ((H-central m V) state)
   (let ((x (coordinate state))
-	(p (momentum state)))
+        (p (momentum state)))
     (+ (/ (square p) (* 2 m))
        (V (sqrt (square x))))))
 

@@ -20,32 +20,32 @@
 
 (define (poly:gcd-dispatch u v)
   (cond ((poly:zero? u) v)
-	((poly:zero? v) u)
-	((poly:one? u) u)
-	((poly:one? v) v)
-	((base? u)
-	 (if (base? v)
-	     (base/gcd u v)
-	     (base/gcd u (sparse-base-content (poly->sparse v)))))
-	((base? v)
-	 (base/gcd (sparse-base-content (poly->sparse u)) v))
-	(else
-	 (let ((arity (gcd-check-same-arity u v)))
-	   (or (with-limited-time 1.0 ;seconds
-		 (lambda () (poly/gcd-sparse u v)))
-	       (with-limited-time 1.0
-		 (lambda () (poly/gcd-classical u v)))
-	       (with-limited-time 100.0
-		 (lambda () (poly/gcd-sparse u v)))
-	       (and (fix:< arity *euclid-breakpoint-arity*)
-		    (with-limited-time 100.0
-		      (lambda () (poly/gcd-classical u v))))
-	       (poly/gcd-sparse u v)
-	       (if *gcd-cut-losses*
-		   (or (with-limited-time *gcd-cut-losses*
-			 (lambda () (poly/gcd-classical u v)))
-		       poly/one)
-		   (poly/gcd-classical u v)))))))
+        ((poly:zero? v) u)
+        ((poly:one? u) u)
+        ((poly:one? v) v)
+        ((base? u)
+         (if (base? v)
+             (base/gcd u v)
+             (base/gcd u (sparse-base-content (poly->sparse v)))))
+        ((base? v)
+         (base/gcd (sparse-base-content (poly->sparse u)) v))
+        (else
+         (let ((arity (gcd-check-same-arity u v)))
+           (or (with-limited-time 1.0 ;seconds
+                                  (lambda () (poly/gcd-sparse u v)))
+               (with-limited-time 1.0
+                                  (lambda () (poly/gcd-classical u v)))
+               (with-limited-time 100.0
+                                  (lambda () (poly/gcd-sparse u v)))
+               (and (fix:< arity *euclid-breakpoint-arity*)
+                    (with-limited-time 100.0
+                                       (lambda () (poly/gcd-classical u v))))
+               (poly/gcd-sparse u v)
+               (if *gcd-cut-losses*
+                   (or (with-limited-time *gcd-cut-losses*
+                                          (lambda () (poly/gcd-classical u v)))
+                       poly/one)
+                   (poly/gcd-classical u v)))))))
 
 (define *gcd-cut-losses* #f)
 ;;;(define *gcd-cut-losses* 1000.0)

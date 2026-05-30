@@ -46,8 +46,8 @@
     (v-on-N (compose g-on-M mu:N->M)))
   (assert (vector-field? v-on-N))
   (procedure->vector-field v-on-M
-			   `((d ,(diffop-name mu:N->M))
-			     ,(diffop-name v-on-N))))
+                           `((d ,(diffop-name mu:N->M))
+                             ,(diffop-name v-on-N))))
 
 
 (define differential differential-of-map)
@@ -69,7 +69,7 @@
 
 (define (literal-manifold-map name source target)
   (let ((n (source 'dimension))
-	(m (target 'dimension)))
+        (m (target 'dimension)))
     (let ((sig (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
       (procedure-rename ;;bdk;; nicer name for diffop
        (compose (target '->point)
@@ -204,7 +204,7 @@ r0
 #| Result:
 ((D mu0) tau)
 |#
-    
+
 (pec ((dy ((differential mu) d/dt))
       ((R1-rect '->point) 'tau)))
 #| Result:
@@ -230,10 +230,10 @@ r0
 
 (pec (((ref edual 0)
        (procedure->vector-field
-	(lambda (f)
-	  (lambda (m)
-	    ((((differential mu) d/dt) f)
-	     ((R1-rect '->point) 't))))))
+        (lambda (f)
+          (lambda (m)
+            ((((differential mu) d/dt) f)
+             ((R1-rect '->point) 't))))))
       R2-rect-point))
 #| Result:
 (/ (+ (* -1 (e1^1 (up x0 y0)) ((D mu0) t))
@@ -246,13 +246,13 @@ r0
 
 (define mu
   (compose (S2-spherical '->point)
-	   (up (literal-function 'theta)
-	       (literal-function 'phi))
-	   (R1-rect '->coords)))
+           (up (literal-function 'theta)
+               (literal-function 'phi))
+           (R1-rect '->coords)))
 
 (define f
   (compose (literal-function 'f (-> (UP Real Real) Real))
-	   (S2-spherical '->coords)))
+           (S2-spherical '->coords)))
 
 
 (pec ((((differential mu) d/dt) f)
@@ -273,7 +273,7 @@ r0
   (procedure->vector-field
    (lambda (f-on-M)
      (compose (v-on-M f-on-M)
-	      mu:N->M))
+              mu:N->M))
    `((vector-field->vector-field-over-map ,(diffop-name mu:N->M))
      ,(diffop-name v-on-M))))
 
@@ -287,21 +287,21 @@ r0
    (lambda (V-over-mu)
      (lambda (n)
        ((w-on-M
-	 (vector-field-over-map->vector-field V-over-mu n))
-	(mu:N->M n))))
+         (vector-field-over-map->vector-field V-over-mu n))
+        (mu:N->M n))))
    `((1form-field-over-map ,(diffop-name mu:N->M))
      ,(diffop-name w-on-M))))
 |#
 
 (define ((form-field->form-field-over-map mu:N->M) w-on-M)
-  
-  (define (vector-field-over-map->vector-field V-over-mu n) 
+
+  (define (vector-field-over-map->vector-field V-over-mu n)
     ;; This helper has no clear meaning.
     (procedure->vector-field
      (lambda (f)
        (lambda (m)
-	 ;;(assert (= m (mu:N->M n)))
-	 ((V-over-mu f) n)))
+         ;;(assert (= m (mu:N->M n)))
+         ((V-over-mu f) n)))
      `(vector-field-over-map->vector-field
        ,(diffop-name V-over-mu))))
 
@@ -310,22 +310,22 @@ r0
      (assert (= (length vectors-over-map) (get-rank w-on-M)))
      (lambda (n)
        ((apply w-on-M
-	       (map (lambda (V-over-mu)
-		      (vector-field-over-map->vector-field V-over-mu n))
-		    vectors-over-map))
-	(mu:N->M n))))
+               (map (lambda (V-over-mu)
+                      (vector-field-over-map->vector-field V-over-mu n))
+                    vectors-over-map))
+        (mu:N->M n))))
    (get-rank w-on-M)
    `((form-field->form-field-over-map ,(diffop-name mu:N->M))
      ,(diffop-name w-on-M))))
 
 (define (basis->basis-over-map mu:N->M basis-on-M)
   (let ((vector-basis-on-M (basis->vector-basis basis-on-M))
-	(dual-basis-on-M (basis->1form-basis basis-on-M)))
+        (dual-basis-on-M (basis->1form-basis basis-on-M)))
     (make-basis
      (s:map/r (vector-field->vector-field-over-map mu:N->M)
-	      vector-basis-on-M)
+              vector-basis-on-M)
      (s:map/r (form-field->form-field-over-map mu:N->M)
-	      dual-basis-on-M))))
+              dual-basis-on-M))))
 
 #|
 (install-coordinates S2-spherical (up 'theta 'phi))
@@ -335,9 +335,9 @@ r0
 ;;; General path on the sphere
 (define mu
   (compose (S2-spherical '->point)
-	   (up (literal-function 'theta)
-	       (literal-function 'phi))
-	   (R1-rect '->coords)))
+           (up (literal-function 'theta)
+               (literal-function 'phi))
+           (R1-rect '->coords)))
 
 (pec ((((vector-field->vector-field-over-map mu) d/dtheta) f)
       ((R1-rect '->point) 't)))
@@ -354,7 +354,7 @@ r0
 
 (define foo
   (basis->basis-over-map mu
-			 (coordinate-system->basis S2-spherical)))
+                         (coordinate-system->basis S2-spherical)))
 
 (pec
  (((basis->1form-basis foo)
@@ -380,9 +380,9 @@ r0
    (lambda (g-on-M)
      (lambda (m)
        ;;(assert (= m (mu:N->M n)))
-       ((((differential mu:N->M) v-on-N) 
-	 g-on-M) 
-	n)))
+       ((((differential mu:N->M) v-on-N)
+         g-on-M)
+        n)))
    `((differential ,(diffop-name mu:N->M))
      ,(diffop-name v-on-N))))
 
@@ -393,8 +393,8 @@ r0
    (lambda (v-on-N)
      (lambda (n)
        ((omega-on-M
-	 ((effective-pushforward mu:N->M n) v-on-N))
-	(mu:N->M n))))
+         ((effective-pushforward mu:N->M n) v-on-N))
+        (mu:N->M n))))
    `((pullback ,(diffop-name mu:N->M))
      ,(diffop-name omega-on-M))))
 
@@ -409,19 +409,19 @@ r0
 (define ((pullback mu:N->M) omega-on-M)
   (let ((k (get-rank omega-on-M)))
     (if (= k 0)
-	((pullback-function mu:N->M) omega-on-M)
-	(let ((the-pullback
-	       (lambda args
-		 (assert (fix:= (length args) k))
-		 (lambda (n)
-		   ((apply omega-on-M
-			   (map (effective-pushforward mu:N->M n)
-				args))
-		    (mu:N->M n))))))
-	  (procedure->nform-field the-pullback
-				  k
-				  `((pullback ,(diffop-name mu:N->M))
-				    ,(diffop-name omega-on-M)))))))
+        ((pullback-function mu:N->M) omega-on-M)
+        (let ((the-pullback
+               (lambda args
+                 (assert (fix:= (length args) k))
+                 (lambda (n)
+                   ((apply omega-on-M
+                           (map (effective-pushforward mu:N->M n)
+                                args))
+                    (mu:N->M n))))))
+          (procedure->nform-field the-pullback
+                                  k
+                                  `((pullback ,(diffop-name mu:N->M))
+                                    ,(diffop-name omega-on-M)))))))
 |#
 ;;; The general case
 ;;; ((mu^* w) v) = w (mu_* v) = (w^mu ((d mu) v))
@@ -429,15 +429,15 @@ r0
 (define ((pullback-form mu:N->M) omega-on-M)
   (let ((k (get-rank omega-on-M)))
     (if (= k 0)
-	((pullback-function mu:N->M) omega-on-M)
-	(procedure->nform-field
-	 (lambda vectors-on-N
-	   (apply ((form-field->form-field-over-map mu:N->M) omega-on-M)
-		  (map (differential mu:N->M)
-		       vectors-on-N)))
-	 k
-	 `((pullback ,(diffop-name mu:N->M))
-	   ,(diffop-name omega-on-M))))))
+        ((pullback-function mu:N->M) omega-on-M)
+        (procedure->nform-field
+         (lambda vectors-on-N
+           (apply ((form-field->form-field-over-map mu:N->M) omega-on-M)
+                  (map (differential mu:N->M)
+                       vectors-on-N)))
+         k
+         `((pullback ,(diffop-name mu:N->M))
+           ,(diffop-name omega-on-M))))))
 
 (define (pullback-vector-field mu:N->M mu^-1:M->N)
   (pushforward-vector mu^-1:M->N mu:N->M))
@@ -445,8 +445,8 @@ r0
 (define ((pullback mu:N->M #:optional mu^-1:M->N) thing)
   (if (vector-field? thing)
       (if (default-object? mu^-1:M->N)
-	  (error "Pullback vector needs inverse map")
-	  ((pullback-vector-field mu:N->M mu^-1:M->N) thing))
+          (error "Pullback vector needs inverse map")
+          ((pullback-vector-field mu:N->M mu^-1:M->N) thing))
       ((pullback-form mu:N->M) thing)))
 
 #|
@@ -483,11 +483,11 @@ r0
   (compose
    (R3-cyl '->point)
    (up (literal-function 'mu^r
-			 (-> (UP Real Real Real) Real))
+                         (-> (UP Real Real Real) Real))
        (literal-function 'mu^theta
-			 (-> (UP Real Real Real) Real))
+                         (-> (UP Real Real Real) Real))
        (literal-function 'mu^zeta
-			 (-> (UP Real Real Real) Real)))
+                         (-> (UP Real Real Real) Real)))
    (R3-rect '->coords)))
 
 (pec
@@ -541,8 +541,8 @@ r0
 
 (define phi
   (compose (R2-rect '->point)
-	   (up square cube)
-	   (R1-rect '->coords)))
+           (up square cube)
+           (R1-rect '->coords)))
 
 (pec ((((pullback phi) (* x dy)) d/dt)
       ((R1-rect '->point) 't0)))
@@ -552,11 +552,11 @@ r0
 
 (define psi
   (compose (R1-rect '->point)
-	   (lambda (v)
-	     (let ((x (ref v 0))
-		   (y (ref v 1)))
-	       (- x y)))
-	   (R2-rect '->coords)))
+           (lambda (v)
+             (let ((x (ref v 0))
+                   (y (ref v 1)))
+               (- x y)))
+           (R2-rect '->coords)))
 
 (pec ((((pullback psi) dt)
        (literal-vector-field 'u R2-rect))
@@ -595,16 +595,16 @@ r0
 
 (define mu
   (compose R3-rect-chi-inverse
-	   (up (literal-function 'mu^x R2-rect->R)
-	       (literal-function 'mu^y R2-rect->R)
-	       (literal-function 'mu^z R2-rect->R))
-	   R2-chi))
+           (up (literal-function 'mu^x R2-rect->R)
+               (literal-function 'mu^y R2-rect->R)
+               (literal-function 'mu^z R2-rect->R))
+           R2-chi))
 
 ;;; first pullback a function
 
 (define f
   (compose (literal-function 'f R3-rect->R)
-	   R3-rect-chi))
+           R3-rect-chi))
 
 (pec
  (((- ((pullback mu) (d f))
@@ -663,7 +663,7 @@ r0
  (let ((theta (literal-1form-field 'theta R3-rect))
        (phi (literal-1form-field 'phi R3-rect)))
    (((- (wedge ((pullback mu) theta) ((pullback mu) phi))
-	((pullback mu) (wedge theta phi)))
+        ((pullback mu) (wedge theta phi)))
      X2
      Y2)
     m2)))
@@ -675,7 +675,7 @@ r0
  (let ((theta (literal-manifold-function 'f R3-rect))
        (phi (literal-1form-field 'phi R3-rect)))
    (((- (wedge ((pullback mu) theta) ((pullback mu) phi))
-	((pullback mu) (wedge theta phi)))
+        ((pullback mu) (wedge theta phi)))
      X2)
     m2)))
 #| Result:

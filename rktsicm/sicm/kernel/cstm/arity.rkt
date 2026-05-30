@@ -120,19 +120,19 @@
                                   (combine-arity (vector-ref v 1) (vector-ref v* 1))
                                   (combine-arity (vector-ref v 2) (vector-ref v* 2))))
   (define (inner-n? A B)
-      (cond
-        [(number? B) (if (= A B) (vector '() A '()) (vector A '() B))]
-        [(arity-at-least? B)
-         (define b (arity-at-least-value B))
-         (if (<= b A)
-             (vector '() A (append (for/list ([i (in-range b A)]) i)
-                                   (list (arity-at-least (+ A 1)))))
-             (vector A '() B))]
-        [(list? B)
-         (for/fold ([v (vector A '() '())])
-                   ([b (in-list B)])
-           (vcombine v (inner (vector-ref v 0) b)))]
-        [else (error "huhB?" B)]))
+    (cond
+      [(number? B) (if (= A B) (vector '() A '()) (vector A '() B))]
+      [(arity-at-least? B)
+       (define b (arity-at-least-value B))
+       (if (<= b A)
+           (vector '() A (append (for/list ([i (in-range b A)]) i)
+                                 (list (arity-at-least (+ A 1)))))
+           (vector A '() B))]
+      [(list? B)
+       (for/fold ([v (vector A '() '())])
+                 ([b (in-list B)])
+         (vcombine v (inner (vector-ref v 0) b)))]
+      [else (error "huhB?" B)]))
   (define (inner-+l A B)
     (for/fold ([v (vector A '() '())])
               ([b (in-list B)])

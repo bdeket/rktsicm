@@ -79,7 +79,7 @@
     (check-equal?  (lset-intersection eq? '(1 2 3 3) '(4 4 5 6 6)) '())
     (check-equal?  (lset-intersection eq? '(1 2 3 3) '(4 4 2 5 1 6 3 6)) '(1 2 3 3))
     (check-equal?  (lset-intersection eq? '(1 2 3 3) '(4 4 2 5 1 6 6)) '(1 2)))
-   
+
    ;; items from original list-utils
    (test-case
     "variable<?"

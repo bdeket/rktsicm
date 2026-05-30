@@ -15,7 +15,7 @@
 
 
 ;;; Simple Vandermonde systems
-;;; Given k_i and w_j to find x_i 
+;;; Given k_i and w_j to find x_i
 ;;;  such that Sigma_i (expt k_j i) x_i = w_j
 
 ;;;  e.g.    x_0 + k_0*x_1 + k_0^2*x_2 + k_0^3*x_3 + ... = w_0
@@ -30,7 +30,7 @@
     (assert (fix:= n (length ks)))
     (let ((Q
            (fold-left sparse-multiply (sparse-one 1)
-                  linear-terms))
+                      linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
         (if (fix:= i n)
@@ -57,8 +57,8 @@
                                        (lp (fix:+ i 1)))))))))))))
 
 ;;; Transposed Vandermonde systems
-;;; Given k_i and w_j to find x_i 
-;;;  such that Sigma_i (expt k_i j) x_i = w_j 
+;;; Given k_i and w_j to find x_i
+;;;  such that Sigma_i (expt k_i j) x_i = w_j
 
 ;;;  e.g.        x_0   +     x_1   +     x_2   +     x_3   + ... = w_0
 ;;;          k_0*x_0   + k_1*x_1   + k_2*x_2   + k_3*x_3   + ... = w_1
@@ -73,7 +73,7 @@
     (assert (fix:= n (length ks)))
     (let ((Q
            (fold-left sparse-multiply (sparse-one 1)
-                  linear-terms))
+                      linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
         (if (fix:= i n)
@@ -100,10 +100,10 @@
                                        (lp (fix:+ i 1)))))))))))))
 
 ;;; Variant transposed Vandermonde systems
-;;; Given k_i and w_j to find x^i 
-;;;  such that Sigma_i (expt k_i (+ j 1)) x^i = w^j 
+;;; Given k_i and w_j to find x^i
+;;;  such that Sigma_i (expt k_i (+ j 1)) x^i = w^j
 
-;;;  e.g. 
+;;;  e.g.
 ;;;          k_0*x_0   + k_1*x_1   + k_2*x_2   + k_3*x_3   + ... = w_0
 ;;;          k_0^2*x_0 + k_1^2*x_1 + k_2^2*x_2 + k_3^2*x_3 + ... = w_1
 ;;;          ...
@@ -116,7 +116,7 @@
     (assert (fix:= n (length ks)))
     (let ((Q
            (fold-left sparse-multiply (sparse-one 1)
-                  linear-terms))
+                      linear-terms))
           (x (make-vector (length ws) 0)))
       (let lp ((i 0))
         (if (fix:= i n)
@@ -144,25 +144,25 @@
 
 (define (roots->poly-value ks z)
   (fold-left *
-         1
-         (map (lambda (k)
-                (- z k))
-              ks)))
+             1
+             (map (lambda (k)
+                    (- z k))
+                  ks)))
 
 #|
 (solve-vandermonde-system '(3 5 7) '(9 11 13)
-			  (lambda (x) x) (lambda () 'foo))
+                          (lambda (x) x) (lambda () 'foo))
 ;Value: (6 1 0)
 
 (solve-vandermonde-t-system '(3 5 7) '(9 11 13)
-			    (lambda (x) x) (lambda () 'foo))
+                            (lambda (x) x) (lambda () 'foo))
 ;Value: (49/2 -23 15/2)
 
 (solve-vandermonde-td-system '(3 5 7) '(9 11 13)
-			     (lambda (x) x) (lambda () 'foo))
+                             (lambda (x) x) (lambda () 'foo))
 ;Value: (49/6 -23/5 15/14)
 
 (solve-vandermonde-td-system '(3 5 0) '(9 11 13)
-			     (lambda (x) x) (lambda () 'foo))
+                             (lambda (x) x) (lambda () 'foo))
 ;Value: foo
 |#

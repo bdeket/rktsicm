@@ -13,7 +13,7 @@
    "numerics/roots/multidimensional"
    (test-case
     "1"
-    (check-within (multidimensional-root 
+    (check-within (multidimensional-root
                    (lambda (v)
                      (let ((x (vector-ref v 0)) (y (vector-ref v 1)))
                        (vector (+ x y -3) (+ x (- y) -1))))
@@ -24,7 +24,7 @@
                   1e-15))
    (test-case
     "2"
-    (check-within (multidimensional-root 
+    (check-within (multidimensional-root
                    (lambda (v)
                      (let ((x (vector-ref v 0)) (y (vector-ref v 1)))
                        (vector (* x x) (+ x (- y) -1))))
@@ -35,7 +35,7 @@
                   1e-10))
    (test-case
     "3"
-    (check-within (multidimensional-root 
+    (check-within (multidimensional-root
                    (lambda (v)
                      (let ((x (vector-ref v 0)) (y (vector-ref v 1)))
                        (vector (+ x (- y) -1) (expt (+ x y -3) 2))))

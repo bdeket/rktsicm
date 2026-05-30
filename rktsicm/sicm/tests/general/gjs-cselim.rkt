@@ -64,7 +64,7 @@
     (check-equal? (gjs/cselim '(+ (* x y) (let ((x y)) (* x y)))) '(+ (* x y) (let ((x y)) (* x y))))
     ;; named lets are not implemented
     (check-exn #px"Not implemented" (λ () (gjs/cselim '(+ (* x y) (let lp ((x y)) (* x y))))))
-    
+
     (skip "NEXT TEST ARE INCORRECT but in line with scmutils")
     ;; for... let* let-values ... are not handled correctly!!
     (check-unique-match? (gjs/cselim '(+ (* x y) (for ((x y)) (* x y))))
@@ -76,7 +76,7 @@
     (check-unique-match? (gjs/cselim '(+ (* x y) (let () (begin (define x 6) (* x y)))))
                          (q)
                          `(let ([,q (* x y)]) (+ ,q (begin (define x 6) ,q)))))
-   
+
    (test-case
     "occurs-in?"
     (check-true (occurs-in? 'x '(list x y)))
@@ -95,7 +95,7 @@
     (check-equal? (make-canonical-lets '((x 1)(z 2)) '(list x y)) '(let ((x 1)(z 2))(list x y)))
     (check-equal? (make-canonical-lets '((x y)(y 2)) '(list x y)) '(let ((y 2))(let ((x y)) (list x y))))
     (check-exn #px"variables interdependent" (λ () (make-canonical-lets '((x (* 3 y))(y (+ 2 x))) '(list x y)))))
-   
+
    (test-case
     "expression-recorder"
     (define X (make-expression-recorder #f '()))

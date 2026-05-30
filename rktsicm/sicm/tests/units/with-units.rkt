@@ -77,12 +77,12 @@
     (check-true (u:= &meter (with-units 1 &meter)))
     (check-false (u:= (with-units 1 &meter) (with-units 1 &kilogram)))
     (check-false (u:= (with-units 2 &meter) (with-units 1 &meter)))
-    
+
     (check-true (u:< 1 (with-units 2 &unitless)))
     (check-true (u:< &meter (with-units 2 &meter)))
     (check-false (u:< (with-units 1 &meter) (with-units 2 &kilogram)))
     (check-false (u:< (with-units 1 &meter) (with-units 1 &meter)))
-    
+
     (check-true (u:<= 1 (with-units 2 &unitless)))
     (check-true (u:<= 1 (with-units 1 &unitless)))
     (check-true (u:<= &meter (with-units 2 &meter)))
@@ -90,12 +90,12 @@
     (check-false (u:<= (with-units 1 &meter) (with-units 2 &kilogram)))
     (check-false (u:<= (with-units 1 &meter) (with-units 1 &kilogram)))
     (check-false (u:<= (with-units 1 &meter) (with-units 0 &meter)))
-    
+
     (check-true (u:> 2 (with-units 1 &unitless)))
     (check-true (u:> &meter (with-units 0 &meter)))
     (check-false (u:> (with-units 2 &meter) (with-units 1 &kilogram)))
     (check-false (u:> (with-units 1 &meter) (with-units 1 &meter)))
-    
+
     (check-true (u:>= 2 (with-units 1 &unitless)))
     (check-true (u:>= 1 (with-units 1 &unitless)))
     (check-true (u:>= &meter (with-units 0 &meter)))
@@ -204,26 +204,26 @@
     (with-units:assign-operations #t)
     (check-equal? (solve-linear-left 'x (with-units 1 &meter)) (with-units (/ 'x) &meter))
     (check-equal? (solve-linear-left (with-units 1 &meter) 'x) (with-units 'x (/units &unitless &meter)))
-    
+
     (check-equal? (solve-linear-left &kilogram (with-units 3 &meter)) (with-units 3 (/units &meter &kilogram)))
     (check-equal? (solve-linear-left (with-units 3 &meter) &kilogram) (with-units 1/3 (/units &kilogram &meter)))
-    
+
     (check-equal? (solve-linear-left &kilogram 3) (with-units 3 (/units &unitless &kilogram)))
     (check-equal? (solve-linear-left 3 &kilogram) (with-units 1/3 (/units &kilogram &unitless)))
-    
+
     (check-equal? (solve-linear 'x (with-units 1 &meter)) (with-units (/ 'x) &meter))
     (check-equal? (solve-linear (with-units 1 &meter) 'x) (with-units 'x (/units &unitless &meter)))
-    
+
     (check-equal? (solve-linear &kilogram (with-units 3 &meter)) (with-units 3 (/units &meter &kilogram)))
     (check-equal? (solve-linear (with-units 3 &meter) &kilogram) (with-units 1/3 (/units &kilogram &meter)))
-    
+
     (check-equal? (solve-linear &kilogram 3) (with-units 3 (/units &unitless &kilogram)))
     (check-equal? (solve-linear 3 &kilogram) (with-units 1/3 (/units &kilogram &unitless)))
 
     (check-equal? (apply (with-units sqrt &meter) '(4)) (with-units 2 &meter))
     (check-equal? (apply (with-units sqrt &meter) (list (with-units 4 (*units &meter &meter)))) (with-units 2 &meter))
     )
-   
+
    (skip ;; TODO under permisive rules (+ &kilogram &meter) = 2 :: that can't be the intention
     )
    ))

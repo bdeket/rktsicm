@@ -7,61 +7,61 @@
 
 ;;bdk;; insert 1
 (define generic-numerical-operators
-  '(	
-	zero-like
-	one-like
-	identity-like
+  '(
+    zero-like
+    one-like
+    identity-like
 
-	negate
-	invert
+    negate
+    invert
 
-	square
-	cube
+    square
+    cube
 
-	sqrt
+    sqrt
 
-	exp
-	log
+    exp
+    log
 
-	exp2
-	exp10
-	log2
-	log10
+    exp2
+    exp10
+    log2
+    log10
 
-	sin
-	cos
-	tan
-	sec
-	csc
+    sin
+    cos
+    tan
+    sec
+    csc
 
-	asin
-	acos
+    asin
+    acos
 
-	sinh
-	cosh
-	tanh
-	sech
-	csch
+    sinh
+    cosh
+    tanh
+    sech
+    csch
 
-	abs
+    abs
 
-	+
-	-
-	*
-	/
+    +
+    -
+    *
+    /
 
-	expt
-	gcd
+    expt
+    gcd
 
-	make-rectangular
-	make-polar
+    make-rectangular
+    make-polar
 
-	real-part
-	imag-part
-	magnitude
-	angle
+    real-part
+    imag-part
+    magnitude
+    angle
 
-	conjugate
+    conjugate
 
-	atan))
+    atan))
 ;;bdk;; insert 1 end

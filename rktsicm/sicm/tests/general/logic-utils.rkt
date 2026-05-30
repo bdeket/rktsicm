@@ -96,7 +96,7 @@
     (test-noted '(real? a) 'R8)
     ;; any
     (test-noted 'halo 'R9)
-    
+
     ;; default false assumption
     (let ([prep '(positive? -1)])
       (check-equal? (assume! prep 'R10) 'noted)
@@ -104,7 +104,7 @@
       (check-equal? `(assuming (false! ,prep)) note)
       (check-equal? (eq-get note 'rules) '(R10))
       (clear-notes!))
-    
+
     )
    ))
 

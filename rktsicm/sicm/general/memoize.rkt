@@ -66,7 +66,7 @@
 ;;brm;;                   scmutils-base-environment)
 ;;brm;;      (procedure-name f)))
 
-  
+
 (define (clear-memoizer-tables)
   (for ([M (in-hash-values (cdr *memoizers*))]
         #:unless (gc-reclaimed-object? (memoizer-fun M)) )
@@ -77,12 +77,12 @@
 ;;; single-argument keys.
 
 (define (linear-memoize-1arg f #:optional max-table-size finder)
-  (let ((max-table-size			;set to 0 for no limit
-	 (if (default-object? max-table-size)
-	     12
-	     max-table-size))
-	(finder
-	 (if (default-object? finder) weak-find-equal? finder))
+  (let ((max-table-size                        ;set to 0 for no limit
+         (if (default-object? max-table-size)
+             12
+             max-table-size))
+        (finder
+         (if (default-object? finder) weak-find-equal? finder))
         (table '())
         (memo-hits 0)
         (memo-misses 0))
@@ -99,11 +99,11 @@
              (let ((seen (finder x table)))
                (if seen
                    (begin (if *auditing-memoizers*
-                            (set! memo-hits (int:+ memo-hits 1)))
+                              (set! memo-hits (int:+ memo-hits 1)))
                           seen)
                    (let ((ans (f x)))
                      (if *auditing-memoizers*
-                       (set! memo-misses (int:+ memo-misses 1)))
+                         (set! memo-misses (int:+ memo-misses 1)))
                      (set! table
                            (purge-list (cons (weak-cons x ans) table)
                                        max-table-size))
@@ -116,12 +116,12 @@
 ;;; arglists.
 
 (define (linear-memoize f #:optional max-table-size finder)
-  (let ((max-table-size			;set to 0 for no limit
-	 (if (default-object? max-table-size)
-	     12
-	     max-table-size))
-	(finder
-	 (if (default-object? finder) weak-find-equal-args? finder))
+  (let ((max-table-size                        ;set to 0 for no limit
+         (if (default-object? max-table-size)
+             12
+             max-table-size))
+        (finder
+         (if (default-object? finder) weak-find-equal-args? finder))
         (table '())
         (memo-hits 0)
         (memo-misses 0))
@@ -138,11 +138,11 @@
              (let ((seen (finder x table)))
                (if seen
                    (begin (if *auditing-memoizers*
-                            (set! memo-hits (int:+ memo-hits 1)))
+                              (set! memo-hits (int:+ memo-hits 1)))
                           seen)
                    (let ((ans (apply f x)))
                      (if *auditing-memoizers*
-                       (set! memo-misses (int:+ memo-misses 1)))
+                         (set! memo-misses (int:+ memo-misses 1)))
                      (set! table
                            (purge-list (cons (cons (list->weak-list x)
                                                    ans)
@@ -203,11 +203,11 @@
              (let ((seen (hash-table/get table x *not-seen*)))
                (if (not (eq? seen *not-seen*))
                    (begin (if *auditing-memoizers*
-                            (set! memo-hits (int:+ memo-hits 1)))
+                              (set! memo-hits (int:+ memo-hits 1)))
                           seen)
                    (let ((ans (f x)))
                      (if *auditing-memoizers*
-                       (set! memo-misses (int:+ memo-misses 1)))
+                         (set! memo-misses (int:+ memo-misses 1)))
                      (hash-table/put! table x ans)
                      ans))))))
       (reset)
@@ -231,11 +231,11 @@
              (let ((seen (hash-table/get table x *not-seen*)))
                (if (not (eq? seen *not-seen*))
                    (begin (if *auditing-memoizers*
-                            (set! memo-hits (int:+ memo-hits 1)))
+                              (set! memo-hits (int:+ memo-hits 1)))
                           seen)
                    (let ((ans (apply f x)))
                      (if *auditing-memoizers*
-                       (set! memo-misses (int:+ memo-misses 1)))
+                         (set! memo-misses (int:+ memo-misses 1)))
                      (hash-table/put! table x ans)
                      ans))))))
       (reset)
@@ -279,7 +279,7 @@
 ;;brm;;                   (else
 ;;brm;;                    (case memo-type
 ;;brm;;                      ((linear) (linear-memoize proc))
-;;brm;;                      ((hash) (hash-memoize proc)))))))	
+;;brm;;                      ((hash) (hash-memoize proc)))))))
 ;;brm;;        (if (not (environment-bound? environment
 ;;brm;;                                     '*memoized-procedures*))
 ;;brm;;            (environment-define environment
@@ -341,7 +341,7 @@
                     (lp (cdr keys) v)))
               *not-found*))))
 
-  (define (store! value keys)      
+  (define (store! value keys)
     (let lp ((keys keys) (table the-table))
       (if (null? (cdr keys))
           (if (1d-table? table)
@@ -431,7 +431,7 @@
 
 (define (memoize-multi-arg-eq procedure)
   (let* ((memory) (lookup) (not-found?) (store!)
-         (hits) (misses))
+                  (hits) (misses))
 
     (define (info)
       (list hits misses memory))
@@ -531,20 +531,20 @@
 
 (define scmutils-memoize-multi-arg-eq
   (make-scmutils-memoizer))
-  
+
 ;; (define (scmutils-memoize-multi-arg-eq f)
 ;;   (let ((mf (simple-memoize-multi-arg-eq f)))
-;;     (if (apply-hook? f)                 
+;;     (if (apply-hook? f)
 ;;         (set! mf (make-apply-hook mf (apply-hook-extra f))))
 ;;     (eq-clone! f mf)
 ;;     mf))
 
 ;; (define (samritchie-memoizer f)
 ;;   (if *samritchie-memoizing*
-;;       (let ((mf 
+;;       (let ((mf
 ;;              (scmutils-memoize-multi-arg-eq
 ;;               (compose scmutils-memoize-multi-arg-eq f))))
-;;         (if (apply-hook? f)                 
+;;         (if (apply-hook? f)
 ;;             (set! mf (make-apply-hook mf (apply-hook-extra f))))
 ;;         (eq-clone! f mf)
 ;;         mf)

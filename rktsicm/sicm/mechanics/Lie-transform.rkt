@@ -11,15 +11,15 @@
 ;;;  derivative (see Hamiltonian.scm).
 
 (define (Lie-transform H delta-t)
-  (make-operator 
-    (exp (* delta-t (Lie-derivative H)))
-    `(Lie-transform ,H ,delta-t)))
-  
+  (make-operator
+   (exp (* delta-t (Lie-derivative H)))
+   `(Lie-transform ,H ,delta-t)))
+
 
 ;;; The generalization of Lie-transform to include time dependence.
 
 (define (flow-transform H delta-t)
-  (make-operator 
+  (make-operator
    (exp (* delta-t (flow-derivative H)))
    `(flow-transform ,H ,delta-t)))
 
@@ -40,7 +40,7 @@
 
 (define ((H-harmonic m k) state)
   (let ((q (coordinate state))
-	(p (momentum state)))
+        (p (momentum state)))
     (+ (/ (square p) (* 2 m))
        (* 1/2 k (square q)))))
 
@@ -95,8 +95,8 @@ p_0
           (pr ((component 0) p))
           (pphi ((component 1) p)))
       (+ (/ (+ (square pr)
-	       (square (/ pphi r)))
-	    (* 2 m))
+               (square (/ pphi r)))
+            (* 2 m))
          (V r)))))
 
 (series:for-each print-expression
@@ -105,8 +105,8 @@ p_0
     'dt)
    state->q)
   (->H-state 0
-	      (coordinate-tuple 'r_0 'phi_0)
-	      (momentum-tuple 'p_r_0 'p_phi_0)))
+              (coordinate-tuple 'r_0 'phi_0)
+              (momentum-tuple 'p_r_0 'p_phi_0)))
  4)
 (up r_0 phi_0)
 (up (/ (* dt p_r_0) m) (/ (* dt p_phi_0) (* m (expt r_0 2))))
@@ -138,19 +138,19 @@ p_0
          (V r)))))
 
 
-;;; I left this one that uses the Lagrangian because it appears to be 
+;;; I left this one that uses the Lagrangian because it appears to be
 ;;; used for timings
 (show-time
  (lambda ()
    (series:print
     (((Lie-transform
        (Lagrangian->Hamiltonian
-	(L-central-polar 'm (lambda (r) (- (/ 'GM r)))))
+        (L-central-polar 'm (lambda (r) (- (/ 'GM r)))))
        'dt)
       state->q)
      (->H-state 0
-		 (coordinate-tuple 'r_0 'phi_0)
-		 (momentum-tuple 'p_r_0 'p_phi_0)))
+                 (coordinate-tuple 'r_0 'phi_0)
+                 (momentum-tuple 'p_r_0 'p_phi_0)))
     4)))
 #|
 ;;; 13 March 2012: I changed the system so that the original
@@ -217,9 +217,9 @@ p_0
 ;;;  But memoization makes some stuff feasible (see calculus/tensor.scm).
 ;;;
 ;;; Earlier
-;;; MAHARAL 
+;;; MAHARAL
 ;;;         process time: 3940 (3710 RUN + 230 GC); real time: 3956
-;;; HOD     
+;;; HOD
 ;;;         process time: 14590 (13610 RUN + 980 GC); real time: 14588
 ;;; PLANET003 600MHz PIII
 ;;;         process time: 19610 (17560 RUN + 2050 GC); real time: 19610
@@ -227,7 +227,7 @@ p_0
 ;;;         process time: 27380 (24250 RUN + 3130 GC); real time: 27385
 ;;; GEVURAH 300 MHz
 ;;;         process time: 36070 (33800 RUN + 2270 GC); real time: 36072
-;;; MAHARAL 
+;;; MAHARAL
 ;;;         process time: 56390 (50970 RUN + 5420 GC); real time: 56386
 ;;; ACTION1 200MHz Pentium Pro
 ;;;         process time: 55260 (49570 RUN + 5690 GC); real time: 55257

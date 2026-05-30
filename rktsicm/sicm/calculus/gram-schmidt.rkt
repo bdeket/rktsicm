@@ -16,7 +16,7 @@
         (if (negative? x)
             (- x)
             x)
-	(sqrt (square x))))
+        (sqrt (square x))))
   (define (normalize v)
     (* (/ 1 (sqrt (make-positive (metric v v)))) v))
   (let lp ((ins (ultra-flatten vector-basis)) (outs '()))
@@ -29,7 +29,7 @@
               (cons q outs))))))
 
 #|
-;;; Orthonormalizing with respect to the Lorentz metric in 2 dimensions. 
+;;; Orthonormalizing with respect to the Lorentz metric in 2 dimensions.
 
 (install-coordinates R2-rect (up 't 'x))
 (define R2-point ((R2-rect '->point) (up 't0 'x0)))
@@ -43,9 +43,9 @@
   (Gram-Schmidt (basis->vector-basis R2-basis) (L2-metric 'c)))
 
 (s:foreach (lambda (v)
-	     (pec ((v (literal-manifold-function 'f R2-rect))
-		  R2-point)))
-	   L2-vector-basis)
+             (pec ((v (literal-manifold-function 'f R2-rect))
+                  R2-point)))
+           L2-vector-basis)
 #| Result:
 (/ (((partial 0) f) (up t0 x0)) c)
 |#
@@ -55,9 +55,9 @@
 ;Value: done
 
 (s:foreach (lambda (omega)
-	     (pec ((omega (literal-vector-field 'v R2-rect))
-		  R2-point)))
-	   (vector-basis->dual L2-vector-basis R2-rect))
+             (pec ((omega (literal-vector-field 'v R2-rect))
+                  R2-point)))
+           (vector-basis->dual L2-vector-basis R2-rect))
 #| Result:
 (* c (v^0 (up t0 x0)))
 |#
@@ -88,10 +88,10 @@
 
 ;;; SR-V1 is orthogonal
 (for-each (lambda (v1)
-	    (for-each (lambda (v2)
-			(pe (((g-Lorentz 'c) v1 v2) an-event)))
-		      (cdr (memq v1 SR-V1))))
-	  SR-V1)
+            (for-each (lambda (v2)
+                        (pe (((g-Lorentz 'c) v1 v2) an-event)))
+                      (cdr (memq v1 SR-V1))))
+          SR-V1)
 0
 0
 0
@@ -101,17 +101,17 @@
 
 ;;; SR-V1 is normal
 (for-each (lambda (v)
-	    (pe (((g-Lorentz 'c) v v) an-event)))
-	  SR-V1)
+            (pe (((g-Lorentz 'c) v v) an-event)))
+          SR-V1)
 -1
 1
 1
 1
 
 (for-each (lambda (v)
-	    (pe ((v (SR '->coords))
-		 an-event)))
-	  SR-V1)
+            (pe ((v (SR '->coords))
+                 an-event)))
+          SR-V1)
 (up (/ 1 c) 0 0 0)
 (up 0 1 0 0)
 (up 0 0 1 0)
@@ -137,12 +137,12 @@
 (define g3 (g3-maker 'a 'b 'c 'd 'e 'f))
 
 (for-each (lambda (v)
-	    (pe ((v (R3-rect '->coords))
-		 R3-point)))
-	  (ultra-flatten
-	   (Gram-Schmidt
-	    (basis->vector-basis R3-basis)
-	    g3)))
+            (pe ((v (R3-rect '->coords))
+                 R3-point)))
+          (ultra-flatten
+           (Gram-Schmidt
+            (basis->vector-basis R3-basis)
+            g3)))
 (up (/ 1 (sqrt a)) 0 0)
 (up (/ (* -1 b) (sqrt (+ (* (expt a 2) d) (* -1 a (expt b 2)))))
     (/ a (sqrt (+ (* (expt a 2) d) (* -1 a (expt b 2)))))

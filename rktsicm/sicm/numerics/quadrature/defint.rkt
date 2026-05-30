@@ -72,11 +72,11 @@
 
 (define (definite-integral-numerical f t1 t2 tolerance compile?)
   (cond ((and (number? t1) (number? t2) (= t1 t2)) 0)
-	((not compile?)
-	 (definite-integral-with-tolerance f t1 t2 tolerance))
-	(else
-	 (definite-integral-with-tolerance (compile-procedure f)
-	   t1 t2 tolerance))))
+        ((not compile?)
+         (definite-integral-with-tolerance f t1 t2 tolerance))
+        (else
+         (definite-integral-with-tolerance (compile-procedure f)
+           t1 t2 tolerance))))
 
 (define (definite-integral f t1 t2 #:optional tolerance compile?)
   (if (default-object? tolerance)
@@ -84,52 +84,52 @@
   (if (default-object? compile?)
       (set! compile? *compile-integrand?))
   (let ((fx (f (choose-interior-point t1 t2))))
-    (if (with-units? fx)		;Must extract numerical procedure
-	(let* ((input-value (generate-uninterned-symbol))
-	       (input-units (u:units t1))
-	       (input (with-units input-value input-units))
-	       (output (f input))
-	       (output-units (u:units output))
-	       (output-value (u:value output))
-	       (integral-units (*units output-units input-units))
-	       (lexp
-		(cselim
-		 `(lambda (,input-value)
-		    ,(*compiler-simplifier* output-value))))
-	       (nf (eval lexp scmutils-base-environment)))
-	  (with-units
-	      (definite-integral-numerical nf (u:value t1) (u:value t2)
-		tolerance compile?)
-	    integral-units))
-	(definite-integral-numerical f (u:value t1) (u:value t2)
-	  tolerance compile?))))
+    (if (with-units? fx)                ;Must extract numerical procedure
+        (let* ((input-value (generate-uninterned-symbol))
+               (input-units (u:units t1))
+               (input (with-units input-value input-units))
+               (output (f input))
+               (output-units (u:units output))
+               (output-value (u:value output))
+               (integral-units (*units output-units input-units))
+               (lexp
+                (cselim
+                 `(lambda (,input-value)
+                    ,(*compiler-simplifier* output-value))))
+               (nf (eval lexp scmutils-base-environment)))
+          (with-units
+           (definite-integral-numerical nf (u:value t1) (u:value t2)
+             tolerance compile?)
+           integral-units))
+        (definite-integral-numerical f (u:value t1) (u:value t2)
+          tolerance compile?))))
 
 (define (choose-interior-point x1 x2)
   (assert (units:= x1 x2)
-	  "Limits of integration must have same units.")
+          "Limits of integration must have same units.")
   (let ((u (u:units x1))
-	(t1 (u:value x1))
-	(t2 (u:value x2)))
+        (t1 (u:value x1))
+        (t2 (u:value x2)))
     (cond ((and (number? t1) (number? t2))
-	   (with-units (/ (+ t1 t2) 2.0) u))
+           (with-units (/ (+ t1 t2) 2.0) u))
 
-	  ((and (eq? t1 :-infinity) (number? t2))
-	   (with-units (- t2 1.0) u))
-	  ((and (number? t1) (eq? t2 :+infinity))
-	   (with-units (+ t1 1.0) u))
+          ((and (eq? t1 :-infinity) (number? t2))
+           (with-units (- t2 1.0) u))
+          ((and (number? t1) (eq? t2 :+infinity))
+           (with-units (+ t1 1.0) u))
 
-	  ((and (eq? t1 :+infinity) (number? t2))
-	   (with-units (+ t2 1.0) u))
-	  ((and (number? t1) (eq? t2 :-infinity))
-	   (with-units (- t1 1.0) u))
+          ((and (eq? t1 :+infinity) (number? t2))
+           (with-units (+ t2 1.0) u))
+          ((and (number? t1) (eq? t2 :-infinity))
+           (with-units (- t1 1.0) u))
 
-	  ((and (eq? t1 :-infinity) (eq? t2 :+infinity))
-	   (with-units 0 u))
-	  ((and (eq? t1 :+infinity) (eq? t2 :-infinity))
-	   (with-units 0 u))
+          ((and (eq? t1 :-infinity) (eq? t2 :+infinity))
+           (with-units 0 u))
+          ((and (eq? t1 :+infinity) (eq? t2 :-infinity))
+           (with-units 0 u))
 
-	  (else
-	   (error "No interior point: CHOOSE-INTERIOR-POINT")))))
+          (else
+           (error "No interior point: CHOOSE-INTERIOR-POINT")))))
 
 #|
 (define (definite-integral f t1 t2 #:optional epsilon compile?)
@@ -138,12 +138,12 @@
   (if (default-object? compile?)
       (set! compile? *compile-integrand?))
   (cond ((and (number? t1) (number? t2) (= t1 t2)) 0)
-	((not compile?)
-	 ((make-definite-integrator f t1 t2 epsilon)
-	  'integral))
-	(else
-	 ((make-definite-integrator (compile-procedure f) t1 t2 epsilon)
-	  'integral))))
+        ((not compile?)
+         ((make-definite-integrator f t1 t2 epsilon)
+          'integral))
+        (else
+         ((make-definite-integrator (compile-procedure f) t1 t2 epsilon)
+          'integral))))
 |#
 
 

@@ -26,7 +26,7 @@
     (check-equal? (expression (((Lie-D R-swap) F) (sigma 't)))
                   '(up t (+ (* 1/2 (+ 3 (* b t t))) (* a t))
                        (+ (* 1/2 (+ 3 (* b t t)) (+ 3 (* b t t))) (* a t a t))))
-    
+
    )))
 
 (module+ test

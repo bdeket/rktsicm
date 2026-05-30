@@ -24,27 +24,27 @@
 (define (wedge2 form1 form2)
   (let ((n1 (get-rank form1)) (n2 (get-rank form2)))
     (if (or (zero? n1) (zero? n2))
-	(* form1 form2)
-	(let ((n (fix:+ n1 n2))
+        (* form1 form2)
+        (let ((n (fix:+ n1 n2))
               (k (/ 1 (* (factorial n1) (factorial n2)))))
-	  (define (the-wedge . args)
-	    (assert (fix:= (length args) n)
-		    "Wrong number of args to wedge product")
-	    (let ((perms (permutations (iota n))))
-	      (g:* k                    ; Error in Singer.
-		   (apply g:+
-			  (map (lambda (p)
-				 (let ((pargs (permute p args)))
-				   (let ((order (permutation-interchanges p)))
+          (define (the-wedge . args)
+            (assert (fix:= (length args) n)
+                    "Wrong number of args to wedge product")
+            (let ((perms (permutations (iota n))))
+              (g:* k                    ; Error in Singer.
+                   (apply g:+
+                          (map (lambda (p)
+                                 (let ((pargs (permute p args)))
+                                   (let ((order (permutation-interchanges p)))
                                      (define-values (a1 a2) (split-at pargs n1))
-				     (g:* (if (even? order) 1 -1)
-					  (apply form1 a1)
-					  (apply form2 a2)))))
-			       perms)))))
-	  (procedure->nform-field the-wedge
-				  n
-				  `(wedge ,(diffop-name form1)
-					  ,(diffop-name form2)))))))
+                                     (g:* (if (even? order) 1 -1)
+                                          (apply form1 a1)
+                                          (apply form2 a2)))))
+                               perms)))))
+          (procedure->nform-field the-wedge
+                                  n
+                                  `(wedge ,(diffop-name form1)
+                                          ,(diffop-name form2)))))))
 
 (define (wedge . args)
   (reduce-right wedge2 (constant 1) args))
@@ -56,12 +56,12 @@
 
 (define (get-rank op)
   (cond ((operator? op)
-	 (let ((a (o:arity op)))
+         (let ((a (o:arity op)))
            (unless (exactly-n? a)
              (error (format "Unknown rank operator ~a -> ~a" op a)))
-	   a))
-	((function? op) 0)
-	(else (error "Bad rank " op))))
+           a))
+        ((function? op) 0)
+        (else (error "Bad rank " op))))
 
 (define (rank->arity n)
   (exact-arity n))
@@ -72,8 +72,8 @@
   (if (= n 0)
       (proc)
       (let ((the-field (make-operator proc name wedge (rank->arity n))))
-	(declare-argument-types! the-field (make-list n vector-field?))
-	the-field)))
+        (declare-argument-types! the-field (make-list n vector-field?))
+        the-field)))
 
 #|
 (install-coordinates R3-rect (up 'x 'y 'z))
@@ -139,23 +139,23 @@
 (define (Alt form)
   (let ((n (get-rank form)))
     (if (zero? n)
-	form
-	(let ()
-	  (define (the-alternation . args)
-	    (assert (fix:= (length args) n)
-		    "Wrong number of args to alternation")
-	    (let ((perms (permutations (iota n))))
-	      (g:* (/ 1 (factorial n))
-		   (apply g:+
-			  (map (lambda (p)
-				 (let ((pargs (permute p args)))
-				   (let ((order (permutation-interchanges p)))
-				     (g:* (if (even? order) 1 -1)
-					  (apply form pargs)))))
-			       perms)))))
-	  (procedure->nform-field the-alternation
-				  n
-				  `(Alt ,(diffop-name form)))))))
+        form
+        (let ()
+          (define (the-alternation . args)
+            (assert (fix:= (length args) n)
+                    "Wrong number of args to alternation")
+            (let ((perms (permutations (iota n))))
+              (g:* (/ 1 (factorial n))
+                   (apply g:+
+                          (map (lambda (p)
+                                 (let ((pargs (permute p args)))
+                                   (let ((order (permutation-interchanges p)))
+                                     (g:* (if (even? order) 1 -1)
+                                          (apply form pargs)))))
+                               perms)))))
+          (procedure->nform-field the-alternation
+                                  n
+                                  `(Alt ,(diffop-name form)))))))
 
 (define (tensor-product2 t1 t2)
   (let ((n1 (get-rank t1)) (n2 (get-rank t2)))
@@ -175,7 +175,7 @@
 (define (w2 form1 form2)
   (let ((n1 (get-rank form1)) (n2 (get-rank form2)))
     (* (/ (factorial (+ n1 n2))
-	  (* (factorial n1) (factorial n2)))
+          (* (factorial n1) (factorial n2)))
        (Alt (tensor-product2 form1 form2)))))
 
 ;;;(define (wedge . args)

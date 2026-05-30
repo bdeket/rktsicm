@@ -18,26 +18,26 @@
 ;;; (define xs '(.1 .2 .3 .4 .5 .6))
 ;;; (define bar (lagrange (map sin xs) xs))
 ;;; (define foo (lambda->numerical-procedure bar))
-;;; Then BAR is a lambda-expression, and FOO is the procedure that 
+;;; Then BAR is a lambda-expression, and FOO is the procedure that
 ;;; evaluates the polynomial interpolating SIN at the given points.
-;;; 
+;;;
 
 ;;; Edited by GJS 10Jan09
 
 
 ;;; Needs: ENCLOSE/COMCON (for LAMBDAFY, LETIFY utilities)
 ;;;        ENCLOSE/ENCLOSE for LAMBDA->NUMERICAL-PROCEDURE
-;;;                               ENCLOSE/MAGIC for FLONUMIZE, etc. 
+;;;                               ENCLOSE/MAGIC for FLONUMIZE, etc.
 
 
 (define (lagrange ys xs)
   (lambdafy 1
-	    (lambda (var)
-	      (letify (map (lambda (x) (- var x)) xs)
-		      (lambda (diffs)
-			(triangle-iterate xs ys
-					  (make-linear-interpolator
-					   (table-of eqv? xs diffs))))))))
+            (lambda (var)
+              (letify (map (lambda (x) (- var x)) xs)
+                      (lambda (diffs)
+                        (triangle-iterate xs ys
+                                          (make-linear-interpolator
+                                           (table-of eqv? xs diffs))))))))
 
 #|
 (pp (lagrange '(y1 y2 y3 y4) '(x1 x2 x3 x4)))
@@ -62,50 +62,50 @@
 (define (lagrange ys xs)
   (lambda (var)
     (triangle-iterate xs ys
-		      (make-linear-interpolator
-		       (table-of eqv? xs (map (lambda (x) (- var x)) xs))))))
+                      (make-linear-interpolator
+                       (table-of eqv? xs (map (lambda (x) (- var x)) xs))))))
 |#
 
 
 
 
 
-(define (triangle-iterate xs v f)	;(f x0 x1 v0 v1)
+(define (triangle-iterate xs v f)        ;(f x0 x1 v0 v1)
   (define (all-except-ends l)
     (reverse (cdr (reverse (cdr l)))))
   (define map-consec-pairs
     (lambda (x0s x1s vs)
       (if (null? x1s)
-	  '()
-	  (cons (f (car x0s) (car x1s) (car vs) (cadr vs))
-		(map-consec-pairs (cdr x0s) (cdr x1s) (cdr vs))))))
+          '()
+          (cons (f (car x0s) (car x1s) (car vs) (cadr vs))
+                (map-consec-pairs (cdr x0s) (cdr x1s) (cdr vs))))))
   (let level ((x1s (cdr xs)) (vs v))
     (if (null? (cdr vs))
-	(car vs)
-	(let ((nvs (map-consec-pairs xs x1s vs)))
-	  (if (null? (cdr nvs))
-	      (car nvs)
-	      (letify (all-except-ends nvs)
-		      (lambda (names)
-			(level (cdr x1s)
-			       (append (list (car nvs))
-				       names
-				       (last-pair nvs))))))))))
+        (car vs)
+        (let ((nvs (map-consec-pairs xs x1s vs)))
+          (if (null? (cdr nvs))
+              (car nvs)
+              (letify (all-except-ends nvs)
+                      (lambda (names)
+                        (level (cdr x1s)
+                               (append (list (car nvs))
+                                       names
+                                       (last-pair nvs))))))))))
 
 (define (make-linear-interpolator lookup)
   (lambda (x0 x1 v0 v1)
     (vector->vector-constructor
      (/ (- (* v1 (lookup x0))
-	   (* v0 (lookup x1)))
-	(- x1 x0)))))
+           (* v0 (lookup x1)))
+        (- x1 x0)))))
 
 (define (vector->vector-constructor exp)
   (if (vector? exp)
       (cons 'vector
-	    (map vector->vector-constructor
-		 (vector->list exp)))
+            (map vector->vector-constructor
+                 (vector->list exp)))
       exp))
-	     
+
 #|
 (define (lagrange-interpolation-function ys xs)
   (lambda->interpreted-generic-procedure
@@ -114,7 +114,7 @@
 
 (define (lagrange-interpolation-function ys xs)
   (lagrange (vector->list ys)
-	    (vector->list xs)))      
+            (vector->list xs)))
 |#
 
 

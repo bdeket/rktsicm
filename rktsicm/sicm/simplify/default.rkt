@@ -22,22 +22,22 @@
 (define (default-simplify expr)
   (define (bad? expr)
     (or (boolean? expr)
-	(null? expr)
-	(pathname? expr)
-	(undefined-value? expr)
-	(and (pair? expr)
-	     (not (list? expr)))))
+        (null? expr)
+        (pathname? expr)
+        (undefined-value? expr)
+        (and (pair? expr)
+             (not (list? expr)))))
   (cond ((list? expr)
-	 (let ((subs
-		(map (lambda (x) (g:simplify x))
-		     expr)))
-	   (if (not (rexists bad? subs))
-	       (new-simplify subs)
-	       subs)))
-	((pair? expr)
-	 (cons (g:simplify (car expr))
-	       (g:simplify (cdr expr))))
-	(else expr)))
+         (let ((subs
+                (map (lambda (x) (g:simplify x))
+                     expr)))
+           (if (not (rexists bad? subs))
+               (new-simplify subs)
+               subs)))
+        ((pair? expr)
+         (cons (g:simplify (car expr))
+               (g:simplify (cdr expr))))
+        (else expr)))
 
 #; ;;bdk;; the generic name is created in kernel/generic. because g:simplify is used in kernel.
 (define g:simplify
@@ -72,9 +72,9 @@
 #|
 (define (simplify-with-units num)
   (let ((value (g:* (unit-scale (u:units num)) (u:value num)))
-	(vect (unit-exponents (u:units num)))
-	(system (environment-lookup scmutils-base-environment
-				    (unit-system (u:units num)))))
+        (vect (unit-exponents (u:units num)))
+        (system (environment-lookup scmutils-base-environment
+                                    (unit-system (u:units num)))))
     (make-unit-description (g:simplify value) vect system)))
 
 (assign-operation 'simplify simplify-with-units with-units?)
@@ -82,14 +82,14 @@
 
 (define (simplify-units num)
   (let ((system (environment-lookup scmutils-base-environment
-				    (unit-system (u:units num)))))
+                                    (unit-system (u:units num)))))
     (with-units->expression system num)))
 
 (assign-operation 'simplify simplify-units with-units?)
 (assign-operation 'simplify simplify-units units?)
 
-;;; This must be the first handler (last in generic table) 
-;;; that triggers on PROCEDURE? because it is default for 
+;;; This must be the first handler (last in generic table)
+;;; that triggers on PROCEDURE? because it is default for
 ;;; procedures.  Operators and abstract functions must
 ;;; be checked first.
 
@@ -113,8 +113,8 @@
 
 (define (simplify-quaternion expr)
   (cons 'quaternion
-	(vector->list
-	 ((vector-elementwise g:simplify) (cadr expr)))))
+        (vector->list
+         ((vector-elementwise g:simplify) (cadr expr)))))
 
 (assign-operation 'simplify simplify-quaternion quaternion?)
 
@@ -122,9 +122,9 @@
 (define (simplify-matrix expr)
   `(matrix-by-rows
     ,@(map (lambda (r)
-	     (cons 'list (vector->list r)))
-	   (vector->list
-	    (matrix->array ((m:elementwise g:simplify) expr))))))
+             (cons 'list (vector->list r)))
+           (vector->list
+            (matrix->array ((m:elementwise g:simplify) expr))))))
 
 (assign-operation 'simplify simplify-matrix matrix?)
 
@@ -132,36 +132,36 @@
 (define (simplify-differential expr)
   `(make-differential-quantity
     (list ,@(map (lambda (term)
-		   `(make-differential-term
-		     ',(differential-tags term)
-		     ,(g:simplify (differential-coefficient term))))
-		 (differential-term-list expr)))))
+                   `(make-differential-term
+                     ',(differential-tags term)
+                     ,(g:simplify (differential-coefficient term))))
+                 (differential-term-list expr)))))
 
 (assign-operation 'simplify simplify-differential differential?)
 
 (define (simplify-down expr)
   (cons down-constructor-name
-	(let lp ((i 0))
-	  (if (fix:= i (s:length expr))
-	      '()
-	      (cons (g:simplify (s:ref expr i))
-		    (lp (fix:+ i 1)))))))
+        (let lp ((i 0))
+          (if (fix:= i (s:length expr))
+              '()
+              (cons (g:simplify (s:ref expr i))
+                    (lp (fix:+ i 1)))))))
 
 (assign-operation 'simplify simplify-down down?)
 
 
 (define (simplify-up expr)
   (cons up-constructor-name
-	(let lp ((i 0))
-	  (if (fix:= i (s:length expr))
-	      '()
-	      (cons (g:simplify (s:ref expr i))
-		    (lp (fix:+ i 1)))))))
+        (let lp ((i 0))
+          (if (fix:= i (s:length expr))
+              '()
+              (cons (g:simplify (s:ref expr i))
+                    (lp (fix:+ i 1)))))))
 
 (assign-operation 'simplify simplify-up up?)
 
 
-;;; Not quite right... Should only expressionize 
+;;; Not quite right... Should only expressionize
 ;;; and simplify compound arguments to literal-function
 ;;; subexpressions.
 (define (simplify-literal-number expr)

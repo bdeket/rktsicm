@@ -21,7 +21,7 @@
 ;;; We have a function, f, defined on points in n-space.
 ;;; We are looking for a local minimum of f.
 
-;;; The central idea -- We have a simplex of n+1 vertices where f is 
+;;; The central idea -- We have a simplex of n+1 vertices where f is
 ;;; known.  We want to deform the simplex until it sits on the minimum.
 
 ;;; A simplex is represented as a list of entries, each of which is a
@@ -58,10 +58,10 @@
 (define simplex-centroid
   (lambda (simplex)
     (scalar*vector (/ 1 (simplex-size simplex))
-		   (a-reduce vector+vector
-			     (map simplex-vertex simplex)))))
+                   (a-reduce vector+vector
+                             (map simplex-vertex simplex)))))
 
-(define	extender	
+(define extender
   (lambda (p1 p2)
     (let ((dp (vector-vector p2 p1)))
       (lambda (k)
@@ -69,14 +69,14 @@
 
 (define (make-simplex point step f)
   (simplex-sort
-    (map (lambda (vertex) (simplex-entry vertex (f vertex)))
-         (cons point
-	       (let ((n (vector-length point)))
-		 (generate-list n
-		   (lambda (i)
-		     (vector+vector point
-		       (scalar*vector step
-			 (v:make-basis-unit n i))))))))))
+   (map (lambda (vertex) (simplex-entry vertex (f vertex)))
+        (cons point
+              (let ((n (vector-length point)))
+                (generate-list n
+                               (lambda (i)
+                                 (vector+vector point
+                                                (scalar*vector step
+                                                               (v:make-basis-unit n i))))))))))
 
 (define (stationary? simplex epsilon)
   (close-enuf? (simplex-value (simplex-highest simplex))
@@ -95,31 +95,31 @@
     (let ((pv (simplex-vertex point)))
       (simplex-sort
        (map (lambda (sp)
-	      (if (eq? point sp) 
-		  sp
-		  (let ((vertex ((extender pv (simplex-vertex sp)) 
-				 shrink-coef)))
-		    (simplex-entry vertex (f vertex)))))
-	    simplex))))
+              (if (eq? point sp)
+                  sp
+                  (let ((vertex ((extender pv (simplex-vertex sp))
+                                 shrink-coef)))
+                    (simplex-entry vertex (f vertex)))))
+            simplex))))
   (define (nm-step simplex)
     (let ((g (simplex-highest simplex))
           (h (simplex-next-highest simplex))
           (s (simplex-lowest simplex))
           (s-h (simplex-but-highest simplex)))
       (let* ((vg (simplex-vertex g)) (fg (simplex-value g))
-             (fh (simplex-value h)) (fs (simplex-value s))
-             (extend (extender vg (simplex-centroid s-h))))
+                                     (fh (simplex-value h)) (fs (simplex-value s))
+                                     (extend (extender vg (simplex-centroid s-h))))
         (let* ((vr (extend reflection-coef))
                (fr (f vr)))                 ;try reflection
           (if (< fr fh)                     ;reflection successful
-              (if (< fr fs)                 ;new minimum 
+              (if (< fr fs)                 ;new minimum
                   (let* ((ve (extend expansion-coef))
                          (fe (f ve)))       ;try expansion
                     (if (< fe fs)           ;expansion successful
                         (simplex-adjoin ve fe s-h)
                         (simplex-adjoin vr fr s-h)))
                   (simplex-adjoin vr fr s-h))
-              (let* ((vc (extend (if (< fr fg) 
+              (let* ((vc (extend (if (< fr fg)
                                      contraction-coef-1
                                      contraction-coef-2)))
                      (fc (f vc)))           ;try contraction
@@ -139,7 +139,7 @@
 ;;;(define (stationary? simplex epsilon)
 ;;;  (let ((np1 (length simplex)))
 ;;;    (let* ((mean (/ (a-reduce + (map simplex-value simplex)) np1))
-;;;           (variance (/ (a-reduce + 
+;;;           (variance (/ (a-reduce +
 ;;;                                  (map (lambda (e)
 ;;;                                         (square (- (simplex-value e) mean)))
 ;;;                                       simplex))
@@ -162,18 +162,18 @@
 (define (generate-gradient-procedure f n tol)
   (lambda (x)
     (generate-vector
-      n
-      (lambda (i)
-        (richardson-limit
-          (let ((fi (lambda (t)
-                      (f (vector+vector x
-			   (scalar*vector t
-			     (v:make-basis-unit n i)))))))
-            (lambda (h) (/ (- (fi h) (fi (- h))) 2 h)))
-          (max 0.1 (* 0.1 (abs (vector-ref x i)))) ;starting h
-          2  ;ord -- see doc for RE.SCM
-          2  ;inc
-          tol)))))
+     n
+     (lambda (i)
+       (richardson-limit
+        (let ((fi (lambda (t)
+                    (f (vector+vector x
+                                      (scalar*vector t
+                                                     (v:make-basis-unit n i)))))))
+          (lambda (h) (/ (- (fi h) (fi (- h))) 2 h)))
+        (max 0.1 (* 0.1 (abs (vector-ref x i)))) ;starting h
+        2  ;ord -- see doc for RE.SCM
+        2  ;inc
+        tol)))))
 
 
 
@@ -200,16 +200,16 @@
                      (vgt (v:dot-product v gt))
                      (z (+ (* 3 (- f0 ft)  (/ 1 (max 1e-10 t))) vg0 vgt))
                      (w (sqrt (- (* z z) (* vg0 vgt))))
-                     (tstar (* t (- 1 (/ (+ vgt w (- z)) 
+                     (tstar (* t (- 1 (/ (+ vgt w (- z))
                                          (+ vgt (- vg0) (* 2 w))))))
                      (fstar (linef tstar)))
-                 (cond ((< fstar f0)  (list 'ok (t->x tstar) fstar))
-                       ((< 0 tstar 1) (loop tstar (+ iter 1)))
-                       (else          (loop (/ t 2) (+ iter 1)))))
+                (cond ((< fstar f0)  (list 'ok (t->x tstar) fstar))
+                      ((< 0 tstar 1) (loop tstar (+ iter 1)))
+                      (else          (loop (/ t 2) (+ iter 1)))))
               (loop (* t 2) (+ iter 1)))))))
-  
-  
-  
+
+
+
 ;;; The following line-minimization procedure is based on Brent's
 ;;; algorithm.
 
@@ -221,35 +221,35 @@
   (define g0 (lineg 0))
   (define s0 (/ (- f0 est) -.5 (v:dot-product g0 v)))
   (let loop ((t (if (and (positive? s0) (< s0 1)) s0 1))
-	     (iter 0))
+             (iter 0))
     (if (> iter 100)
-	(list 'no-min)
-	(let ((ft (linef t))
-	      (gt (lineg t)))
-	  (if (or (>= ft f0)
-		  (>= (v:dot-product v gt) 0))
-	      (let* ((result (brent-min linef 0 t n:sqrt-machine-epsilon))
-		     (tstar (car result))
-		     (fstar (cadr result)))
-		(list 'ok (t->x tstar) fstar))
-	      (loop (* t 2) (+ iter 1)))))))
+        (list 'no-min)
+        (let ((ft (linef t))
+              (gt (lineg t)))
+          (if (or (>= ft f0)
+                  (>= (v:dot-product v gt) 0))
+              (let* ((result (brent-min linef 0 t n:sqrt-machine-epsilon))
+                     (tstar (car result))
+                     (fstar (cadr result)))
+                (list 'ok (t->x tstar) fstar))
+              (loop (* t 2) (+ iter 1)))))))
 
 
 ;;; In the following implementation of the Davidon-Fletcher-Powell
 ;;;  algorithm, f is a function of a single vector argument that returns
 ;;;  a real value to be minimized, g is the vector-valued gradient and
 ;;;  x is a (vector) starting point, and est is an estimate of the minimum
-;;;  function value. If g is '(), then a numerical approximation is 
-;;;  substituted using GENERATE-GRADIENT-PROCEDURE. ftol is the convergence 
-;;;  criterion: the search is stopped when the relative change in f falls 
+;;;  function value. If g is '(), then a numerical approximation is
+;;;  substituted using GENERATE-GRADIENT-PROCEDURE. ftol is the convergence
+;;;  criterion: the search is stopped when the relative change in f falls
 ;;;  below ftol.
 
 (define fletcher-powell-wallp? false)
 
 (define (fletcher-powell line-search f g x est ftol maxiter)
   (let ((n (vector-length x)))
-    (if (null? g) (set! g (generate-gradient-procedure 
-                            f n (* 1000 n:machine-epsilon))))
+    (if (null? g) (set! g (generate-gradient-procedure
+                           f n (* 1000 n:machine-epsilon))))
     (let loop ((H (m:make-identity n))
                (x x)
                (fx (f x))
@@ -258,33 +258,33 @@
       (if fletcher-powell-wallp? (print (list x fx gx)))
       (let ((v (matrix*vector H (scalar*vector -1 gx))))
         (if (positive? (v:dot-product v gx))
-          (begin 
-            (if fletcher-powell-wallp? 
-               (display (list "H reset to Identity at iteration" count)))
-            (loop (m:make-identity n) x fx gx count))
-          (let ((r (line-search f g x v est)))
-            (if (eq? (car r) 'no-min)
-              (list 'no-min (cons x fx) count)
-              (let ((newx (cadr r))
-                    (newfx (caddr r)))
-                (if (close-enuf? newfx fx ftol) ;convergence criterion
-                  (list 'ok (cons newx newfx) count)
-                  (if (fix:= count maxiter)
-                    (list 'maxcount (cons newx newfx) count)
-                    (let* ((newgx (g newx))
-                           (dx (vector-vector newx x))
-                           (dg (vector-vector newgx gx))
-                           (Hdg (matrix*vector H dg))
-                           (A (matrix*scalar
-			       (m:outer-product (vector->column-matrix dx)
-						(vector->row-matrix dx))
-			       (/ 1 (v:dot-product dx dg))))
-                           (B (matrix*scalar
-			       (m:outer-product (vector->column-matrix Hdg)
-						(vector->row-matrix Hdg))
-			       (/ -1 (v:dot-product dg Hdg))))
-                           (newH (matrix+matrix H (matrix+matrix A B))))
-                      (loop newH newx newfx newgx (fix:+ count 1)))))))))))))
+            (begin
+              (if fletcher-powell-wallp?
+                  (display (list "H reset to Identity at iteration" count)))
+              (loop (m:make-identity n) x fx gx count))
+            (let ((r (line-search f g x v est)))
+              (if (eq? (car r) 'no-min)
+                  (list 'no-min (cons x fx) count)
+                  (let ((newx (cadr r))
+                        (newfx (caddr r)))
+                    (if (close-enuf? newfx fx ftol) ;convergence criterion
+                        (list 'ok (cons newx newfx) count)
+                        (if (fix:= count maxiter)
+                            (list 'maxcount (cons newx newfx) count)
+                            (let* ((newgx (g newx))
+                                   (dx (vector-vector newx x))
+                                   (dg (vector-vector newgx gx))
+                                   (Hdg (matrix*vector H dg))
+                                   (A (matrix*scalar
+                                       (m:outer-product (vector->column-matrix dx)
+                                                        (vector->row-matrix dx))
+                                       (/ 1 (v:dot-product dx dg))))
+                                   (B (matrix*scalar
+                                       (m:outer-product (vector->column-matrix Hdg)
+                                                        (vector->row-matrix Hdg))
+                                       (/ -1 (v:dot-product dg Hdg))))
+                                   (newH (matrix+matrix H (matrix+matrix A B))))
+                              (loop newH newx newfx newgx (fix:+ count 1)))))))))))))
 
 
 ;;; The following procedures, DFP and DFP-BRENT, call directly upon
@@ -308,8 +308,8 @@
 
 (define (bfgs f g x est ftol maxiter)
   (let ((n (vector-length x)))
-    (if (null? g) (set! g (generate-gradient-procedure 
-                            f n (* 1000 n:machine-epsilon))))
+    (if (null? g) (set! g (generate-gradient-procedure
+                           f n (* 1000 n:machine-epsilon))))
     (let loop ((H (m:make-identity n))
                (x x)
                (fx (f x))
@@ -318,41 +318,41 @@
       (if bfgs-wallp? (print (list x fx gx)))
       (let ((v (matrix*vector H (scalar*vector -1 gx))))
         (if (positive? (v:dot-product v gx))
-          (begin 
-            (if bfgs-wallp? 
-               (display (list "H reset to Identity at iteration" count)))
-            (loop (m:make-identity n) x fx gx count))
-          (let ((r (line-min-davidon f g x v est)))
-            (if (eq? (car r) 'no-min)
-              (list 'no-min (cons x fx) count)
-              (let ((newx (cadr r))
-                    (newfx (caddr r)))
-                (if (close-enuf? newfx fx ftol) ;convergence criterion
-                  (list 'ok (cons newx newfx) count)
-                  (if (fix:= count maxiter)
-                    (list 'maxcount (cons newx newfx) count)
-                    (let* ((newgx (g newx))
-                           (dx (vector-vector newx x))
-                           (dg (vector-vector newgx gx))
-                           (Hdg (matrix*vector H dg))
-                           (dxdg (v:dot-product dx dg))
-                           (dgHdg (v:dot-product dg Hdg))
-                           (u (vector-vector (scalar*vector (/ 1 dxdg) dx)
-					     (scalar*vector (/ 1 dgHdg) Hdg)))
-                           (A (matrix*scalar
-			       (m:outer-product (vector->column-matrix dx)
-						(vector->row-matrix dx))
-			       (/ 1 dxdg)))
-                           (B (matrix*scalar
-			       (m:outer-product (vector->column-matrix Hdg)
-						(vector->row-matrix Hdg))
-			       (/ -1 dgHdg)))
-                           (C (matrix*scalar
-			       (m:outer-product (vector->column-matrix u)
-						(vector->row-matrix u))
-			       dgHdg))
-                           (newH
-			    (matrix+matrix (matrix+matrix H A)
-					   (matrix+matrix B C))))
-                        (loop newH newx newfx newgx (fix:+ count 1)))))))))))))
+            (begin
+              (if bfgs-wallp?
+                  (display (list "H reset to Identity at iteration" count)))
+              (loop (m:make-identity n) x fx gx count))
+            (let ((r (line-min-davidon f g x v est)))
+              (if (eq? (car r) 'no-min)
+                  (list 'no-min (cons x fx) count)
+                  (let ((newx (cadr r))
+                        (newfx (caddr r)))
+                    (if (close-enuf? newfx fx ftol) ;convergence criterion
+                        (list 'ok (cons newx newfx) count)
+                        (if (fix:= count maxiter)
+                            (list 'maxcount (cons newx newfx) count)
+                            (let* ((newgx (g newx))
+                                   (dx (vector-vector newx x))
+                                   (dg (vector-vector newgx gx))
+                                   (Hdg (matrix*vector H dg))
+                                   (dxdg (v:dot-product dx dg))
+                                   (dgHdg (v:dot-product dg Hdg))
+                                   (u (vector-vector (scalar*vector (/ 1 dxdg) dx)
+                                                     (scalar*vector (/ 1 dgHdg) Hdg)))
+                                   (A (matrix*scalar
+                                       (m:outer-product (vector->column-matrix dx)
+                                                        (vector->row-matrix dx))
+                                       (/ 1 dxdg)))
+                                   (B (matrix*scalar
+                                       (m:outer-product (vector->column-matrix Hdg)
+                                                        (vector->row-matrix Hdg))
+                                       (/ -1 dgHdg)))
+                                   (C (matrix*scalar
+                                       (m:outer-product (vector->column-matrix u)
+                                                        (vector->row-matrix u))
+                                       dgHdg))
+                                   (newH
+                                    (matrix+matrix (matrix+matrix H A)
+                                                   (matrix+matrix B C))))
+                              (loop newH newx newfx newgx (fix:+ count 1)))))))))))))
 

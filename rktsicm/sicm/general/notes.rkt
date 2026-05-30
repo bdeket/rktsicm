@@ -22,7 +22,7 @@
          (if *showing-notes*
              (display-note note))
          (if *taking-notes*
-             (begin 
+             (begin
                (set! *notes* (lset-adjoin equal? *notes* note))
                'noted)
              'ignored))))

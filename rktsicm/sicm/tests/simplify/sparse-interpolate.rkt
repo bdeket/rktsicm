@@ -27,7 +27,7 @@
                   (vector (list (sparse-term '(0) 5))))
     (check-equal? (univariate-interpolate-values '(0 1) '(3 2) list vector) ;; 3-x
                   (list (list (sparse-term '(1) -1) (sparse-term '(0) 3))))
-    (check-equal? (univariate-interpolate-values '(516 516) '(1804 3283) 
+    (check-equal? (univariate-interpolate-values '(516 516) '(1804 3283)
                                                  error (λ _ 'fail))
                   'fail)
 
@@ -88,7 +88,7 @@
                   (lambda (x) (+ (* 3 (expt x 5)) (expt x 2) x 4))
                   '(((5) . 1) ((2) . 1) ((1) . 1) ((0) . 1)))
                  '(((5) . 3) ((2) . 1) ((1) . 1) ((0) . 4)))
-   
+
    (check-equal? (univariate-interpolate
                   (lambda (x) (+ (* 3 (expt x 5)) (expt x 2) x 4))
                   6)

@@ -10,7 +10,7 @@
 
 ;;;; Property Tables
 
-;;; Properties are n-dimensional sparse tables implemented as 
+;;; Properties are n-dimensional sparse tables implemented as
 ;;; nests of association lists.
 
 ;;; For any given sequence of keys, there can be both a value
@@ -23,30 +23,30 @@
 
     (define (lookup keys)
       (define (loop keys table)
-	(if (null? keys) (car table)
-	    (let ((entry (assoc (car keys) (cdr table))))
-	      (if entry
-		  (loop (cdr keys) (cdr entry))
-		  *no-value*))))
+        (if (null? keys) (car table)
+            (let ((entry (assoc (car keys) (cdr table))))
+              (if entry
+                  (loop (cdr keys) (cdr entry))
+                  *no-value*))))
       (loop keys local-table))
 
     (define (smash! keys value)
       #;
       (define (loop keys table)
-	(if (null? keys) (set-car! table value)
-	    (let ((entry (assoc (car keys) (cdr table))))
-	      (if entry
-		  (loop (cdr keys) (cdr entry))
-		  (set-cdr! table
-			    (cons (cons (car keys)
-					(make-subtable (cdr keys) value))
-				  (cdr table)))))))
+        (if (null? keys) (set-car! table value)
+            (let ((entry (assoc (car keys) (cdr table))))
+              (if entry
+                  (loop (cdr keys) (cdr entry))
+                  (set-cdr! table
+                            (cons (cons (car keys)
+                                        (make-subtable (cdr keys) value))
+                                  (cdr table)))))))
       (define (loop keys table)
-	(if (null? keys)
+        (if (null? keys)
             (cons value (cdr table))
-	    (let ((entry (assoc (car keys) (cdr table))))
-	      (if entry
-		  (for/list ([i (in-list table)])
+            (let ((entry (assoc (car keys) (cdr table))))
+              (if entry
+                  (for/list ([i (in-list table)])
                     (if (eq? i entry)
                         (cons (car entry) (loop (cdr keys) (cdr entry)))
                         i))
@@ -59,35 +59,35 @@
 
     (define (make-subtable keys value)
       (if (null? keys) (list value)
-	  (list *no-value*
-		(cons (car keys)
-		      (make-subtable (cdr keys) value)))))
+          (list *no-value*
+                (cons (car keys)
+                      (make-subtable (cdr keys) value)))))
 
     (define (accumulator! increment-procedure initial-value keys value)
       #;
       (define (loop keys table)
-	(if (null? keys)
-	    (if (eq? (car table) *no-value*)
-		(set-car! table (increment-procedure value initial-value))
-		(set-car! table (increment-procedure value (car table))))
-	    (let ((entry (assoc (car keys) (cdr table))))
-	      (if entry
-		  (loop (cdr keys) (cdr entry))
-		  (set-cdr! table
-			    (cons (cons (car keys)
-					(make-subtable (cdr keys)
-						       (increment-procedure value
-									    initial-value)))
-				  (cdr table)))))))
+        (if (null? keys)
+            (if (eq? (car table) *no-value*)
+                (set-car! table (increment-procedure value initial-value))
+                (set-car! table (increment-procedure value (car table))))
+            (let ((entry (assoc (car keys) (cdr table))))
+              (if entry
+                  (loop (cdr keys) (cdr entry))
+                  (set-cdr! table
+                            (cons (cons (car keys)
+                                        (make-subtable (cdr keys)
+                                                       (increment-procedure value
+                                                                            initial-value)))
+                                  (cdr table)))))))
       (define (loop keys table)
-	(if (null? keys)
+        (if (null? keys)
             (cons (increment-procedure value
                                        (if (eq? (car table) *no-value*)
                                            initial-value
                                            (car table)))
                   (cdr table))
-	    (let ([entry (assoc (car keys) (cdr table))])
-	      (if entry
+            (let ([entry (assoc (car keys) (cdr table))])
+              (if entry
                   (for/list ([i (in-list table)])
                     (if (eq? i entry)
                         (cons (car entry) (loop (cdr keys) (cdr entry)))
@@ -132,29 +132,29 @@
 (define (get-with-default table default . keys)
   (let ((v ((vector-ref table 1) keys)))
     (if (eq? v *no-value*)
-	default
-	v)))
+        default
+        v)))
 
 (define ((getter-with-default table default) . keys)
   (let ((v ((vector-ref table 1) keys)))
     (if (eq? v *no-value*)
-	default
-	v)))
+        default
+        v)))
 
 
 (define (get-with-check table . keys)
   (let ((v ((vector-ref table 1) keys)))
     (if (eq? v *no-value*)
-	(error "can't find value in table"
-	       (list table keys))
-	v)))
+        (error "can't find value in table"
+               (list table keys))
+        v)))
 
 (define ((getter-with-check table) . keys)
   (let ((v ((vector-ref table 1) keys)))
     (if (eq? v *no-value*)
-	(error "can't find value in table"
-	       (list table keys))
-	v)))
+        (error "can't find value in table"
+               (list table keys))
+        v)))
 
 
 (define (add-to-list! object table . keys)
@@ -174,32 +174,32 @@
 (define (lookup key table)
   (let ((val (assq key table)))
     (if val
-	(cadr val)
-	(error "key not in table -- LOOKUP" key))))
+        (cadr val)
+        (error "key not in table -- LOOKUP" key))))
 
 (define (rlookup key table)
   (cond ((null? table) false)
-	((null? (cdar table)) (rlookup key (cdr table)))
-	((eq? key (cadar table)) (car table))
-	(else (rlookup key (cdr table)))))
+        ((null? (cdar table)) (rlookup key (cdr table)))
+        ((eq? key (cadar table)) (car table))
+        (else (rlookup key (cdr table)))))
 
 (define (rassq key table)
   (cond ((null? table) false)
-	((eq? key (cdar table)) (car table))
-	(else (rassq key (cdr table)))))
+        ((eq? key (cdar table)) (car table))
+        (else (rassq key (cdr table)))))
 
 (define (rassoc key table)
   (cond ((null? table) false)
-	((equal? key (cdar table)) (car table))
-	(else (rassoc key (cdr table)))))
+        ((equal? key (cdar table)) (car table))
+        (else (rassoc key (cdr table)))))
 
 (define (disassoc key alist)
   (cond ((null? alist) '())
-	((equal? key (caar alist))
-	 (cdr alist))
-	(else
-	 (cons (car alist)
-	       (disassoc key (cdr alist))))))
+        ((equal? key (caar alist))
+         (cdr alist))
+        (else
+         (cons (car alist)
+               (disassoc key (cdr alist))))))
 
 
 ;;; Elementary table utility implemented as PLISTs

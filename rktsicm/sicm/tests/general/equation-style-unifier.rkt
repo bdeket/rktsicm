@@ -60,7 +60,7 @@
     (check-equal? (unify:type '(?? a)) '??)
     (check-equal? (unify:type `(? a ,number?)) '?)
     (check-equal? (unify:type `(?? a ,list?)) '??))
-   
+
    ;; dictionary
    ;; the dictionary is an eq-association list of variable names with the found value
    (test-case

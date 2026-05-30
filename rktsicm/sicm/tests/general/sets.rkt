@@ -7,7 +7,7 @@
 (define (set-package-test S e1 e2 e3 e4)
   (check-true ((empty-set? S) (empty-set S)))
   (check-true ((empty-set? S) ((list->set S) '())))
-  
+
   (check-equal? ((singleton-set S) e1) ((singleton-set S) e1))
   (check-true ((singleton-set? S) ((singleton-set S) e2)))
   (check-false ((singleton-set? S) (empty-set S)))
@@ -24,7 +24,7 @@
                 ((list->set S) (list e2 e1)))
   (check-equal? ((adjoin-set S) e2 ((singleton-set S) e1))
                 ((list->set S) (list e1 e2 e2)))
-  
+
   (check-equal? ((remove-set S) e2 ((adjoin-set S) e2 ((singleton-set S) e1)))
                 ((singleton-set S) e1))
   (check-equal? ((remove-set S) e2 (empty-set S))
@@ -40,13 +40,13 @@
 
   (check-equal? ((intersect-sets S) ((list->set S) (list e3 e2 e1)) ((list->set S) (list e2 e1 e4)))
                 ((list->set S) (list e2 e1)))
-  
+
   (check-equal? ((union-sets S) ((list->set S) (list e3 e2 e1)) ((list->set S) (list e2 e1 e4)))
                 ((list->set S) (list e1 e2 e3 e4)))
 
   (check-equal? ((difference-sets S) ((list->set S) (list e3 e2 e1)) ((list->set S) (list e2 e1 e4)))
                 ((list->set S) (list e3)))
-  
+
   (check-equal? ((subset-sets? S) ((list->set S) (list e3 e2 e1)) ((list->set S) (list e2 e1 e4)))
                 #f)
   (check-equal? ((subset-sets? S) ((list->set S) (list e2 e1)) ((list->set S) (list e2 e1 e4)))
@@ -82,7 +82,7 @@
     "set-package from strings"
     (set-package-test (make-sets-package string-ci=? string-ci<?) "a" "B" "c" "D")
     (set-package-test (make-sets-package string=? string<?) "B" "D" "a" "c"))
-   
+
    ;; sets as list tested with simple:equal? (unordered)
    (test-case
     "list-adjoin"
@@ -116,7 +116,7 @@
     "same-set?"
     (check-equal? (same-set? '(1 2 3 2 1 3) '(3 2 1)) #t)
     (check-equal? (same-set? '(1 2 3 2 1 3 4) '(3 2 1)) #f))
-   
+
    ;; eq-set: elements are compared with eq? and result is eq? to input if nothing changed
    (test-case
     "eq-set/make-empty & empty?"
@@ -176,7 +176,7 @@
     (check-false (eq-set/subset? S2 S1))
     (check-true (eq-set/subset? S1 S3))
     (check-false (eq-set/subset? S2 S3)))
-   
+
    ;; multi-set
    (test-case
     "multi-set/empty & multi-set/empty?"

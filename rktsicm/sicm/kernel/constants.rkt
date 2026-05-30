@@ -30,15 +30,15 @@
 
 (define n:machine-epsilon
   (let loop ((e 1.0))
-     (if (= 1.0 (+ e 1.0))
-         (* 2 e)
-         (loop (/ e 2)))))
+    (if (= 1.0 (+ e 1.0))
+        (* 2 e)
+        (loop (/ e 2)))))
 
-;;; In 64-bit IEEE-754 floating point 
+;;; In 64-bit IEEE-754 floating point
 ;;; n:machine-epsilon = 2.220446049250313e-16 = 2^(-52)
 
 
-(define n:sqrt-machine-epsilon 
+(define n:sqrt-machine-epsilon
   (sqrt n:machine-epsilon))
 
 (define n:euler 0.57721566490153286)

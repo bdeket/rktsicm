@@ -29,23 +29,23 @@
 (define (rule-simplifier the-rules)
   (define (simplify-expression expression)
     (if (pair? expression)
-	(let ((ssubs (map simplify-expression expression)))
-	  (let ((result (try-rules ssubs the-rules)))
-	    (if result
-		(simplify-expression result)
-		ssubs)))
-	expression))
+        (let ((ssubs (map simplify-expression expression)))
+          (let ((result (try-rules ssubs the-rules)))
+            (if result
+                (simplify-expression result)
+                ssubs)))
+        expression))
   (set! simplify-expression
-	(rule-memoize simplify-expression))
+        (rule-memoize simplify-expression))
   simplify-expression)
 
 
 (define (try-rules expression the-rules)
   (define (scan rules)
     (if (null? rules)
-	#f
-	(or ((car rules) expression)
-	    (scan (cdr rules)))))
+        #f
+        (or ((car rules) expression)
+            (scan (cdr rules)))))
   (scan the-rules))
 
 
@@ -55,25 +55,25 @@
   (let ((matcher (match:->combinators pattern-expression)))
     (define (the-rule expression)
       (matcher (list expression)
-	       '()
-	       (lambda (dictionary unmatched-tail)
-		 (and (null? unmatched-tail)
-		      (apply consequent
-			     (map (lambda (binding)
-				    (let ((v (match:value binding)))
-				      (if (vector? v)
-					  (match:extract-segment v)
-					  v)))
-				  dictionary))))))
+               '()
+               (lambda (dictionary unmatched-tail)
+                 (and (null? unmatched-tail)
+                      (apply consequent
+                             (map (lambda (binding)
+                                    (let ((v (match:value binding)))
+                                      (if (vector? v)
+                                          (match:extract-segment v)
+                                          v)))
+                                  dictionary))))))
     the-rule))
 
 (define (match:extract-segment v)
   (let ((beg (match:segment-beginning v))
-	(end (match:segment-end v)))
+        (end (match:segment-end v)))
     (if (null? end) beg
-	(let lp ((p beg))
-	  (if (eq? p end) '()
-	      (cons (car p) (lp (cdr p))))))))
+        (let lp ((p beg))
+          (if (eq? p end) '()
+              (cons (car p) (lp (cdr p))))))))
 
 #|
 ;;; "Call-by-name", as per Alan Bundy.
@@ -82,29 +82,29 @@
 (define (rule-simplifier the-rules)
   (define (simplify-exprs exprs resimp?)
     (let ((result
-	   (let lp ((exprs exprs))
-	     (cond ((null? exprs) '())
-		   ((try-rules (car exprs) the-rules)
-		    => (lambda (result)
-			 (set! resimp? #t)
-			 (cons (if (pair? result)
-				   (lp result)
-				   result)
-			       (cdr exprs))))
-		   (else
-		    (cons (car exprs)
-			  (lp (cdr exprs))))))))
+           (let lp ((exprs exprs))
+             (cond ((null? exprs) '())
+                   ((try-rules (car exprs) the-rules)
+                    => (lambda (result)
+                         (set! resimp? #t)
+                         (cons (if (pair? result)
+                                   (lp result)
+                                   result)
+                               (cdr exprs))))
+                   (else
+                    (cons (car exprs)
+                          (lp (cdr exprs))))))))
       (if resimp?
-	  (simplify-expression result)
-	  result)))
+          (simplify-expression result)
+          result)))
   (define (simplify-expression expression)
     (if (pair? expression)
-	(let ((result (try-rules expression the-rules)))
-	  (if result
-	      (if (pair? result)
-		  (simplify-exprs result #t)
-		  result)
-	      (simplify-exprs expression #f)))
-	expression))
+        (let ((result (try-rules expression the-rules)))
+          (if result
+              (if (pair? result)
+                  (simplify-exprs result #t)
+                  result)
+              (simplify-exprs expression #f)))
+        expression))
   (rule-memoize simplify-expression))
 |#

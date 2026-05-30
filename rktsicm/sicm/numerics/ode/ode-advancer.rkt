@@ -97,27 +97,27 @@
   ns)
 
 (define (bs-advancer sysder local-error-tolerance dimension)
-  (bulirsch-stoer-lisptran		;integrator
+  (bulirsch-stoer-lisptran                ;integrator
    (system-derivative->lisptran-derivative sysder)
    dimension
    local-error-tolerance))
 
 (define (qcrk4-advancer sysder local-error-tolerance)
   ((quality-control rk4 4)
-   sysder	
+   sysder
    local-error-tolerance))
 
 (define (qc-ctrap-advancer sysder local-error-tolerance)
   ((quality-control c-trapezoid 2)
-   sysder			
-   local-error-tolerance 
+   sysder
+   local-error-tolerance
    (* *corrector-convergence-margin*
       local-error-tolerance)))
 
 (define (qc-ceuler-advancer sysder local-error-tolerance)
   ((quality-control c-euler 1)
-   sysder			
-   local-error-tolerance 
+   sysder
+   local-error-tolerance
    (* *corrector-convergence-margin*
       local-error-tolerance)))
 

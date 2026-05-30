@@ -95,7 +95,7 @@
             (coordinate-tuple (ref q 0) (- (ref p 1)))
             (momentum-tuple   (ref p 0) (ref q 1)))))
     (define a-state
-      (up 't 
+      (up 't
           (coordinate-tuple 'x 'y)
           (momentum-tuple 'p_x 'p_y)))
     (check-simplified? ((time-independent-canonical? Cmix)
@@ -162,7 +162,7 @@
               (x1 (ref x 1))
               (p0 (ref p 0))
               (p1 (ref p 1)))
-          (up 
+          (up
            (time state)
            (coordinate-tuple (/ (+ (* m0 x0) (* m1 x1)) (+ m0 m1))
                              (- x1 x0))

@@ -34,23 +34,23 @@
           (set! miss (+ miss 1))))
     (values
      (λ (x y)
-      (define H (hash-ref the-cons-table x #f))
-      (cond
-        [H
-         (define B (hash-ref H y #f))
-         ;; the value of a weak-box is always a pair, so #f can be used for gc-ed values
-         (cond
-           [(and B (weak-box-value B))]
-           [else
-            (when B (miss+))
-            (define the-cons (cons x y))
-            (hash-set! H y (make-weak-box the-cons))
-            the-cons])]
-        [else
-         (define the-cons (cons x y))
-         (hash-set! the-cons-table x
-                    (make-weak-hasheqv (list (cons y (make-weak-box the-cons)))))
-         the-cons]))
+       (define H (hash-ref the-cons-table x #f))
+       (cond
+         [H
+          (define B (hash-ref H y #f))
+          ;; the value of a weak-box is always a pair, so #f can be used for gc-ed values
+          (cond
+            [(and B (weak-box-value B))]
+            [else
+             (when B (miss+))
+             (define the-cons (cons x y))
+             (hash-set! H y (make-weak-box the-cons))
+             the-cons])]
+         [else
+          (define the-cons (cons x y))
+          (hash-set! the-cons-table x
+                     (make-weak-hasheqv (list (cons y (make-weak-box the-cons)))))
+          the-cons]))
      (λ (x [def #f])
        (cond
          [(hash-ref the-cons-table (car x) #f)
@@ -64,13 +64,13 @@
 ;;bdk;; start original file
 
 ;;;;         HashCONS
-;;;  Apparently invented by Ershov 
+;;;  Apparently invented by Ershov
 ;;;   (see CACM 1, 8, August 1958, pp. 3--6)
 ;;;  Re-introduced by E.Goto in 1974.
 
 ;;; Implementation by GJS and Taylor Campbell 2010,
 ;;;  improved by Taylor Campbell in 2011.
-;;;  Further improved by Taylor Campbell(2014), 
+;;;  Further improved by Taylor Campbell(2014),
 ;;;   using the new key-ephemeral type.
 ;;; Updated by GJS (2020).
 
@@ -106,25 +106,25 @@
      ))))
 
 (define cons-unique
-    (let* ((cons                    ;the REAL cons
+  (let* ((cons                    ;the REAL cons
           (access cons system-global-environment))
          (the-test-pair (cons #f #f)))
-      (define (generator) the-test-pair)
-      (define (hashcons x y)
-        (set-car! the-test-pair x)
-        (set-cdr! the-test-pair y)
-        (let ((the-canonical-pair
-               (hash-table/intern! the-cons-table
-                                   the-test-pair
-                                   generator)))
-          (if (eq? the-canonical-pair the-test-pair)
-              ;; Test pair used; make a new one.
-              (set! the-test-pair (cons #f #f))
-              ;; Clear the test pair.
-              (begin (set-car! the-test-pair #f)
-                     (set-cdr! the-test-pair #f)))
-          the-canonical-pair))
-      hashcons))
+    (define (generator) the-test-pair)
+    (define (hashcons x y)
+      (set-car! the-test-pair x)
+      (set-cdr! the-test-pair y)
+      (let ((the-canonical-pair
+             (hash-table/intern! the-cons-table
+                                 the-test-pair
+                                 generator)))
+        (if (eq? the-canonical-pair the-test-pair)
+            ;; Test pair used; make a new one.
+            (set! the-test-pair (cons #f #f))
+            ;; Clear the test pair.
+            (begin (set-car! the-test-pair #f)
+                   (set-cdr! the-test-pair #f)))
+        the-canonical-pair))
+    hashcons))
 
 (define hash-cons cons-unique)
 
@@ -138,8 +138,8 @@
   (if (pair? x)
       (let ((v (;hash-table/get the-cons-table
                 from-cons-table-get
-                               x
-                               #f)))
+                x
+                #f)))
         (or v (recurse)))
       x))
 
@@ -178,7 +178,7 @@
 
 (define bar
   '(define cons-unique
-     (let ((the-pair (cons #f #f)))  
+     (let ((the-pair (cons #f #f)))
        (define (hashcons x y)
          (set-car! the-pair x)
          (set-cdr! the-pair y)

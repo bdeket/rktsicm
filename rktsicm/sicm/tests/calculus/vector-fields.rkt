@@ -146,7 +146,7 @@
     (define e-r d/dr)
     (define e-z d/dzeta)
     (define B (+ (* 'B_r e-r) (* 'B_theta e-theta) (* 'B_z e-z)))
-    
+
     (check-simplified? ((vector-field->components B R3-rect) (up 'x 'y 'z))
                        '(up
                          (+ (/ (* B_r x) (sqrt (+ (expt x 2) (expt y 2))))

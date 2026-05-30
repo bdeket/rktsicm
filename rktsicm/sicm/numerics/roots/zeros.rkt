@@ -7,30 +7,30 @@
 ;;bdk;; start original file
 
 
-;;; To find x such that f(x)=0, 
+;;; To find x such that f(x)=0,
 ;;;  given x1, x2 where f(x1) and f(x2) have opposite sign.
 
 (define (false-position-search f x1 x2 epsilon)
   (define (fpsl x1 fx1 x2 fx2)
     (let ((afx1 (abs fx1)) (afx2 (abs fx2)))
       (define (best-guess)
-	(if (opposite-sign? fx1 fx2)
-	    (average x1 x2)
-	    (if (< afx1 afx2) x1 x2)))
+        (if (opposite-sign? fx1 fx2)
+            (average x1 x2)
+            (if (< afx1 afx2) x1 x2)))
       (if (< afx1 epsilon)
-	  (if (< afx2 epsilon)
-	      (best-guess)
-	      x1)
-	  (if (< afx2 epsilon)
-	      x2
-	      (if (close-enuf? x1 x2 epsilon)
-		  (best-guess)
-		  (let* ((x (/ (- (* x2 fx1) (* fx2 x1))
-			       (- fx1 fx2)))
-			 (fx (f x)))
-		    (if (opposite-sign? fx1 fx)
-			(fpsl x1 fx1 x fx)
-			(fpsl x fx x2 fx2))))))))
+          (if (< afx2 epsilon)
+              (best-guess)
+              x1)
+          (if (< afx2 epsilon)
+              x2
+              (if (close-enuf? x1 x2 epsilon)
+                  (best-guess)
+                  (let* ((x (/ (- (* x2 fx1) (* fx2 x1))
+                               (- fx1 fx2)))
+                         (fx (f x)))
+                    (if (opposite-sign? fx1 fx)
+                        (fpsl x1 fx1 x fx)
+                        (fpsl x fx x2 fx2))))))))
   (fpsl x1 (f x1) x2 (f x2)))
 #|
 ;;; For example
@@ -67,37 +67,37 @@
   (define (fpsl x1 fx1 dfx1 x2 fx2 dfx2)
     (define (try x)
       (if (opposite-sign? (- x x1) (- x x2))
-	  (begin ;;(write-line (list 'newton x1 fx1 dfx1 x2 fx2 dfx2 x))
-		 (next x))
-	  (begin ;;(write-line (list 'fp x1 fx1 x2 fx2))
-		 (next (/ (- (* x2 fx1) (* fx2 x1)) (- fx1 fx2))))))
+          (begin ;;(write-line (list 'newton x1 fx1 dfx1 x2 fx2 dfx2 x))
+            (next x))
+          (begin ;;(write-line (list 'fp x1 fx1 x2 fx2))
+            (next (/ (- (* x2 fx1) (* fx2 x1)) (- fx1 fx2))))))
     (define (next x)
       (f&df x
-	    (lambda (fx dfx)
-	      (if (opposite-sign? fx1 fx)
-		  (fpsl x1 fx1 dfx1 x fx dfx)
-		  (fpsl x fx dfx x2 fx2 dfx2)))))
+            (lambda (fx dfx)
+              (if (opposite-sign? fx1 fx)
+                  (fpsl x1 fx1 dfx1 x fx dfx)
+                  (fpsl x fx dfx x2 fx2 dfx2)))))
     (let ((afx1 (abs fx1)) (afx2 (abs fx2)))
       (define (best-guess)
-	(if (opposite-sign? fx1 fx2)
-	    (average x1 x2)
-	    (if (< afx1 afx2) x1 x2)))
+        (if (opposite-sign? fx1 fx2)
+            (average x1 x2)
+            (if (< afx1 afx2) x1 x2)))
       (if (< afx1 epsilon)
-	  (if (< afx2 epsilon)
-	      (best-guess)
-	      x1)
-	  (if (< afx2 epsilon)
-	      x2
-	      (if (close-enuf? x1 x2 epsilon)
-		  (best-guess)
-		  (if (< afx1 afx2)
-		      (try (- x1 (/ fx1 dfx1)))
-		      (try (- x2 (/ fx2 dfx2)))))))))
+          (if (< afx2 epsilon)
+              (best-guess)
+              x1)
+          (if (< afx2 epsilon)
+              x2
+              (if (close-enuf? x1 x2 epsilon)
+                  (best-guess)
+                  (if (< afx1 afx2)
+                      (try (- x1 (/ fx1 dfx1)))
+                      (try (- x2 (/ fx2 dfx2)))))))))
   (f&df x1
-	(lambda (fx1 dfx1)
-	  (f&df x2
-		(lambda (fx2 dfx2)
-		  (fpsl x1 fx1 dfx1 x2 fx2 dfx2))))))
+        (lambda (fx1 dfx1)
+          (f&df x2
+                (lambda (fx2 dfx2)
+                  (fpsl x1 fx1 dfx1 x2 fx2 dfx2))))))
 #|
 ;;; For example
 
@@ -106,7 +106,7 @@
     (lambda (e cont)
       (write-line e)
       (cont (- e (* ecc (sin e)) m)
-	    (- 1 (* ecc (cos e)))))
+            (- 1 (* ecc (cos e)))))
     0.0
     n:2pi
     1e-15))

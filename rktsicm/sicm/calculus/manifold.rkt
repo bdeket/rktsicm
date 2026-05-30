@@ -33,9 +33,9 @@
   ;(assert (eq? ((point->manifold point) 'name) manifold-name))
   (let ((rep
          (find (lambda (rep)
-                  ;(eq? ((car rep) 'name) chart-name)
-                  #t)
-                (coordinate-reps point))))
+                 ;(eq? ((car rep) 'name) chart-name)
+                 #t)
+               (coordinate-reps point))))
     (assert rep)
     (cadr rep)))
 
@@ -60,7 +60,7 @@
           (set! embedding-dimension dimension)
           (assert (and (exact-integer? embedding-dimension)
                        (fix:>= embedding-dimension dimension))))
-      (set! counter (+ counter 1))      
+      (set! counter (+ counter 1))
       (let ((name
              (symbol (let* ((namestring (symbol->string manifold-name))
                             (p (regexp-match #px".*(?=\\^n)" namestring)))
@@ -110,7 +110,7 @@
              (if patch-entry
                  (caddr patch-entry)
                  (error "Unknown patch" patch-name)))))
-        ((generator) generator)	
+        ((generator) generator)
         (else (error "Unknown message: manifold setup" m))))
     setup))
 
@@ -137,7 +137,7 @@
                           coordinate-system-name patch-name)))))
           ((coordinate-system-names)
            (map car coordinate-systems))
-          (else (manifold m)		; pass the buck.
+          (else (manifold m)                ; pass the buck.
                 ;; (error "unknown message: patch" m)
                 )))
       the-patch)
@@ -181,10 +181,10 @@
                 (c:generate (manifold 'dimension) 'up
                             (lambda (i) (symbol 'x i)))
                 (begin
-                    (assert
-                     (fix:= (manifold 'dimension)
+                  (assert
+                   (fix:= (manifold 'dimension)
                           (s:dimension coordinate-prototype)))
-              coordinate-prototype)))
+                  coordinate-prototype)))
            (access-chains
             (s:map-chain (lambda (element chain) chain)
                          coordinate-prototype))
@@ -216,71 +216,71 @@
                  (set! access-chains new-chains)
                  (set! dual-chains (flip-indices new-chains)))
                #|
-               (set! access-chains 
+               (set! access-chains
                      (s:map-chain (lambda (element chain) chain)
                                   coordinate-prototype))
                |#
                (set! coordinate-function-specs #f)
                (set! coordinate-basis-vector-field-specs #f)
                (set! coordinate-basis-1form-field-specs #f)
-               (set! coordinate-basis #f)))	       
+               (set! coordinate-basis #f)))
             ((access-chains) access-chains)
             ((dual-chains) dual-chains)
 
             ((coordinate-function-specs)
              (if (not coordinate-function-specs)
-               (set! coordinate-function-specs
-                     (s:map/r
-                      (lambda (coordinate-name access-chain)
-                        (list coordinate-name
-                              (compose
-                               (apply component access-chain)
-                               (transform-delivery 'point->coords))))
-                      coordinate-prototype
-                      access-chains)))
+                 (set! coordinate-function-specs
+                       (s:map/r
+                        (lambda (coordinate-name access-chain)
+                          (list coordinate-name
+                                (compose
+                                 (apply component access-chain)
+                                 (transform-delivery 'point->coords))))
+                        coordinate-prototype
+                        access-chains)))
              coordinate-function-specs)
             ((coordinate-basis-vector-field-specs)
              (if (not coordinate-basis-vector-field-specs)
-               (set! coordinate-basis-vector-field-specs
-                     (flip-indices
-                      (s:map/r
-                       (lambda (coordinate-name access-chain)
-                         (let* ((oname (symbol 'd/d coordinate-name))
-                                (vf
-                                 (apply coordinate-basis-vector-field
-                                        the-coordinate-system
-                                        oname
-                                        access-chain)))
-                           (set-operator-optionals! vf
-                                                    (cons `(manifold ,manifold)
-                                                          (operator-optionals vf)))
-                           (list oname vf)))
-                       coordinate-prototype
-                       access-chains))))
+                 (set! coordinate-basis-vector-field-specs
+                       (flip-indices
+                        (s:map/r
+                         (lambda (coordinate-name access-chain)
+                           (let* ((oname (symbol 'd/d coordinate-name))
+                                  (vf
+                                   (apply coordinate-basis-vector-field
+                                          the-coordinate-system
+                                          oname
+                                          access-chain)))
+                             (set-operator-optionals! vf
+                                                      (cons `(manifold ,manifold)
+                                                            (operator-optionals vf)))
+                             (list oname vf)))
+                         coordinate-prototype
+                         access-chains))))
              coordinate-basis-vector-field-specs)
             ((coordinate-basis-1form-field-specs)
              (if (not coordinate-basis-1form-field-specs)
-               (set! coordinate-basis-1form-field-specs
-                     (s:map/r
-                      (lambda (coordinate-name access-chain)
-                        (let* ((oname (symbol 'd coordinate-name))
-                               (ff
-                                (apply coordinate-basis-1form-field
-                                       the-coordinate-system
-                                       oname
-                                       access-chain)))
-                          (set-operator-optionals! ff
-                                                   (cons `(manifold ,manifold)
-                                                         (operator-optionals ff)))
-                          (list oname ff)))
-                      coordinate-prototype
-                      access-chains)))
+                 (set! coordinate-basis-1form-field-specs
+                       (s:map/r
+                        (lambda (coordinate-name access-chain)
+                          (let* ((oname (symbol 'd coordinate-name))
+                                 (ff
+                                  (apply coordinate-basis-1form-field
+                                         the-coordinate-system
+                                         oname
+                                         access-chain)))
+                            (set-operator-optionals! ff
+                                                     (cons `(manifold ,manifold)
+                                                           (operator-optionals ff)))
+                            (list oname ff)))
+                        coordinate-prototype
+                        access-chains)))
              coordinate-basis-1form-field-specs)
 
             ((coordinate-basis)
              (if (not coordinate-basis)
-               (set! coordinate-basis
-                     (coordinate-system->basis the-coordinate-system)))
+                 (set! coordinate-basis
+                       (coordinate-system->basis the-coordinate-system)))
              coordinate-basis)
             ((coordinate-functions)
              (s:map/r cadr
@@ -308,7 +308,7 @@
                                   (the-coordinate-system
                                    'coordinate-basis-1form-field-specs))
                         => cadr)
-                       (else (manifold m)))		;pass the buck.
+                       (else (manifold m)))                ;pass the buck.
                  (error "bad message" m)))))
         the-coordinate-system)))
   ((((manifold-type 'patch-setup) patch-name)
@@ -373,7 +373,7 @@
                 (cons (list name
                             (environment-lookup user-generic-environment
                                                 name)
-							user-generic-environment)
+                            user-generic-environment)
                       *saved-environment-values*))))
     (environment-define user-generic-environment name value))
   (define (install-symbols s)
@@ -506,8 +506,8 @@
                                 ((coords->point)
                                  (lambda (coords)
                                    (if ((me 'check-coordinates) coords)
-                                       (let ((r (ref coords 0)) 
-                                             (theta (ref coords 1)) 
+                                       (let ((r (ref coords 0))
+                                             (theta (ref coords 1))
                                              (phi (ref coords 2)))
                                          (make-manifold-point
                                           (s:generate (s:dimension coords) 'up
@@ -533,7 +533,7 @@
                                                         (if (and (up? prep)
                                                                  (fix:= (s:dimension prep)
                                                                         (manifold 'embedding-dimension)))
-                                                            (let ((x (ref prep 0)) 
+                                                            (let ((x (ref prep 0))
                                                                   (y (ref prep 1))
                                                                   (z (ref prep 2)))
                                                               (let ((r (sqrt
@@ -571,8 +571,8 @@
                                              (phi   (ref coords 3)))
                                          (make-manifold-point
                                           (up t
-                                              (* r (sin theta) (cos phi)) 
-                                              (* r (sin theta) (sin phi)) 
+                                              (* r (sin theta) (cos phi))
+                                              (* r (sin theta) (sin phi))
                                               (* r (cos theta)))
                                           manifold
                                           me
@@ -835,7 +835,7 @@
 (define S^n S^n-type)
 
 ;; Manifold points are represented by
-;;(up 
+;;(up
 ;;    (* (sin theta0) (cos theta1) )
 ;;    (* (sin theta0) (sin theta1) (cos theta2) )
 ;;    ...
@@ -848,7 +848,7 @@
 ;;
 ;; The first n-1 angles  must be nonzero to avoid the coordinate singularity.
 ;;
-;; S^n-coordinates takes an orientation function that takes the dimension 
+;; S^n-coordinates takes an orientation function that takes the dimension
 ;; of the embedding space (1+the dimension of the manifold) and produces the
 ;; matrix that shifts the location of the "north pole".
 
@@ -856,7 +856,7 @@
   (define (list-top-to-bottom l)
     (append (cdr l) (list (car l))))
   (define (list-bottom-to-top l)
-    (cons (car (last-pair l)) (butlast l)))  
+    (cons (car (last-pair l)) (butlast l)))
   (lambda (manifold)
     (let* ((n (manifold 'dimension))
            (orientation-matrix (orientation-function (+ n 1)))
@@ -886,12 +886,12 @@
                          (list->up-structure
                           (list-top-to-bottom
                            (make-initialized-list (fix:+ n 1)
-                                       (lambda (i)
-                                         (if (fix:= i n)
-                                             (apply * sines)
-                                             (apply *
-                                                    (cons (list-ref cosines i)
-                                                          (list-head sines i))))))))))
+                                                  (lambda (i)
+                                                    (if (fix:= i n)
+                                                        (apply * sines)
+                                                        (apply *
+                                                               (cons (list-ref cosines i)
+                                                                     (list-head sines i))))))))))
                    (make-manifold-point (* orientation-matrix pt)
                                         manifold me coords)))))
           ((check-point)
@@ -902,7 +902,7 @@
                  (error "Bad point: S^n-spherical" point me))
              (define (safe-atan y x)
                (if (and (number? y) (number? x) (= y 0) (= x 0))
-                   (warn "S^n-spherical singular" point me))  
+                   (warn "S^n-spherical singular" point me))
                (atan y x))
              (let* ((pt
                      (reverse
@@ -924,7 +924,7 @@
           ((orientation) orientation-function)
           (else (error "S^n-spherical: Bad message" m me))))
       me)))
-	 
+
 (attach-patch 'north-pole S^n-type)
 (attach-coordinate-system 'spherical 'north-pole S^n-type
                           (S^n-coordinates m:make-identity))
@@ -959,7 +959,7 @@
 (pe ((compose (S1-circular '->coords) (S1-tilted '->point)) 'theta))
 ; Result: (atan (cos theta) (* -1 (sin theta)))
 
-|#                      
+|#
 
 (define S2p (make-manifold S^n-type 2))
 (define S2p-spherical (coordinate-system-at 'spherical 'north-pole S2p))
@@ -980,9 +980,9 @@
 (pe ((compose (S2p-spherical '->coords) (S2p-tilted '->point))
      (up 'theta 'phi)))
 ; Result: (up (atan (sqrt (+ (* (expt (cos theta) 2) (expt (cos phi) 2))
-;			     (expt (sin phi) 2)))
-;		    (* -1 (sin theta) (cos phi)))
-;	      (atan (* (sin phi) (sin theta)) (cos theta)))
+;                             (expt (sin phi) 2)))
+;                    (* -1 (sin theta) (cos phi)))
+;              (atan (* (sin phi) (sin theta)) (cos theta)))
 
 (pe ((compose (S2p-spherical '->coords) (S2p-spherical '->point))
      (up 1 0)))
@@ -992,19 +992,19 @@
      (up 0 1)))
 ;(up 0 0)
 ;Should be warned singular!
-|#                      
+|#
 
 (define S3 (make-manifold S^n-type 3))
 (define S3-spherical (coordinate-system-at 'spherical 'north-pole S3))
 (define S3-tilted (coordinate-system-at 'spherical 'tilted S3))
 #|
 (pe ((compose (S3-spherical '->coords)
-	      (S3-spherical '->point))
+              (S3-spherical '->point))
      (up 'a 'b 'c)))
 ; Result: (up a b c)
 
 (pe ((compose (S3-spherical '->coords)
-	      (S3-tilted '->point))
+              (S3-tilted '->point))
      (up 'a 'b 'c)))
 ; Result:
 ;(up
@@ -1020,11 +1020,11 @@
 ; (atan (* -1 (cos a)) (* (sin b) (sin a) (cos c))))
 
 (pe ((compose (S3-spherical '->coords)
-	      (S3-spherical '->point))
+              (S3-spherical '->point))
      (up 0 0 0)))
 ;(up 0 0 0)
 ;Should be warned singular!
-|#                      
+|#
 
 ;;; Stereographic Projection from the final coordinate.
 ;;
@@ -1034,7 +1034,7 @@
 ;;
 ;;  x(0) = p, x(1) = m
 ;;  x_n(t) = 1-t(1+m_n), 0 = x_n(1/(1+m_n))
-;;  
+;;
 ;;  The orientation function should return an orthogonal (n+1)-by-(n+1)
 ;;  matrix.  It can be interpreted as moving the pole / plane of projection
 ;;  and possibly reflecting.
@@ -1114,7 +1114,7 @@
 (define m ((S1-slope '->point) 's))
 
 (pe (manifold-point-representation m))
-; Result:  
+; Result:
 ;(up (/ (* 2 s)
 ;       (+ 1 (expt s 2)))
 ;    (/ (+ -1 (expt s 2))
@@ -1122,9 +1122,9 @@
 
 (pe  (manifold-point-representation
       ((compose (S1-slope '->point)
-		(S1-slope '->coords))
+                (S1-slope '->coords))
        m)))
-; Result: 
+; Result:
 ;(up (/ (* 2 s)
 ;       (+ 1 (expt s 2)))
 ;    (/ (+ -1 (expt s 2))
@@ -1132,14 +1132,14 @@
 
 
 (pe ((compose (S1-slope '->coords)
-	      (S1-slope '->point))
+              (S1-slope '->point))
      's))
 ; Result: s
-|#     
+|#
 
 #|
 (define S2p (make-manifold S^n-type 2))
-|#     
+|#
 
 (define S2p-stereographic (coordinate-system-at 'stereographic 'north-pole S2p))
 (define S2p-Riemann S2p-stereographic)
@@ -1148,8 +1148,8 @@
 (define m ((S2p-Riemann '->point) (up 'x 'y)))
 
 (pe (manifold-point-representation m))
-; Result: 
-;(up (/ (* 2 x) 
+; Result:
+;(up (/ (* 2 x)
 ;       (+ 1 (expt x 2) (expt y 2)))
 ;    (/ (* 2 y)
 ;       (+ 1 (expt y 2) (expt x 2)))
@@ -1159,7 +1159,7 @@
 (pe (manifold-point-representation
      ((compose (S2p-Riemann '->point) (S2p-Riemann '->coords))
       m)))
-; Result: 
+; Result:
 ;(up (/ (* 2 x)
 ;       (+ 1 (expt x 2) (expt y 2)))
 ;    (/ (* 2 y)
@@ -1176,7 +1176,7 @@
        (up (cos 'theta) (sin 'theta)))))
 ; Result: (up (cos theta) (sin theta) 0)
 ; The equator is invariant.
-|#              
+|#
 
 ;;; Gnomic Projection of the sphere
 ;;
@@ -1268,7 +1268,7 @@
 (pe ((compose (S1-slope '->coords) (S1-slope '->point)) 's))
 ; Result: s
 
-|#     
+|#
 
 
 #|
@@ -1303,7 +1303,7 @@
       ((S2p-gnomic '->point)
        (up (cos 'theta) (sin 'theta)))))
 ; Result: (up (/ (cos theta) (sqrt 2))
-;             (/ (sin theta) (sqrt 2)) 
+;             (/ (sin theta) (sqrt 2))
 ;             (/ 1 (sqrt 2)))
 ; The unit circle on the plane represents the intersection of S2 and
 ;      z = (/ 1 (sqrt 2))
@@ -1315,10 +1315,10 @@
 (define p ((S2p-stereographic '->point) (up 1.5 0)))
 
 (pe (simplify (simplify ((S2p-stereographic '->coords)
-			 ((S2p-gnomic '->point)
-			  (+ (* 't ((S2p-gnomic '->coords) p))
-			     (* (- 1 't) ((S2p-gnomic '->coords) q))))))))
-; Result: 
+                         ((S2p-gnomic '->point)
+                          (+ (* 't ((S2p-gnomic '->coords) p))
+                             (* (- 1 't) ((S2p-gnomic '->coords) q))))))))
+; Result:
 ;(up
 ; (/ (+ (* 3.257142857142857 t) -.8571428571428571)
 ;    (+ -1
@@ -1330,7 +1330,7 @@
 ;       (sqrt (+ (* 11.343673469387754 (expt t 2))
 ;                (* -7.053061224489795 t)
 ;                2.4693877551020407)))))
-|#              
+|#
 
 #|
 ;; Now a fun example synthesizing the to projective coordinates.
@@ -1359,13 +1359,13 @@
     (/ z (+ -1 (sqrt (+ 1 (expt z 2) (expt x 2) (expt y 2))))))
 
 (pe (euclidean-norm ((S3-stereographic '->coords)
-		     ((S3-gnomic '->point) (up 'x 'y 'z)))))
+                     ((S3-gnomic '->point) (up 'x 'y 'z)))))
 
 (/ (sqrt (+ (expt x 2) (expt y 2) (expt z 2)))
    (sqrt (+ 2
-	    (expt x 2) (expt y 2) (expt z 2)
-	    (* -2
-	       (sqrt (+ 1 (expt x 2) (expt y 2) (expt z 2)))))))
+            (expt x 2) (expt y 2) (expt z 2)
+            (* -2
+               (sqrt (+ 1 (expt x 2) (expt y 2) (expt z 2)))))))
 |#
 
 ;;; SO(3).  Points are represented by 3x3 (down (up ...) ...)
@@ -1397,7 +1397,7 @@
                    (Mz-phi (rotate-z-tuple phi))
                    (Mz-psi (rotate-z-tuple psi)))
                (let ((the-point (* Mz-phi Mx-theta Mz-psi)))
-                 (make-manifold-point 
+                 (make-manifold-point
                   the-point
                   manifold
                   me
@@ -1422,7 +1422,7 @@
         ((manifold) manifold)
         (else (error "Euler-chart: Bad message" m me)) ))
     me))
-	   
+
 (define alternate-chart
   (lambda (manifold)
     (define (me m)
@@ -1467,7 +1467,7 @@
                                   (up theta phi psi)))))))
         ((manifold) manifold)
         (else (error "alternate-chart: Bad message" m me))))
-    me))	   
+    me))
 
 (attach-patch 'Euler-patch SO3-type)
 
@@ -1486,7 +1486,7 @@
 
 #|
 (pec ((compose (alternate-angles '->coords)
-	       (Euler-angles '->point))
+               (Euler-angles '->point))
       (up 'theta 'phi 'psi)))
 #| Result:
 (up
@@ -1497,9 +1497,9 @@
 |#
 
 (pec ((compose (Euler-angles '->coords)
-	       (alternate-angles '->point)
-	       (alternate-angles '->coords)
-	       (Euler-angles '->point))
+               (alternate-angles '->point)
+               (alternate-angles '->coords)
+               (Euler-angles '->point))
       (up 'theta 'phi 'psi)))
 #| Result:
 (up theta phi psi)
@@ -1552,7 +1552,7 @@
 
 (define (h-concrete xy)
   (let ((x (ref xy 0))
-	(y (ref xy 1)))
+        (y (ref xy 1)))
     (+ 5
        (square x)
        (* -1 x (cube y))

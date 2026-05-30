@@ -46,7 +46,7 @@
     (check-equal? (call-with-output-string (λ (out)
                                              (cpp 'x out)))
                   "#|\nx\n|#\n")
-    
+
     (skip (check-equal? (call-with-output-string (λ (out)
                                              (parameterize ([current-output-port out])
                                                (cpp (lambda (x) x)))))

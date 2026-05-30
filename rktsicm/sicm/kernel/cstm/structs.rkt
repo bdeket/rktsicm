@@ -39,11 +39,11 @@
 
 (define (s:type v)
   (cond ((up? v) up-type-tag)
-	((down? v) down-type-tag)
-	((abstract-up? v) up-type-tag)
-	((abstract-down? v) down-type-tag)
-	(else
-	 (error "Bad structure -- S:TYPE" v))))
+        ((down? v) down-type-tag)
+        ((abstract-up? v) up-type-tag)
+        ((abstract-down? v) down-type-tag)
+        (else
+         (error "Bad structure -- S:TYPE" v))))
 
 (define (sc:type-predicate v) up-quantity?)
 (define (sr:type-predicate v) down-quantity?)
@@ -58,19 +58,19 @@
 
 (define (literal-up name size)
   (s:generate size 'up
-	      (lambda (i)
-		(string->symbol
-		 (string-append (symbol->string name)
-				"^"
-				(number->string i))))))
+              (lambda (i)
+                (string->symbol
+                 (string-append (symbol->string name)
+                                "^"
+                                (number->string i))))))
 
 (define (literal-down name size)
   (s:generate size 'down
-	      (lambda (i)
-		(string->symbol
-		 (string-append (symbol->string name)
-				"_"
-				(number->string i))))))
+              (lambda (i)
+                (string->symbol
+                 (string-append (symbol->string name)
+                                "_"
+                                (number->string i))))))
 
 (define (s:structure up/down v)
   (case up/down
@@ -80,7 +80,7 @@
      (vector->down v))
     (else
      (error "Bad up/down spec -- S:STRUCTURE"
-	    up/down v))))
+            up/down v))))
 
 (define (up->vector v)
   ;;(cadr v)
@@ -91,9 +91,9 @@
 
 (define (s:->vector v)
   (cond ((up? v) (up->vector v))
-	((down? v) (down->vector v))
-	(else
-	 (error "Bad structure -- S:->VECTOR" v))))
+        ((down? v) (down->vector v))
+        (else
+         (error "Bad structure -- S:->VECTOR" v))))
 
 (define (up . args)
   (vector->up (list->vector args)))
@@ -104,15 +104,15 @@
 
 (define (s:opposite v)
   (cond ((up? v) 'down)
-	((down? v) 'up)
-	(else
-	 (error "Bad structure -- S:OPPOSITE" v))))
+        ((down? v) 'up)
+        (else
+         (error "Bad structure -- S:OPPOSITE" v))))
 
 (define (s:same v)
   (cond ((up? v) 'up)
-	((down? v) 'down)
-	(else
-	 (error "Bad structure -- S:SAME" v))))
+        ((down? v) 'down)
+        (else
+         (error "Bad structure -- S:SAME" v))))
 
 (define (s:length v)
   (if (structure? v)
@@ -124,8 +124,8 @@
   (if (structure? v)
       (vector-ref (s:->vector v) i)
       (if (fix:= i 0)
-	  v
-	  (error "Bad structure -- S:REF" v i))))
+          v
+          (error "Bad structure -- S:REF" v i))))
 
 (define (s:with-substituted-coord v i xi)
   (if (structure? v)
@@ -160,11 +160,11 @@
       (cond ((fix:= i n) ans)
             ((not ans) ans)
             (else
-             (lp (fix:+ i 1) (p (s:ref s i))))))))  
+             (lp (fix:+ i 1) (p (s:ref s i))))))))
 
 (define (s:select . selectors)
   (let lp ((selectors selectors)
-           (ans g:identity)) 
+           (ans g:identity))
     (if (null? selectors)
         ans
         (lp (cdr selectors)

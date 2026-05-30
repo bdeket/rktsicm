@@ -93,7 +93,7 @@
 #; ;original, doesn't keep arity for a > 3
 (define ((f:binary operator) f1 f2)
   (let ((f1 (if (function? f1) f1 (coerce-to-function f1)))
-        (f2 (if (function? f2) f2 (coerce-to-function f2))))	
+        (f2 (if (function? f2) f2 (coerce-to-function f2))))
     (let ((a (joint-arity (g:arity f1) (g:arity f2))))
       (if (not a)
           (error "Functions have different arities" f1 f2))
@@ -143,7 +143,7 @@
 
 (define (f:arity f) (procedure-arity f))
 
-(define (f:zero-like f)			;want (zero-like range-element)
+(define (f:zero-like f)                        ;want (zero-like range-element)
   ;;bdk;; same arity
   (define arity (procedure-arity f))
   (make-plain-procedure-slct 'f:zero-like arity
@@ -152,7 +152,7 @@
                              (λ (xs) #`(#,g:zero-like (#,f #,@xs)))
                              (λ (xs rst) #`(#,g:zero-like (#,f #,@xs #,rst)))))
 
-(define (f:one-like f)			;want (one-like range-element)
+(define (f:one-like f)                        ;want (one-like range-element)
   ;;bdk;; same arity
   (define arity (procedure-arity f))
   (make-plain-procedure-slct 'f:one-like arity
@@ -233,9 +233,9 @@
 (assign-operation 'gcd                (f:binary g:gcd)           cofunction? function?)
 
 (assign-operation 'make-rectangular   (f:binary g:make-rectangular)
-	                                                        function? cofunction?)
+                  function? cofunction?)
 (assign-operation 'make-rectangular   (f:binary g:make-rectangular)
-	                                                        cofunction? function?)
+                  cofunction? function?)
 
 (assign-operation 'make-polar         (f:binary g:make-polar)    function? cofunction?)
 (assign-operation 'make-polar         (f:binary g:make-polar)    cofunction? function?)
@@ -267,21 +267,21 @@
 (assign-operation 'transpose          f:transpose                function?)
 
 #|
-;;; 
+;;;
 
 (define (transpose-defining-relation T g a)
   ;; T is a linear transformation T:V -> W
-  ;; the transpose of T, T^t:W* -> V* 
+  ;; the transpose of T, T^t:W* -> V*
   ;; Forall a in V, g in W*,  g:W -> R
   ;; (T^t(g))(a) = g(T(a)).
   (- (((f:transpose T) g) a) (g (T a))))
 
 (let ((DTf
-	(let ((T (literal-function 'T (-> (UP Real Real) (UP Real Real Real)))))
-	  (let ((DT (D T)))
-	    (lambda (s)
-	      (lambda (x)
-		(* (DT s) x))))))
+        (let ((T (literal-function 'T (-> (UP Real Real) (UP Real Real Real)))))
+          (let ((DT (D T)))
+            (lambda (s)
+              (lambda (x)
+                (* (DT s) x))))))
 
       (a (up 'a^0 'a^1))
       (g (lambda (w) (* (down 'g_0 'g_1 'g_2) w)))

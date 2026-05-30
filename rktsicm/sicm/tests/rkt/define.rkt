@@ -16,19 +16,19 @@
           (list 'do1 a b c)))
     (check-equal? (do1 1 2) '(do1 1 2))
     (check-equal? (do1 1 2 3) '(do1 1 2 3)))
-  
+
    (test-case
     "2"
     (define (do2 a b)
       (list 'do2 a b))
     (check-equal? (do2 1 2) '(do2 1 2)))
-  
+
    (test-case
     "3"
     (define do3 'do3)
     (define do3*)
     (check-true (symbol? do3*)))
-  
+
    (test-case
     "4"
     (define (do4 a b #:optional c d)
@@ -36,14 +36,14 @@
     (check-equal? (do4 1 2) `(do4 1 2 ,default-object ,default-object))
     (check-equal? (do4 1 2 3) `(do4 1 2 3 ,default-object))
     (check-equal? (do4 1 2 3 4) '(do4 1 2 3 4)))
-  
+
    (test-case
     "5"
     (define (do5 a b #:optional c d . e)
       (list 'do5 a b c d e))
     (check-equal? (do5 1 2 3 4 5 6 7) '(do5 1 2 3 4 (5 6 7)))
     (check-equal? (do5 1 2) `(do5 1 2 ,default-object ,default-object ())))
-  
+
    (test-case
     "6"
     (define (do6 a b . c)

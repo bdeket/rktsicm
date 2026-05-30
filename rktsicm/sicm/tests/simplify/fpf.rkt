@@ -63,7 +63,7 @@
     (check-equal? (fpf:terms P1) '((() . 5)))
     (check-equal? (fpf:terms P2) '(((1) . 7)))
     (check-equal? (fpf:terms P3) '(((0 0 0) . 3)))
-    
+
     (check-false (explicit-fpf? P0))
     (check-false (explicit-fpf? P1))
     (check-true  (explicit-fpf? P2))
@@ -104,7 +104,7 @@
     (check-true  (fpf:lexicographical> '(2 1) '(2)))
     (check-false (fpf:lexicographical> '(2 1) '(2 1)))
     (check-false (fpf:lexicographical> '(0 2 3) '(1 2)))
-    
+
     (check-false (fpf:graded> '() '()))
     (check-false (fpf:graded> '() '(1)))
     (check-true  (fpf:graded> '(1) '()))
@@ -183,7 +183,7 @@
                   (mkTerms '((2 1) -3) '((0 1) -2)))
     (check-equal? (fpf:negate-terms-general (mkTerms '((2 1) 3) '((0 1) 2)) /)
                   (mkTerms '((2 1) 1/3) '((0 1) 1/2)))
-    
+
     (check-equal? (fpf:negate (fpf:make (mkTerms '((2 1) 3) '((0 1) 2))))
                   (fpf:make (mkTerms '((2 1) -3) '((0 1) -2))))
     (check-equal? (fpf:negate 7) -7)

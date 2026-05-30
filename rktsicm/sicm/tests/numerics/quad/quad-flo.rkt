@@ -85,8 +85,8 @@
     (check-equal? (quad:magnitude Z2)
                   '(16.660090602480967 . -1.4626082127539948e-16))
     )
-   
-   
+
+
    ))
 
 (module+ test

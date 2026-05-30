@@ -441,7 +441,7 @@
     (check-false (Dn? '(expt x 2)))
     (check-false (Dn? '(expt D 3)))
     (check-true  (Dn? '((expt D 3) F)))
-    
+
     (check-false (D2? 'x))
     (check-false (D2? '(+ x)))
     (check-false (D2? '(expt x 2)))
@@ -487,7 +487,7 @@
 
     ;; dividends: equations are = 0 so numerators are ignored
     (check-equal? (standardize-equation '(/ (+ (f t) 3) (+ x y)) '() '() 't) '((+ 3 (f t)) ((f t)) (f)))
-    
+
     (check-equal? (standardize-equation '(* 4.5 x) '(y) '() #f) '((* 4.5 x) (x y) ()))
     (check-equal? (standardize-equation '(* 4.5 x) '() '(f) #f) '((* 4.5 x) (x) (f)))
     (check-equal? (standardize-equation '(* 4.5 x) '() '() #f vector) (vector '(* 4.5 x) '(x) '()))
@@ -548,7 +548,7 @@
       ((((expt D 2) g) t) (g t) ((D f) t) y (f t) x z)
       (((expt D 2) g) g (D f) f)))
 
-   ;;; Signs of life.  
+   ;;; Signs of life.
    (check-equal?
     (solve-incremental
      (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
@@ -725,9 +725,8 @@
                   "(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
                   "(list '() '() (list (list '(= R2 100) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f))) (list '(= R1 200) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f)))) '())\n"
                   "(list '() '() (list (list '(= R2 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f))) (list '(= R1 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f)))) '())\n"))
-   
-(skip ;;TODO investigate above problem of missing 0 solution (see solve/solve)
-   )
+   (skip ;;TODO investigate above problem of missing 0 solution (see solve/solve)
+    )
 
    ;;; Now can solve quadratics and does backtracking to find a root
    (check-equal?
@@ -973,7 +972,7 @@ Some things are not right, see solve/solve
              siga4)
          (list 'K))
         ))
-  
+
      (define unknowns
        '(siga0 siga1 siga2 siga3 siga4 sigd0 sigd1 sigd2 sigd3 sigd4 sa0 sa1 sd0 sd1))
 
@@ -1087,7 +1086,7 @@ Some things are not right, see solve/solve
         (0 (B F H D I) ())
         (0 (B F H D E J) ())
         (0 (B F H D A E J K) ())))
-  
+
      )
 
    ;;; SIMPLE SOLVE

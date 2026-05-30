@@ -34,63 +34,63 @@
 (define (svd-least-squares A b #:optional eps db)
   (if (default-object? eps) (set! eps 1e-15))
   (let ((bp (if (default-object? db)
-		b
-		((vector-elementwise /) b db)))
-	(Ap (if (default-object? db)
-		A
-		(m:generate (m:num-rows A) (m:num-cols A)
-			    (lambda (i j)
+                b
+                ((vector-elementwise /) b db)))
+        (Ap (if (default-object? db)
+                A
+                (m:generate (m:num-rows A) (m:num-cols A)
+                            (lambda (i j)
                               (/ (m:ref A i j)
                                  (vector-ref db i)))))))
     (svd Ap
-     (lambda (u w-mat v w)
-       (let* ((n (vector-length w))
-              (inverted-w
-               (if (and (number? eps) (integer? eps) (>= eps 1))
-                   (make-initialized-vector n
-                     (lambda (i) 
-                       (let ((wi (vector-ref w i)))
-                         (if (< i eps) (/ 1 wi) 0))))
-                   (let ((wmin
-                          (cond ((number? eps)
-                                 (* eps
-				    (apply max (vector->list w))))
-                                ((procedure? eps)
-                                 (* (eps w)
-				    (apply max (vector->list w))))
-                                (else
-                                 (error "Bad cutoff -- SVD" eps)))))
-                     (make-initialized-vector n
-                       (lambda (i) 
-                         (let ((wi (vector-ref w i)))
-                           (if (< wi wmin) 0 (/ 1 wi)))))))))
-	 ;; Continued
+         (lambda (u w-mat v w)
+           (let* ((n (vector-length w))
+                  (inverted-w
+                   (if (and (number? eps) (integer? eps) (>= eps 1))
+                       (make-initialized-vector n
+                                                (lambda (i)
+                                                  (let ((wi (vector-ref w i)))
+                                                    (if (< i eps) (/ 1 wi) 0))))
+                       (let ((wmin
+                              (cond ((number? eps)
+                                     (* eps
+                                        (apply max (vector->list w))))
+                                    ((procedure? eps)
+                                     (* (eps w)
+                                        (apply max (vector->list w))))
+                                    (else
+                                     (error "Bad cutoff -- SVD" eps)))))
+                         (make-initialized-vector n
+                                                  (lambda (i)
+                                                    (let ((wi (vector-ref w i)))
+                                                      (if (< wi wmin) 0 (/ 1 wi)))))))))
+             ;; Continued
 
-	 ;; Continuation
-	 (let ((numw
-                (let lp ((i 0))
-                  (cond ((= i n) n)
-                        ((= (vector-ref w i) 0) i)
-                        (else (lp (+ i 1))))))
-               (x                       ; The unknown vector
-                (matrix*vector v
-                               ((vector-elementwise *)
-                                (matrix*vector (m:transpose u) bp)
-                                inverted-w))))
-  
-           (let ((chi2                  ; Overall error measure
-                  (v:square (vector-vector (matrix*vector A x) b)))
-                 (dx^2 
-                  (g:sigma (lambda (i) 
-                             (scalar*vector (vector-ref inverted-w i)
-                                            ((vector-elementwise *)
-                                             (m:nth-col v i)
-                                             (m:nth-col v i))))
-                         0 
-                         (- numw 1))))
-             (let ((dx                  ; The covariances
-                    ((vector-elementwise sqrt) dx^2)))
-               (list x dx chi2)))))))))
+             ;; Continuation
+             (let ((numw
+                    (let lp ((i 0))
+                      (cond ((= i n) n)
+                            ((= (vector-ref w i) 0) i)
+                            (else (lp (+ i 1))))))
+                   (x                       ; The unknown vector
+                    (matrix*vector v
+                                   ((vector-elementwise *)
+                                    (matrix*vector (m:transpose u) bp)
+                                    inverted-w))))
+
+               (let ((chi2                  ; Overall error measure
+                      (v:square (vector-vector (matrix*vector A x) b)))
+                     (dx^2
+                      (g:sigma (lambda (i)
+                                 (scalar*vector (vector-ref inverted-w i)
+                                                ((vector-elementwise *)
+                                                 (m:nth-col v i)
+                                                 (m:nth-col v i))))
+                               0
+                               (- numw 1))))
+                 (let ((dx                  ; The covariances
+                        ((vector-elementwise sqrt) dx^2)))
+                   (list x dx chi2)))))))))
 
 (define svd-solve-linear-system
   (compose car svd-least-squares))
@@ -103,12 +103,12 @@
 (define (make-random-data A B sigma xs)
   (list->vector
    (map (lambda (x)
-	  (+ ((f A B) x) (* sigma (gaussian-random))))
-	xs)))
+          (+ ((f A B) x) (* sigma (gaussian-random))))
+        xs)))
 
 (define (make-design xs)
   (apply matrix-by-rows
-	 (map (lambda (x) (list (cos x) (* 2 (sin x)))) xs)))
+         (map (lambda (x) (list (cos x) (* 2 (sin x)))) xs)))
 
 (define (xs n)
   (map (lambda (i) (* n:2pi (/ i n))) (iota n)))

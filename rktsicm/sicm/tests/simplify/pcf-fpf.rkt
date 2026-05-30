@@ -54,7 +54,7 @@
                   (list (sparse-term '(1 2) 3) (sparse-term '(1 1) 2)))
     ;;TODO;; should it accept numbers? (since they are pcf?)
     (check-exn #px"Unknown type: poly->sparse" (λ () (poly->sparse 3)))
-    
+
     (check-equal? (sparse->poly (list (sparse-term '(1 2) 3) (sparse-term '(1 1) 2)) '*fpf*)
                   (fpf:make (list (fpf:make-term '(1 2) 3) (fpf:make-term '(1 1) 2))))
     (check-equal? (sparse->poly (list (sparse-term '(1 2) 3) (sparse-term '(1 1) 2)) '*pcf*)

@@ -196,7 +196,7 @@
                         (list (+ (* (cos (theta t)) ((D phi) t))
                                  ((D psi) t)))))
    (check-simplified? ((M->omega-body Euler->M)
-                       (up 't 
+                       (up 't
                            (up 'theta 'phi 'psi)
                            (up 'thetadot 'phidot 'psidot)))
                       '(matrix-by-rows
@@ -224,7 +224,7 @@
                           )
                        0)
     (check-simplified? (determinant
-                        (((compose (partial 2) (partial 2)) 
+                        (((compose (partial 2) (partial 2))
                           (T-body-Euler 'A 'B 'C))
                          an-Euler-state))
                        '(* A B C (expt (sin theta) 2))))
@@ -249,8 +249,8 @@
                       (up .6319896958334494 1.3610271540875034 17.437900484737938)
                       (up -.12343716197181527 .09016109524808046 .07567921658605782))
                   1e-10))
-   (check-simplified? ((T-body-Euler 'A 'A 'C) 
-                       (up 't 
+   (check-simplified? ((T-body-Euler 'A 'A 'C)
+                       (up 't
                            (up 'theta 'phi 'psi)
                            (up 'thetadot 'phidot 'psidot)))
                       '(+ (* 1/2 A (expt phidot 2) (expt (sin theta) 2))
@@ -269,7 +269,7 @@
    (check-simplified? (let ((Euler (up (literal-function 'theta)
                                        (literal-function 'phi)
                                        (literal-function 'psi))))
-                        (antisymmetric->column-matrix 
+                        (antisymmetric->column-matrix
                          (* (transpose ((Euler->M Euler) 't))
                             ((D (Euler->M Euler)) 't))))
                       '(matrix-by-rows
@@ -323,7 +323,7 @@
                                                  (up 0.1 0.1 0.1)))
                                 (M (Euler->M (coordinates Euler-state)))
                                 (q (quaternion->vector (rotation-matrix->quaternion M)))
-                                (qw-state0 
+                                (qw-state0
                                  (up (time Euler-state)
                                      q
                                      (Euler-state->omega-body Euler-state))))

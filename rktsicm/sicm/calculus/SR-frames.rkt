@@ -34,11 +34,11 @@
 ;;; Implementation of the coordinates uses a put/get table.
 
 (define (make-SR-coordinates frame 4tuple)
-   (assert (vector? 4tuple))
-   (assert (fix:= (vector-length 4tuple) 4))
-   (eq-put! 4tuple 'SR-coordinates #t)
-   (claim! 4tuple frame)
-   4tuple)
+  (assert (vector? 4tuple))
+  (assert (fix:= (vector-length 4tuple) 4))
+  (eq-put! 4tuple 'SR-coordinates #t)
+  (claim! 4tuple frame)
+  4tuple)
 
 (define (SR-coordinates? coords)
   (eq-get coords 'SR-coordinates))
@@ -49,27 +49,27 @@
 ;;; SR frames
 
 (define (coordinates->event ancestor-frame this-frame
-			    boost-direction v/c origin)
+                            boost-direction v/c origin)
   (assert (eq? (frame-owner origin) ancestor-frame))
   (define (c->e coords)
     (assert (SR-coordinates? coords))
     ((point ancestor-frame)
      (make-SR-coordinates ancestor-frame
-			  (+ ((general-boost2 boost-direction v/c)
-			      coords)
-			     origin))))
+                          (+ ((general-boost2 boost-direction v/c)
+                              coords)
+                             origin))))
   c->e)
 
 
 (define (event->coordinates ancestor-frame this-frame
-			    boost-direction v/c origin)
+                            boost-direction v/c origin)
   (assert (eq? (frame-owner origin) ancestor-frame))
   (define (e->c event)
     (assert (event? event))
     (make-SR-coordinates this-frame
-			 ((general-boost2 (- boost-direction) v/c)
-			  (- ((chart ancestor-frame) event)
-			     origin))))
+                         ((general-boost2 (- boost-direction) v/c)
+                          (- ((chart ancestor-frame) event)
+                             origin))))
   e->c)
 
 
@@ -80,26 +80,26 @@
 (define (ancestor->this x) x)
 
 (define (coordinates->event ancestor-frame this-frame
-			    boost-direction v/c origin)
+                            boost-direction v/c origin)
   (assert (eq? (frame-owner origin) ancestor-frame))
   (define (c->e coords)
     (assert (SR-coordinates? coords))
     ((point ancestor-frame)
      (make-SR-coordinates ancestor-frame
-			  (+ (this->ancestor coords)
-			     origin))))
+                          (+ (this->ancestor coords)
+                             origin))))
   c->e)
 
 
 (define (event->coordinates ancestor-frame this-frame
-			    boost-direction v/c origin)
+                            boost-direction v/c origin)
   (assert (eq? (frame-owner origin) ancestor-frame))
   (define (e->c event)
     (assert (event? event))
     (make-SR-coordinates this-frame
-			 (ancestor->this
-			  (- ((chart ancestor-frame) event)
-			     origin))))
+                         (ancestor->this
+                          (- ((chart ancestor-frame) event)
+                             origin))))
   e->c)
 |#
 
@@ -132,8 +132,8 @@
   (make-SR-coordinates this-frame event))
 
 (define the-ether
-   ((frame-maker base-frame-point base-frame-chart)
-    'the-ether 'the-ether))
+  ((frame-maker base-frame-point base-frame-chart)
+   'the-ether 'the-ether))
 
 #|
 (symbolic-constants #f)
@@ -143,22 +143,22 @@
 
 (define A
    (make-SR-frame 'A the-ether
-		  (up 1 0 0)
-		  (/ 'va :c)
-		  (make-SR-coordinates the-ether
-				       #(0 0 0 0))))
+                  (up 1 0 0)
+                  (/ 'va :c)
+                  (make-SR-coordinates the-ether
+                                       #(0 0 0 0))))
 
 (define B
    (make-SR-frame 'B A
-		  (up 1 0 0)
-		  (/ 'vb :c)
-		  (make-SR-coordinates A
-				       #(0 0 0 0))))
+                  (up 1 0 0)
+                  (/ 'vb :c)
+                  (make-SR-coordinates A
+                                       #(0 0 0 0))))
 
 (let ((foo ((chart the-ether)
-	    ((point B)
-	     (make-SR-coordinates B
-	       (up (* :c 'tau) 0 0 0))))))
+            ((point B)
+             (make-SR-coordinates B
+               (up (* :c 'tau) 0 0 0))))))
    (/ (ref foo 1) (/ (ref foo 0) :c)))
 #|
 (/ (+ (* (expt :c 2) va)
@@ -172,19 +172,19 @@
 |#
 
 (define (add-v/cs v1/c v2/c)
-   (/ (+ v1/c v2/c)
-      (+ 1 (* v1/c v2/c))))
+  (/ (+ v1/c v2/c)
+     (+ 1 (* v1/c v2/c))))
 
 (define (add-velocities v1 v2)
-   (/ (+ v1 v2)
-      (+ 1 (* (/ v1 (*c*)) (/ v2 (*c*))))))
+  (/ (+ v1 v2)
+     (+ 1 (* (/ v1 (*c*)) (/ v2 (*c*))))))
 
 #|
 ;;; Simple test of reversibility
 
 (define A
    (make-SR-frame 'A the-ether (up 1 0 0) 'va/c
-		  (make-SR-coordinates the-ether #(cta xa ya za))))
+                  (make-SR-coordinates the-ether #(cta xa ya za))))
 
 
 ((chart A)
@@ -205,12 +205,12 @@
 
 (define B
    (make-SR-frame 'B A (up 1 0 0) 'vba/c
-		  (make-SR-coordinates A #(ctba xba yba zba))))
+                  (make-SR-coordinates A #(ctba xba yba zba))))
 
 ((chart B)
   ((point B)
    (make-SR-coordinates B
-	  #(ct x y z))))
+          #(ct x y z))))
 #|
 (up ct x y z)
 |#
@@ -222,11 +222,11 @@
 
 (define A
    (make-SR-frame 'A the-ether (up 1 0 0) 'va/c
-		  (make-SR-coordinates the-ether #(cta xa ya za))))
+                  (make-SR-coordinates the-ether #(cta xa ya za))))
 
 (define B
    (make-SR-frame 'B A (up 1 0 0) 'vba/c
-		  (make-SR-coordinates A #(ctba xba yba zba))))
+                  (make-SR-coordinates A #(ctba xba yba zba))))
 
 
 
@@ -251,9 +251,9 @@ origin-B
 
 (define C
   (make-SR-frame 'C the-ether
-		 (up 1 0 0)
-		 (add-v/cs 'va/c 'vba/c)
-		 origin-B))
+                 (up 1 0 0)
+                 (add-v/cs 'va/c 'vba/c)
+                 origin-B))
 
 
 ;;; A typical event.
@@ -261,5 +261,5 @@ origin-B
 (define foo
   ((point the-ether)
    (make-SR-coordinates the-ether
-			(up 'ct 'x 'y 'z))))
+                        (up 'ct 'x 'y 'z))))
 |#

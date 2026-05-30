@@ -69,12 +69,12 @@
                                 (* 1/6 (((partial 0) ((partial 1) ((partial 1) H))) a b)))
                           (down (* 1/6 (((partial 0) ((partial 1) ((partial 1) H))) a b))
                                 (* 1/6 (((partial 1) ((partial 1) ((partial 1) H))) a b)))))))
-   ;;BUG 
-   (check-simplified? ((D (lambda (y) 
+   ;;BUG
+   (check-simplified? ((D (lambda (y)
                             (ref (Taylor-series-coefficients (lambda (x) (* x y)) 0) 1)))
                        'a)
                       0)
-;;; This does not produce a function.  It is a 
+;;; This does not produce a function.  It is a
 ;;; symbolic manipulation.
    (test-case
     "bug1"
@@ -86,7 +86,7 @@
                                 (substitute x dummy term))
                               simplify))
          (((exp D) f) dummy))))
-    (check-simplified? ((D (lambda (y) 
+    (check-simplified? ((D (lambda (y)
                              (ref (Taylor-series-coefficients (lambda (x) (* x y)) 0) 1)))
                         'a)
                        0))
@@ -98,7 +98,7 @@
         ((series:elementwise (lambda (term)
                                (substitute x dummy term)))
          (((exp D) f) dummy))))
-    (check-simplified? ((D (lambda (y) 
+    (check-simplified? ((D (lambda (y)
                              (ref (Taylor-series-coefficients (lambda (x) (* x y)) 0) 1)))
                         'a)
                        1))

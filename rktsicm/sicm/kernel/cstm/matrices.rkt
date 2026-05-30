@@ -39,7 +39,7 @@
   (assert (matrix? mat) "Not a matrix -- DIMENSION" mat)
   (let ((d (m:num-rows mat)))
     (assert (fix:= d (m:num-cols mat))
-	    "Not a square matrix -- DIMENSION" mat)
+            "Not a square matrix -- DIMENSION" mat)
     d))
 
 (define (matrix-size mat)
@@ -72,6 +72,6 @@
 
 (define (m:submatrix A lowrow hirow+1 lowcol hicol+1)
   (m:generate (fix:- hirow+1 lowrow) (fix:- hicol+1 lowcol)
-    (lambda (i j)
-      (matrix-ref A (fix:+ i lowrow) (fix:+ j lowcol)))))
+              (lambda (i j)
+                (matrix-ref A (fix:+ i lowrow) (fix:+ j lowcol)))))
 ;;bdk;; insert 5 end

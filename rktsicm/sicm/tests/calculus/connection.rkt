@@ -49,7 +49,7 @@
     (clear-arguments)
     (check-exn #px"assertion failed: \\(coordinate-basis\\? basis\\)"
                (λ () (metric->Christoffel-2 (literal-metric 'M R2-rect) 'not-a-basis))))
-   
+
    (test-case
     "literal-Christoffel-names"
     (check-equal? (literal-Christoffel-names 'n '(up up down) 0)
@@ -105,7 +105,7 @@
                                      (* (C_11^0 (up x y)) (v^1 (up x y))))
                                   (+ (* (C_01^1 (up x y)) (v^0 (up x y)))
                                      (* (C_11^1 (up x y)) (v^1 (up x y))))))))
-   
+
    (test-case
     "metric->connection"
     ;; TODO: what is the difference with metric->Christoffel-1/2?
@@ -240,7 +240,7 @@
                       (* (compose (square sin) theta)
                          (dphi u)
                          (dphi v)))))
-              
+
               (check-simplified?
                ((Christoffel->symbols
                   (metric->Christoffel-2 (g-sphere 'R)
@@ -313,7 +313,7 @@
                          (* (square (sin theta))
                             (* (dphi v1) (dphi v2)))))))
 
-              (define spherical-Lorentz-point 
+              (define spherical-Lorentz-point
                 ((spherical-Lorentz '->point) (up 't 'r 'theta 'phi)))
 
               (define (orthonormal-spherical-Lorentz-vector-basis c^2)
@@ -325,7 +325,7 @@
               (define (orthonormal-spherical-Lorentz-1form-basis c^2)
                 (let ((orthonormal-spherical-Lorentz-vectors
                        (orthonormal-spherical-Lorentz-vector-basis c^2)))
-                  (vector-basis->dual orthonormal-spherical-Lorentz-vectors 
+                  (vector-basis->dual orthonormal-spherical-Lorentz-vectors
                                       spherical-Lorentz)))
 
               (define (orthonormal-spherical-Lorentz-basis c^2)

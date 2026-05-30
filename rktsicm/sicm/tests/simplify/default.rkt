@@ -19,7 +19,7 @@
       (make-assign-operations 'simplify))
     (assign-operation 'simplify (λ (x) (and x (if (and (pair? x) (not (list? x))) x `(xpress ,x)))))
     (s:assign-operations #t)
-    
+
     (check-equal? (default-simplify 'top-expr) 'top-expr)
     (check-equal? (default-simplify '(car . cdr)) `((xpress car) . (xpress cdr)))
     (check-equal? (default-simplify '(first #f (+ (expt (cos x) 2) (expt (sin x) 2))))
@@ -28,7 +28,7 @@
                   '((xpress first) (1 2 . 3) (xpress (+ (expt (cos x) 2) (expt (sin x) 2)))))
     (check-equal? (default-simplify `(first 3 ,c²+s²))
                   '((xpress first) (xpress 3) (xpress 1))))
-   
+
    (test-case
     "unit"
     (check-equal? (simplify-units (g:* 5 &meter))

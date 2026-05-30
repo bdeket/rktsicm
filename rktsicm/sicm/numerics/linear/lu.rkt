@@ -34,7 +34,7 @@
 ;;; (lu-backsubstitute lu-matrix lu-permutation b-vector) => x-vector
 
 
-;;; Solves an inhomogeneous system of linear equations, A*X=B, 
+;;; Solves an inhomogeneous system of linear equations, A*X=B,
 ;;; returning the vector X.
 
 (define (lu-solve-linear-system A b)
@@ -81,12 +81,12 @@
     (lu-decompose-internal a
                            (lambda (lumat luperm sign)
                              (let ((m (make-initialized-vector n
-                                                    (lambda (i)
-                                                      (let ((e (v:make-basis-unit n i)))
-                                                        (lu-backsubstitute-internal lumat luperm e))))))
+                                                               (lambda (i)
+                                                                 (let ((e (v:make-basis-unit n i)))
+                                                                   (lu-backsubstitute-internal lumat luperm e))))))
                                (transpose-array m)))
                            barf-on-zero-pivot)))
-    
+
 (define (lu-determinant-internal M)
   (let ((n (num-rows M)))
     (lu-decompose-internal M
@@ -107,20 +107,20 @@
 (define (lu-decompose-internal m succeed singular-matrix)
   (let* ((n (num-rows m))
          (perms (make-initialized-vector n (lambda (i) i))) ;row permutations
-         (sign 1)			;1 for even permutations, -1 for odd
+         (sign 1)                        ;1 for even permutations, -1 for odd
          ;; We must copy the matrix, since Crout's algorithm clobbers it.
          (m (array-copy m)))
     (let jloop ((j 0))
       (if (fix:< j n)
           (begin
-            (let iloop ((i 0))		;compute elements above diagonal
+            (let iloop ((i 0))                ;compute elements above diagonal
               (if (not (fix:> i j))
-                (begin (array-set! m i j (lu-upper-eqn i j m))
-                       (iloop (fix:+ i 1)))))
+                  (begin (array-set! m i j (lu-upper-eqn i j m))
+                         (iloop (fix:+ i 1)))))
             (let iloop ((i (fix:+ j 1))) ;compute elements below diagonal
               (if (fix:< i n)
-                (begin (array-set! m i j (lu-lower-eqn i j m))
-                       (iloop (fix:+ i 1)))))
+                  (begin (array-set! m i j (lu-lower-eqn i j m))
+                         (iloop (fix:+ i 1)))))
             (let* ((pivot-info (lu-find-best-pivot m j n))
                    (pivot (car pivot-info))
                    (pivot-index (cdr pivot-info)))
@@ -129,7 +129,7 @@
                   (let ((inverted-pivot (invert pivot)))
                     (lu-row-swap m j pivot-index perms)
                     (if (not (fix:= j pivot-index))
-                      (set! sign (fix:- 0 sign)))
+                        (set! sign (fix:- 0 sign)))
                     (let iloop ((i (fix:+ j 1))) ;divide through by pivot
                       (if (fix:= i n)
                           'done
@@ -193,9 +193,9 @@
       (vector-set! vector i (vector-ref vector j))
       (vector-set! vector j temp)))
   (if (not (fix:= i1 i2))
-    (begin (swap-elements perms i1 i2)
-           ;;uses fact that matrix is a vector of rows
-           (swap-elements m i1 i2))))
+      (begin (swap-elements perms i1 i2)
+             ;;uses fact that matrix is a vector of rows
+             (swap-elements m i1 i2))))
 
 ;;; Back substitution (see Press, page 32)
 
@@ -206,40 +206,40 @@
          (x (make-vector n '())))
     (let fdloop ((i 0))
       (if (fix:< i n)
-        (begin
-          (vector-set! y i
-                       (- (vector-ref b (vector-ref perm i))
-                          (let jloop ((j 0) (sum 0))
-                            (if (fix:= j i)
-                                sum
-                                (jloop (fix:+ j 1)
-                                       (+ sum
-                                          (* (vector-ref y j)
-                                             (array-ref m i j))))))))
-          (fdloop (fix:+ i 1)))))
+          (begin
+            (vector-set! y i
+                         (- (vector-ref b (vector-ref perm i))
+                            (let jloop ((j 0) (sum 0))
+                              (if (fix:= j i)
+                                  sum
+                                  (jloop (fix:+ j 1)
+                                         (+ sum
+                                            (* (vector-ref y j)
+                                               (array-ref m i j))))))))
+            (fdloop (fix:+ i 1)))))
     (let bkloop ((i top))
       (if (not (fix:< i 0))
-        (begin
-          (vector-set! x i
-                       (/ (- (vector-ref y i)
-                             (let jloop ((j (fix:+ i 1)) (sum 0))
-                               (if (fix:= j n)
-                                   sum
-                                   (jloop (fix:+ j 1)
-                                          (+ sum
-                                             (* (vector-ref x j)
-                                                (array-ref m i j)))))))
-                          (array-ref m i i)))
-          (bkloop (fix:- i 1)))))
+          (begin
+            (vector-set! x i
+                         (/ (- (vector-ref y i)
+                               (let jloop ((j (fix:+ i 1)) (sum 0))
+                                 (if (fix:= j n)
+                                     sum
+                                     (jloop (fix:+ j 1)
+                                            (+ sum
+                                               (* (vector-ref x j)
+                                                  (array-ref m i j)))))))
+                            (array-ref m i i)))
+            (bkloop (fix:- i 1)))))
     x))
 
-;;; In the case of a homogeneous system we can solve if the matrix is 
-;;;  singular.  
+;;; In the case of a homogeneous system we can solve if the matrix is
+;;;  singular.
 
 (define (lu-null-space A)
   (let* ((n (m:dimension A))
          (AA (matrix->array A))
-         (maxel (vector-accumulate 
+         (maxel (vector-accumulate
                  max
                  (lambda (row)
                    (vector-accumulate max g:magnitude n:zero row))
@@ -277,22 +277,22 @@
          (x (make-vector n '())))
     (let bkloop ((i top) (acount 0))
       (if (not (fix:< i 0))
-        (let ((p (array-ref m i i)))
-          (if (heuristically-zero? p maxel)
-              (begin
-                (if (fix:= acount k)
-                    (vector-set! x i 1)
-                    (vector-set! x i 0))
-                (bkloop (fix:- i 1) (fix:+ acount 1)))
-              (let ((s (let jloop ((j (fix:+ i 1)) (sum 0))
-                         (if (fix:= j n)
-                             sum
-                             (jloop (fix:+ j 1)
-                                    (+ sum
-                                       (* (vector-ref x j)
-                                          (array-ref m i j))))))))
-                (vector-set! x i (/ (- s) p))
-                (bkloop (fix:- i 1) acount))))))
+          (let ((p (array-ref m i i)))
+            (if (heuristically-zero? p maxel)
+                (begin
+                  (if (fix:= acount k)
+                      (vector-set! x i 1)
+                      (vector-set! x i 0))
+                  (bkloop (fix:- i 1) (fix:+ acount 1)))
+                (let ((s (let jloop ((j (fix:+ i 1)) (sum 0))
+                           (if (fix:= j n)
+                               sum
+                               (jloop (fix:+ j 1)
+                                      (+ sum
+                                         (* (vector-ref x j)
+                                            (array-ref m i j))))))))
+                  (vector-set! x i (/ (- s) p))
+                  (bkloop (fix:- i 1) acount))))))
     x))
 
 (define heuristic-zero-test-bugger-factor

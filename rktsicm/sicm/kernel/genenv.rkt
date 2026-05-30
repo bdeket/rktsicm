@@ -14,131 +14,131 @@
 (define (generic-environment-maker new [base scmutils-base-environment])
   (let ((e (extend-environment new base)))
     (let ((d (lambda (name value)
-	       (environment-define e name value))))
-	(d '*environment* 'generic-environment)
+               (environment-define e name value))))
+      (d '*environment* 'generic-environment)
 
-	;; Unary operators from generic.scm
+      ;; Unary operators from generic.scm
 
-	(d 'type g:type)
-	(d 'type-predicate g:type-predicate)
-	(d 'arity g:arity)
+      (d 'type g:type)
+      (d 'type-predicate g:type-predicate)
+      (d 'arity g:arity)
 
-	(d 'inexact? g:inexact?)
+      (d 'inexact? g:inexact?)
 
-	(d 'zero-like g:zero-like)
-	(d 'one-like g:one-like)
-	(d 'identity-like g:identity-like)
-	
-	(d 'zero? g:zero?)
-	(d 'one? g:one?)
-	(d 'identity? g:identity?)
+      (d 'zero-like g:zero-like)
+      (d 'one-like g:one-like)
+      (d 'identity-like g:identity-like)
 
-	(d 'negate g:negate)
-	(d 'invert g:invert)
+      (d 'zero? g:zero?)
+      (d 'one? g:one?)
+      (d 'identity? g:identity?)
 
-	(d 'square g:square)
-	(d 'cube   g:cube)
+      (d 'negate g:negate)
+      (d 'invert g:invert)
 
-	(d 'sqrt g:sqrt)
+      (d 'square g:square)
+      (d 'cube   g:cube)
 
-	(d 'exp g:exp)
-	(d 'log g:log)
+      (d 'sqrt g:sqrt)
 
-	(d 'exp2  g:exp2)
-	(d 'exp10 g:exp10)
-	(d 'log2  g:log2)
-	(d 'log10 g:log10)
+      (d 'exp g:exp)
+      (d 'log g:log)
 
-	(d 'sin g:sin)
-	(d 'cos g:cos)
-	(d 'tan g:tan)
-	(d 'cot g:cot)
-	(d 'sec g:sec)
-	(d 'csc g:csc)
+      (d 'exp2  g:exp2)
+      (d 'exp10 g:exp10)
+      (d 'log2  g:log2)
+      (d 'log10 g:log10)
 
-	(d 'asin g:asin)
-	(d 'acos g:acos)
+      (d 'sin g:sin)
+      (d 'cos g:cos)
+      (d 'tan g:tan)
+      (d 'cot g:cot)
+      (d 'sec g:sec)
+      (d 'csc g:csc)
 
-	(d 'sinh g:sinh)
-	(d 'cosh g:cosh)
-	(d 'tanh g:tanh)
-	(d 'sech g:sech)
-	(d 'csch g:csch)
+      (d 'asin g:asin)
+      (d 'acos g:acos)
 
-	(d 'asinh g:asinh)
-	(d 'acosh g:acosh)
-	(d 'atanh g:atanh)
+      (d 'sinh g:sinh)
+      (d 'cosh g:cosh)
+      (d 'tanh g:tanh)
+      (d 'sech g:sech)
+      (d 'csch g:csch)
 
-	(d 'abs g:abs)
+      (d 'asinh g:asinh)
+      (d 'acosh g:acosh)
+      (d 'atanh g:atanh)
 
-	(d 'determinant g:determinant)
-	(d 'trace g:trace)
-        (d 'transpose g:transpose)
-	(d 'dimension g:dimension)
+      (d 'abs g:abs)
 
-        (d 'solve-linear-left g:solve-linear-left)
-        (d 'solve-linear-right g:solve-linear-right)
-        (d 'solve-linear g:solve-linear)
+      (d 'determinant g:determinant)
+      (d 'trace g:trace)
+      (d 'transpose g:transpose)
+      (d 'dimension g:dimension)
 
-	(d 'derivative g:derivative)
+      (d 'solve-linear-left g:solve-linear-left)
+      (d 'solve-linear-right g:solve-linear-right)
+      (d 'solve-linear g:solve-linear)
 
-	;; Binary (and nary) operators from generic.scm
+      (d 'derivative g:derivative)
 
-	(d '= g:=)
-	(d '< g:<)
-	(d '<= g:<=)
-	(d '> g:>)
-	(d '>= g:>=)
+      ;; Binary (and nary) operators from generic.scm
 
-	(d '+ g:+)
-	(d '- g:-)
-	(d '* g:*)
-	(d '/ g:/)
+      (d '= g:=)
+      (d '< g:<)
+      (d '<= g:<=)
+      (d '> g:>)
+      (d '>= g:>=)
 
-	(d 'dot-product g:dot-product)
-	(d 'cross-product g:cross-product)
+      (d '+ g:+)
+      (d '- g:-)
+      (d '* g:*)
+      (d '/ g:/)
 
-	(d 'outer-product g:outer-product)
+      (d 'dot-product g:dot-product)
+      (d 'cross-product g:cross-product)
 
-	(d 'expt g:expt)
-	(d 'gcd g:gcd)
+      (d 'outer-product g:outer-product)
 
-
-        ;; Complex operators from generic.scm
-
-	(d 'make-rectangular g:make-rectangular)
-	(d 'make-polar g:make-polar)
-
-	(d 'real-part g:real-part)
-	(d 'imag-part g:imag-part)
-	(d 'magnitude g:magnitude)
-	(d 'angle g:angle)
-
-	(d 'conjugate g:conjugate)
+      (d 'expt g:expt)
+      (d 'gcd g:gcd)
 
 
-	;; Wierd operators from generic.scm
+      ;; Complex operators from generic.scm
 
-	(d 'atan g:atan)
+      (d 'make-rectangular g:make-rectangular)
+      (d 'make-polar g:make-polar)
 
-	(d 'partial-derivative g:partial-derivative)
-	(d 'partial g:partial)
+      (d 'real-part g:real-part)
+      (d 'imag-part g:imag-part)
+      (d 'magnitude g:magnitude)
+      (d 'angle g:angle)
 
-	(d 'apply g:apply)
+      (d 'conjugate g:conjugate)
 
 
-	;; Compound operators from mathutil.scm
+      ;; Wierd operators from generic.scm
 
-	(d 'arg-scale g:arg-scale)
-	(d 'arg-shift g:arg-shift)
+      (d 'atan g:atan)
 
-	(d 'sigma g:sigma)
+      (d 'partial-derivative g:partial-derivative)
+      (d 'partial g:partial)
 
-        (d 'ref   g:ref)
-	(d 'size  g:size)
+      (d 'apply g:apply)
 
-	(d 'compose g:compose)
-	)
+
+      ;; Compound operators from mathutil.scm
+
+      (d 'arg-scale g:arg-scale)
+      (d 'arg-shift g:arg-shift)
+
+      (d 'sigma g:sigma)
+
+      (d 'ref   g:ref)
+      (d 'size  g:size)
+
+      (d 'compose g:compose)
+      )
     e))
 
 #;;;bdk;; slightly different
@@ -150,19 +150,19 @@
 (let ((numerical-environment
        (extend-top-level-environment generic-environment)))
   (environment-define scmutils-base-environment
-		      'numerical-environment
-		      numerical-environment)
+                      'numerical-environment
+                      numerical-environment)
   (environment-define numerical-environment
-		      '*environment*
-		      'numerical-environment))
+                      '*environment*
+                      'numerical-environment))
 |#
 
 #;
 (let ((numerical-environment
        (extend-top-level-environment scmutils-base-environment)))
   (environment-define scmutils-base-environment
-		      'numerical-environment
-		      numerical-environment)
+                      'numerical-environment
+                      numerical-environment)
   (environment-define numerical-environment
-		      '*environment*
-		      'numerical-environment))
+                      '*environment*
+                      'numerical-environment))

@@ -206,7 +206,7 @@
    (test-case
     "rcf:gcd"
     (check-equal? (rcf:gcd P21 P22) (poly/make 1 '(1 0)))
-    
+
     (check-equal? (rcf:gcd poly:zero (make-rcf P11 P22)) (make-rcf P11 P22))
     (check-equal? (rcf:gcd poly:one  (make-rcf P11 P22)) 1)
     (check-equal? (rcf:gcd P21 (make-rcf P11 P22)) 1)
@@ -227,7 +227,7 @@
     (check-equal? (rcf:expt (make-rcf P11 P12) 1) (make-rcf P11 P12))
     (check-equal? (rcf:expt (make-rcf P11 P12) 2) (rcf:square (make-rcf P11 P12)))
     (check-equal? (rcf:expt (make-rcf P11 P12) 3) (rcf:* (make-rcf P11 P12) (rcf:square (make-rcf P11 P12))))
-    
+
     (check-equal? (rcf:expt (make-rcf P11 P12) -1) (make-rcf P12 P11))
     (check-equal? (rcf:expt (make-rcf P11 P12) -2) (rcf:square (make-rcf P12 P11)))
     (check-equal? (rcf:expt (make-rcf P11 P12) -3) (rcf:* (make-rcf P12 P11) (rcf:square (make-rcf P12 P11))))
@@ -347,7 +347,7 @@
                   '(/ (+ 1 (* (+ 2 (* 3 x)) x)) (+ 3 (* (+ 1 (* 2 x)) x))))
     (check-equal? (rcf:->expression (poly/make 2 `(,(poly/make 1 '(1 0 0)) 3 2)) '(x y))
                   '(+ 2 (* (+ 3 (* (expt y 2) x)) x)))
-    
+
     (check-equal? (rcf:expression-> '(/ (+ 1 (* 2 x) (* 3 (expt x 2))) (- 3 (negate (* (+ 1 (* 2 x)) x)))) vector)
                   (vector (make-rcf P11 P12) '(x)))
     (check-equal? (rcf:expression-> '(* (+ 1 (* 2 x) (* 3 (square x))) (invert (+ 3 (* (+ 1 (* 2 x)) x)))) vector)

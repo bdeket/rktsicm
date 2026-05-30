@@ -30,19 +30,19 @@
     (define T (sparse-term '(1 2 3) 4))
     (check-equal? (sparse-exponents T) '(1 2 3))
     (check-equal? (sparse-coefficient T) 4)
-    
+
     (check-true  (sparse-constant-term? (sparse-term (build-list (random 10) (λ _ 0)) 3)))
     (check-false (sparse-constant-term? (sparse-term '(0 0 1 0) 3)))
-    
+
     (check-true  (sparse-univariate? (mkTerms '((1) 3) '((2) 8))))
     (check-true  (sparse-univariate? (mkTerms '((0) 3))))
     (check-false (sparse-univariate? (mkTerms '((0 1) 3))))
     (check-false (sparse-univariate? (mkTerms '(() 3))))
-    
+
     (check-true  (sparse-constant? (mkTerms '((0) 3))))
     (check-true  (sparse-constant? (mkTerms '((0 0 0) 3))))
     (check-false (sparse-constant? (mkTerms '((1) 3))))
-    
+
     (check-true  (sparse-one-term? (sparse-term '(0 0 0) 1)))
     (check-false (sparse-one-term? (sparse-term '(0 0 0) 0)))
     (check-false (sparse-one-term? (sparse-term '(0 0 1) 1)))
@@ -50,7 +50,7 @@
     (check-false (sparse-one? (mkTerms '((0 0 0) 1) '((0 0 1) 1))))
     (check-false (sparse-one? (mkTerms '((0 0 0) 0))))
     (check-false (sparse-one? (mkTerms '((0 0 1) 1))))
-    
+
     (check-true  (sparse-zero-term? (sparse-term '(0 0 0) 0)))
     (check-false (sparse-zero-term? (sparse-term '(0 0 0) 1)))
     (check-false (sparse-zero-term? (sparse-term '(0 0 1) 0)))
@@ -257,10 +257,10 @@
                   (mkTerms '((6 3) 1) '((2 2) 3)))
     (check-equal? (sparse-merge-adjacent-terms (mkTerms '((1 2) 1) '((6 3) 1) '((1 2) -1) '((2 2) 3)))
                   (mkTerms '((1 2) 1) '((6 3) 1) '((1 2) -1) '((2 2) 3)))
-    
+
     (check-equal? (sparse-combine-like-terms (mkTerms '((1 2) 1) '((6 3) 1) '((1 2) -1) '((2 2) 3)))
                   (mkTerms '((6 3) 1) '((2 2) 3))))
-   
+
    ;**************************************************************************************************
    (check-equal? (map (λ (x) (cons (sparse-exponents x) (expression (sparse-coefficient x))))
                   (sparse-evaluate>

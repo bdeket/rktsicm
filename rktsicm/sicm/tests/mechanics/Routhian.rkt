@@ -55,7 +55,7 @@
                            (* -1/2 mx (expt vx 2))
                            (* x (expt y 2))
                            (/ (* 1/2 (expt py 2)) my)))
-    (check-simplified? (((Routh-equations 
+    (check-simplified? (((Routh-equations
                           (Lagrangian->Routhian (Lag 'mx 'kx 'my 'ky)))
                          (literal-function 'x)
                          (literal-function 'y)
@@ -80,7 +80,7 @@
                 (* 1/2 m (square vy)))
              (+ (* 1/2 k (square x))
                 (* 1/2 k (square y)))))))
-    (check-simplified? (((Routh-equations 
+    (check-simplified? (((Routh-equations
                           (Lagrangian->Routhian (Lag2 'm 'k)))
                          (up (literal-function 'x0) (literal-function 'x1))
                          (up (literal-function 'y0) (literal-function 'y1))
@@ -152,7 +152,7 @@
                            (V (up x1 y1) (up x2 y2))
                            (/ (* 1/2 (expt p2x 2)) m2)
                            (/ (* 1/2 (expt p2y 2)) m2)))
-    (check-simplified? (((Routh-equations 
+    (check-simplified? (((Routh-equations
                           (Lagrangian->Routhian
                            (L 'm1 'm2
                               (literal-function 'V

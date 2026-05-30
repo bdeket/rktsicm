@@ -98,8 +98,8 @@
   6.67259e-11
   (/ (* &newton (square &meter)) (square &kilogram))
   128e-6)
-|#				;relative error
- 
+|#                                ;relative error
+
 ;;; CODATA 2006
 (define-constant ':G "G" "gravitational constant"
   6.67428e-11
@@ -213,7 +213,7 @@
 (define-constant ':alpha "\\alpha" "fine structure constant"
   (* (/ 1 (* 4 :pi :epsilon_0))
      (/ (square :e) (* :h-bar :c)))
-  &unitless)				
+  &unitless)
 
 (define-constant ':R_infinity "R_\\inf" "Rydberg constant"
   (/ (* :m_e :c (square :alpha))
@@ -269,7 +269,7 @@
 (define-constant ':sigma "\\sigma" "Stefan-Boltzmann constant"
   (* (/ (square :pi) 60)
      (/ (expt :k 4)
-	(* (expt :h-bar 3) (expt :c 2))))
+        (* (expt :h-bar 3) (expt :c 2))))
   (/ &watt (* (square &meter) (expt &kelvin 4)))
   34.0e-6)
 
@@ -279,8 +279,8 @@
 
 ;;;; Observed and measured numbers
 
-(define background-temperature		;Cobe 1994
-  (& 2.726 &kelvin))			;+-.005 Kelvin
+(define background-temperature                ;Cobe 1994
+  (& 2.726 &kelvin))                        ;+-.005 Kelvin
 
 
 
@@ -306,7 +306,7 @@
 (define earth-mass
   (& 5.976e24 &kilogram))
 
-(define earth-radius			
+(define earth-radius
   (& 6371e3 &meter))
 
 (define earth-surface-area
@@ -318,22 +318,22 @@
 (define earth-gravitational-acceleration
   (& 9.80665 (/ &meter (expt &second 2))))
 
-(define :g 
+(define :g
   earth-gravitational-acceleration)
 
 (define earth-mean-density
   (& 5.52e3 (/ &kilogram (expt &meter 3))))
 
 
-;;;     This is the average amount of 
+;;;     This is the average amount of
 ;;; sunlight available at Earth on an
 ;;; element of surface normal to a
 ;;; radius from the sun.  The actual
-;;; power at the surface of the earth, 
+;;; power at the surface of the earth,
 ;;; for a panel in full sunlight, is
-;;; not very different, because, in 
+;;; not very different, because, in
 ;;; absence of clouds the atmosphere
-;;; is quite transparent.  The number 
+;;; is quite transparent.  The number
 ;;; differs from the obvious geometric
 ;;; number
 ;;; (/ sun-luminosity (* 4 :pi (square m/AU)))
@@ -348,7 +348,7 @@
 (define vol@stp
   (& 2.24136e-2 (/ (expt &meter 3) &mole)))
 
-(define sound-speed@stp			;c_s
+(define sound-speed@stp                        ;c_s
   (& 331.45 (/ &meter &second)))
 
 (define pressure@stp
@@ -390,7 +390,7 @@
 
 ;;; The Gaussian constant
 
-(define GMsun				;=(* gravitational-constant sun-mass)	
+(define GMsun                                ;=(* gravitational-constant sun-mass)
   (& 1.32712497e20
      (/ (* &newton (expt &meter 2)) &kilogram)))
 

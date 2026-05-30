@@ -185,7 +185,7 @@
 
     (check-true (negate? '(negate a)))
     (check-equal? (symb:negate 'a) '(- a))
-    
+
     (check-equal? (symb:dif:n '()) 0)
     (check-equal? (symb:dif:n '(a)) '(- a))
     (check-equal? (symb:dif:n '(a b c)) '(- a (+ b c)))
@@ -299,7 +299,7 @@
 
     (check-true (invert? '(invert a)))
     (check-equal? (symb:invert 'a) '(/ 1 a))
-    
+
     (check-equal? (symb:quo:n '()) 1)
     (check-equal? (symb:quo:n '(a)) '(/ 1 a))
     (check-equal? (symb:quo:n '(a b c)) '(/ a (* b c)))
@@ -384,7 +384,7 @@
     ;; !!!
     ;(check-true (cube? '(expt a 3)))
     (check-true (sqrt? '(sqrt a)))
-        
+
     (check-equal? (symb:expt 2 3) (expt 2 3))
     (check-equal? (symb:expt 0 'a) '(expt 0 a))
     (check-equal? (symb:expt 1 'a) 1)
@@ -441,19 +441,19 @@
     (check-not-false (   n:zero-mod-pi? (- (* 2 n:pi) δ)))
     (check-false     (   n:zero-mod-pi? (- (* 1/2 n:pi) δ)))
     (check-not-false (symb:zero-mod-pi? ':-pi))
-    
+
     (check-not-false (   n:pi/2-mod-2pi? (- (* 17 n:pi/2) δ)))
     (check-false     (   n:pi/2-mod-2pi? (- (* 15 n:pi/2) δ)))
     (check-not-false (symb:pi/2-mod-2pi? ':+pi/2))
-    
+
     (check-not-false (   n:-pi/2-mod-2pi? (- (* 13 n:-pi/2) δ)))
     (check-false     (   n:-pi/2-mod-2pi? (- (* 11 n:-pi/2) δ)))
     (check-not-false (symb:-pi/2-mod-2pi? ':-pi/2))
-    
+
     (check-not-false (   n:pi/2-mod-pi? (- (* 13 n:pi/2) δ)))
     (check-false     (   n:pi/2-mod-pi? (- (* 12 n:pi/2) δ)))
     (check-not-false (symb:pi/2-mod-pi? ':-pi/2))
-    
+
     (check-not-false (   n:zero-mod-2pi? (- (* 6 n:pi) δ)))
     (check-false     (   n:zero-mod-2pi? (- (* 5 n:pi) δ)))
     (check-not-false (symb:zero-mod-2pi? ':2pi))
@@ -461,11 +461,11 @@
     (check-not-false (   n:pi-mod-2pi? (- (* 5 n:pi) δ)))
     (check-false     (   n:pi-mod-2pi? (- (* 6 n:pi) δ)))
     (check-not-false (symb:pi-mod-2pi? ':-pi))
-    
+
     (check-not-false (   n:pi/4-mod-pi? (- (* 13 n:pi/4) δ)))
     (check-false     (   n:pi/4-mod-pi? (- (* 12 n:pi/4) δ)))
     (check-not-false (symb:pi/4-mod-pi? ':pi/4))
-    
+
     (check-not-false (   n:-pi/4-mod-pi? (- (* 13 n:-pi/4) δ)))
     (check-false     (   n:-pi/4-mod-pi? (- (* 11 n:-pi/4) δ)))
     (check-not-false (symb:-pi/4-mod-pi? ':-pi/4)))
@@ -484,7 +484,7 @@
     (check-equal? (symb:sin ':-pi/2) -1)
     (check-equal? (symb:sin 'a) '(sin a))
     (check-equal? (symb:sin '(* 2 :pi)) '(sin (* 2 :pi)))
-    
+
     (check-true (csc? '(csc a)))
     (check-equal? (symb:csc 3.) (csc 3.))
     (check-exn #px"Zero argument -- CSC" (λ () (symb:csc 0)))
@@ -492,7 +492,7 @@
     (check-equal? (symb:csc 'a) '(/ 1 (sin a)))
     ;; !!!
     ;(check-equal? (symb:csc ':pi) '(/ 1 0))
-    
+
     (check-true (asin? '(asin a)))
     (check-equal? (symb:asin 3.) (asin 3.))
     (check-equal? (symb:asin 0) 0)
@@ -501,13 +501,13 @@
     ;(check-equal? (symb:asin 1) ':pi/2)
     ;(check-equal? (symb:asin -1) ':-pi/2)
     (check-equal? (symb:asin 'a) '(asin a))
-    
+
     (check-true (sinh? '(sinh a)))
     (check-equal? (symb:sinh 3.) (sinh 3.))
     (check-equal? (symb:sinh 0) (sinh 0))
     (check-equal? (symb:sinh 3) '(sinh 3))
     (check-equal? (symb:sinh 'a) '(sinh a)))
-   
+
    (test-case
     "cos-like"
     (check-true (cos? '(cos a)))
@@ -522,7 +522,7 @@
     (check-equal? (symb:cos ':2pi) 1)
     (check-equal? (symb:cos 'a) '(cos a))
     (check-equal? (symb:cos '(* 2 :pi)) '(cos (* 2 :pi)))
-    
+
     (check-true (sec? '(sec a)))
     (check-equal? (symb:sec 3.) (sec 3.))
     (check-equal? (symb:sec 0) 1)
@@ -532,7 +532,7 @@
     (check-equal? (symb:sec 'a) '(/ 1 (cos a)))
     ;; !!!
     ;(check-equal? (symb:sec ':pi/2) '(/ 1 0))
-    
+
     (check-true (acos? '(acos a)))
     (check-equal? (symb:acos 3.) (acos 3.))
     (check-equal? (symb:acos 1) 0)
@@ -541,7 +541,7 @@
     ;(check-equal? (symb:acos 0) ':pi/2)
     ;(check-equal? (symb:acos -1) ':pi)
     (check-equal? (symb:acos 'a) '(acos a))
-    
+
     (check-true (cosh? '(cosh a)))
     (check-equal? (symb:cosh 3.) (cosh 3.))
     (check-equal? (symb:cosh 0) (cosh 0))
@@ -564,7 +564,7 @@
     (check-equal? (symb:tan ':-pi/4) -1)
     (check-equal? (symb:tan 'a) '(tan a))
     (check-equal? (symb:tan '(+ :pi/4 :pi)) '(tan (+ :pi/4 :pi)))
-    
+
     (check-true (atan? '(atan a)))
     (check-equal? (symb:atan 3.) (atan 3.))
     (check-equal? (symb:atan 0) 0)
@@ -573,7 +573,7 @@
     ;(check-equal? (symb:atan -1) ':-pi/4)
     (check-equal? (symb:atan 3) '(atan 3))
     (check-equal? (symb:atan 'a) '(atan a))
-    
+
     (check-equal? (symb:atan 0 1) 0)
     (check-equal? (symb:atan 0 -2) ':pi)
     (begin
@@ -632,7 +632,7 @@
     ;; trying to select into something that is not a tuple => #f
     (check-false (symb:elementary-access? '(0) '(a)))
     (check-false (symb:elementary-access? '(0) '((+ a b c))))
-    
+
     (check-true (symb:elementary-access? '(0) '((up a))))
     (check-true (symb:elementary-access? '(0) '((down (+ a b c)))))
     (check-false (symb:elementary-access? '(0) '((up (down a b) c))))
@@ -649,7 +649,7 @@
     (check-true (symb:elementary-access? '(1 0) '(1 (up a))))
     (check-true (symb:elementary-access? '(1 0) '(1 (down (+ a b c))))))
 
-   
+
    ))
 
 (module+ test

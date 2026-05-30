@@ -16,7 +16,7 @@
     (let ()
       (define (transpose-defining-relation T g a)
         ;; T is a linear transformation T:V -> W
-        ;; the transpose of T, T^t:W* -> V* 
+        ;; the transpose of T, T^t:W* -> V*
         ;; Forall a in V, g in W*,  g:W -> R
         ;; (T^t(g))(a) = g(T(a)).
         (- (((f:transpose T) g) a) (g (T a))))
@@ -102,14 +102,14 @@
     (check-equal? ((f:+ F5 (up (λ (x y) x) (λ (x y) y))) 2 3) (up 4 6))
     (check-equal? ((f:+ 5 F2) 9) 8)
     (check-equal? ((f:+ (up (λ (x) x) (λ (x) 2)) F3) 9) (up 18 29))
-    
+
     (check-equal? ((f:+ rkt:+ rkt:+) 1 2 3) 12)
     (check-equal? (arity (f:+ rkt:+ rkt:+)) (arity rkt:+))
     (check-equal? ((f:+ F F) 1 2 3) 12)
     (check-equal? (arity (f:+ F F)) (arity F))
     (check-equal? ((f:+ G G) 1 2 3) 12)
     (check-equal? (arity (f:+ G G)) (arity G))
-    
+
     (check-equal? ((f:+ rkt:+ 4) 1 2 3) 10)
     (check-equal? (arity (f:+ rkt:+ 4)) (arity rkt:+))
     (check-equal? ((f:+ F 4) 1 2 3) 10)
@@ -329,11 +329,11 @@
     (check-equal? ((f:exp Fn) 3) (exp 3))
     (check-equal? (series:sum ((f:exp FM) 7) 2) (matrix-by-rows (list 129/2 72) (list 72 165/2)))
     (check-equal? ((f:exp Gn) 1 2) (exp 3))
-    
+
     )
 
 
-    
+
 #|
 ;(assign-operation 'conjugate         (f:unary g:conjugate)      function?)
 

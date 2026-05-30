@@ -11,7 +11,7 @@
 ;;; time evolution transformations
 
 (define ((shift-t delta-t) state)
-  (->H-state 
+  (->H-state
    (+ (time state) delta-t)
    (coordinate state)
    (momentum state)))

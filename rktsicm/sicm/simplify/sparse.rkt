@@ -36,7 +36,7 @@
 (define (sparse-univariate? p)
   (and (pair? p)
        (fix:= (length (sparse-exponents (car p)))
-	      1)))
+              1)))
 
 (define (sparse-constant? p)
   (and (fix:= (length p) 1)
@@ -66,36 +66,36 @@
 
 (define (sparse-identity-term arity-n varnum)
   (sparse-term (generate-list arity-n
-			      (lambda (i)
-				(if (fix:= i varnum) 1 0)))
-	       1))
+                              (lambda (i)
+                                (if (fix:= i varnum) 1 0)))
+               1))
 
 (define (sparse-linear arity-n varnum root)
   (if (zero? root)
       (list (sparse-identity-term arity-n varnum))
       (list (sparse-identity-term arity-n varnum)
-	    (sparse-constant-term arity-n (- root)))))
+            (sparse-constant-term arity-n (- root)))))
 
 
 (define (sparse-term-> t1 t2)
   (sparse:>exponents? (sparse-exponents t1)
-		      (sparse-exponents t2)))
+                      (sparse-exponents t2)))
 
 
 ;;; Graded Lexicographical Order
 
 (define (sparse:>exponents? fs1 fs2)
   (let ((o1 (reduce fix:+ 0 fs1))
-	(o2 (reduce fix:+ 0 fs2)))
+        (o2 (reduce fix:+ 0 fs2)))
     (cond ((fix:> o1 o2) #t)
-	  ((fix:< o1 o2) #f)
-	  (else
-	   (let lp ((l1 fs1) (l2 fs2))
-	     (cond ((null? l1) #f)
-		   ((null? l2) #t)
-		   ((fix:> (car l1) (car l2)) #t)
-		   ((fix:< (car l1) (car l2)) #f)
-		   (else (lp (cdr l1) (cdr l2)))))))))
+          ((fix:< o1 o2) #f)
+          (else
+           (let lp ((l1 fs1) (l2 fs2))
+             (cond ((null? l1) #f)
+                   ((null? l2) #t)
+                   ((fix:> (car l1) (car l2)) #t)
+                   ((fix:< (car l1) (car l2)) #f)
+                   (else (lp (cdr l1) (cdr l2)))))))))
 
 #|
 ;;; Lexicographical Order
@@ -103,31 +103,31 @@
 (define (sparse:>exponents? fs1 fs2)
   (let lp ((l1 fs1) (l2 fs2))
     (cond ((null? l1) #f)
-	  ((null? l2) #t)
-	  ((fix:> (car l1) (car l2)) #t)
-	  ((fix:< (car l1) (car l2)) #f)
-	  (else (lp (cdr l1) (cdr l2))))))
+          ((null? l2) #t)
+          ((fix:> (car l1) (car l2)) #t)
+          ((fix:< (car l1) (car l2)) #f)
+          (else (lp (cdr l1) (cdr l2))))))
 |#
 
 (define (sparse-normalize poly term)
   (if (or (and (number? term) (= term 1))
-	  (sparse-one-term? term))
+          (sparse-one-term? term))
       poly
       (map (lambda (pterm)
-	     (sparse-term
-	      (map - (sparse-exponents pterm) (sparse-exponents term))
-	      (/ (sparse-coefficient pterm) (sparse-coefficient term))))
-	   poly)))
+             (sparse-term
+              (map - (sparse-exponents pterm) (sparse-exponents term))
+              (/ (sparse-coefficient pterm) (sparse-coefficient term))))
+           poly)))
 
 (define (sparse-scale poly term)
   (if (or (and (number? term) (= term 1))
-	  (sparse-one-term? term))
+          (sparse-one-term? term))
       poly
       (map (lambda (pterm)
-	     (sparse-term
-	      (map + (sparse-exponents pterm) (sparse-exponents term))
-	      (* (sparse-coefficient pterm) (sparse-coefficient term))))
-	   poly)))
+             (sparse-term
+              (map + (sparse-exponents pterm) (sparse-exponents term))
+              (* (sparse-coefficient pterm) (sparse-coefficient term))))
+           poly)))
 
 (define (sparse-negate-term t)
   (sparse-term (sparse-exponents t) (- (sparse-coefficient t))))
@@ -135,71 +135,71 @@
 (define (sparse-add xlist ylist)
   (let tloop ((xlist xlist) (ylist ylist))
     (cond ((null? xlist) ylist)
-	  ((null? ylist) xlist)
-	  (else
-	   (let ((e1 (sparse-exponents (car xlist)))
-		 (e2 (sparse-exponents (car ylist))))
-	     (cond ((simple:equal? e1 e2)
-		    (let ((ncoeff (+ (sparse-coefficient (car xlist))
-				     (sparse-coefficient (car ylist)))))
-		      (if (= ncoeff 0)
-			  (tloop (cdr xlist) (cdr ylist))
-			  (cons (sparse-term e1 ncoeff)
-				(tloop (cdr xlist) (cdr ylist))))))
-		   ((sparse:>exponents? e1 e2)
-		    (cons (car xlist) (tloop (cdr xlist) ylist)))
-		   (else
-		    (cons (car ylist) (tloop xlist (cdr ylist))))))))))
+          ((null? ylist) xlist)
+          (else
+           (let ((e1 (sparse-exponents (car xlist)))
+                 (e2 (sparse-exponents (car ylist))))
+             (cond ((simple:equal? e1 e2)
+                    (let ((ncoeff (+ (sparse-coefficient (car xlist))
+                                     (sparse-coefficient (car ylist)))))
+                      (if (= ncoeff 0)
+                          (tloop (cdr xlist) (cdr ylist))
+                          (cons (sparse-term e1 ncoeff)
+                                (tloop (cdr xlist) (cdr ylist))))))
+                   ((sparse:>exponents? e1 e2)
+                    (cons (car xlist) (tloop (cdr xlist) ylist)))
+                   (else
+                    (cons (car ylist) (tloop xlist (cdr ylist))))))))))
 
 (define (sparse-multiply xlist ylist)
   (let lp ((xlist xlist))
     (if (null? xlist)
-	'()
-	(sparse-add (sparse-multiply-term (car xlist) ylist)
-		    (lp (cdr xlist))))))
+        '()
+        (sparse-add (sparse-multiply-term (car xlist) ylist)
+                    (lp (cdr xlist))))))
 
 (define (sparse-multiply-term t x)
   (let ((exponents (sparse-exponents t))
-	(coeff (sparse-coefficient t)))
+        (coeff (sparse-coefficient t)))
     (map (lambda (term)
-	   (sparse-term (map + exponents (sparse-exponents term))
-			(* coeff (sparse-coefficient term))))
-	 x)))
+           (sparse-term (map + exponents (sparse-exponents term))
+                        (* coeff (sparse-coefficient term))))
+         x)))
 
 (define (sparse-abs p)
   (if (null? p)
       '()
       (if (let ((c (sparse-coefficient (car p))))
-	    (and (real? c) (< c 0)))
-	  (map (lambda (term)
-		 (sparse-term (sparse-exponents term)
-			      (- (sparse-coefficient term))))
-	       p)
-	  p)))
+            (and (real? c) (< c 0)))
+          (map (lambda (term)
+                 (sparse-term (sparse-exponents term)
+                              (- (sparse-coefficient term))))
+               p)
+          p)))
 
 (define (sparse-divide numerator-terms denominator-terms cont)
   (let ((dexps (sparse-exponents (car denominator-terms)))
-	(dcoef (sparse-coefficient (car denominator-terms))))
+        (dcoef (sparse-coefficient (car denominator-terms))))
     (define (dloop nterms cont)
       (if (null? nterms)
-	  (cont '() '())
-	  (let ((nexps (sparse-exponents (car nterms)))
-		(ncoef (sparse-coefficient (car nterms))))
-	    (cond ((&and (map >= nexps dexps)) ;monomial-divisible?
-		   (let ((qt (sparse-term (map - nexps dexps)
-					  (/ ncoef dcoef))))
-		     (dloop
-		      (sparse-add (cdr nterms)
-		        (sparse-multiply-term (sparse-negate-term qt)
-			  (cdr denominator-terms)))
-		      (lambda (q r)
-			(cont (sparse-add (list qt) q) r)))))
-		  (else
-		   (dloop (cdr nterms)
-			  (lambda (q r)
-			    (cont q
-				  (sparse-add (list (car nterms))
-						    r)))))))))
+          (cont '() '())
+          (let ((nexps (sparse-exponents (car nterms)))
+                (ncoef (sparse-coefficient (car nterms))))
+            (cond ((&and (map >= nexps dexps)) ;monomial-divisible?
+                   (let ((qt (sparse-term (map - nexps dexps)
+                                          (/ ncoef dcoef))))
+                     (dloop
+                      (sparse-add (cdr nterms)
+                                  (sparse-multiply-term (sparse-negate-term qt)
+                                                        (cdr denominator-terms)))
+                      (lambda (q r)
+                        (cont (sparse-add (list qt) q) r)))))
+                  (else
+                   (dloop (cdr nterms)
+                          (lambda (q r)
+                            (cont q
+                                  (sparse-add (list (car nterms))
+                                              r)))))))))
     (dloop numerator-terms cont)))
 
 
@@ -221,26 +221,26 @@
 (define (sparse-divisible? n d)
   (if *heuristic-sparse-divisible-enabled*
       (let ((m (length (sparse-exponents (car n)))))
-	(let ((na (sparse-evaluate n (generate-list m interpolate-random)))
-	      (da (sparse-evaluate d (generate-list m interpolate-random))))
-	  (if (and (integer? na) (integer? da) (zero? (remainder na da)))
-	      (let ((val (null? (sparse-divide n d (lambda (q r) r)))))
-		(set! *heuristic-sparse-divisible-lose*
-		      (+ *heuristic-sparse-divisible-lose* 1))
-		(if (not val)
-		    (set! *heuristic-sparse-divisible-bad-decision*
-			  (+ *heuristic-sparse-divisible-bad-decision* 1)))
-		val)
-	      (begin
-		(set! *heuristic-sparse-divisible-win*
-		      (+ *heuristic-sparse-divisible-win* 1))
-		(if *heuristic-sparse-divisible-testing*
-		    (let ((val (null? (sparse-divide n d (lambda (q r) r)))))
-		      (if val
-			  (begin (bkpt "Wrong answer! sparse-divisible")
-				 val)
-			  val))
-		    #f)))))
+        (let ((na (sparse-evaluate n (generate-list m interpolate-random)))
+              (da (sparse-evaluate d (generate-list m interpolate-random))))
+          (if (and (integer? na) (integer? da) (zero? (remainder na da)))
+              (let ((val (null? (sparse-divide n d (lambda (q r) r)))))
+                (set! *heuristic-sparse-divisible-lose*
+                      (+ *heuristic-sparse-divisible-lose* 1))
+                (if (not val)
+                    (set! *heuristic-sparse-divisible-bad-decision*
+                          (+ *heuristic-sparse-divisible-bad-decision* 1)))
+                val)
+              (begin
+                (set! *heuristic-sparse-divisible-win*
+                      (+ *heuristic-sparse-divisible-win* 1))
+                (if *heuristic-sparse-divisible-testing*
+                    (let ((val (null? (sparse-divide n d (lambda (q r) r)))))
+                      (if val
+                          (begin (bkpt "Wrong answer! sparse-divisible")
+                                 val)
+                          val))
+                    #f)))))
       (null? (sparse-divide n d (lambda (q r) r)))))
 |#
 
@@ -250,20 +250,20 @@
 #|
 (define (divide-test q d r)
   (let ((pq (fpf:expression-> q (lambda (p v) p)))
-	(pd (fpf:expression-> d (lambda (p v) p)))
-	(pr (fpf:expression-> r (lambda (p v) p))))
+        (pd (fpf:expression-> d (lambda (p v) p)))
+        (pr (fpf:expression-> r (lambda (p v) p))))
     (let ((pn (fpf:+ (fpf:* pq pd) pr))
-	  (sq (fpf:->sparse pq))
-	  (sr (fpf:->sparse pr)))
+          (sq (fpf:->sparse pq))
+          (sr (fpf:->sparse pr)))
       (let ((sn (fpf:->sparse pn))
-	    (sd (fpf:->sparse pd)))
-	;; n = q*d + r
-	(sparse-divide sn sd
-		       (lambda (q r)
-			 (pp `((sn ,sn) = (q ,q) * (d ,sd) + (r ,r)))
-			 (if (and (simple:equal? q sq) (simple:equal? r sr))
-			     (pp #t)
-			     (pp `((sq ,sq) (sr ,sr))))))))))
+            (sd (fpf:->sparse pd)))
+        ;; n = q*d + r
+        (sparse-divide sn sd
+                       (lambda (q r)
+                         (pp `((sn ,sn) = (q ,q) * (d ,sd) + (r ,r)))
+                         (if (and (simple:equal? q sq) (simple:equal? r sr))
+                             (pp #t)
+                             (pp `((sq ,sq) (sr ,sr))))))))))
 |#
 
 ;;; Evaluation of polynomials at argument lists.
@@ -272,16 +272,16 @@
   (if (null? p)
       0
       (begin
-	(assert (fix:= (length x)
-		       (length (sparse-exponents (car p)))))
-	(apply g:+
-	       (map (lambda (term)
-		      (g:* (sparse-coefficient term)
-			 (apply g:*
-				(map g:expt
-				     x
-				     (sparse-exponents term)))))
-		    p)))))
+        (assert (fix:= (length x)
+                       (length (sparse-exponents (car p)))))
+        (apply g:+
+               (map (lambda (term)
+                      (g:* (sparse-coefficient term)
+                           (apply g:*
+                                  (map g:expt
+                                       x
+                                       (sparse-exponents term)))))
+                    p)))))
 
 
 ;;; If x is smaller than the arity of p then the last vars are filled
@@ -291,18 +291,18 @@
   (if (or (null? x) (null? p))
       p
       (let* ((n (length x))
-	     (arity (length (sparse-exponents (car p))))
-	     (narity (- arity n)))
-	(sparse-combine-like-terms
-	 (map (lambda (term)
-		(sparse-term (list-head (sparse-exponents term) narity)
-			     (g:* (sparse-coefficient term)
-				(apply g:*
-				       (map g:expt
-					    x
-					    (list-tail (sparse-exponents term)
-						       narity))))))
-	      p)))))
+             (arity (length (sparse-exponents (car p))))
+             (narity (- arity n)))
+        (sparse-combine-like-terms
+         (map (lambda (term)
+                (sparse-term (list-head (sparse-exponents term) narity)
+                             (g:* (sparse-coefficient term)
+                                  (apply g:*
+                                         (map g:expt
+                                              x
+                                              (list-tail (sparse-exponents term)
+                                                         narity))))))
+              p)))))
 
 #|
 (print-expression
@@ -316,16 +316,16 @@
   (if (or (null? x) (null? p))
       p
       (let ((n (length x)))
-	(sparse-combine-like-terms
-	 (map (lambda (term)
-		(sparse-term (list-tail (sparse-exponents term) n)
-		  (g:* (sparse-coefficient term)
-		     (apply g:*
-			    (map g:expt
-				 x
-				 (list-head (sparse-exponents term)
-					    n))))))
-	      p)))))
+        (sparse-combine-like-terms
+         (map (lambda (term)
+                (sparse-term (list-tail (sparse-exponents term) n)
+                             (g:* (sparse-coefficient term)
+                                  (apply g:*
+                                         (map g:expt
+                                              x
+                                              (list-head (sparse-exponents term)
+                                                         n))))))
+              p)))))
 
 #|
 (print-expression
@@ -340,21 +340,21 @@
 
 (define (sparse-merge-adjacent-terms terms)
   (cond ((null? terms)
-	 '())
-	((null? (cdr terms))
-	 (if (g:= (sparse-coefficient (car terms)) 0)
-	     '()
-	     terms))
+         '())
+        ((null? (cdr terms))
+         (if (g:= (sparse-coefficient (car terms)) 0)
+             '()
+             terms))
         ((simple:equal? (sparse-exponents (car terms))
                         (sparse-exponents (cadr terms)))
-	 (let ((coeff (g:+ (sparse-coefficient (car terms))
+         (let ((coeff (g:+ (sparse-coefficient (car terms))
                            (sparse-coefficient (cadr terms)))))
-	   (if (g:= coeff 0)
-	       (sparse-merge-adjacent-terms (cddr terms))
-	       (sparse-merge-adjacent-terms
-		(cons (sparse-term (sparse-exponents (car terms))
-				   coeff)
-		      (cddr terms))))))
-	(else
-	 (cons (car terms)
-	       (sparse-merge-adjacent-terms (cdr terms))))))
+           (if (g:= coeff 0)
+               (sparse-merge-adjacent-terms (cddr terms))
+               (sparse-merge-adjacent-terms
+                (cons (sparse-term (sparse-exponents (car terms))
+                                   coeff)
+                      (cddr terms))))))
+        (else
+         (cons (car terms)
+               (sparse-merge-adjacent-terms (cdr terms))))))

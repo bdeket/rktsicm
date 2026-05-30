@@ -30,11 +30,11 @@
       ;; Note: the derivative must be scaled initially
       (let ((s (- b a)))
         (let ((p (poly:+ (poly:+ (poly:scale h0 fa)
-				 (poly:scale h1 fb))
-			 (poly:+ (poly:scale h2 (* s fpa))
-				 (poly:scale h3 (* s fpb))))))
+                                 (poly:scale h1 fb))
+                         (poly:+ (poly:scale h2 (* s fpa))
+                                 (poly:scale h3 (* s fpb))))))
           (poly:arg-shift (poly:arg-scale p (list (/ 1 s)))
-			  (list (- a))))))
+                          (list (- a))))))
     cubic-interpolant))
 
 
@@ -43,26 +43,26 @@
 
 (define make-quintic-interpolant
   (let ((m
-	 (m:invert (matrix-by-rows '(1  0  0  0  0  0)
-				   '(0  1  0  0  0  0)
-				   '(0  0  2  0  0  0)
-				   '(1  1  1  1  1  1)
-				   '(0  1  2  3  4  5)
-				   '(0  0  2  6 12 20)))))
+         (m:invert (matrix-by-rows '(1  0  0  0  0  0)
+                                   '(0  1  0  0  0  0)
+                                   '(0  0  2  0  0  0)
+                                   '(1  1  1  1  1  1)
+                                   '(0  1  2  3  4  5)
+                                   '(0  0  2  6 12 20)))))
     (define (quintic-interpolant a fa fpa fppa b fb fpb fppb)
       (let* ((s (- b a))
              (v (vector fa (* fpa s) (* fppa s s)
                         fb (* fpb s) (* fppb s s)))
              (p (poly:dense-> (vector->list (matrix*vector m v)))))
         (poly:arg-shift (poly:arg-scale p (list (/ 1 s)))
-			(list (- a)))))
+                        (list (- a)))))
     quintic-interpolant))
 
 
 ;;; Given an order of contact n, return a procedure that generates
-;;; an Hermite interpolating polynomial of degree 2n+1, which matches 
-;;; function value along with first n derivatives at two selected 
-;;; points. The returned procedure expects two arguments, each a list 
+;;; an Hermite interpolating polynomial of degree 2n+1, which matches
+;;; function value along with first n derivatives at two selected
+;;; points. The returned procedure expects two arguments, each a list
 ;;; of length n+2:
 ;;;    (a f(a) f'(a) f"(a) ... ),   (b f(b) f'(b) f"(b) ... )
 
@@ -74,7 +74,7 @@
                 (if (fix:= i n)
                     prod
                     (loop (fix:+ i 1)
-			  (fix:* prod (fix:+ k i)))))))
+                          (fix:* prod (fix:+ k i)))))))
          (term (lambda (i j)
                  (if (fix:< i m)
                      (if (fix:= j i) (! i 1) 0)
@@ -85,19 +85,19 @@
          (mat (m:invert (m:generate 2m 2m term))))
     (define (hermite-interpolator avals bvals)
       (let* ((a (car avals)) (b (car bvals))
-             (s (- b a))
-             (*s (lambda (x) (* s x)))
-             (scale (letrec 
-                      ((scale 
-                         (lambda (L)
-			   (if (null? L)
-			       '()
-			       (cons (car L)
-				     (scale (map *s (cdr L))))))))
-                      scale))
-             (v (list->vector (append (scale (cdr avals)) (scale (cdr bvals)))))
-             (p (poly:dense-> (vector->list (matrix*vector mat v)))))
+                             (s (- b a))
+                             (*s (lambda (x) (* s x)))
+                             (scale (letrec
+                                        ((scale
+                                          (lambda (L)
+                                            (if (null? L)
+                                                '()
+                                                (cons (car L)
+                                                      (scale (map *s (cdr L))))))))
+                                      scale))
+                             (v (list->vector (append (scale (cdr avals)) (scale (cdr bvals)))))
+                             (p (poly:dense-> (vector->list (matrix*vector mat v)))))
         (poly:arg-shift (poly:arg-scale p (list (/ 1 s)))
-			(list (- a)))))
+                        (list (- a)))))
     hermite-interpolator))
 

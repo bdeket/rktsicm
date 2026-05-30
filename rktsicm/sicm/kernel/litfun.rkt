@@ -55,24 +55,24 @@
 
 (define H
   (literal-function 'H
-		    (-> (UP Real (UP* Real 2) (DOWN* Real 2)) Real)))
+                    (-> (UP Real (UP* Real 2) (DOWN* Real 2)) Real)))
 
-(show-expression 
+(show-expression
  (((Hamilton-equations H)
    (coordinate-tuple (literal-function 'x)
-		     (literal-function 'y))
+                     (literal-function 'y))
    (momentum-tuple (literal-function 'p_x)
-		   (literal-function 'p_y)))
+                   (literal-function 'p_y)))
   't))
 (up
  0
  (up
   (+ ((D x) t)
      (* -1
-	(((partial 2 0) H) (up t (up (x t) (y t)) (down (p_x t) (p_y t))))))
+        (((partial 2 0) H) (up t (up (x t) (y t)) (down (p_x t) (p_y t))))))
   (+ ((D y) t)
      (* -1
-	(((partial 2 1) H) (up t (up (x t) (y t)) (down (p_x t) (p_y t)))))))
+        (((partial 2 1) H) (up t (up (x t) (y t)) (down (p_x t) (p_y t)))))))
  (down
   (+ ((D p_x) t)
      (((partial 1 0) H) (up t (up (x t) (y t)) (down (p_x t) (p_y t)))))
@@ -95,41 +95,41 @@
 
 (define (X . types)
   (cond ((null? types) (error "Null type argument -- X"))
-	((null? (cdr types)) (car types))
-	(else (cons 'X types))))
+        ((null? (cdr types)) (car types))
+        (else (cons 'X types))))
 
 (define (UP . types)
   (cond ((null? types) (error "Null type argument -- UP"))
-	((null? (cdr types)) (car types))
-	(else (cons 'UP types))))
+        ((null? (cdr types)) (car types))
+        (else (cons 'UP types))))
 
 (define (DOWN . types)
   (cond ((null? types) (error "Null type argument -- DOWN"))
-	((null? (cdr types)) (car types))
-	(else (cons 'DOWN types))))
+        ((null? (cdr types)) (car types))
+        (else (cons 'DOWN types))))
 
-(define (^ type n)			;n = dimension
+(define (^ type n)                        ;n = dimension
   (apply X (make-list n type)))
 
 
 (define (starify rest starred unstarred-proc)
   (cond ((null? rest) (error "Null type argument" starred))
-	(else
-	 (let lp ((args rest) (curtype #f) (explicit #f) (types '()))
-	   (cond ((null? args)
-		  (if explicit (apply unstarred-proc types) (cons starred types)))
-		 ((number? (car args))
-		  (if (and (exact-positive-integer? (car args)) curtype)
-		      (lp (cdr args)
-			  #f
-			  #t
-			  (append types (make-list (fix:- (car args) 1) curtype)))
-		      (error "Bad type arguments" starred rest)))
-		 (else
-		  (lp (cdr args)
-		      (car args)
-		      #f
-		      (append types (list (car args))))))))))
+        (else
+         (let lp ((args rest) (curtype #f) (explicit #f) (types '()))
+           (cond ((null? args)
+                  (if explicit (apply unstarred-proc types) (cons starred types)))
+                 ((number? (car args))
+                  (if (and (exact-positive-integer? (car args)) curtype)
+                      (lp (cdr args)
+                          #f
+                          #t
+                          (append types (make-list (fix:- (car args) 1) curtype)))
+                      (error "Bad type arguments" starred rest)))
+                 (else
+                  (lp (cdr args)
+                      (car args)
+                      #f
+                      (append types (list (car args))))))))))
 
 
 (define (X* . rest)
@@ -159,12 +159,12 @@
 
 ;;; Some useful types
 
-(define (Lagrangian #:optional n)	;n = #degrees-of-freedom
+(define (Lagrangian #:optional n)        ;n = #degrees-of-freedom
   (if (default-object? n)
       (-> (UP Real (UP* Real) (UP* Real)) Real)
       (-> (UP Real (UP* Real n) (UP* Real n)) Real)))
 
-(define (Hamiltonian #:optional n)	;n = #degrees-of-freedom
+(define (Hamiltonian #:optional n)        ;n = #degrees-of-freedom
   (if (default-object? n)
       (-> (UP Real (UP* Real) (DOWN* Real)) Real)
       (-> (UP Real (UP* Real n) (DOWN* Real n)) Real)))
@@ -229,9 +229,9 @@
   (assert (eq? (car type) '->))
   (let ((domain (type->domain type)))
     (cond ((and (pair? domain) (eq? (car domain) 'X))
-	   (cdr domain))
-	  (else
-	   (list domain)))))
+           (cdr domain))
+          (else
+           (list domain)))))
 
 (define (type->arity type)
   (assert (eq? (car type) '->))
@@ -251,100 +251,100 @@
 
 (define (type-expression->predicate type-expression)
   (cond ((pair? type-expression)
-	 (case (car type-expression)
-	   ((X)
-	    (let ((type-predicates
-		   (map type-expression->predicate
-			(cdr type-expression))))
-	      (lambda (datum)
-		(and (vector? datum)
-		     (all-satisfied type-predicates datum)))))
-	   ((UP)
-	    (let ((type-predicates
-		   (map type-expression->predicate
-			(cdr type-expression))))
-	      (lambda (datum)
-		(and (up? datum)
-		     (all-satisfied type-predicates datum)))))
-	   ((DOWN)
-	    (let ((type-predicates
-		   (map type-expression->predicate
-			(cdr type-expression))))
-	      (lambda (datum)
-		(and (down? datum)
-		     (all-satisfied type-predicates datum)))))
-	   ((X*)
-	    (let ((type-predicates
-		   (map type-expression->predicate
-			(cdr type-expression))))
-	      (lambda (datum)
-		(cond ((vector? datum)
-		       (let ((n (vector-length datum)))
-			 (let lp ((i 0) (preds type-predicates))
-			   (cond ((fix:= i n) #t)
-				 (((car preds) (vector-ref datum i))
-				  (lp (fix:+ i 1)
-				      (if (null? (cdr preds))
-					  preds
-					  (cdr preds))))
-				 (else #f)))))
-		      ((null? (cdr type-predicates))
-		       ((car type-predicates) datum))
-		      (else #f)))))
-	   ((UP* DOWN*)
-	    (let ((type-predicates
-		   (map type-expression->predicate
-			(cdr type-expression)))
-		  (test?
-		   (if (eq? (car type-expression) 'UP*) up? down?)))
-	      (lambda (datum)
-		(cond ((test? datum)
-		       (let ((n (s:length datum)))
-			 (let lp ((i 0) (preds type-predicates))
-			   (cond ((fix:= i n) #t)
-				 (((car preds) (s:ref datum i))
-				  (lp (fix:+ i 1)
-				      (if (null? (cdr preds))
-					  preds
-					  (cdr preds))))
-				 (else #f)))))
-		      ((and (not (structure? datum))
-			    (null? (cdr type-predicates)))
-		       ((car type-predicates) datum))
-		      (else #f)))))
-	   ((->) function?)
-	   (else (error "Unknown type combinator" type-expression))))
-	((eq? type-expression Real) numerical-quantity?)
+         (case (car type-expression)
+           ((X)
+            (let ((type-predicates
+                   (map type-expression->predicate
+                        (cdr type-expression))))
+              (lambda (datum)
+                (and (vector? datum)
+                     (all-satisfied type-predicates datum)))))
+           ((UP)
+            (let ((type-predicates
+                   (map type-expression->predicate
+                        (cdr type-expression))))
+              (lambda (datum)
+                (and (up? datum)
+                     (all-satisfied type-predicates datum)))))
+           ((DOWN)
+            (let ((type-predicates
+                   (map type-expression->predicate
+                        (cdr type-expression))))
+              (lambda (datum)
+                (and (down? datum)
+                     (all-satisfied type-predicates datum)))))
+           ((X*)
+            (let ((type-predicates
+                   (map type-expression->predicate
+                        (cdr type-expression))))
+              (lambda (datum)
+                (cond ((vector? datum)
+                       (let ((n (vector-length datum)))
+                         (let lp ((i 0) (preds type-predicates))
+                           (cond ((fix:= i n) #t)
+                                 (((car preds) (vector-ref datum i))
+                                  (lp (fix:+ i 1)
+                                      (if (null? (cdr preds))
+                                          preds
+                                          (cdr preds))))
+                                 (else #f)))))
+                      ((null? (cdr type-predicates))
+                       ((car type-predicates) datum))
+                      (else #f)))))
+           ((UP* DOWN*)
+            (let ((type-predicates
+                   (map type-expression->predicate
+                        (cdr type-expression)))
+                  (test?
+                   (if (eq? (car type-expression) 'UP*) up? down?)))
+              (lambda (datum)
+                (cond ((test? datum)
+                       (let ((n (s:length datum)))
+                         (let lp ((i 0) (preds type-predicates))
+                           (cond ((fix:= i n) #t)
+                                 (((car preds) (s:ref datum i))
+                                  (lp (fix:+ i 1)
+                                      (if (null? (cdr preds))
+                                          preds
+                                          (cdr preds))))
+                                 (else #f)))))
+                      ((and (not (structure? datum))
+                            (null? (cdr type-predicates)))
+                       ((car type-predicates) datum))
+                      (else #f)))))
+           ((->) function?)
+           (else (error "Unknown type combinator" type-expression))))
+        ((eq? type-expression Real) numerical-quantity?)
         ((eq? type-expression Complex) numerical-quantity?)
-	((eq? type-expression Any) any?)
-	(else (error "Unknown primitive type" type-expression))))
+        ((eq? type-expression Any) any?)
+        (else (error "Unknown primitive type" type-expression))))
 
 (define (all-satisfied type-preds structure)
   (let ((n (length type-preds)))
     (and (fix:= n (s:length structure))
-	 (let lp ((types type-preds) (i 0))
-	   (cond ((fix:= i n) #t)
-		 (((car types) (s:ref structure i))
-		  (lp (cdr types) (fix:+ i 1)))
-		 (else #f))))))
+         (let lp ((types type-preds) (i 0))
+           (cond ((fix:= i n) #t)
+                 (((car types) (s:ref structure i))
+                  (lp (cdr types) (fix:+ i 1)))
+                 (else #f))))))
 
 (define (type-expression->type-tag type-expression)
   (let ((type
-	 (cond ((pair? type-expression)
-		(case (car type-expression)
-		  ((X) *vector*)
-		  ((UP) *up*)
-		  ((DOWN) *down*)
-		  ((X*) *vector*)
-		  ((UP*) *up*)
-		  ((DOWN*) *down*)
-		  ((->) *function*)
-		  (else
-		   (error "Unknown type combinator" type-expression))))
-	       ((eq? type-expression Real) *number*)
+         (cond ((pair? type-expression)
+                (case (car type-expression)
+                  ((X) *vector*)
+                  ((UP) *up*)
+                  ((DOWN) *down*)
+                  ((X*) *vector*)
+                  ((UP*) *up*)
+                  ((DOWN*) *down*)
+                  ((->) *function*)
+                  (else
+                   (error "Unknown type combinator" type-expression))))
+               ((eq? type-expression Real) *number*)
                ((eq? type-expression Complex) *number*)
-	       (else
-		(error "Unknown primitive type" type-expression)))))
+               (else
+                (error "Unknown primitive type" type-expression)))))
     (abstract-type-tag type)))
 
 
@@ -379,9 +379,9 @@
 (define (typed-function function range-type domain-types)
   (let ((arity (g:arity function)))
     (assert (exactly-n? arity)
-	    "I cannot handle this arity -- TYPED-FUNCTION")
+            "I cannot handle this arity -- TYPED-FUNCTION")
     (assert (fix:= (length domain-types) (arity-min arity))
-	    "Inconsistent arity -- TYPED-FUNCTION")
+            "Inconsistent arity -- TYPED-FUNCTION")
     (make-apply-hook function
                      (list '*function* domain-types range-type #f))
     #;
@@ -399,34 +399,34 @@
   (if (default-object? descriptor)
       (set! descriptor (default-function-type 1)))
   (let ((arity (type->arity descriptor))
-	(range-type (type->range-type descriptor)))
+        (range-type (type->range-type descriptor)))
     (cond ((or (eq? Real range-type)
                (eq? Complex range-type)
-	       (eq? '*function* (type-expression->type-tag range-type)))
-	   (litfun fexp arity range-type (type->domain-types descriptor)
-		   `(literal-function ',fexp ,descriptor)))
-	  ((not (symbol? fexp))
-	   (error "Cannot handle this function expression: LITERAL-FUNCTION"
-		  fexp
-		  descriptor))
-	  ((eq? (car range-type) 'UP)
-	   (let ((n (length (cdr range-type))))
-	     (s:generate n 'up
-			 (lambda (i)
-			   (literal-function (symbol fexp '^ i)
-					     (-> (type->domain descriptor)
-						 (list-ref (cdr range-type) i)))))))
-	  ((eq? (car range-type) 'DOWN)
-	   (let ((n (length (cdr range-type))))
-	     (s:generate n 'down
-			 (lambda (i)
-			   (literal-function (symbol fexp '_ i)
-					     (-> (type->domain descriptor)
-						 (list-ref (cdr range-type) i)))))))
-	  (else
-	   (error "Cannot handle this range type: LITERAL-FUNCTION"
-		  fexp
-		  descriptor)))))
+               (eq? '*function* (type-expression->type-tag range-type)))
+           (litfun fexp arity range-type (type->domain-types descriptor)
+                   `(literal-function ',fexp ,descriptor)))
+          ((not (symbol? fexp))
+           (error "Cannot handle this function expression: LITERAL-FUNCTION"
+                  fexp
+                  descriptor))
+          ((eq? (car range-type) 'UP)
+           (let ((n (length (cdr range-type))))
+             (s:generate n 'up
+                         (lambda (i)
+                           (literal-function (symbol fexp '^ i)
+                                             (-> (type->domain descriptor)
+                                                 (list-ref (cdr range-type) i)))))))
+          ((eq? (car range-type) 'DOWN)
+           (let ((n (length (cdr range-type))))
+             (s:generate n 'down
+                         (lambda (i)
+                           (literal-function (symbol fexp '_ i)
+                                             (-> (type->domain descriptor)
+                                                 (list-ref (cdr range-type) i)))))))
+          (else
+           (error "Cannot handle this range type: LITERAL-FUNCTION"
+                  fexp
+                  descriptor)))))
 
 (define (litfun fexp arity range-type domain-types call)
   ;;(assert (exactly-n? arity)
@@ -452,21 +452,21 @@
   (if (rexists differential? args)
       (litderiv apply-hook args)
       (let ((fexp (f:expression apply-hook))
-	    (dtypes (f:domain-types apply-hook))
-	    (rtype (f:range-type apply-hook)))
-	(let ((dpreds (map type-expression->predicate dtypes))
-	      (range-tag (type-expression->type-tag rtype)))
-	  (assert (&and (map (lambda (p x) (p x)) dpreds args))
-		  "Wrong type argument -- LITERAL-FUNCTION"
-		  (cons fexp (map cons dpreds args)))
-	  (if (eq? range-tag '*function*)
-	      (let ((ans (literal-function `(,fexp ,@args) rtype)))
-		;; properties?
-		ans)	  
-	      (let ((ans (make-combination range-tag fexp args)))
-		(add-property! ans 'literal-function apply-hook)
-		(add-property! ans 'type-expression rtype)
-		ans))))))
+            (dtypes (f:domain-types apply-hook))
+            (rtype (f:range-type apply-hook)))
+        (let ((dpreds (map type-expression->predicate dtypes))
+              (range-tag (type-expression->type-tag rtype)))
+          (assert (&and (map (lambda (p x) (p x)) dpreds args))
+                  "Wrong type argument -- LITERAL-FUNCTION"
+                  (cons fexp (map cons dpreds args)))
+          (if (eq? range-tag '*function*)
+              (let ((ans (literal-function `(,fexp ,@args) rtype)))
+                ;; properties?
+                ans)
+              (let ((ans (make-combination range-tag fexp args)))
+                (add-property! ans 'literal-function apply-hook)
+                (add-property! ans 'type-expression rtype)
+                ans))))))
 
 ;;; Sam Ritchie's improvement: 15 August 2021
 (define (litderiv apply-hook args)
@@ -526,53 +526,53 @@
 ;;   (let ((v (list->up-structure args)))
 ;;     (let ((maxtag (apply max-order-tag (s:fringe v))))
 ;;       (let ((ev
-;; 	     (up-structure->list
-;; 	      (s:map/r (lambda (x) (without-tag x maxtag)) v)))
-;; 	    (dv
-;; 	     (s:map/r (lambda (x) (with-tag x maxtag)) v)))
-;; 	(d:+ (apply apply-hook ev)
-;; 	     (a-reduce d:+
-;; 		       (map (lambda (partialx dx)
-;; 			      (d:* (apply partialx ev) dx))
-;; 			    (s:fringe (make-partials apply-hook v))  
-;; 			    (s:fringe dv))))))))
+;;              (up-structure->list
+;;               (s:map/r (lambda (x) (without-tag x maxtag)) v)))
+;;             (dv
+;;              (s:map/r (lambda (x) (with-tag x maxtag)) v)))
+;;         (d:+ (apply apply-hook ev)
+;;              (a-reduce d:+
+;;                        (map (lambda (partialx dx)
+;;                               (d:* (apply partialx ev) dx))
+;;                             (s:fringe (make-partials apply-hook v))
+;;                             (s:fringe dv))))))))
 
 ;; (define (make-partials apply-hook v)
 ;;   (define (fd indices vv)
 ;;     (cond ((structure? vv)
-;; 	   (s:generate (s:length vv) (s:same vv)
-;; 		       (lambda (i)
-;; 			 (fd (cons i indices)
-;; 			     (s:ref vv i))))) 
-;; 	  ((or (numerical-quantity? vv)
-;; 	       (abstract-quantity? vv))
-;; 	   (let ((fexp		  
-;; 		  (let ((is (reverse indices)))
-;; 		    (if (pair:eq? (g:arity apply-hook) *exactly-one*) ;univariate
-;; 			(if (fix:= (car is) 0)
-;; 			    (if (fix:= (length indices) 1)
-;; 				(symb:derivative (f:expression apply-hook))
-;; 				`((partial ,@(cdr is))
-;; 				  ,(f:expression apply-hook)))
-;; 			    (error "Wrong indices -- MAKE-PARTIALS"
-;; 				   indices vv))
-;; 			`((partial ,@is)
-;; 			  ,(f:expression apply-hook)))))
-;; 		 (range
-;; 		  (df-range-type (f:domain-types apply-hook)
-;; 				 (f:range-type apply-hook)
-;; 				 vv))
-;; 		 (domain
-;; 		  (f:domain-types apply-hook)))
-;; 	     (litfun fexp
-;; 		     (g:arity apply-hook)
-;; 		     range
-;; 		     domain
-;; 		     `(literal-function ',fexp
-;; 					(-> ,(apply X domain) ,range)))))
-;; 	  (else
-;; 	   (error "Bad structure -- MAKE-PARTIALS"
-;; 		  indices vv))))
+;;            (s:generate (s:length vv) (s:same vv)
+;;                        (lambda (i)
+;;                          (fd (cons i indices)
+;;                              (s:ref vv i)))))
+;;           ((or (numerical-quantity? vv)
+;;                (abstract-quantity? vv))
+;;            (let ((fexp
+;;                   (let ((is (reverse indices)))
+;;                     (if (pair:eq? (g:arity apply-hook) *exactly-one*) ;univariate
+;;                         (if (fix:= (car is) 0)
+;;                             (if (fix:= (length indices) 1)
+;;                                 (symb:derivative (f:expression apply-hook))
+;;                                 `((partial ,@(cdr is))
+;;                                   ,(f:expression apply-hook)))
+;;                             (error "Wrong indices -- MAKE-PARTIALS"
+;;                                    indices vv))
+;;                         `((partial ,@is)
+;;                           ,(f:expression apply-hook)))))
+;;                  (range
+;;                   (df-range-type (f:domain-types apply-hook)
+;;                                  (f:range-type apply-hook)
+;;                                  vv))
+;;                  (domain
+;;                   (f:domain-types apply-hook)))
+;;              (litfun fexp
+;;                      (g:arity apply-hook)
+;;                      range
+;;                      domain
+;;                      `(literal-function ',fexp
+;;                                         (-> ,(apply X domain) ,range)))))
+;;           (else
+;;            (error "Bad structure -- MAKE-PARTIALS"
+;;                   indices vv))))
 ;;   (fd '() v))
 
 #|
@@ -580,17 +580,17 @@
 
 (define (accumulate-tags v)
   (cond ((structure? v)
-	 (let ((n (s:length v)))
-	   (let lp ((i 0) (ut '()))
-	     (if (fix:= i n)
-		 ut
-		 (lp (fix:+ i 1)
-		     (union-differential-tags
-		      ut
-		      (accumulate-tags (s:ref v i))))))))
-	((numerical-quantity? v)
-	 (differential-tags
-	  (car (last-pair (differential->terms v)))))
-	(else
-	 (error "Bad structure -- ACCUMULATE-TAGS" v))))
+         (let ((n (s:length v)))
+           (let lp ((i 0) (ut '()))
+             (if (fix:= i n)
+                 ut
+                 (lp (fix:+ i 1)
+                     (union-differential-tags
+                      ut
+                      (accumulate-tags (s:ref v i))))))))
+        ((numerical-quantity? v)
+         (differential-tags
+          (car (last-pair (differential->terms v)))))
+        (else
+         (error "Bad structure -- ACCUMULATE-TAGS" v))))
 |#

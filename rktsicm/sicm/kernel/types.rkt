@@ -19,9 +19,9 @@
 
 
 (define (make-type type-tag abstract-type-tag
-		   quantity-predicate concrete-predicate abstract-predicate)
+                   quantity-predicate concrete-predicate abstract-predicate)
   (list type-tag abstract-type-tag
-	quantity-predicate concrete-predicate abstract-predicate))
+        quantity-predicate concrete-predicate abstract-predicate))
 
 (define (type-tag type)
   (car type))
@@ -80,7 +80,7 @@
 (define (units? x)
   (or (eq? x '&unitless)
       (and (pair? x)
-	   (eq? (car x) unit-type-tag))))
+           (eq? (car x) unit-type-tag))))
 
 
 (define *number*
@@ -93,14 +93,14 @@
 
 (define (not-compound? x)
   (not (or (vector? x)
-	   (and (pair? x)
-		(compound-type-tag? (car x))))))
+           (and (pair? x)
+                (compound-type-tag? (car x))))))
 
 (define (scalar? x)
   (not (or (vector? x)
-	   (and (pair? x)
-		(compound-type-tag? (car x)))
-	   (function? x)
+           (and (pair? x)
+                (compound-type-tag? (car x)))
+           (function? x)
            (operator? x))))
 
 ;;; Scheme vectors are used to represent concrete vectors.
@@ -114,13 +114,13 @@
   (or (vector? v)
       (abstract-vector? v)
       (and (differential? v)
-	   (vector-quantity? (differential-of v)))))
+           (vector-quantity? (differential-of v)))))
 
 
 (define *vector*
   (make-type vector-type-tag
-	     abstract-vector-type-tag
-	     vector-quantity? vector? abstract-vector?))
+             abstract-vector-type-tag
+             vector-quantity? vector? abstract-vector?))
 
 
 (define (quaternion? v)
@@ -142,13 +142,13 @@
   (or (up? v)
       (abstract-up? v)
       (and (differential? v)
-	   (up-quantity? (differential-of v)))))
+           (up-quantity? (differential-of v)))))
 
 
 (define *up*
   (make-type up-type-tag
-	     abstract-up-type-tag
-	     vector-quantity? up? abstract-up?))
+             abstract-up-type-tag
+             vector-quantity? up? abstract-up?))
 
 
 (define (down? x)
@@ -162,7 +162,7 @@
   (or (down? v)
       (abstract-down? v)
       (and (differential? v)
-	   (down-quantity? (differential-of v)))))
+           (down-quantity? (differential-of v)))))
 
 
 (define *down*
@@ -178,7 +178,7 @@
 (define (abstract-structure? x)
   (or (abstract-up? x) (abstract-down? x)))
 
-(define (matrix? m)		
+(define (matrix? m)
   (and (pair? m)
        (eq? (car m) matrix-type-tag)))
 
@@ -186,7 +186,7 @@
   (or (matrix? m)
       (abstract-matrix? m)
       (and (differential? m)
-	   (matrix-quantity? (differential-of m)))))
+           (matrix-quantity? (differential-of m)))))
 
 (define (abstract-matrix? m)
   (and (pair? m)
@@ -194,8 +194,8 @@
 
 (define *matrix*
   (make-type matrix-type-tag
-	     abstract-matrix-type-tag
-	     matrix-quantity? matrix? abstract-matrix?))
+             abstract-matrix-type-tag
+             matrix-quantity? matrix? abstract-matrix?))
 
 (define (square-matrix? matrix)
   (and (matrix? matrix)
@@ -213,13 +213,13 @@
   (not (operator? x)))
 
 (define (function-quantity? f)
-  (procedure? f))			;apply hooks are procedures.
+  (procedure? f))                        ;apply hooks are procedures.
 
 (define (function? f)
   (and (procedure? f)
        (not (operator? f))))
 
-(define (cofunction? f)			;may be combined with a function
+(define (cofunction? f)                        ;may be combined with a function
   (not (operator? f)))
 
 (define (abstract-function? f)
@@ -233,20 +233,20 @@
 (define (typed-or-abstract-function? f)
   (and (apply-hook? f)
        (eq? (car (apply-hook-extra f))
-	    function-type-tag)))
+            function-type-tag)))
 
 ;;bdk;; insert 1 : from litfun
 (define (f:expression f)
   (if (typed-or-abstract-function? f)
       (if (*literal-reconstruction*)
-	  (cadddr (cdr (apply-hook-extra f)))
-	  (cadddr (apply-hook-extra f)))
+          (cadddr (cdr (apply-hook-extra f)))
+          (cadddr (apply-hook-extra f)))
       #f))
 ;;bdk;; insert 1 end
 (define *function*
   (make-type function-type-tag
-	     abstract-function-type-tag
-	     function-quantity? function? abstract-function?))
+             abstract-function-type-tag
+             function-quantity? function? abstract-function?))
 
 
 ;;bdk;; moved to cstm/diff 0
@@ -265,16 +265,16 @@
 
 (define (not-differential-or-compound? x)
   (not (or (vector? x)
-	   (and (pair? x)
-		(or (compound-type-tag? (car x))
-		    (eq? (car x) differential-type-tag))))))
+           (and (pair? x)
+                (or (compound-type-tag? (car x))
+                    (eq? (car x) differential-type-tag))))))
 
 (define (not-d-c-u? x)
   (not (or (eq? x '&unitless)
-	   (vector? x)
-	   (and (pair? x)
-		(or (compound-type-tag? (car x))
-		    (eq? (car x) differential-type-tag)
-		    (eq? (car x) with-units-type-tag)
-		    (eq? (car x) unit-type-tag))))))
+           (vector? x)
+           (and (pair? x)
+                (or (compound-type-tag? (car x))
+                    (eq? (car x) differential-type-tag)
+                    (eq? (car x) with-units-type-tag)
+                    (eq? (car x) unit-type-tag))))))
 

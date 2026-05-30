@@ -57,25 +57,25 @@
 (define (deriv:euclidean-structure f selectors)
   (define (sd g v)
     (cond ((structure? v)
-	   (s:generate (s:length v) (s:opposite v)
-		       (lambda (i)
-			 (sd (lambda (xi)
-			       (g (s:with-substituted-coord v i xi)))
-			     (s:ref v i))))) 
-	  ((or (numerical-quantity? v) (abstract-quantity? v))
-	   (simple-derivative-internal g v))
-	  (else
-	   (error "Bad structure -- DERIV:EUCLIDEAN-STRUCTURE" g v))))
+           (s:generate (s:length v) (s:opposite v)
+                       (lambda (i)
+                         (sd (lambda (xi)
+                               (g (s:with-substituted-coord v i xi)))
+                             (s:ref v i)))))
+          ((or (numerical-quantity? v) (abstract-quantity? v))
+           (simple-derivative-internal g v))
+          (else
+           (error "Bad structure -- DERIV:EUCLIDEAN-STRUCTURE" g v))))
   (define (a-euclidean-derivative v)
     (cond ((structure? v)
-	   (sd (lambda (w)
-		 (f (s:subst-internal v w selectors)))
-	       (ref-internal v selectors)))
-	  ((null? selectors)
-	   (simple-derivative-internal f v))
-	  (else
-	   (error "Bad selectors -- DERIV:EUCLIDEAN-STRUCTURE"
-		  f selectors v))))
+           (sd (lambda (w)
+                 (f (s:subst-internal v w selectors)))
+               (ref-internal v selectors)))
+          ((null? selectors)
+           (simple-derivative-internal f v))
+          (else
+           (error "Bad selectors -- DERIV:EUCLIDEAN-STRUCTURE"
+                  f selectors v))))
   a-euclidean-derivative)
 
 #|
@@ -84,17 +84,17 @@
 (define (deriv:euclidean-structure f)
   (define (sd g v)
     (cond ((structure? v)
-	   (s:generate (s:length v) (s:opposite v)
-		       (lambda (i)
-			 (sd (lambda (xi)
-			       (g (s:with-substituted-coord v i xi)))
-			     (s:ref v i))))) 
-	  ((or (numerical-quantity? v)
-	       (abstract-quantity? v))
-	   (simple-derivative-internal g v))
-	  (else
-	   (error "Bad structure -- DERIV:EUCLIDEAN-STRUCTURE"
-		  g v))))
+           (s:generate (s:length v) (s:opposite v)
+                       (lambda (i)
+                         (sd (lambda (xi)
+                               (g (s:with-substituted-coord v i xi)))
+                             (s:ref v i)))))
+          ((or (numerical-quantity? v)
+               (abstract-quantity? v))
+           (simple-derivative-internal g v))
+          (else
+           (error "Bad structure -- DERIV:EUCLIDEAN-STRUCTURE"
+                  g v))))
   (define (a-euclidean-derivative v)
     (fluid-let ((differential-tag-count differential-tag-count))
       (sd f v)))
@@ -106,8 +106,8 @@
 
 (pe ((simple-derivative-internal
       (lambda (eps)
-	 (lambda (t)
-	   ((D (* cos eps)) t)))
+         (lambda (t)
+           ((D (* cos eps)) t)))
       'e)
      't))
 (* -1 (sin t)) ;; correct
@@ -115,11 +115,11 @@
 
 (pe (((D
        (lambda (eps)
-	 (lambda (t)
-	   ((D (* cos eps)) t))))
+         (lambda (t)
+           ((D (* cos eps)) t))))
       'e)
      't))
-0	      ;; wrong!
+0              ;; wrong!
 
 ;;; To recover this idea see custom-repl.scm
 |#
@@ -130,55 +130,55 @@
 
 (define (deriv:multivariate-derivative f selectors)
   (let ((a (g:arity f))
-	(d (lambda (f) (deriv:euclidean-structure f selectors))))
+        (d (lambda (f) (deriv:euclidean-structure f selectors))))
     (cond ((pair:eq? a *exactly-zero*)
-	   (lambda () n:zero))
-	  ((pair:eq? a *at-least-one*)
-	   (lambda (x . y)
-	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (cons x y)))))
-	  ((pair:eq? a *exactly-one*)
-	   (d f))
-	  ((pair:eq? a *at-least-two*)
-	   (lambda (x y . z)
-	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (cons* x y z)))))
-	  ((pair:eq? a *exactly-two*)
-	   (lambda (x y)
-	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (list x y)))))
-	  ((pair:eq? a *at-least-three*)
-	   (lambda (u x y . z)
-	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (cons* u x y z)))))
-	  ((pair:eq? a *exactly-three*)
-	   (lambda (x y z)
-	     ((d (lambda (s) (g:apply f (up-structure->list s))))
-	      (list->up-structure (list x y z)))))
-	  ((pair:eq? a *one-or-two*)
-	   (lambda (x #:optional y)
-	     (if (default-object? y)
-		 ((d f) x)
-		 ((d (lambda (s)
-		       (g:apply f (up-structure->list s))))
-		  (list->up-structure (list x y))))))
-	  (else
-	   (lambda args
-	     (cond ((not (arity-includes? a (length args)))
+           (lambda () n:zero))
+          ((pair:eq? a *at-least-one*)
+           (lambda (x . y)
+             ((d (lambda (s) (g:apply f (up-structure->list s))))
+              (list->up-structure (cons x y)))))
+          ((pair:eq? a *exactly-one*)
+           (d f))
+          ((pair:eq? a *at-least-two*)
+           (lambda (x y . z)
+             ((d (lambda (s) (g:apply f (up-structure->list s))))
+              (list->up-structure (cons* x y z)))))
+          ((pair:eq? a *exactly-two*)
+           (lambda (x y)
+             ((d (lambda (s) (g:apply f (up-structure->list s))))
+              (list->up-structure (list x y)))))
+          ((pair:eq? a *at-least-three*)
+           (lambda (u x y . z)
+             ((d (lambda (s) (g:apply f (up-structure->list s))))
+              (list->up-structure (cons* u x y z)))))
+          ((pair:eq? a *exactly-three*)
+           (lambda (x y z)
+             ((d (lambda (s) (g:apply f (up-structure->list s))))
+              (list->up-structure (list x y z)))))
+          ((pair:eq? a *one-or-two*)
+           (lambda (x #:optional y)
+             (if (default-object? y)
+                 ((d f) x)
+                 ((d (lambda (s)
+                       (g:apply f (up-structure->list s))))
+                  (list->up-structure (list x y))))))
+          (else
+           (lambda args
+             (cond ((not (arity-includes? a (length args)))
                     (error "Wrong number of args passed to derivative with arity" a))
                    ((null? args)
-		    0)
-		   ((null? (cdr args))	; one argument
-		    ((d f) (car args)))
-		   (else
-		    ((d (lambda (s)
-			  (g:apply f (up-structure->list s))))
-		     (list->up-structure args)))))))))
+                    0)
+                   ((null? (cdr args))        ; one argument
+                    ((d f) (car args)))
+                   (else
+                    ((d (lambda (s)
+                          (g:apply f (up-structure->list s))))
+                     (list->up-structure args)))))))))
 
 (assign-operation 'partial-derivative
-		  deriv:multivariate-derivative
-		  (disjunction function? structure?)
-		  any?)
+                  deriv:multivariate-derivative
+                  (disjunction function? structure?)
+                  any?)
 
 ;;; In order to implement derivatives with respect to abstract
 ;;; quantities we need to create more types -- differential vector,

@@ -20,7 +20,7 @@
                (simplify
                 (s:map-chain cons (up 'a (down 'b 'c) 'd)))
                '(up (a 0) (down (b 1 0) (c 1 1)) (d 2))))
-   
+
    (test-case "ORIG:matrix*matrix"
               (check-equal?
                (simplify
@@ -38,14 +38,14 @@
                  (down (up 'e 'g) (up 'f 'h))))
                '(down (up (+ (* a e) (* b g)) (+ (* c e) (* d g)))
                       (up (+ (* a f) (* b h)) (+ (* c f) (* d h)))))
-              
+
               (check-equal?
                (simplify
                 (s:multiply
                  (down (up 'a 'c) (up 'b 'd))
                  (up 'dx 'dy)))
                '(up (+ (* a dx) (* b dy)) (+ (* c dx) (* d dy)))))
-   
+
    (test-case "ORIG:s:outer-product"
               (check-equal?
                (simplify
@@ -61,7 +61,7 @@
                                  (row-matrix 'b0 'b1 'b2)))
                '(matrix-by-rows (list (* a0 b0) (* a0 b1) (* a0 b2))
                                 (list (* a1 b0) (* a1 b1) (* a1 b2))))
-              
+
               (check-unique-match?
                (simplify
                 (let* ((s (up 'dt (up 'dx 'dy) (down 'dpx 'dpy)))

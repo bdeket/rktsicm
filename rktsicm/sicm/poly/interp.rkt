@@ -16,7 +16,7 @@
 
 ;;; Edited by GJS 10Jan09
 
-;;; This version, in the file interp.scm, is numerical.  
+;;; This version, in the file interp.scm, is numerical.
 ;;; It is loaded into scmutils-base-environment.
 ;;; There is also a generic version in the file interp-generic.scm.
 
@@ -25,26 +25,26 @@
     (assert (fix:= (length xs) n))
     (define (poly x)
       (reduce + n:zero
-	      (generate-list n
-		(lambda (i)
-		  (/ (reduce * n:one
-		       (generate-list n
-		         (lambda (j)
-			   (if (fix:= j i)
-			       (list-ref ys i)
-			       (- x (list-ref xs j))))))
-		     (let ((xi (list-ref xs i)))
-		       (reduce * n:one
-			 (generate-list n
-		           (lambda (j)
-			     (cond ((fix:< j i) (- (list-ref xs j) xi))
-				   ((fix:= j i) (expt n:-one i))
-				   (else    (- xi (list-ref xs j)))))))))))))
+              (generate-list n
+                             (lambda (i)
+                               (/ (reduce * n:one
+                                          (generate-list n
+                                                         (lambda (j)
+                                                           (if (fix:= j i)
+                                                               (list-ref ys i)
+                                                               (- x (list-ref xs j))))))
+                                  (let ((xi (list-ref xs i)))
+                                    (reduce * n:one
+                                            (generate-list n
+                                                           (lambda (j)
+                                                             (cond ((fix:< j i) (- (list-ref xs j) xi))
+                                                                   ((fix:= j i) (expt n:-one i))
+                                                                   (else    (- xi (list-ref xs j)))))))))))))
     poly))
 
 #|
-;;; If run in generic environment we can look at the kind of thing that 
-;;; this code does, by partial evaluation... an excellent aid to debugging. 
+;;; If run in generic environment we can look at the kind of thing that
+;;; this code does, by partial evaluation... an excellent aid to debugging.
 
 (print-expression
  ((lagrange-interpolation-function '(y1 y2 y3 y4) '(x1 x2 x3 x4)) 'x1))
@@ -90,4 +90,4 @@ y4
 
 
 
-		       
+

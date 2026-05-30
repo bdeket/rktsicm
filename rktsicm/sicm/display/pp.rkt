@@ -19,18 +19,18 @@
 (define (watch-it wallp message)
   (lambda (e)
     (if wallp
-	(begin (newline)
-	       (display message)
-           (pp e)))
+        (begin (newline)
+               (display message)
+               (pp e)))
     e))
 
 (define (cpp x #:optional port)
   (let ((port
-	 (if (default-object? port)
-	     (current-output-port)
-	     port)))
+         (if (default-object? port)
+             (current-output-port)
+             port)))
     (display "#|\n" port)
-    (pp x port true)			; as code 
+    (pp x port true)                        ; as code
     (display "|#\n" port)))
 
 ;;bdk;; insert 1 end

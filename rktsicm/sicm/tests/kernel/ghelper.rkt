@@ -102,12 +102,12 @@
    (check-exn #px"Generic operator inapplicable: #<procedure:_bar_>\n function:" (λ () (bar 1)))
    (check-exn #px"make-generic-operator: contract violation\n  expected: procedure that satisfies  arity 1\n  given:"
               (λ () (make-generic-operator 1 'bar (λ () 0))))
-   
+
    (check-equal? (procedure-arity bar) 1)
    (define (ID x) x)
    (assign-operation bar ID)
    (check-equal? (bar 1) 1)
-   
+
    (check-exn #px"assign-operation: contract violation\n  expected: known generic operator\n  given:"
               (λ () (assign-operation (gensym) ID)))
    (check-exn #px"assign-operation:bar: contract violation\n  expected: handler procedure\\?\n  given:"
@@ -125,7 +125,7 @@
 
    (check-equal? (get-operator-record-for bar)
                  `((,b? -> ,-) (,a? -> ,+) (,c? -> ,/) (any/c? (... ...) -> ,ID)))
-   
+
    (check-equal? (procedure-arity (make-generic-operator (arity-at-least 2)))
                  (arity-at-least 2))
    (check-equal? (procedure-arity (make-generic-operator (list 0 (arity-at-least 2))))

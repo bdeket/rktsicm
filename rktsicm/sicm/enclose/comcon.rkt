@@ -15,29 +15,29 @@
 
 (define (lambdafy n body-generator)
   (cond ((exact-integer? n)
-	 (let ((bvl (make-bound-variables n)))
-	   `(lambda ,bvl ,(expression (g:apply body-generator bvl)))))
+         (let ((bvl (make-bound-variables n)))
+           `(lambda ,bvl ,(expression (g:apply body-generator bvl)))))
 
-	((list? n)
-	 (let llp ((n n) (body-generator body-generator))
-	   (if (null? (cdr n))
-	       (let ((bvl (make-bound-variables (car n))))
-		 `(lambda ,bvl ,(expression (g:apply body-generator bvl))))
-	       (let ((bvl (make-bound-variables (car n))))
-		 `(lambda ,bvl
-		    ,(llp (cdr n) (g:apply body-generator bvl)))))))
-	((and (pair? n)
-	      (exact-integer? (car n))
-	      (exact-integer? (cdr n))
-	      (fix:= (car n) (cdr n)))
-	 (lambdafy (car n) body-generator))
-	((pair? n)
-	 ;; In Scheme 7.5 #f=() so (3) and (3 . #f) are not distinguished.
-	 (error "General arity is unimplemented -- LAMBDAFY"
-		n))
-	(else
-	 (error "Bad variable specification -- LAMBDAFY"
-		n))))
+        ((list? n)
+         (let llp ((n n) (body-generator body-generator))
+           (if (null? (cdr n))
+               (let ((bvl (make-bound-variables (car n))))
+                 `(lambda ,bvl ,(expression (g:apply body-generator bvl))))
+               (let ((bvl (make-bound-variables (car n))))
+                 `(lambda ,bvl
+                    ,(llp (cdr n) (g:apply body-generator bvl)))))))
+        ((and (pair? n)
+              (exact-integer? (car n))
+              (exact-integer? (cdr n))
+              (fix:= (car n) (cdr n)))
+         (lambdafy (car n) body-generator))
+        ((pair? n)
+         ;; In Scheme 7.5 #f=() so (3) and (3 . #f) are not distinguished.
+         (error "General arity is unimplemented -- LAMBDAFY"
+                n))
+        (else
+         (error "Bad variable specification -- LAMBDAFY"
+                n))))
 
 (define (make-bound-variables n)
   ;;n is a general arity
@@ -60,10 +60,10 @@
 (define (definify name definition-expression)
   (if (pair? definition-expression)
       (if (eq? (car definition-expression) 'lambda)
-	  `(define (,name . ,(cadr definition-expression))
-	     . ,(cddr definition-expression))
-	  `(define ,name ,definition-expression))
+          `(define (,name . ,(cadr definition-expression))
+             . ,(cddr definition-expression))
+          `(define ,name ,definition-expression))
       `(define ,name ,definition-expression)))
-	     
+
 
 

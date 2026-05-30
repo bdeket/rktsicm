@@ -38,7 +38,7 @@
     (check-unique-match? (take ((expression-analyzer (make-analyzer => <= `(add1 + expt))) '(+ (add1 (expt x 2)) (expt x 2))) 3)
                   ()
                   `(<= (+ (add1 (expt x 2)) (expt x 2)) ,=>))
-    
+
     (check-unique-match? (take ((expression-analyzer (make-analyzer => <= `(add1 + expt))) '(+ (add1 (expt x 2.3)) (expt x 2.3))) 3)
                          (kernel)
                          `(<= (+ (add1 ,kernel) ,kernel) ,=>))
@@ -82,7 +82,7 @@
     (define less?_2 (list-ref ((expression-analyzer ANA) '(+ x y)) 3))
     (check-true  (less?_2 'y 'x))
     (check-false (less?_2 'x 'y))
-    ;; it affects internal state: 
+    ;; it affects internal state:
     (check-true  (less?_1 'y 'x))
     (check-false (less?_1 'x 'y))
     ;; a seen variable comes before an unseen
@@ -128,7 +128,7 @@
                     '(/ (+ (* x y) (* 2 y)) (+ 2 x)))
       (check-equal? (rcf:simplify E)
                     'y)))
-   
+
    (test-case
     "todo"
 

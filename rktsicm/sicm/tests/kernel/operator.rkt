@@ -102,7 +102,7 @@
     (check-equal? (series:sum (((o:exp O2) -) 3 6) 3) -19)
     (check-equal? (expression (series:sum (((o:exp o:identity) (literal-function 'f)) 't) 5))
                   '(+ (f t) (f t) (* 1/2 (f t)) (* 1/6 (f t)) (* 1/24 (f t)) (* 1/120 (f t))))
-    
+
     (operator-check (o:cos O2) '(cos a) 'b 1 '(rest))
     (check-exn #px"o:cos:\n\tassertion failed:" (λ () (o:cos O )))
     (check-equal? (expression (series:sum (((o:cos o:identity) (literal-function 'f)) 't) 5))

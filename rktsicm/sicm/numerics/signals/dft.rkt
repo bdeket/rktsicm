@@ -137,8 +137,8 @@
 
 (define x
   (samples 64 (lambda (x)
-		(- (random 1.0) 0.5))
-	   n:pi))
+                (- (random 1.0) 0.5))
+           n:pi))
 
 (define X (dft x))
 

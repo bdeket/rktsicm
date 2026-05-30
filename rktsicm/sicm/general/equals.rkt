@@ -27,16 +27,16 @@
 (define (vector:equal? x y)
   (let ((size (vector-length x)))
     (and (fix:= size (vector-length y))
-	 (let loop ((index 0))
-	   (or (fix:= index size)
-	       (and (simple:equal? (vector-ref x index)
-				   (vector-ref y index))
-		    (loop (fix:+ index 1))))))))
+         (let loop ((index 0))
+           (or (fix:= index size)
+               (and (simple:equal? (vector-ref x index)
+                                   (vector-ref y index))
+                    (loop (fix:+ index 1))))))))
 
 (define (pair:eq? x y)
   (and (eq? (car x) (car y))
        (eq? (cdr x) (cdr y))))
-  
+
 
 ;;; Problem in simplify/simplify.scm there is a hash
 ;;; table that I don't know how to handle.

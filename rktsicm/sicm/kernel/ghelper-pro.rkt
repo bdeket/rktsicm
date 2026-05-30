@@ -73,7 +73,7 @@
                    (if (pair? (cdr args))
                        (λ (branch) (loop branch (cdr args)))
                        tree-han))))
-    
+
   (define operator
     (procedure-rename
      (case arity
@@ -101,8 +101,8 @@
 ;***************************************************************************************************
 ;;; Failures make it to here.  Time to DWIM, with apologies to Warren
 ;;; Teitelman.  Can we look at some argument as a default numerical
-;;; expression?  I want to get rid of this, since "when in doubt, dike 
-;;; it out." -- Greenblatt, but metacirc/prop seems to need this.  
+;;; expression?  I want to get rid of this, since "when in doubt, dike
+;;; it out." -- Greenblatt, but metacirc/prop seems to need this.
 ;;; It should be fixed.
 
 (define (no-way-known operator name arguments)

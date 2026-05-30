@@ -29,10 +29,10 @@
 
 (define (add-lists l1 l2)
   (cond ((null? l1) l2)
-	((null? l2) l1)
-	(else
-	 (cons (+ (car l1) (car l2))
-	       (add-lists (cdr l1) (cdr l2))))))
+        ((null? l2) l1)
+        (else
+         (cons (+ (car l1) (car l2))
+               (add-lists (cdr l1) (cdr l2))))))
 
 (define (scale-list s l)
   (map (lambda (x) (* s x)) l))
@@ -43,13 +43,13 @@
 
 (define chebyshev-polynomials
   (let ((x poly:identity)
-	(2x (poly:scale poly:identity 2)))
+        (2x (poly:scale poly:identity 2)))
     (cons-stream 1
-		 (cons-stream x
-			      (map-streams (lambda (p1 p2)
-					     (poly:- (poly:* 2x p1) p2))
-					   (tail chebyshev-polynomials)
-					   chebyshev-polynomials)))))
+                 (cons-stream x
+                              (map-streams (lambda (p1 p2)
+                                             (poly:- (poly:* 2x p1) p2))
+                                           (tail chebyshev-polynomials)
+                                           chebyshev-polynomials)))))
 
 
 ;;; The following procedure returns the Nth Chebyshev polynomial
@@ -70,25 +70,25 @@
 ;;;  so that the resulting expansion is exact in integer arithmetic.
 
 (define (2x cheb-exp)
-    (let ((t1 (cdr cheb-exp))
-          (t2 (append (list 0) cheb-exp))
-          (t3 (list 0 (car cheb-exp))))
-      (add-lists t1 (add-lists t2 t3))))
+  (let ((t1 (cdr cheb-exp))
+        (t2 (append (list 0) cheb-exp))
+        (t3 (list 0 (car cheb-exp))))
+    (add-lists t1 (add-lists t2 t3))))
 
 (define scaled-chebyshev-expansions
   (cons-stream '(1)
-   (cons-stream '(0 1)
-    (map-stream 2x
-		(tail scaled-chebyshev-expansions)))))
+               (cons-stream '(0 1)
+                            (map-stream 2x
+                                        (tail scaled-chebyshev-expansions)))))
 
 
 ;;; For convenience, we also provide the non-scaled Chebyshev expansions
 
 (define chebyshev-expansions
   (letrec (;; s = {1 1 2 4 8 16 ...}
-	   (s (cons-stream 1
-	       (cons-stream 1
-		(map-stream (lambda (x) (+ x x)) (tail s)))))
+           (s (cons-stream 1
+                           (cons-stream 1
+                                        (map-stream (lambda (x) (+ x x)) (tail s)))))
            (c scaled-chebyshev-expansions))
     (map-streams (lambda (factor expansion)
                    (scale-list (/ 1 factor) expansion))
@@ -100,22 +100,22 @@
 
 (define (poly->cheb-exp poly)
   (let* ((maxcoeff (apply max (map abs (poly/coefficients poly))))
-	 (zero-tolerance (* 10 maxcoeff n:machine-epsilon))
-	 (=0?
-	  (lambda (p)
-	    (and (number? p)
-		 (< (abs p) zero-tolerance)))))
+         (zero-tolerance (* 10 maxcoeff n:machine-epsilon))
+         (=0?
+          (lambda (p)
+            (and (number? p)
+                 (< (abs p) zero-tolerance)))))
     (let lp ((p poly) (c chebyshev-expansions) (s '(0)))
-      (if (=0? p)			;(equal? p poly:zero) NO!
-	  s
-	  (let ((v (poly:value p 0)))
-	    (poly:divide (poly:- p v) poly:identity
-			 (lambda (q r)
-			   (if (not (equal? r poly:zero))
-			       (error "POLY->CHEB-EXP"))
-			   (lp q
-			       (tail c)
-			       (add-lists (scale-list v (head c)) s)))))))))
+      (if (=0? p)                        ;(equal? p poly:zero) NO!
+          s
+          (let ((v (poly:value p 0)))
+            (poly:divide (poly:- p v) poly:identity
+                         (lambda (q r)
+                           (if (not (equal? r poly:zero))
+                               (error "POLY->CHEB-EXP"))
+                           (lp q
+                               (tail c)
+                               (add-lists (scale-list v (head c)) s)))))))))
 
 
 ;;; Convert from Chebyshev expansion to polynomial form
@@ -158,7 +158,7 @@
 (define (cheb-root-list n)
   (define (root i)
     (if (and (odd? n)
-	     (fix:= (fix:* 2 i) (fix:- n 1)))
+             (fix:= (fix:* 2 i) (fix:- n 1)))
         0
         (- (cos (/ (* (+ i 1/2) n:pi) n)))))
   (let loop ((i 0))
@@ -211,9 +211,9 @@
   (if (<= b a)
       (error "Bad interval in GENERATE-CHEB-EXP"))
   (let ((interval-map    ;map [-1,1] onto [a,b]
-          (let ((c (/ (+ a b) 2))
-                (d (/ (- b a) 2)))
-            (lambda (x) (+ c (* d x))))))
+         (let ((c (/ (+ a b) 2))
+               (d (/ (- b a) 2)))
+           (lambda (x) (+ c (* d x))))))
     (let ((roots (cheb-root-list n))
           (polys (stream-head chebyshev-polynomials n)))
       (let ((vals (map f (map interval-map roots))))
@@ -221,7 +221,7 @@
           (if (fix:= i n)
               (reverse coeffs)
               (let ((chebf (lambda (x)
-			     (poly:value (list-ref polys i) x))))
+                             (poly:value (list-ref polys i) x))))
                 (let ((chebvals (map chebf roots)))
                   (let ((sum (a-reduce + (map * vals chebvals))))
                     (let ((term (if (zero? i) (/ sum n) (/ (* 2 sum) n))))

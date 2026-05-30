@@ -12,36 +12,36 @@
    (test-case
     "in file tests"
     (define (der-qq f state)
-      ((richardson-derivative 
+      ((richardson-derivative
         (lambda (q)
-          (state->q 
+          (state->q
            (f (->H-state (state->t state) q (state->p state)))))
         1.e-8
         .01)
        (state->q state)))
 
     (define (der-qp f state)
-      ((richardson-derivative 
+      ((richardson-derivative
         (lambda (p)
-          (state->q 
+          (state->q
            (f (->H-state (state->t state) (state->q state) p))))
         1.e-8
         .01)
        (state->p state)))
 
     (define (der-pq f state)
-      ((richardson-derivative 
+      ((richardson-derivative
         (lambda (q)
-          (state->p 
+          (state->p
            (f (->H-state (state->t state) q (state->p state)))))
         1.e-8
         .01)
        (state->q state)))
 
     (define (der-pp f state)
-      ((richardson-derivative 
+      ((richardson-derivative
         (lambda (p)
-          (state->p 
+          (state->p
            (f (->H-state (state->t state) (state->q state) p))))
         1.e-8
         .01)
@@ -50,7 +50,7 @@
     (skip "from original file: VERY different accuracy")
 
     (check-= (let ((f (pendulum-circulating-aa-state-to-state 2.0 9.8))
-                   (g (pendulum-circulating-state-to-aa-state 2.0 9.8))) 
+                   (g (pendulum-circulating-state-to-aa-state 2.0 9.8)))
                (let* ((state (->H-state 1. 1. 15.))
                       (aa-state (g state)))
                  (- (* (der-qq f aa-state) (der-pp f aa-state))
@@ -59,7 +59,7 @@
              1.0000000000003484 1e-6)
 
     (check-= (let ((f (pendulum-circulating-aa-state-to-state 2.0 9.8))
-                   (g (pendulum-circulating-state-to-aa-state 2.0 9.8))) 
+                   (g (pendulum-circulating-state-to-aa-state 2.0 9.8)))
                (let* ((state (->H-state 1. 1. 15.))
                       (aa-state (g state)))
                  (- (* (der-qq g state) (der-pp g state))
@@ -68,7 +68,7 @@
              .9999999999986688 1e-15)
 
     (check-= (let ((f (pendulum-oscillating-aa-state-to-state 2.0 9.8))
-                   (g (pendulum-oscillating-state-to-aa-state 2.0 9.8))) 
+                   (g (pendulum-oscillating-state-to-aa-state 2.0 9.8)))
                (let* ((state (->H-state 1. 1. 1.))
                       (aa-state (g state)))
                  (- (* (der-qq g state) (der-pp g state))
@@ -77,7 +77,7 @@
              1.000000000000521 1e-15)
 
     (check-= (let ((f (pendulum-oscillating-aa-state-to-state 2.0 9.8))
-                   (g (pendulum-oscillating-state-to-aa-state 2.0 9.8))) 
+                   (g (pendulum-oscillating-state-to-aa-state 2.0 9.8)))
                (let* ((state (->H-state 1. 1. 1.))
                       (aa-state (g state)))
                  (- (* (der-qq f aa-state) (der-pp f aa-state))
@@ -90,7 +90,7 @@
     (define (((pendulum-solution-series alpha beta) state) time)
       (let ((E ((Hpendulum alpha beta) state)))
         (let ((omega (pendulum-frequency alpha beta E))
-              (beta (abs beta)))    
+              (beta (abs beta)))
           (if (< E beta)
               (let ((k (sqrt (/ (+ E beta) (* 2 beta))))
                     (omega-0 (sqrt (abs (/ beta alpha)))))
@@ -238,7 +238,7 @@
     (check-= ((pendulum-separatrix-angular-momentum 1 1) 0) 2. 1e-10)
     (check-= (inverse-gudermannian (gudermannian 1)) 1 1e-10)
     )
-   
+
    ))
 
 (module+ test

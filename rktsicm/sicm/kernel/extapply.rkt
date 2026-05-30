@@ -61,9 +61,9 @@
 (define (once-only! thunk name)
   (if (lexical-unbound? system-global-environment name)
       (begin (thunk)
-	     ;; Create NAME in SGE
-	     (eval `(define ,name #t) system-global-environment)
-	     'done)
+             ;; Create NAME in SGE
+             (eval `(define ,name #t) system-global-environment)
+             'done)
       'already-done))
 
 (once-only! apply-extension-init 'apply-extension-init)
@@ -78,14 +78,14 @@
    (list condition-type:inapplicable-object)
    (lambda (condition)
      (if *enable-generic-apply*
-	 ((stack-frame->continuation
-	   (stack-frame/next
-	    (stack-frame/next
-	     (stack-frame/next
-	      (continuation->stack-frame
-	       (condition/continuation condition))))))
-	  (lambda args
-	    (g:apply (inapplicable-object/operator condition) args)))))))
+         ((stack-frame->continuation
+           (stack-frame/next
+            (stack-frame/next
+             (stack-frame/next
+              (continuation->stack-frame
+               (condition/continuation condition))))))
+          (lambda args
+            (g:apply (inapplicable-object/operator condition) args)))))))
 |#
 
 ;;; Extension of Scheme for self-evaluating unbound variables
@@ -101,19 +101,19 @@
          'for-top)
 (define-syntax with-self-evaluating-unbound-variables
   (syntax-rules ()
-      [(_ thunk)
-       (syntax-parameterize ([#%top (syntax-rules () [(_ . id) 'id])])
-         (thunk))]))
+    [(_ thunk)
+     (syntax-parameterize ([#%top (syntax-rules () [(_ . id) 'id])])
+       (thunk))]))
 
 #;
 (define (with-self-evaluating-unbound-variables thunk)
   (bind-condition-handler
-      (list condition-type:unbound-variable)
-      (lambda (condition)
-	(let ((variable-name
-	       (access-condition condition 'location)))
-	  (use-value variable-name)))
-    thunk))
+   (list condition-type:unbound-variable)
+   (lambda (condition)
+     (let ((variable-name
+            (access-condition condition 'location)))
+       (use-value variable-name)))
+   thunk))
 
 #|
 (pe (with-self-evaluating-unbound-variables
@@ -138,8 +138,8 @@
 ;Unbound variable: f
 
 (pe (with-literal-apply-enabled
-	(lambda ()
-	  (+ (f 'a) 3))))
+        (lambda ()
+          (+ (f 'a) 3))))
 ;Unbound variable: f
 
 (pe (with-self-evaluating-unbound-variables
@@ -148,10 +148,10 @@
 ;Application of a number not allowed f ((a))
 
 (pe (with-literal-apply-enabled
-	(lambda ()
-	  (with-self-evaluating-unbound-variables
-	   (lambda ()
-	     (+ (f 'a) 3)) ))))
+        (lambda ()
+          (with-self-evaluating-unbound-variables
+           (lambda ()
+             (+ (f 'a) 3)) ))))
 (+ 3 (f a))
 |#
 
@@ -174,5 +174,5 @@
 ;;brm;;  (bind-condition-handler
 ;;brm;;      (list condition-type:floating-point-underflow)
 ;;brm;;      (lambda (condition)
-;;brm;;	(use-value 0.))
+;;brm;;        (use-value 0.))
 ;;brm;;    thunk))

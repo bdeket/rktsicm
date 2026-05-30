@@ -40,10 +40,10 @@
 
 (define &angular &unitless)
 
-(define-derived-unit SI '&radian 
+(define-derived-unit SI '&radian
   "rad" "plane angle" &angular)
 
-(define-derived-unit SI '&steradian 
+(define-derived-unit SI '&steradian
   "rad" "solid angle" &angular)
 
 
@@ -209,7 +209,7 @@
 (define-additional-unit SI '&dyne
   "dyne" "Force" &newton 1.0e-5)
 
-(define-additional-unit SI '&calorie	;at 20 C
+(define-additional-unit SI '&calorie        ;at 20 C
   "cal" "Heat energy" &joule 4.1819)
 
 (define-additional-unit SI '&minute

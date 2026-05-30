@@ -16,10 +16,10 @@
 (define (F->C F)
   (define (C state)
     (up (time state)
-	(F state)
-	(+ (((partial 0) F) state)
-	   (* (((partial 1) F) state) 
-	      (velocity state)))))
+        (F state)
+        (+ (((partial 0) F) state)
+           (* (((partial 1) F) state)
+              (velocity state)))))
   C)
 |#
 
@@ -28,9 +28,9 @@
   (let ((n (vector-length local)))
     ((Gamma-bar
       (lambda (qp)
-	(Gamma
+        (Gamma
           (compose F (Gamma qp))
-	 n)))
+         n)))
      local)))
 |#
 
@@ -49,14 +49,14 @@
   (define (C local)
     (let ((n (vector-length local)))
       (define (f-bar q-prime)
-	(define q
-	  (compose F (Gamma q-prime)))
-	(Gamma q n))
+        (define q
+          (compose F (Gamma q-prime)))
+        (Gamma q n))
       ((Gamma-bar f-bar) local)))
   C)
 
-;;; The following transformations are applicable to 
-;;;  configuration coordinates. 
+;;; The following transformations are applicable to
+;;;  configuration coordinates.
 
 (define (rectangular->polar rectangular-tuple)
   (let ((x (ref rectangular-tuple 0))
@@ -70,9 +70,9 @@
 
 
 (define (polar->rectangular polar-tuple)
-  (let ((r (ref polar-tuple 0)) 
+  (let ((r (ref polar-tuple 0))
         (phi (ref polar-tuple 1)))
-    (let ((x (* r (cos phi))) 
+    (let ((x (* r (cos phi)))
           (y (* r (sin phi))))
       (up x y))))
 
@@ -80,23 +80,23 @@
   (polar->rectangular (coordinate tqv)))
 
 #|
-(show-expression 
+(show-expression
  (velocity
   ((F->C p->r)
-   (->local 't 
-	    (coordinate-tuple 'r 'phi) 
-	    (velocity-tuple 'rdot 'phidot)))))
+   (->local 't
+            (coordinate-tuple 'r 'phi)
+            (velocity-tuple 'rdot 'phidot)))))
 (up (+ (* -1 r phidot (sin phi)) (* rdot (cos phi)))
     (+ (* r phidot (cos phi)) (* rdot (sin phi))))
 
 
 (define (L-central-polar m V)
   (compose (L-central-rectangular m V)
-	   (F->C p->r)))
+           (F->C p->r)))
 
 (show-expression
   ((L-central-polar 'm (literal-function 'V))
-   (->local 't (coordinate-tuple 'r 'phi) 
+   (->local 't (coordinate-tuple 'r 'phi)
                (velocity-tuple 'rdot 'phidot))))
 (+ (* 1/2 m (expt phidot 2) (expt r 2))
    (* 1/2 m (expt rdot 2))
@@ -153,13 +153,13 @@
 
 (define ((dp-coordinates l y_s) local)
   (let ((t (time local))
-	(theta (coordinate local)))
+        (theta (coordinate local)))
     (let ((x (* l (sin theta)))
-	  (y (- (y_s t) (* l (cos theta)))))
+          (y (- (y_s t) (* l (cos theta)))))
       (coordinate-tuple x y))))
 
 (define (L-pend m l g y_s)
-  (compose (Lf m g) 
+  (compose (Lf m g)
            (F->C (dp-coordinates l y_s))))
 
 (show-expression
@@ -185,24 +185,24 @@
 
 (define (spherical->rectangular q)
   (let ((r (ref q 0))
-	(theta (ref q 1))
-	(phi (ref q 2)))
+        (theta (ref q 1))
+        (phi (ref q 2)))
     (let ((x (* r (sin theta) (cos phi)))
-	  (y (* r (sin theta) (sin phi)))
-	  (z (* r (cos theta))))
-      (coordinate-tuple x y z))))  
+          (y (* r (sin theta) (sin phi)))
+          (z (* r (cos theta))))
+      (coordinate-tuple x y z))))
 
 (define (s->r local)
   (spherical->rectangular (coordinate local)))
 
 (define (rectangular->spherical q)
   (let ((x (ref q 0))
-	(y (ref q 1))
-	(z (ref q 2)))
+        (y (ref q 1))
+        (z (ref q 2)))
     (let ((r (sqrt (+ (* x x) (* y y) (* z z)))))
       (let ((theta (acos (/ z r)))
-	    (phi (atan y x)))
-	(up r theta phi)))))
+            (phi (atan y x)))
+        (up r theta phi)))))
 
 (define (r->s local)
   (rectangular->spherical (coordinate local)))
@@ -221,7 +221,7 @@
 
 (show-expression
   ((compose (ang-mom-z 'm) (F->C s->r))
-   (->local 't 
+   (->local 't
             (coordinate-tuple 'r 'theta 'phi)
             (velocity-tuple 'rdot 'thetadot 'phidot))))
 (* m (expt r 2) phidot (expt (sin theta) 2))
@@ -242,10 +242,10 @@
 
 (define ((Rx angle) q)
   (let ((ca (cos angle))
-	(sa (sin angle)))
+        (sa (sin angle)))
     (let ((x (ref q 0))
-	  (y (ref q 1))
-	  (z (ref q 2)))
+          (y (ref q 1))
+          (z (ref q 2)))
       (up
        x
        (- (* ca y) (* sa z))
@@ -253,10 +253,10 @@
 
 (define ((Ry angle) q)
   (let ((ca (cos angle))
-	(sa (sin angle)))
+        (sa (sin angle)))
     (let ((x (ref q 0))
-	  (y (ref q 1))
-	  (z (ref q 2)))
+          (y (ref q 1))
+          (z (ref q 2)))
       (up
        (+ (* ca x) (* sa z))
        y
@@ -264,10 +264,10 @@
 
 (define ((Rz angle) q)
   (let ((ca (cos angle))
-	(sa (sin angle)))
+        (sa (sin angle)))
     (let ((x (ref q 0))
-	  (y (ref q 1))
-	  (z (ref q 2)))
+          (y (ref q 1))
+          (z (ref q 2)))
       (up
        (- (* ca x) (* sa y))
        (+ (* ca y) (* sa x))

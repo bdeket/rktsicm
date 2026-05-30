@@ -14,7 +14,7 @@
    "numerics/linear/svd"
    (test-case
     "Test case from book"
-    (define a 
+    (define a
       (array->matrix #( #( 1  6 11 )
                         #( 2  7 12 )
                         #( 3  8 13 )
@@ -82,8 +82,8 @@
     (define (matnorm a)
       (apply max
              (map abs
-                  (apply append 
-                         (map vector->list 
+                  (apply append
+                         (map vector->list
                               (vector->list (matrix->array a)))))))
     (define (test n [m 100])
       (let ((h (hilbert n)))
@@ -98,19 +98,19 @@
                      (let ((inverted-w
                             (let ((wmin (* eps (apply max (vector->list w)))))
                               (build-vector (vector-length w)
-                                                       (lambda (i) 
+                                                       (lambda (i)
                                                          (let ((wi (vector-ref w i)))
                                                            (if (< wi wmin) 0 (/ 1 wi))))))))
                        (let ((inv
                               (matrix*matrix v
                                              (matrix*matrix (m:make-diagonal inverted-w)
                                                             (m:transpose u)))))
-		   
+
                          (println `(svd ,eps
                                            ,(matnorm
                                              (matrix-matrix (matrix*matrix h inv)
                                                             (m:make-identity n))))))
-			     
+
                        (elp (/ eps 3) (- m 1)))))))))
     (skip #;(test 13)
           #;(test 19)

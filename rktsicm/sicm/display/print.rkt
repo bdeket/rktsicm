@@ -41,27 +41,27 @@
 
 ;;brm;;(define (canonicalize-numbers expr)
 ;;brm;;  (cond ((with-units? expr)
-;;brm;;	 (with-si-units->expression expr))
-;;brm;;	((list? expr)
-;;brm;;	 (cons (canonicalize-numbers (operator expr))
-;;brm;;	       (map canonicalize-numbers (operands expr))))
-;;brm;;	((and (number? expr) *heuristic-numbers*)
-;;brm;;	 (heuristic-canonicalize-complex expr))
-;;brm;;	(else
-;;brm;;	 expr)))
+;;brm;;         (with-si-units->expression expr))
+;;brm;;        ((list? expr)
+;;brm;;         (cons (canonicalize-numbers (operator expr))
+;;brm;;               (map canonicalize-numbers (operands expr))))
+;;brm;;        ((and (number? expr) *heuristic-numbers*)
+;;brm;;         (heuristic-canonicalize-complex expr))
+;;brm;;        (else
+;;brm;;         expr)))
 
 (define (ham:simplify hexp)
   (cond ((and (quotient? hexp) *divide-out-terms*)
-	 (cond ((sum? (symb:numerator hexp))
-		(let ((d (symb:denominator hexp)))
-		  (a-reduce symb:+
-			    (map (lambda (n)
-				   (g:simplify (symb:/ n d)))
-				 (operands (symb:numerator hexp))))))
-	       (else hexp)))
-	((compound-data-constructor? hexp)
-	 (cons (operator hexp) (map ham:simplify (operands hexp))))
-	(else hexp)))
+         (cond ((sum? (symb:numerator hexp))
+                (let ((d (symb:denominator hexp)))
+                  (a-reduce symb:+
+                            (map (lambda (n)
+                                   (g:simplify (symb:/ n d)))
+                                 (operands (symb:numerator hexp))))))
+               (else hexp)))
+        ((compound-data-constructor? hexp)
+         (cons (operator hexp) (map ham:simplify (operands hexp))))
+        (else hexp)))
 
 (define (divide-out-terms-simplify doit?)
   (assert (boolean? doit?) "argument must be a boolean.")
@@ -74,26 +74,26 @@
 
 (define (eqn:simplify hexp)
   (cond ((quotient? hexp)
-	 (symb:numerator hexp))
-	((matrix? hexp)
-	 ((m:elementwise eqn:simplify) hexp))
-	((vector? hexp)
-	 ((v:elementwise eqn:simplify) hexp))
-	(else hexp)))
+         (symb:numerator hexp))
+        ((matrix? hexp)
+         ((m:elementwise eqn:simplify) hexp))
+        ((vector? hexp)
+         ((v:elementwise eqn:simplify) hexp))
+        (else hexp)))
 
 (define (flush-derivative expr)
   (substitute derivative-symbol
-	      'derivative
-	      expr))
+              'derivative
+              expr))
 
 (define (flush-literal-function-constructors expr)
   (if (pair? expr)
       (if (eq? (car expr) 'literal-function)
-	  (if (and (pair? (cadr expr)) (eq? (caadr expr) 'quote))
-	      (flush-literal-function-constructors (cadadr expr))
-	      (cadr expr))
-	  (cons (flush-literal-function-constructors (car expr))
-		(flush-literal-function-constructors (cdr expr))))
+          (if (and (pair? (cadr expr)) (eq? (caadr expr) 'quote))
+              (flush-literal-function-constructors (cadadr expr))
+              (cadr expr))
+          (cons (flush-literal-function-constructors (car expr))
+                (flush-literal-function-constructors (cdr expr))))
       expr))
 
 
@@ -103,9 +103,9 @@
 (define (simplify exp)
   (flush-derivative
        (flush-literal-function-constructors
-	(ham:simplify
-	 ((if *factoring* poly:factor (lambda (expr) expr))
-	  (g:simplify exp))))))
+        (ham:simplify
+         ((if *factoring* poly:factor (lambda (expr) expr))
+          (g:simplify exp))))))
 |#
 
 (define (simplify exp)
@@ -128,15 +128,15 @@
         numerical-environment scmutils-base-environment))
 
 (define (prepare-for-printing expr simplifier)
-  (set! *last-expression-printed* 
-	(cond ((unsimplifiable? expr)
-	       (lambda () expr))
-	      ((and (not (with-units? expr))
-		    (apply object-name expr (system-environments)))
-	       => (lambda (name) (lambda () name)))
-	      (else
-	       (let ((rexpr (simplifier expr)))
-		  (lambda () (arg-suppressor rexpr))))))
+  (set! *last-expression-printed*
+        (cond ((unsimplifiable? expr)
+               (lambda () expr))
+              ((and (not (with-units? expr))
+                    (apply object-name expr (system-environments)))
+               => (lambda (name) (lambda () name)))
+              (else
+               (let ((rexpr (simplifier expr)))
+                 (lambda () (arg-suppressor rexpr))))))
   *last-expression-printed*)
 
 (define (unsimplifiable? expr)
@@ -147,15 +147,15 @@
       (hash-table? expr)
       (undefined-value? expr)
       (and (procedure? expr)
-	   (object-name expr system-global-environment))
+           (object-name expr system-global-environment))
       (improper-expression? expr)))
 
 (define (improper-expression? expr)
   (and (pair? expr)
        (not (eq? (car expr) '*matrix*))
        (or (memq (car expr) '(*operator* *solution*)) ;What is this?
-	   (not (list? expr))
-	   (any improper-expression? expr))))
+           (not (list? expr))
+           (any improper-expression? expr))))
 
 (define (show-expression expr #:optional simplifier)
   (if (default-object? simplifier) (set! simplifier simplify))

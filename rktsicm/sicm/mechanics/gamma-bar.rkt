@@ -20,15 +20,15 @@
 
 (define ((osculating-path state0) t)
   (let ((t0 (time state0))
-	(q0 (coordinate state0))
-	(k (vector-length state0)))
+        (q0 (coordinate state0))
+        (k (vector-length state0)))
     (let ((dt (- t t0)))
       (let loop ((n 2) (sum q0) (dt^n/n! dt))
-	(if (fix:= n k)
-	    sum
-	    (loop (+ n 1)
-		  (+ sum (* (vector-ref state0 n) dt^n/n!))
-		  (/ (* dt^n/n! dt) n)))))))
+        (if (fix:= n k)
+            sum
+            (loop (+ n 1)
+                  (+ sum (* (vector-ref state0 n) dt^n/n!))
+                  (/ (* dt^n/n! dt) n)))))))
 
 ;;; "total time derivative"
 
@@ -51,7 +51,7 @@
   (define (DtF state)
     (let ((n (vector-length state)))
       (define (DF-on-path q)
-	(D (compose F (Gamma q (- n 1)))))
+        (D (compose F (Gamma q (- n 1)))))
       ((Gamma-bar DF-on-path) state)))
   DtF)
 
@@ -63,7 +63,7 @@
  ((Dt
    (lambda (state)
      (let ((t (time state))
-	   (q (coordinate state)))
+           (q (coordinate state)))
        (square q))))
   (up 't (up 'x 'y) (up 'vx 'vy))))
 (+ (* 2 vx x) (* 2 vy y))
@@ -76,7 +76,7 @@ a
 
 (print-expression
  ((Dt (Dt (lambda (state)
-	    (square (coordinate state)))))
+            (square (coordinate state)))))
   (up 't 'x 'v 'a 'j)))
 (+ (* 2 a x) (* 2 (expt v 2)))
 
@@ -104,7 +104,7 @@ a
 
 (define LE Euler-Lagrange-operator)
 (define Lagrange-equations-operator LE)
- 
+
 ;;; Given a local tuple, produces a finite state.
 
 #|
@@ -169,10 +169,10 @@ a
 
 (print-expression
  ((compose (LE (L-central-polar 'm (literal-function 'V)))
-	   (Gamma
-	    (coordinate-tuple (literal-function 'r)
-			      (literal-function 'phi))
-	    4))
+           (Gamma
+            (coordinate-tuple (literal-function 'r)
+                              (literal-function 'phi))
+            4))
   't))
 (down
  (+ (* -1 m (expt ((D phi) t) 2) (r t))
@@ -188,26 +188,26 @@ a
 
 (define (clip state)
   (vector-head state
-	       (- (vector-length state)
-		  1)))
+               (- (vector-length state)
+                  1)))
 
 
 (define ((generalized-LE Lagrangian) state)
   (let ((m (s:length state)))
     (assert (and (fix:> m 3) (even? m))
-	    "Incorrect state size for Lagrange Equations")
+            "Incorrect state size for Lagrange Equations")
     (let lp ((i (quotient m 2)) (state state))
       (if (fix:= i 0)
-	  0
-	  (- (((expt Dt (fix:- i 1))
-	       ((partial i) Lagrangian))
-	      state)
-	     (lp (fix:- i 1) (clip state)))))))
+          0
+          (- (((expt Dt (fix:- i 1))
+               ((partial i) Lagrangian))
+              state)
+             (lp (fix:- i 1) (clip state)))))))
 
 #|
 (define ((L2harmonic m k) state)
   (let ((x (coordinate state))
-	(a (acceleration state)))
+        (a (acceleration state)))
     (+ (* 1/2 m x a) (* 1/2 k (square x)))))
 
 (print-expression

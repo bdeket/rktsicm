@@ -24,32 +24,32 @@
 
 (define ((frame-maker c->e e->c) name ancestor-frame . params)
 
-   (define (coordinates->event coords)
-     (assert (eq? (frame-owner coords) this-frame))
-     (let ((event
-	    ((apply c->e ancestor-frame this-frame params) coords)))
-       (assert (event? event))
-       event))
+  (define (coordinates->event coords)
+    (assert (eq? (frame-owner coords) this-frame))
+    (let ((event
+           ((apply c->e ancestor-frame this-frame params) coords)))
+      (assert (event? event))
+      event))
 
-   (define (event->coordinates event)
-     (assert (event? event))
-     (let ((coords 
-	    ((apply e->c ancestor-frame this-frame params) event)))
-       (assert (eq? (frame-owner coords) this-frame))
-       coords))
+  (define (event->coordinates event)
+    (assert (event? event))
+    (let ((coords
+           ((apply e->c ancestor-frame this-frame params) event)))
+      (assert (eq? (frame-owner coords) this-frame))
+      coords))
 
   (define this-frame (frame name ancestor-frame coordinates->event event->coordinates params))
   #; ;;bdk;; -> frame struct
-   (define (this-frame m)
-     (case m
-       ((coords->event) coordinates->event)
-       ((event->coords) event->coordinates)
-       ((name) name)
-       ((ancestor-frame) ancestor-frame)
-       ((params) params)
-       ((manifold) #f)			;Kludge.  See frame? in manifold.scm
-       (else (error "Unknown message: " name m))))
-   this-frame)
+  (define (this-frame m)
+    (case m
+      ((coords->event) coordinates->event)
+      ((event->coords) event->coordinates)
+      ((name) name)
+      ((ancestor-frame) ancestor-frame)
+      ((params) params)
+      ((manifold) #f)                        ;Kludge.  See frame? in manifold.scm
+      (else (error "Unknown message: " name m))))
+  this-frame)
 
 #;#;#; ;;bdk;; -> frame struct
 (define (event->coords frame) (frame 'event->coords))
@@ -69,9 +69,9 @@
 (define (claim! coords owner)
   (let ((other (frame-owner coords)))
     (if other
-	(if (not (eq? other owner))
-	    (error "Someone else owns these coords" coords owner))
-	(eq-put! coords 'owner owner))
+        (if (not (eq? other owner))
+            (error "Someone else owns these coords" coords owner))
+        (eq-put! coords 'owner owner))
     coords))
 
 #;#; ;;bdk;; -> frame struct

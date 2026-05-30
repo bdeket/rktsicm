@@ -143,7 +143,7 @@
     (check-equal? ((s->l 5) (series:inflate s1 3)) '(1 0 0 1 0)))
    (test-case
     "solve-linear"
-    
+
     (check-equal? ((s->l 5) (g:solve-linear (power-series 5) (power-series 3)))
                   ((s->l 5) (power-series 3/5)))
     (check-equal? ((s->l 5) (g:solve-linear 5 (power-series 3)))

@@ -20,7 +20,7 @@
               1e-15)
              1.5707963267948966
              1e-15))
-   ;;; If the root is multiple, the convergence is much slower 
+   ;;; If the root is multiple, the convergence is much slower
    ;;;  and much less accurate.
    (test-case
     "multi-root"

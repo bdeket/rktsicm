@@ -70,11 +70,11 @@
 (define (g:acosh z)
   (g:* 2
        (g:log (g:+ (g:sqrt (g:/ (g:+ z n:one) 2))
-		   (g:sqrt (g:/ (g:- z n:one) 2))))))
+                   (g:sqrt (g:/ (g:- z n:one) 2))))))
 
 (define (g:atanh z)
   (g:/ (g:- (g:log (g:+ n:one z))
-	    (g:log (g:- n:one z)))
+            (g:log (g:- n:one z)))
        2))
 
 (define (g:arg-shift f . shifts)
@@ -103,39 +103,39 @@
 
 (define (g:size x)
   (cond ((vector? x)      (vector-length x))
-	((matrix? x)      (matrix-size x))
-	((structure? x)   (s:length x))
-	((series? x)      #f)
-	((stream-pair? x) #f)
-	((list? x)        (length x))
-	((string? x)      (string-length x))
-	(else
-	 (error "Unknown compound -- G:size" x))))
+        ((matrix? x)      (matrix-size x))
+        ((structure? x)   (s:length x))
+        ((series? x)      #f)
+        ((stream-pair? x) #f)
+        ((list? x)        (length x))
+        ((string? x)      (string-length x))
+        (else
+         (error "Unknown compound -- G:size" x))))
 
 ;;; Generic composition duplicates composition in utils
 
 (define (g:compose . fs)
   (define (lp fs)
     (cond ((null? (cdr fs)) (car fs))
-	  (else (g:compose-2 (car fs) (lp (cdr fs))))))
+          (else (g:compose-2 (car fs) (lp (cdr fs))))))
   (cond ((null? fs) g:identity)
-	((null? (cdr fs)) (car fs))
-	(else
-	 (g:compose-bin (lp (butlast fs))
-			(car (last-pair fs))))))
+        ((null? (cdr fs)) (car fs))
+        (else
+         (g:compose-bin (lp (butlast fs))
+                        (car (last-pair fs))))))
 
 ;;bdk;; moved to cstm/generic 10
 
 (define (g:compose-2 f g)
   (cond ((pair? g)
-	 (lambda x
-	   (g:apply f
-		    (map (lambda (gi)
-			   (g:apply gi x))
-			 g))))
-	(else
-	 (lambda x
-	   (f (g:apply g x))))))
+         (lambda x
+           (g:apply f
+                    (map (lambda (gi)
+                           (g:apply gi x))
+                         g))))
+        (else
+         (lambda x
+           (f (g:apply g x))))))
 
 (define (g:compose-bin f g)
   (cond
@@ -163,121 +163,121 @@
 #;
 (define (g:compose-bin f g)
   (cond ((and (pair? g) (not (structure? g)))
-	 (let ((a
-		(a-reduce joint-arity
-			  (map g:arity g))))
+         (let ((a
+                (a-reduce joint-arity
+                          (map g:arity g))))
            (cond ((pair:eq? a *at-least-zero*)
-		  (lambda x
-		    (g:apply f
-			   (map
-			    (lambda (gi)
-			      (g:apply gi x))
-			    g))))
-		 ((pair:eq? a *exactly-zero*)
-		  (lambda ()
-		    (g:apply f
-			   (map (lambda (gi)
-				  (gi))
-				g))))
-		 ((pair:eq? a *at-least-one*)
-		  (lambda (x . y)
-		    (g:apply f
-			   (map (lambda (gi)
-				  (g:apply gi x y))
-				g))))
-		 ((pair:eq? a *exactly-one*)
-		  (lambda (x)
-		    (g:apply f
-			   (map (lambda (gi)
-				  (gi x))
-				g))))
+                  (lambda x
+                    (g:apply f
+                             (map
+                              (lambda (gi)
+                                (g:apply gi x))
+                              g))))
+                 ((pair:eq? a *exactly-zero*)
+                  (lambda ()
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (gi))
+                                  g))))
+                 ((pair:eq? a *at-least-one*)
+                  (lambda (x . y)
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (g:apply gi x y))
+                                  g))))
+                 ((pair:eq? a *exactly-one*)
+                  (lambda (x)
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (gi x))
+                                  g))))
 
-		 ((pair:eq? a *at-least-two*)
-		  (lambda (x y . z)
-		    (g:apply f
-			   (map (lambda (gi)
-				  (g:apply gi x y z))
-				g))))
-		 ((pair:eq? a *exactly-two*)
-		  (lambda (x y)
-		    (g:apply f
-			   (map (lambda (gi)
-				  (gi x y))
-				g))))
-		 ((pair:eq? a *at-least-three*)
-		  (lambda (u x y . z)
-		    (g:apply f
-			   (map (lambda (gi)
-				  (g:apply gi u x y z))
-				g))))
-		 ((pair:eq? a *exactly-three*)
-		  (lambda (x y z)
-		    (g:apply f
-			   (map (lambda (gi)
-				  (gi x y z))
-				g))))
-		 ((pair:eq? a *one-or-two*)
-		  (lambda (x #:optional y)
-		    (if (default-object? y)
-			(g:apply f
-			       (map (lambda (gi)
-				      (gi x))
-				    g))
-			(g:apply f
-			       (map (lambda (gi)
-				      (gi x y))
-				    g)))))
-		 (else
-		  (lambda x
-		    (g:apply f
-			   (map
-			    (lambda (gi)
-			      (g:apply gi x))
-			    g)))))))
-	(else
-	 (let ((a (g:arity g)))
+                 ((pair:eq? a *at-least-two*)
+                  (lambda (x y . z)
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (g:apply gi x y z))
+                                  g))))
+                 ((pair:eq? a *exactly-two*)
+                  (lambda (x y)
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (gi x y))
+                                  g))))
+                 ((pair:eq? a *at-least-three*)
+                  (lambda (u x y . z)
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (g:apply gi u x y z))
+                                  g))))
+                 ((pair:eq? a *exactly-three*)
+                  (lambda (x y z)
+                    (g:apply f
+                             (map (lambda (gi)
+                                    (gi x y z))
+                                  g))))
+                 ((pair:eq? a *one-or-two*)
+                  (lambda (x #:optional y)
+                    (if (default-object? y)
+                        (g:apply f
+                                 (map (lambda (gi)
+                                        (gi x))
+                                      g))
+                        (g:apply f
+                                 (map (lambda (gi)
+                                        (gi x y))
+                                      g)))))
+                 (else
+                  (lambda x
+                    (g:apply f
+                             (map
+                              (lambda (gi)
+                                (g:apply gi x))
+                              g)))))))
+        (else
+         (let ((a (g:arity g)))
            (cond ((pair:eq? a *at-least-zero*)
-		  (lambda x
-		    (g:apply f
-			     (list (g:apply g x)))))
-		 ((pair:eq? a *exactly-zero*)
-		  (lambda ()
-		    (g:apply f
-			     (list (g:apply g '())))))
-		 ((pair:eq? a *at-least-one*)
-		  (lambda (x . y)
-		    (g:apply f
-			     (list (g:apply g x y)))))
-		 ((pair:eq? a *exactly-one*)
-		  (lambda (x)
-		    (g:apply f
-			     (list (g:apply g (list x))))))
-		 ((pair:eq? a *at-least-two*)
-		  (lambda (x y . z)
-		    (g:apply f
-			     (list (g:apply g x y z)))))
-		 ((pair:eq? a *exactly-two*)
-		  (lambda (x y)
-		    (g:apply f
-			     (list (g:apply g (list x y))))))
-		 ((pair:eq? a *at-least-three*)
-		  (lambda (u x y . z)
-		    (g:apply f
-			     (list (g:apply g u x y z)))))
-		 ((pair:eq? a *exactly-three*)
-		  (lambda (x y z)
-		    (g:apply f
-			     (list (g:apply g (list x y z))))))
-		 ((pair:eq? a *one-or-two*)
-		  (lambda (x #:optional y)
-		    (if (default-object? y)
-			(g:apply f
-				 (list (g:apply g (list x))))
-			(g:apply f
-				 (list (g:apply g (list x y)))))))
-		 (else
-		  (lambda x
-		    (g:apply f
-			     (list (g:apply g x))))))))))
+                  (lambda x
+                    (g:apply f
+                             (list (g:apply g x)))))
+                 ((pair:eq? a *exactly-zero*)
+                  (lambda ()
+                    (g:apply f
+                             (list (g:apply g '())))))
+                 ((pair:eq? a *at-least-one*)
+                  (lambda (x . y)
+                    (g:apply f
+                             (list (g:apply g x y)))))
+                 ((pair:eq? a *exactly-one*)
+                  (lambda (x)
+                    (g:apply f
+                             (list (g:apply g (list x))))))
+                 ((pair:eq? a *at-least-two*)
+                  (lambda (x y . z)
+                    (g:apply f
+                             (list (g:apply g x y z)))))
+                 ((pair:eq? a *exactly-two*)
+                  (lambda (x y)
+                    (g:apply f
+                             (list (g:apply g (list x y))))))
+                 ((pair:eq? a *at-least-three*)
+                  (lambda (u x y . z)
+                    (g:apply f
+                             (list (g:apply g u x y z)))))
+                 ((pair:eq? a *exactly-three*)
+                  (lambda (x y z)
+                    (g:apply f
+                             (list (g:apply g (list x y z))))))
+                 ((pair:eq? a *one-or-two*)
+                  (lambda (x #:optional y)
+                    (if (default-object? y)
+                        (g:apply f
+                                 (list (g:apply g (list x))))
+                        (g:apply f
+                                 (list (g:apply g (list x y)))))))
+                 (else
+                  (lambda x
+                    (g:apply f
+                             (list (g:apply g x))))))))))
 
 

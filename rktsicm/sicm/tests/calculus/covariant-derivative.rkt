@@ -88,7 +88,7 @@
     (check-exn #px"assertion failed: \\(Christoffel\\? Christoffel\\)"
                (λ () (Christoffel->Cartan 'not-a-christoffel))))
 
-   
+
    (test-case
     "symmetrize-Cartan/Christoffel"
     (define pt ((point R2-rect) #(x0 y0)))
@@ -120,7 +120,7 @@
                                        (* ,√x²+y² (+ ,x² ,y²))))
                                 (up (/ (+ ,CC_3 (* v^0 y0) (* -1 v^1 x0)) ,√x²+y²)
                                     (/ (+ ,CC_4 (* v^0 x0) (* v^1 y0)) ,x²+y²))))))
-   
+
    (test-case
     "Cartan->Cartan-over-map"
     (define µ (literal-manifold-map 'µ R2-rect R3-rect))
@@ -374,7 +374,7 @@
                              (* (v1^1 ,M) (((partial 1) µ^0) ,M) (1f_0 ,M^1) (((partial 0) v2^0) ,M^1))
                              (* (v1^1 ,M) (((partial 1) µ^0) ,M) (v2^1 ,M^1) (((partial 0) 1f_1) ,M^1))
                              (* (v1^1 ,M) (((partial 1) µ^0) ,M) (1f_1 ,M^1) (((partial 0) v2^1) ,M^1))))))
-   
+
    (test-case "ORIG:covariant-derivative 1"
               (define omega (literal-1form-field 'omega R4-rect))
               (declare-argument-types! omega (list vector-field?))
@@ -500,7 +500,7 @@
                         (typical-point R2-rect))
                        0)
     (check-simplified? (((((- (covariant-derivative R2-polar-Cartan)
-                              (covariant-derivative 
+                              (covariant-derivative
                                (Cartan-transform R2-polar-Cartan R2-rect-basis)))
                            v)
                           w)
@@ -557,13 +557,13 @@
     (define J (- (* x d/dy) (* y d/dx)))
     (define f (literal-scalar-field 'f R2-rect))
     ;;; Note: arg-suppressor is in force from above.
-    (check-simplified? (((((covariant-derivative rect-Cartan) 
+    (check-simplified? (((((covariant-derivative rect-Cartan)
                            d/dx)
                           J)
                          f)
                         m2)
                        '((partial 1) f))
-    (check-simplified? (((((covariant-derivative polar-Cartan) 
+    (check-simplified? (((((covariant-derivative polar-Cartan)
                            d/dx)
                           J)
                          f)
@@ -598,7 +598,7 @@
     (define spherical-basis (coordinate-system->basis spherical))
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))
@@ -618,11 +618,11 @@
                     (the-real-line '->coords)))
        (basis->vector-basis basis-over-gamma)))
     (define sphere-Cartan (Christoffel->Cartan G-S2-1))
-    (check-simplified? (s:map/r 
+    (check-simplified? (s:map/r
                         (lambda (omega)
                           ((omega
-                            (((covariant-derivative sphere-Cartan gamma:N->M) 
-                              d/dt) 
+                            (((covariant-derivative sphere-Cartan gamma:N->M)
+                              d/dt)
                              w))
                            ((the-real-line '->point) 'tau)))
                         (basis->1form-basis basis-over-gamma))
@@ -710,7 +710,7 @@
     (define 2-sphere-basis (coordinate-system->basis S2-spherical))
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))
@@ -721,7 +721,7 @@
                                                    (literal-function 'mu-phi))
                                                (R1-rect '->coords)))
                              (Cartan (Christoffel->Cartan G-S2-1)))
-                         (s:map/r 
+                         (s:map/r
                           (lambda (w)
                             ((w
                               (((covariant-derivative Cartan mu:N->M) d/dt)
@@ -924,7 +924,7 @@
     (define S2-basis (coordinate-system->basis S2-spherical))
     (define G-S2-1
       (make-Christoffel
-       (let ((zero  (lambda (point) 0))) 
+       (let ((zero  (lambda (point) 0)))
          (down (down (up zero zero)
                      (up zero (/ 1 (tan theta))))
                (down (up zero (/ 1 (tan theta)))

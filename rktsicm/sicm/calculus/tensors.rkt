@@ -14,7 +14,7 @@
 
 ;;; To be a tensor field a function must be linear
 ;;; over the scalar function field in each of its
-;;; arguments.  
+;;; arguments.
 
 ;;; Each argument of a tensor field must be either
 ;;; a one-form field or a vector field.
@@ -25,40 +25,40 @@
 
 (define (tensor-test T types coordsys)
   (let ((args (map (literal-field coordsys) types))
-	(f ((literal-field coordsys) 'scalar)))
+        (f ((literal-field coordsys) 'scalar)))
     (map (lambda (i)
-	    (let ((thing
-		   ((literal-field coordsys) (ref types i))))
-	      ((- (apply T
-			 (list-with-substituted-coord
-			  args i
-			   (+ (* f (ref args i))
-			      thing)))
-		  (+ (* f (apply T args))
-		     (apply T
-			    (list-with-substituted-coord
-			     args i
-			     thing))))
-	       (typical-point coordsys))))
-	  (iota (length types)))))
+           (let ((thing
+                  ((literal-field coordsys) (ref types i))))
+             ((- (apply T
+                        (list-with-substituted-coord
+                         args i
+                         (+ (* f (ref args i))
+                            thing)))
+                 (+ (* f (apply T args))
+                    (apply T
+                           (list-with-substituted-coord
+                            args i
+                            thing))))
+              (typical-point coordsys))))
+         (iota (length types)))))
 
 
 (define ((literal-field coordsys) type)
-    (case type
-      ((scalar function)
-       (literal-manifold-function
-	(generate-uninterned-symbol 'g)
-	coordsys))
-      ((up vector)
-       (literal-vector-field
-	(generate-uninterned-symbol 'v)
-	coordsys))
-      ((down 1form one-form)
-       (literal-1form-field
-	(generate-uninterned-symbol 'omega)
-	coordsys))
-      (else
-       (error "Bad type list" type))))
+  (case type
+    ((scalar function)
+     (literal-manifold-function
+      (generate-uninterned-symbol 'g)
+      coordsys))
+    ((up vector)
+     (literal-vector-field
+      (generate-uninterned-symbol 'v)
+      coordsys))
+    ((down 1form one-form)
+     (literal-1form-field
+      (generate-uninterned-symbol 'omega)
+      coordsys))
+    (else
+     (error "Bad type list" type))))
 
 #|
 (tensor-test

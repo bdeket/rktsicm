@@ -11,7 +11,7 @@
 ;;; Noether Theorem Support
 
 ;;; F-tilde is a parametric coordinate transformation that given
-;;; parameters takes a state and returns transformed coordinates.   
+;;; parameters takes a state and returns transformed coordinates.
 ;;; F-tilde may take an arbitrary number of real-valued parameters.
 ;;; F-tilde applied to zeros is the coordinate selector:  It takes a
 ;;; state and returns the coordinates.  The hypothesis of Noether's
@@ -33,16 +33,16 @@
 
 (define (F-tilde theta phi psi)
   (compose (Rx theta)
-	   (Ry phi)
-	   (Rz psi)
-	   coordinate))
+           (Ry phi)
+           (Rz psi)
+           coordinate))
 
 (pe ((Noether-integral
       (L-central-rectangular 'm (literal-function 'Vr))
       F-tilde)
      (up 't
-	 (up 'x 'y 'z)
-	 (up 'vx 'vy 'vz))))
+         (up 'x 'y 'z)
+         (up 'vx 'vy 'vz))))
 (down (+ (* -1 m vy z) (* m vz y))
       (+ (* m vx z) (* -1 m vz x))
       (+ (* -1 m vx y) (* m vy x)))

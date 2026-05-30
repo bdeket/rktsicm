@@ -19,7 +19,7 @@
     (check-equal? (map s:type (list (up 4) (down 5) (abstract-up 'f) (abstract-down 'g)))
                   (list up-type-tag down-type-tag up-type-tag down-type-tag))
     (check-exn #px"Bad structure -- S:TYPE" (λ () (s:type 'any)))
-    
+
     (check-true ((sc:type-predicate (up 4)) (up 4)))
     (check-true ((sc:type-predicate (up 4)) (abstract-up 'f)))
     (check-true ((sc:type-predicate (up 4)) (literal-up 'f 2)))
@@ -34,7 +34,7 @@
     (check-true ((sc:type-predicate (up 4)) (s:structure 'contravariant #(4 5 6))))
     (check-true ((sr:type-predicate (down 4)) (s:structure 'covariant #(4 5 6))))
     (check-exn #px"Bad up/down spec -- S:STRUCTURE" (λ () (s:structure 'any #(4 5 6))))
-    
+
     (check-equal? (s:opposite (up 3 2 1)) 'down)
     (check-equal? (s:opposite (down 1 2 3)) 'up)
     (check-exn #px"Bad structure -- S:OPPOSITE" (λ () (s:opposite 'any)))
@@ -144,7 +144,7 @@
     "conversion"
     (check-equal? (up->vector (up 1 2 3)) #(1 2 3))
     (check-equal? (down->vector (down 1 2 3)) #(1 2 3))
-    
+
     (check-equal? (s:->vector (up 1 2 3)) #(1 2 3))
     (check-equal? (s:->vector (down 3 2 1)) #(3 2 1))
     (check-exn #px"Bad structure -- S:->VECTOR" (λ () (s:->vector 'any)))
@@ -409,7 +409,7 @@
     (check-equal? (structure->matrix (down (up 1 2) (up 3 4))) (matrix-by-rows '(1 3) '(2 4)))
     (check-equal? (structure->matrix (up (up 1 2) (up 3 4))) (matrix-by-rows '(1 3) '(2 4)))
     (check-exn #px"structure->matrix" (λ () (structure->matrix 'any)))
-    
+
     (check-equal? (s:invert (down (down 1 2) (down 3 4))) (up (up -2 1) (up 3/2 -1/2)))
     (check-equal? (s:invert (up (down 1 2) (down 3 4))) (up (down -2 1) (down 3/2 -1/2)))
     (check-equal? (s:invert (down (up 1 2) (up 3 4))) (down (up -2 1) (up 3/2 -1/2)))
@@ -492,7 +492,7 @@
                   (matrix-by-rows '(1 2 3 4)))
     (check-equal? ((as-matrix (λ (s) (structure*scalar s 5))) (down 1 (up 3)))
                   (matrix-by-rows '(5 0) '(15 0) '(0 5) '(0 15))))
-   
+
 
    ))
 

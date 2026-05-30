@@ -13,16 +13,16 @@
   (test-suite
    "numerics/ode/bulirsch-stoer"
    (check-within ((advance-generator
-                   (bulirsch-stoer-lisptran		;integrator
-                    (lambda (vin vout)			;x'= x
+                   (bulirsch-stoer-lisptran                ;integrator
+                    (lambda (vin vout)                        ;x'= x
                       (vector-set! vout 0
                                    (vector-ref vin 0)))
-                    1					;1 dimension
-                    .0001))				;error tolerated
+                    1                                        ;1 dimension
+                    .0001))                                ;error tolerated
                   #(1.0)
                   1.0
                   0.1
-                  0.5					;no step larger than .5
+                  0.5                                        ;no step larger than .5
                   (lambda (ns dt h cont)
                     (cons (list dt ns) (cont)))
                   (lambda (ns dt sdt)
@@ -37,17 +37,17 @@
                    #(2.7182794600110927) 1. .28125)
                  .0001)
    (check-within (take ((advance-generator
-                   (bulirsch-stoer-lisptran		;integrator
+                   (bulirsch-stoer-lisptran                ;integrator
                     (lambda (vin vout)
                       (vector-set! vout 0 1.0)
                       (vector-set! vout 1 (- 0.0 (vector-ref vin 2)))
                       (vector-set! vout 2  (vector-ref vin 1)))
-                    3					;3 dimensions
-                    1e-12))				;error tolerated
+                    3                                        ;3 dimensions
+                    1e-12))                                ;error tolerated
                   #(0.0 1.0 0.0)
                   (* 2 (angle -1))
                   0.1
-                  1.0					;no step larger than 1.0
+                  1.0                                        ;no step larger than 1.0
                   (lambda (ns dt h cont)
                     (cont))
                   (lambda (ns dt sdt)
@@ -60,13 +60,13 @@
     ""
     (define (f x) (sin (/ 1.0 x)))
     (check-within (take ((advance-generator
-                    (bulirsch-stoer-lisptran		;integrator
+                    (bulirsch-stoer-lisptran                ;integrator
                      (lambda (vin vout)
                        (let ((x (vector-ref vin 0)))
                          (vector-set! vout 0 1.0)
                          (vector-set! vout 1 (- 0.0 (/ (cos (/ 1.0 x)) (* x x))))))
                      2
-                     1e-14))				;error tolerated
+                     1e-14))                                ;error tolerated
                    (vector -2.0 (f -2.0))
                    1.9
                    0.1

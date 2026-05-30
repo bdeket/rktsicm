@@ -21,26 +21,26 @@
 
 
 ;;; Tests that K yields a canonical transformation if the C is
-;;; symplectic.  (The qp-canonical? code is really a symplectic 
+;;; symplectic.  (The qp-canonical? code is really a symplectic
 ;;; test without factoring out the Hamiltonian.)
 
 (define ((qp-canonical? C H) s)
   (- (J-func ((D H) (C s)))
      (* ((D C) s)
-	(J-func
-	 ((D (compose H C)) s)))))
+        (J-func
+         ((D (compose H C)) s)))))
 
 #|
 (define ((canonical-K? C K) s)
   (let ((s* (compatible-shape s)))
     (- (T-func s*)
        (+ (* ((D C) s) (J-func ((D K) s)))
-	  (((partial 0) C) s)))))
+          (((partial 0) C) s)))))
 
 
 (define ((canonical-K? C K) s)
   (let ((DCs ((D C) s))
-	(s* (compatible-shape s)))
+        (s* (compatible-shape s)))
     (- (T-func s*)
        (* DCs ((Hamiltonian->state-derivative K) s)))))
 |#
@@ -48,25 +48,25 @@
 #|
 (define ((rotating n) state)
   (let ((t (time state))
-	(q (coordinate state)))
+        (q (coordinate state)))
     (let ((x (ref q 0))
-	  (y (ref q 1))
-	  (z (ref q 2)))
+          (y (ref q 1))
+          (z (ref q 2)))
       (coordinate-tuple (+ (* (cos (* n t)) x) (* (sin (* n t)) y))
-			(- (* (cos (* n t)) y) (* (sin (* n t)) x))
-			z))))
+                        (- (* (cos (* n t)) y) (* (sin (* n t)) x))
+                        z))))
 
 (define (C-rotating n) (F->CT (rotating n)))
 
 (define ((K n) s)
   (let ((q (coordinate s))
-	(p (momentum s)))
+        (p (momentum s)))
     (let ((x (ref q 0)) (y (ref q 1))
-	  (px (ref p 0)) (py (ref p 1)))
+          (px (ref p 0)) (py (ref p 1)))
       (* n (- (* x py) (* y px))))))
 
-(define a-state 
-  (up 't 
+(define a-state
+  (up 't
       (coordinate-tuple 'x 'y 'z)
       (momentum-tuple 'p_x 'p_y 'p_z)))
 
@@ -79,7 +79,7 @@
 (up 0 (up 0 0 0) (down 0 0 0))
 
 (pe ((- (F->K (rotating 'n))
-	(K 'n))
+        (K 'n))
      a-state))
 0
 

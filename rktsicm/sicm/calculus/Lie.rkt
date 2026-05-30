@@ -21,45 +21,45 @@
   (procedure->1form-field
    (lambda (Z)
      (- ((Lie-derivative X) (Y Z))
-	(Y ((Lie-derivative X) Z))))
+        (Y ((Lie-derivative X) Z))))
    'foo))
 |#
 
 (define (Lie-derivative X)
-  (cond ((function? X)			;compatability with SICM Hamiltonian
-	 (make-operator
-	  (lambda (F)
-	    ;(assert (function? F))
-	    (Poisson-bracket F X))
-	  `(Lie-derivative ,X)))
-	((vector-field? X)
-	 (make-operator
-	  (lambda (Y)
-	    (cond
-	     ((function? Y) (X Y))
-	     ((vector-field? Y) (commutator X Y))
-	     ((form-field? Y)		; Hawking & Ellis p.29
-	      (let ((k (get-rank Y)))
-		(procedure->nform-field
-		 (lambda vectors
-		   (assert (= k (length vectors)))
-		   (- ((Lie-derivative X) (apply Y vectors))
-		      (sigma (lambda (i)
-			       (apply Y
-				      (list-with-substituted-coord vectors i
-					  ((Lie-derivative X)
-					   (list-ref vectors i)))))
-			     0 (- k 1))))
-		 k
-		 `((Lie-derivative ,(diffop-name X))
-		   ,(diffop-name Y)))))
-	     ((structure? Y)
-	      (s:map/r (Lie-derivative X) Y))
-	     (else
-	      (error "Bad argument -- Lie-derivative"))))
-	  `(Lie-derivative ,X)))
-	(else
-	 (error "Bad vector field -- Lie-derivative"))))
+  (cond ((function? X)                        ;compatability with SICM Hamiltonian
+         (make-operator
+          (lambda (F)
+            ;(assert (function? F))
+            (Poisson-bracket F X))
+          `(Lie-derivative ,X)))
+        ((vector-field? X)
+         (make-operator
+          (lambda (Y)
+            (cond
+              ((function? Y) (X Y))
+              ((vector-field? Y) (commutator X Y))
+              ((form-field? Y)                ; Hawking & Ellis p.29
+               (let ((k (get-rank Y)))
+                 (procedure->nform-field
+                  (lambda vectors
+                    (assert (= k (length vectors)))
+                    (- ((Lie-derivative X) (apply Y vectors))
+                       (sigma (lambda (i)
+                                (apply Y
+                                       (list-with-substituted-coord vectors i
+                                                                    ((Lie-derivative X)
+                                                                     (list-ref vectors i)))))
+                              0 (- k 1))))
+                  k
+                  `((Lie-derivative ,(diffop-name X))
+                    ,(diffop-name Y)))))
+              ((structure? Y)
+               (s:map/r (Lie-derivative X) Y))
+              (else
+               (error "Bad argument -- Lie-derivative"))))
+          `(Lie-derivative ,X)))
+        (else
+         (error "Bad vector field -- Lie-derivative"))))
 
 #|
 (install-coordinates R3-rect (up 'x 'y 'z))
@@ -110,7 +110,7 @@
 
 
 (pec ((- ((d ((Lie-derivative X) f)) Y)
-	 (((Lie-derivative X) (d f)) Y) )
+         (((Lie-derivative X) (d f)) Y) )
       R3-rect-point)
      (compose arg-suppressor simplify))
 #| Result:
@@ -118,7 +118,7 @@
 |#
 
 (pec ((- ((d ((Lie-derivative X) w)) Y Z)
-	 (((Lie-derivative X) (d w)) Y Z) )
+         (((Lie-derivative X) (d w)) Y Z) )
       ((R3-rect '->point) (up 'x^0 'y^0 'z^0)))
      (compose arg-suppressor simplify))
 #| Result:
@@ -156,7 +156,7 @@
 Let phi_t(x) be the integral curve of V from x for interval t
 
 L_V Y (f) (x) = lim_t->0 ( Y(f) (phi_t (x)) - (d phi_t)(Y)(f)(x))/t
-              = D (lambda (t) 
+              = D (lambda (t)
                        ( Y(f) (phi_t (x)) - (d phi_t)(Y)(f)(x)))
                 (t=0)
 so let g(t) = ( Y(f) (phi_t (x)) - (d phi_t)(Y)(f)(x))
@@ -198,7 +198,7 @@ Is this correct?  No!, cannot add to a manifold point. ***********
     ((D g) 0)))
 
 (pec (- ((((Lie-test X) Y) f) R2-rect-point)
-	((((Lie-derivative X) Y) f) R2-rect-point)))
+        ((((Lie-derivative X) Y) f) R2-rect-point)))
 #| Result:
 0
 |#
@@ -231,8 +231,8 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 (define Y^i (1form-basis Y))
 
 (pe ((- (((Lie-derivative V) Y) f)
-	(+ (* (s:map/r (Lie-derivative V) Y^i) (vector-basis f))
-	   (* Y^i ((s:map/r (Lie-derivative V) vector-basis) f))))
+        (+ (* (s:map/r (Lie-derivative V) Y^i) (vector-basis f))
+           (* Y^i ((s:map/r (Lie-derivative V) vector-basis) f))))
      m))
 0
 |#
@@ -252,12 +252,12 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 (define ((q coords)  t)
   (+ coords
      (* t
-	((X (R2-rect '->coords))
-	 ((R2-rect '->point) coords)))))
+        ((X (R2-rect '->coords))
+         ((R2-rect '->point) coords)))))
 
 (define (gamma initial-point)
   (compose (R2-rect '->point)
-	   (q ((R2-rect '->coords) initial-point))))
+           (q ((R2-rect '->coords) initial-point))))
 
 (define ((phi^X t) point)
   ((gamma point) t))
@@ -266,8 +266,8 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 
 
 (pe ((D (lambda (t)
-	  (- ((Y f) ((phi^X t) m_0))
-	     ((Y (compose f (phi^X t))) m_0))))
+          (- ((Y f) ((phi^X t) m_0))
+             ((Y (compose f (phi^X t))) m_0))))
      0))
 (+ (* -1 (((partial 1) X^0) (up q_x q_y)) (Y^1 (up q_x q_y)) (((partial 0) f) (up q_x q_y)))
    (* -1 (Y^1 (up q_x q_y)) (((partial 1) X^1) (up q_x q_y)) (((partial 1) f) (up q_x q_y)))
@@ -291,28 +291,28 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 
 
 (pe (- ((D (lambda (t)
-	  (- ((Y f) ((phi^X t) m_0))
-	     ((Y (compose f (phi^X t))) m_0))))
-	0)
+          (- ((Y f) ((phi^X t) m_0))
+             ((Y (compose f (phi^X t))) m_0))))
+        0)
        ((((Lie-derivative X) Y) f) m_0)))
 0
 
 (pe (- ((D (lambda (t)
-	     (- ((Y f) ((phi^X t) m_0)) 
-		((((pushforward-vector (phi^X t) (phi^X (- t)))
-		   Y)
-		  f)
-		 ((phi^X t) m_0)))))
-	0)
+             (- ((Y f) ((phi^X t) m_0))
+                ((((pushforward-vector (phi^X t) (phi^X (- t)))
+                   Y)
+                  f)
+                 ((phi^X t) m_0)))))
+        0)
        ((((Lie-derivative X) Y) f) m_0)))
 0
 
 (pe (- ((D (lambda (t)
-	     ((((pushforward-vector (phi^X (- t)) (phi^X t))
-		Y)
-	       f)
-	      m_0)))
-	0)
+             ((((pushforward-vector (phi^X (- t)) (phi^X t))
+                Y)
+               f)
+              m_0)))
+        0)
        ((((Lie-derivative X) Y) f) m_0)))
 0
 |#
@@ -345,9 +345,9 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 ;;; Verifying equation 0.184
 
 (pec ((- (((Lie-derivative V) Y) f)
-	 (* (vector-basis f)
-	    (+ (V (1form-basis Y))
-	       (* (1form-basis Y) (Delta^i_j V)))))
+         (* (vector-basis f)
+            (+ (V (1form-basis Y))
+               (* (1form-basis Y) (Delta^i_j V)))))
       m))
 
 #| Result:
@@ -357,7 +357,7 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 ;;; Indeed, a painful detail:
 
 (pec ((- (* (1form-basis Y) ((s:map/r (Lie-derivative V) vector-basis) f))
-	 (* (1form-basis Y) (Delta^i_j V) (vector-basis f)))
+         (* (1form-basis Y) (Delta^i_j V) (vector-basis f)))
       m))
 
 #| Result:
@@ -367,7 +367,7 @@ Is this correct?  No!, cannot add to a manifold point. ***********
 ;;; Even simpler
 
 (pec ((- (* ((s:map/r (Lie-derivative V) vector-basis) f))
-	 (* (Delta^i_j V) (vector-basis f)))
+         (* (Delta^i_j V) (vector-basis f)))
       m))
 
 #| Result:

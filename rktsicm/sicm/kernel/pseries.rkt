@@ -17,9 +17,9 @@
 
 (define (series:print s . optionals)
   (apply series:for-each
-	 print-expression
-	 s
-	 optionals))
+         print-expression
+         s
+         optionals))
 
 ;;bdk;; moved to cstm/pseries 2
 

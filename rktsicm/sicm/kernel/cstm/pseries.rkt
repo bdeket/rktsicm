@@ -41,34 +41,34 @@
   (if (null? series-list)
       *at-least-zero*
       (a-reduce joint-arity
-		(map series:arity series-list))))
+                (map series:arity series-list))))
 
 (define ((series-wrapper stream-function) . series-list)
   (let ((arity (series:same-arity series-list)))
     (make-series arity
-		 (apply stream-function
-			(map series->stream
-			     series-list)))))
+                 (apply stream-function
+                        (map series->stream
+                             series-list)))))
 
 (define (series:generate p #:optional arity)
   (make-series (if (default-object? arity)
                    *exactly-one*
                    arity)
-	       (let lp ((i 0))
-		 (cons-stream (p i) (lp (+ i 1))))))
+               (let lp ((i 0))
+                 (cons-stream (p i) (lp (+ i 1))))))
 
 (define (series:for-each proc series . optionals)
   (apply stream:for-each
-	 proc
-	 (series->stream series)
-	 optionals))
+         proc
+         (series->stream series)
+         optionals))
 
 (define ((series:elementwise proc) . series-list)
   (let ((arity (series:same-arity series-list)))
     (make-series arity
-		 (apply map-streams
-			proc
-			(map series->stream series-list)))))
+                 (apply map-streams
+                        proc
+                        (map series->stream series-list)))))
 ;;bdk;; insert 1 end
 
 ;;bdk;; insert 2
@@ -81,37 +81,37 @@
 
 (define (series . args)
   (make-series *exactly-zero*
-    (let lp ((a args))
-      (if (null? a)
-	  (infinite-stream-of (g:zero-like (car args)))
-	  (cons-stream (car a) (lp (cdr a)))))))
+               (let lp ((a args))
+                 (if (null? a)
+                     (infinite-stream-of (g:zero-like (car args)))
+                     (cons-stream (car a) (lp (cdr a)))))))
 
 (define (power-series . args)
   (make-series *exactly-one*
-    (let lp ((a args))
-      (if (null? a)
-	  (infinite-stream-of (g:zero-like (car args)))
-	  (cons-stream (car a) (lp (cdr a)))))))
+               (let lp ((a args))
+                 (if (null? a)
+                     (infinite-stream-of (g:zero-like (car args)))
+                     (cons-stream (car a) (lp (cdr a)))))))
 
-(define series:zero 
+(define series:zero
   (make-series *exactly-one* zero-stream))
 
-(define series:one 
+(define series:one
   (make-series *exactly-one*
-	       (cons-stream n:one zero-stream)))
+               (cons-stream n:one zero-stream)))
 
 (define series:identity
   (make-series *exactly-one*
-	       (cons-stream n:zero
-			    (cons-stream n:one zero-stream))))
+               (cons-stream n:zero
+                            (cons-stream n:one zero-stream))))
 
 
 (define (constant-series c #:optional arity)
   (make-series (if (default-object? arity)
                    *exactly-one*
                    arity)
-	       (cons-stream c zero-stream)))
-    
+               (cons-stream c zero-stream)))
+
 
 ;;; The following procedures provide a set of capabilities for
 ;;;  manipulating series.
@@ -119,46 +119,46 @@
 (define (coefficient+series c series)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (cons-stream (g:+ c (head s)) (tail s)))))
+                 (cons-stream (g:+ c (head s)) (tail s)))))
 
 (define (series+coefficient series c)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (cons-stream (g:+ (head s) c) (tail s)))))
+                 (cons-stream (g:+ (head s) c) (tail s)))))
 
 (define (coefficient-series c series)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (cons-stream (g:- c (head s))
-		   (negate-stream (tail s))))))
+                 (cons-stream (g:- c (head s))
+                              (negate-stream (tail s))))))
 
 (define (series-coefficient series c)
   (let ((s (series->stream series)))
     (make-series (series:arity series)
-      (cons-stream (g:- (head s) c) (tail s)))))
+                 (cons-stream (g:- (head s) c) (tail s)))))
 
 ;;; c*(a0 + a1*x + a2*x^2 + a3*x^3 + ...)
 ;;;  = c*a0 + c*a1*x + c*a2*x^2 + c*a3*x^3 + ...
 
 (define (coefficient*series c s)
   (make-series (series:arity s)
-    (map-stream (lambda (x) (g:* c x))
-		(series->stream s))))
+               (map-stream (lambda (x) (g:* c x))
+                           (series->stream s))))
 
 (define (series*coefficient s c)
   (make-series (series:arity s)
-    (map-stream (lambda (x) (g:* x c))
-		(series->stream s))))
+               (map-stream (lambda (x) (g:* x c))
+                           (series->stream s))))
 
 
 (define (series/coefficient s c)
   (make-series (series:arity s)
-    (map-stream (lambda (x) (g:/ x c))
-		(series->stream s))))
-    
+               (map-stream (lambda (x) (g:/ x c))
+                           (series->stream s))))
+
 (define (coefficient/series c s)
   (series:mul (constant-series c (series:arity s))
-	      (series:invert s)))
+              (series:invert s)))
 
 ;;; (a0 + a1*x + a2*x^2 + ...) + (b0 + b1*x + b2*x^2 + ...)
 ;;;   = (a0+b0) + (a1+b1)*x + (a2+b2)*x^2 + ...
@@ -190,8 +190,8 @@
 
 (define (mul-series s1 s2)
   (cons-stream (g:* (head s1) (head s2))
-	       (add-series (stream:c*s (head s1) (tail s2))
-		    (mul-series (tail s1) s2))))
+               (add-series (stream:c*s (head s1) (tail s2))
+                           (mul-series (tail s1) s2))))
 
 (define series:mul (series-wrapper mul-series))
 
@@ -203,7 +203,7 @@
   (let ((s0 (g:/ n:one (head s))))
     (define inverted
       (cons-stream s0
-        (mul-series (stream:c*s (g:negate s0) (tail s)) inverted)))
+                   (mul-series (stream:c*s (g:negate s0) (tail s)) inverted)))
     inverted))
 
 (define series:invert (series-wrapper invert-series))
@@ -213,76 +213,76 @@
 
 (define div$series
   (inverse-accumulation series:div
-			series:mul
-			series:invert
-			series:one))
+                        series:mul
+                        series:invert
+                        series:one))
 
 (define (series:expt s e)
   (letrec ((square (lambda (s) (mul-series s s)))
-	   (stream:one
-	    (series->stream series:one))
+           (stream:one
+            (series->stream series:one))
            (zuras
-	    (lambda (t e k)
-	      (cons-stream n:one
-		(stream:c*s (generic:/ e k)
-			    (mul-series t
-					(zuras t
-					       (generic:- e 1)
-					       (fix:+ k 1)))))))
-	   (iexpt
-	    (lambda (s e)
-	      (cond ((fix:< e 0)
-		     (invert-series (iexpt s (fix:negate e))))
-		    ((fix:= e 0) stream:one)
-		    ((fix:= e 1) s)
-		    ((even? e)
-		     (square
-		      (iexpt s (fix:quotient e 2))))
-		    (else
-		     (mul-series s
-		       (square
-			(iexpt s
-			       (fix:quotient (fix:- e 1)
-					     2))))))))
-	   (expt
-	    (lambda (s e)
-	      (if (exact-integer? e)
-		  (iexpt s e)
-		  (stream:c*s (generic:expt (head s) e)
-		    (zuras (stream:s/c (tail s) (head s)) e 1))))))
+            (lambda (t e k)
+              (cons-stream n:one
+                           (stream:c*s (generic:/ e k)
+                                       (mul-series t
+                                                   (zuras t
+                                                          (generic:- e 1)
+                                                          (fix:+ k 1)))))))
+           (iexpt
+            (lambda (s e)
+              (cond ((fix:< e 0)
+                     (invert-series (iexpt s (fix:negate e))))
+                    ((fix:= e 0) stream:one)
+                    ((fix:= e 1) s)
+                    ((even? e)
+                     (square
+                      (iexpt s (fix:quotient e 2))))
+                    (else
+                     (mul-series s
+                                 (square
+                                  (iexpt s
+                                         (fix:quotient (fix:- e 1)
+                                                       2))))))))
+           (expt
+            (lambda (s e)
+              (if (exact-integer? e)
+                  (iexpt s e)
+                  (stream:c*s (generic:expt (head s) e)
+                              (zuras (stream:s/c (tail s) (head s)) e 1))))))
     (make-series (series:arity s)
-		 (expt (series->stream s) e))))
+                 (expt (series->stream s) e))))
 
 (define series:derivative
   (let ()
     (define (deriv-iter s n)
       (if (empty-stream? s)
-	  s
-	  (cons-stream (g:* n (head s))
-		       (deriv-iter (tail s) (fix:+ n 1)))))
+          s
+          (cons-stream (g:* n (head s))
+                       (deriv-iter (tail s) (fix:+ n 1)))))
     (define (derivative s varnums)
       (cond ((pair:eq? (series:arity s) *exactly-zero*)
-	     ((series:elementwise
-	       (lambda (term)
-		 (generic:partial-derivative term varnums)))
-	      s))
-	    ((pair:eq? (series:arity s) *exactly-one*)
-	     (if (not (null? varnums))
-		 (error "Cannot yet take partial derivatives of a series"
-			s varnums))
-	     (make-series *exactly-one*
-			  (deriv-iter (tail (series->stream s)) 1)))
-	    (else
-	     (error "Cannot take derivative of non arity=1 series"
-		    s varnums))))
+             ((series:elementwise
+               (lambda (term)
+                 (generic:partial-derivative term varnums)))
+              s))
+            ((pair:eq? (series:arity s) *exactly-one*)
+             (if (not (null? varnums))
+                 (error "Cannot yet take partial derivatives of a series"
+                        s varnums))
+             (make-series *exactly-one*
+                          (deriv-iter (tail (series->stream s)) 1)))
+            (else
+             (error "Cannot take derivative of non arity=1 series"
+                    s varnums))))
     derivative))
 
 ;;; The integral of a series
 ;;;           a0 + a1*x + a2*x^2 + a3*x^3 + ...
 ;;;  is       c + a0*x + a1*x^2/2 + a2*x^3/3 + ...
 ;;;  and is returned by the procedure *INTEGRATE-SERIES which
-;;;  takes the "initial condition" c as a required argument. 
-;;;  For technical reasons, we are unable to use *INTEGRATE-SERIES 
+;;;  takes the "initial condition" c as a required argument.
+;;;  For technical reasons, we are unable to use *INTEGRATE-SERIES
 ;;;  with mutual-recursion as in
 ;;;
 ;;;    (define cos-series (*integrate-series (series:negate sin-series) 1)) ;DOESN'T
@@ -305,13 +305,13 @@
 (define integrate-helper
   (lambda (s n)
     (cons-stream (g:/ (head s) n)
-		 (integrate-helper (tail s) (fix:+ n 1)))))
+                 (integrate-helper (tail s) (fix:+ n 1)))))
 
 (define (*integrate-series series constant-term)
   (make-series (series:arity series)
-	       (cons-stream constant-term
-			    (integrate-helper (series->stream series)
-					      1))))
+               (cons-stream constant-term
+                            (integrate-helper (series->stream series)
+                                              1))))
 
 (define integral-series-tail
   (lambda (series)
@@ -330,13 +330,13 @@
 
 (define (partial-sums-stream value s)
   (cons-stream value
-	       (partial-sums-stream (g:+ value (head s))
-				    (tail s))))
+               (partial-sums-stream (g:+ value (head s))
+                                    (tail s))))
 ;;bdk;; insert 2 end
 
 ;;bdk;; insert 3
 ;;; This procedure produces the result of substituting the argument
-;;; for the indeterminate in the given power series.  
+;;; for the indeterminate in the given power series.
 
 ;;; Note, if the argument is an OPERATOR, the resulting series may be
 ;;; an operator too, as the series is an implicit summation.
@@ -345,35 +345,35 @@
   (define (collect stream-of-procs)
     (let ((first-result (g:apply (head stream-of-procs) arguments)))
       (if (series? first-result)
-	  (let ((fr (series->stream first-result)))
-	    (cons-stream (head fr)
-			 (stream:+ (tail fr)
-				   (collect (tail stream-of-procs)))))
-	  (cons-stream first-result
-		       (collect (tail stream-of-procs))))))
+          (let ((fr (series->stream first-result)))
+            (cons-stream (head fr)
+                         (stream:+ (tail fr)
+                                   (collect (tail stream-of-procs)))))
+          (cons-stream first-result
+                       (collect (tail stream-of-procs))))))
   (cond ((pair:eq? (series:arity series) *exactly-one*)
-	 (cond ((fix:= (length arguments) 1)
-		(make-series *exactly-zero*
-		 (map-streams g:*
-			      (series->stream series)
-			      (stream-of-powers (car arguments)
-						(g:one-like
-						 (car arguments))))))
-	       (else
-		(error "Wrong number of args to series" series arguments))))
-	((pair:eq? (series:arity series) *exactly-zero*)
-	 (make-series *exactly-zero*
-	  (collect (series->stream series))))
-	(else
-	 (error "Bad arity series" series arguments))))
+         (cond ((fix:= (length arguments) 1)
+                (make-series *exactly-zero*
+                             (map-streams g:*
+                                          (series->stream series)
+                                          (stream-of-powers (car arguments)
+                                                            (g:one-like
+                                                             (car arguments))))))
+               (else
+                (error "Wrong number of args to series" series arguments))))
+        ((pair:eq? (series:arity series) *exactly-zero*)
+         (make-series *exactly-zero*
+                      (collect (series->stream series))))
+        (else
+         (error "Bad arity series" series arguments))))
 
 (define (series:->function series)
   (cond ((pair:eq? (series:arity series) *exactly-zero*)
-	 (series:promote-arity series))
-	((pair:eq? (series:arity series) *exactly-one*)
-	 series)
-	(else
-	 (error "Wrong arity SERIES:->FUNCTION" series))))
+         (series:promote-arity series))
+        ((pair:eq? (series:arity series) *exactly-one*)
+         series)
+        (else
+         (error "Wrong arity SERIES:->FUNCTION" series))))
 
 
 ;;; To go the other way we need Taylor's theorem to give us a power series:
@@ -381,11 +381,11 @@
 (define (series:function-> f . opt)
   (let ((x0 (if (null? opt) n:zero (car opt))))
     (make-series *exactly-one*
-		 (let lp ((i 1) (fn f) (factn 1))
-		   (cons-stream (g:/ (fn x0) factn)
-				(lp (fix:1+ i)
-				    (g:derivative fn)
-				    (* factn i)))))))
+                 (let lp ((i 1) (fn f) (factn 1))
+                   (cons-stream (g:/ (fn x0) factn)
+                                (lp (fix:1+ i)
+                                    (g:derivative fn)
+                                    (* factn i)))))))
 
 
 ;;; To expand a series in a power of the argument
@@ -393,8 +393,8 @@
 (define (series:inflate series exponent)
   (assert (and (integer? exponent) (positive? exponent) (series? series)))
   (make-series (series:arity series)
-	       (stream:inflate (series->stream series)
-			       (fix:- exponent 1))))
+               (stream:inflate (series->stream series)
+                               (fix:- exponent 1))))
 
 (define (series:zero-like x)  series:zero)
 (define (series:one-like x)   series:one)
@@ -454,11 +454,11 @@
 
 #| what to do here ???
 
-		     `(integrate ,*integrate-series)
-		     `(integrate-tail ,integral-series-tail)
-		     `(partial-sums ,partial-sums)
-		     `(->function ,->function)
-		     `(function-> ,function->)
+                     `(integrate ,*integrate-series)
+                     `(integrate-tail ,integral-series-tail)
+                     `(partial-sums ,partial-sums)
+                     `(->function ,->function)
+                     `(function-> ,function->)
 
 |#
 
@@ -466,9 +466,9 @@
 (define (binomial-series a)
   (define (binomial-helper a n c)
     (if (g:= a 0)
-	(cons-stream c zero-stream)
-	(cons-stream c
-	  (binomial-helper (g:- a 1) (g:+ n 1) (g:/ (g:* c a) n)))))
+        (cons-stream c zero-stream)
+        (cons-stream c
+                     (binomial-helper (g:- a 1) (g:+ n 1) (g:/ (g:* c a) n)))))
   (make-series *exactly-one* (binomial-helper a 1 1)))
 
 
@@ -476,35 +476,35 @@
 
 (define cos-series
   (make-series *exactly-one*
-    (cons-stream 1
-		 (negate-stream (integral-series-tail sin-series)))))
+               (cons-stream 1
+                            (negate-stream (integral-series-tail sin-series)))))
 
 (define sin-series
   (make-series *exactly-one*
-	       (cons-stream 0 (integral-series-tail cos-series))))
+               (cons-stream 0 (integral-series-tail cos-series))))
 
 (define exp-series
   (make-series *exactly-one*
-	       (cons-stream 1 (integral-series-tail exp-series))))
+               (cons-stream 1 (integral-series-tail exp-series))))
 
 (define cosh-series
   (make-series *exactly-one*
-	       (cons-stream 1 (integral-series-tail sinh-series))))
+               (cons-stream 1 (integral-series-tail sinh-series))))
 
 (define sinh-series
   (make-series *exactly-one*
-	       (cons-stream 0 (integral-series-tail cosh-series))))
+               (cons-stream 0 (integral-series-tail cosh-series))))
 
 (define tan-series
   (series:div sin-series cos-series))
 
-(define atan-series  
+(define atan-series
   (let ()
     (define (atan-helper n s)
-      (if (even? n) 
-	  (cons-stream 0 (atan-helper (+ n 1) s))
-	  (cons-stream (* s (/ 1 n))
-		       (atan-helper (+ n 1) (- s)))))
+      (if (even? n)
+          (cons-stream 0 (atan-helper (+ n 1) s))
+          (cons-stream (* s (/ 1 n))
+                       (atan-helper (+ n 1) (- s)))))
     (make-series *exactly-one*
-		 (atan-helper 0 1))))
+                 (atan-helper 0 1))))
 ;;bdk;; insert 3 end

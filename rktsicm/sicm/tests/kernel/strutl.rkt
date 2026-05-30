@@ -137,7 +137,7 @@
                   '(1 2 3 4 5 6 7 8 9 10))
     (check-equal? (stream-head (stream:list-append '(a b c) natural-number-stream) 10)
                   '(a b c 1 2 3 4 5 6 7)))
-   
+
    ))
 
 (module+ test

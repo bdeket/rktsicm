@@ -30,7 +30,7 @@
 (define (1form-field? fop)
   (and (form-field? fop) (= (get-rank fop) 1)))
 
-;;; 1form fields multiply by wedge.  
+;;; 1form fields multiply by wedge.
 ;;;   (See wedge.scm for definition of get-rank.)
 
 (define (procedure->1form-field fp #:optional name)
@@ -73,8 +73,8 @@
   (define (internal vf)
     (assert (vector-field? vf))
     (compose (* components
-		(vector-field->components vf coordinate-system))
-	     (coordinate-system '->coords)))
+                (vector-field->components vf coordinate-system))
+             (coordinate-system '->coords)))
   (s:map/r internal vf))
 
 
@@ -99,24 +99,24 @@
 (define (literal-1form-field name coordinate-system)
   (let ((n (coordinate-system 'dimension)))
     (let ((function-signature
-	   (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
+           (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
       (let ((components
-	     (s:generate n 'down
-			 (lambda (i)
-			   (literal-function (string->symbol
-					      (string-append
-					       (symbol->string name)
-					       "_"
-					       (number->string i)))
-					     function-signature)))))
-	(components->1form-field components coordinate-system name)))))
+             (s:generate n 'down
+                         (lambda (i)
+                           (literal-function (string->symbol
+                                              (string-append
+                                               (symbol->string name)
+                                               "_"
+                                               (number->string i)))
+                                             function-signature)))))
+        (components->1form-field components coordinate-system name)))))
 
 ;;; To get the elements of a coordinate basis for the 1-form fields
 
 (define ((coordinate-basis-1form-field-procedure coordinate-system . i) vf)
   (define (internal vf)
     (assert (vector-field? vf)
-	    "Bad vector field: coordinate-basis-1form-field")
+            "Bad vector field: coordinate-basis-1form-field")
     (vf (compose (apply component i) (coordinate-system '->coords))))
   (s:map/r internal vf))
 
@@ -139,11 +139,11 @@
 #|
 (define (coordinate-system->1form-basis coordinate-system)
   (s:map (lambda (chain)
-	   (apply coordinate-basis-1form-field
-		  coordinate-system
-		  `(w ,@chain)
-		  chain))
-	 (coordinate-system 'access-chains)))
+           (apply coordinate-basis-1form-field
+                  coordinate-system
+                  `(w ,@chain)
+                  chain))
+         (coordinate-system 'access-chains)))
 |#
 
 (define (coordinate-system->1form-basis coordinate-system)
@@ -191,8 +191,8 @@
 (define a-1form
   (components->1form-field
    (down (literal-function 'ax (-> (UP* Real) Real))
-	 (literal-function 'ay (-> (UP* Real) Real))
-	 (literal-function 'az (-> (UP* Real) Real)))
+         (literal-function 'ay (-> (UP* Real) Real))
+         (literal-function 'az (-> (UP* Real) Real)))
    R3-rect))
 
 (define a-vector-field
@@ -262,9 +262,9 @@
 
 (pec
  (((components->1form-field (1form-field->components
-			     (+ (* 'w_0 dr) (* 'w_1 dtheta))
-			     R3-rect)
-			    R3-rect)
+                             (+ (* 'w_0 dr) (* 'w_1 dtheta))
+                             R3-rect)
+                            R3-rect)
    (+ (* 'V^0 d/dx) (* 'V^1 d/dy)))
   mp))
 #| Result:

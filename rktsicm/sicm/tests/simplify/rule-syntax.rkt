@@ -87,7 +87,7 @@
                                    (expt (: x) (: n)) ))
                   '(rule:make `(exp (* (? n ,integer?) (log (? x))))
                               (lambda (x n) `(expt ,x ,n))))
-    
+
     (check-equal? (rule:compile '( (exp (* (? n integer?) (log (? x))))
                                    `(expt ,x ,n) ))
                   '(rule:make `(exp (* (? n ,integer?) (log (? x))))

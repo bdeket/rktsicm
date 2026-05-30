@@ -14,7 +14,7 @@
 
 ;;bdk;; start original file
 
-;;;; Simple-minded common-subexpression eliminator.  
+;;;; Simple-minded common-subexpression eliminator.
 ;;;    GJS: 9 December 2005, 23 December 2019
 
 
@@ -121,16 +121,16 @@
           (((independent dependent)
             (partition (lambda (binding)
                          (every (lambda (other-binding)
-                                   (not (occurs-in? (car other-binding)
-                                                    (cadr binding))))
-                                 bindings))
+                                  (not (occurs-in? (car other-binding)
+                                                   (cadr binding))))
+                                bindings))
                        bindings)))
         (if (null? independent)
             (error "variables interdependent")
             (let ((inner (make-canonical-lets dependent body)))
               `(let ,independent
                  ,inner))))))
- 
+
 (define (make-expression-recorder parent-recorder bound-variables)
   (let ((local-expressions-seen '()))
     (lambda (message)
@@ -181,7 +181,7 @@
            (if (symbol? variable)
                (let ((entry
                       (find (lambda (entry) (eq? (entry-name entry) variable))
-                             local-expressions-seen)))
+                            local-expressions-seen)))
                  (if entry
                      (list (entry-expr entry))
                      (if parent-recorder
@@ -217,17 +217,17 @@
 
 (pp (gjs/cselim
      '(lambda (x)
-	(/ (+ (* x 3) (- y z) (- x y) (* x 3))
-	   (- y z)))))
+        (/ (+ (* x 3) (- y z) (- x y) (* x 3))
+           (- y z)))))
 (let ((G301 (- y z)))
   (lambda (x)
     (let ((G300 (* x 3)))
       (/ (+ G300 G301 (- x y) G300)
-	 G301))))
+         G301))))
 
 (pp (gjs/cselim
      '(let ((x 32) (y 5))
-	(+ (* x 3) (- x y) (* x 3)))))
+        (+ (* x 3) (- x y) (* x 3)))))
 (let ((x 32) (y 5))
   (let ((G296 (* x 3)))
     (+ G296 (- x y) G296)))

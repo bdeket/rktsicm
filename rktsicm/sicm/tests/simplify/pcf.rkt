@@ -29,7 +29,7 @@
     (check-equal? (poly/gcd-euclid (poly/mul (poly/mul x+1 x+1) x-1)
                                    (poly/mul (poly/mul x-1 x-1) x+1))
                   '(*dense* 1 1 0 -1))
-    
+
     (define k1 (poly/make-from-dense 1 '(1 0 1 0 -3 -3 8 2 -5)))
     (define k2 (poly/make-from-dense 1 '(3 0 5 0 -4 -9 21)))
     (check-equal? (poly/gcd-euclid k1 k2)
@@ -60,7 +60,7 @@
           ;;;(->expression
           ;;; (poly/derivative-partial
           ;;;  (->poly '(+ (* x y z) (* x x z) (* y y))
-          ;;;	     '(x y z))
+          ;;;             '(x y z))
           ;;;  2)
           ;;; '(x y z))
           ;;;Value: (+ (* z x) (* 2 y))
@@ -75,7 +75,7 @@
     (check-true (poly/equal? (pcf:expression-> '(expt x 3) (λ (p v) p)) (poly/make 1 '(1 0 0 0))))
     (check-true (poly/equal? (pcf:expression-> '(square x) (λ (p v) p)) (poly/make 1 '(1 0 0))))
     (check-equal? (pcf:expression-> '(gcd 6 (* 15 x)) list) (list 3 '(x)))
-    
+
     (check-equal? (pcf:expression-> '(+ (+ (* x y z) (* x x z) (* y y)))
                                     (λ (p v) (pcf:->expression p v)))
                   '(+ (* (+ (* z x) (* z y)) x) (expt y 2)))
@@ -198,7 +198,7 @@
     (check-equal? (poly/add (poly/make 1 '(-3 -2 -1 0))
                             (poly/make 1 '(3 2 1 0)))
                   0)
-    
+
     (check-equal? (poly/sub (poly/make-c*x^n 1 0 0) P0)
                   (poly/make 2 (list (poly/make 1 '(-2 -1 0)) -1 0)))
     (check-equal? (poly/sub (poly/make 1 '(1)) (poly/make-c*x^n 1 2 0))
@@ -331,14 +331,14 @@
     (check-equal? (poly/horner-univariate (poly/make 1 '(1 1)) 1) 2)
     (check-equal? (poly/horner-univariate (poly/make 1 '(1 1)) 2) 3)
     (check-equal? (poly/horner-univariate (poly/make 1 '(2 2)) 2) 6)
-    
+
     (check-equal? (poly/horner 1 '(1 2 3)) 1)
     (check-equal? (poly/horner 2 '(1 2 3)) 2)
     (check-equal? (poly/horner P0 '(0 0)) 0)
     (check-equal? (poly/horner P0 '(1 1)) 4)
     (check-equal? (poly/horner P1 '(1 1 1)) 5)
     (check-exn #px"Wrong number of args -- POLY/HORNER" (λ () (poly/horner P0 '(1))))
-    
+
     (check-equal? (poly/horner-with-error 5 1 vector) #(5 0 0 0))
     (check-equal? (poly/horner-with-error (poly/make 1 '(1 0)) 4 vector)
                   (vector 4 1 0 (* 2 4 n:machine-epsilon)))
@@ -394,12 +394,12 @@
     (check-true (pcf? (poly/make 2 '(12 2))))
     (check-true (pcf? (poly/make-c*x^n 5 4 3)))
     (check-false (pcf? '(1 2 3)))
-    
+
     (check-true (explicit-pcf? (poly/make 2 '(12 2))))
     (check-true (explicit-pcf? (poly/make-c*x^n 5 4 3)))
     (check-false (explicit-pcf? 3))
     (check-false (explicit-pcf? '(1 2 3)))
-    
+
     (check-equal? (poly/type 3) '*dense*)
     (check-equal? (poly/type (poly/make 2 '(12 2))) '*dense*)
     (check-equal? (poly/type (poly/make-c*x^n 5 4 3)) '*sparse*)
@@ -421,7 +421,7 @@
     (check-equal? (poly/make-from-sparse 5 '((3 . 4))) (poly/make-c*x^n 5 4 3))
     (check-equal? (poly/make-from-sparse 5 '((3 . 4)(2 . 1)))
                   (poly/add (poly/make-c*x^n 5 4 3) (poly/make-c*x^n 5 1 2)))
-    
+
     (check-false (poly/dense? (poly/make-c*x^n 5 4 3)))
     (check-true (poly/dense? (poly/make-from-dense 2 '(12 2))))
     (check-true (poly/dense? 3))
@@ -544,7 +544,7 @@
     (check-equal? (-$poly P0 P0 P0) (poly/scale P0 -1))
     (check-equal? (*$poly) 1)
     (check-equal? (*$poly P0 P0 P0) (poly/expt P0 3)))
-   
+
    ))
 
 (module+ test

@@ -16,13 +16,13 @@
     "\"simple\" explicit method"
     ;;; A "simple" explicit method, based on fourth-order Runge-Kutta:
     (check-within ((advance-generator
-                                ((quality-control rk4 4)		;integration method
-                                 (lambda (v) v)			        ;x' = x
-                                 .0001))				;error tolerated
-                               #(1.0)					;initial state (at t = t0)
-                               1.0					;proceed to t = t0 + 1
-                               0.1					;first step no larger than .1
-                               0.5					;no step larger than .5
+                                ((quality-control rk4 4)                ;integration method
+                                 (lambda (v) v)                                ;x' = x
+                                 .0001))                                ;error tolerated
+                               #(1.0)                                        ;initial state (at t = t0)
+                               1.0                                        ;proceed to t = t0 + 1
+                               0.1                                        ;first step no larger than .1
+                               0.5                                        ;no step larger than .5
                                (lambda (ns dt h cont)
                                  (cons ns (cont)))
                                (lambda (ns dt sdt)
@@ -44,14 +44,14 @@
    (test-case
     "A trapezoid method: xn+1 is found by corrector iteration"
     (check-within ((advance-generator
-                    ((quality-control c-trapezoid 2)	;integration method
-                     (lambda (v) v)			;x' = x
-                     0.0001				;qc error tolerated
-                     1.0e-5))				;corrector convergence
-                   #(1.0)				;initial state (at t = t0)
-                   1.0					;proceed to t = t0 + 1
-                   0.1					;first step no larger than .1
-                   0.5					;no step larger than .5
+                    ((quality-control c-trapezoid 2)        ;integration method
+                     (lambda (v) v)                        ;x' = x
+                     0.0001                                ;qc error tolerated
+                     1.0e-5))                                ;corrector convergence
+                   #(1.0)                                ;initial state (at t = t0)
+                   1.0                                        ;proceed to t = t0 + 1
+                   0.1                                        ;first step no larger than .1
+                   0.5                                        ;no step larger than .5
                    (lambda (ns dt h cont)
                      (cons ns (cont)))
                    (lambda (ns dt sdt)
@@ -86,16 +86,16 @@
    (test-case
     ";;; A trapezoid method:  xn+1 is found by Newton iteration"
     (check-within ((advance-generator
-                    ((quality-control n-trapezoid 2)	;integration method
-                     (lambda (v cont)			;x' = x
+                    ((quality-control n-trapezoid 2)        ;integration method
+                     (lambda (v cont)                        ;x' = x
                        (cont v (array->matrix #(#(1.0)))))
-                     0.0001				;qc-error tolerated
-                     1					;state dimension
-                     1.0e-5))				;corrector convergence
-                   #(1.0)					;initial state (at t = t0)
-                   1.0					;proceed to t = t0 + 1
-                   0.1					;first step no larger than .1
-                   0.5					;no step larger than .5
+                     0.0001                                ;qc-error tolerated
+                     1                                        ;state dimension
+                     1.0e-5))                                ;corrector convergence
+                   #(1.0)                                        ;initial state (at t = t0)
+                   1.0                                        ;proceed to t = t0 + 1
+                   0.1                                        ;first step no larger than .1
+                   0.5                                        ;no step larger than .5
                    (lambda (ns dt h cont)
                      (cons ns (cont)))
                    (lambda (ns dt sdt)

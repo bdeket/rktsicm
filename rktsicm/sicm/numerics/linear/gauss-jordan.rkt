@@ -31,34 +31,34 @@
 ;;; the vector X.
 
 (define (gauss-jordan-solve-linear-system A b)
-  (let ((A (array-copy (matrix->array A)))	;routine clobbers A and b
-	(b (vector-copy b)))
+  (let ((A (array-copy (matrix->array A)))        ;routine clobbers A and b
+        (b (vector-copy b)))
     (destructive-gauss-jordan-solve-linear-system
-	   A
-	   b
-	   (lambda (x Ainv) x)
-	   barf-on-zero-pivot)))
+     A
+     b
+     (lambda (x Ainv) x)
+     barf-on-zero-pivot)))
 
 
 (define (gauss-jordan-solve A b succeed fail)
-  (let ((A (array-copy (matrix->array A)))	;routine clobbers A and b
-	(b (vector-copy b)))
+  (let ((A (array-copy (matrix->array A)))        ;routine clobbers A and b
+        (b (vector-copy b)))
     (destructive-gauss-jordan-solve-linear-system
-	   A
-	   b
-	   (lambda (x Ainv) (succeed x))
-	   fail)))
+     A
+     b
+     (lambda (x Ainv) (succeed x))
+     fail)))
 
 (define (gauss-jordan-invert-and-solve A b succeed fail)
   ;; succeed = (lambda (x C) where x = C*b, C*A = I)
   ;; fail    = (lambda (dismiss) ... )
-  (let ((A (array-copy (matrix->array A)))	;routine clobbers A and b
-	(b (vector-copy b)))
+  (let ((A (array-copy (matrix->array A)))        ;routine clobbers A and b
+        (b (vector-copy b)))
     (destructive-gauss-jordan-solve-linear-system
-	   A
-	   b
-	   succeed
-	   fail)))
+     A
+     b
+     succeed
+     fail)))
 
 (define *minimum-allowable-gj-pivot* 1.0e-30)
 
@@ -67,126 +67,126 @@
 
 (define (destructive-gauss-jordan-solve-linear-system a b succeed fail)
   (let* ((n (num-rows a))
-	 (ipiv (make-vector n false))	;not a legitimate index
-	 (indxr (make-vector n 0))
-	 (indxc (make-vector n 0)))
+         (ipiv (make-vector n false))        ;not a legitimate index
+         (indxr (make-vector n 0))
+         (indxc (make-vector n 0)))
     (if (not (fix:= n (num-cols a)))
-	(error "Non-square matrix -- gj-solve-linear-system" n))
+        (error "Non-square matrix -- gj-solve-linear-system" n))
     (if (not (fix:= n (vector-length b)))
-	(error "Incompatible sizes --  gj-solve-linear-system" n))
+        (error "Incompatible sizes --  gj-solve-linear-system" n))
 
-    (let iloop ((i 0))			;runs over columns
+    (let iloop ((i 0))                        ;runs over columns
       (if (fix:= i n)
-	  'done
-	  (let ((big *minimum-allowable-gj-pivot*)
-		(irow 0) (icol 0) (pivinv 0))
+          'done
+          (let ((big *minimum-allowable-gj-pivot*)
+                (irow 0) (icol 0) (pivinv 0))
 
-	    ;; Find the position of the largest (in absolute value) element 
-	    ;;  in the matrix that is not in a column from which we
-	    ;;  have already picked a pivot.  
+            ;; Find the position of the largest (in absolute value) element
+            ;;  in the matrix that is not in a column from which we
+            ;;  have already picked a pivot.
 
-	    (let jloop ((j 0))	                        ;runs over rows
-	      (if (fix:= j n)
-		  'done
-		  (begin
-		    (if (not (vector-ref ipiv j))	;row is free
-			(let kloop ((k 0))              ;runs over columns 
-			  (if (fix:= k n)
-			      'done
-			      (begin
-				(if (not (vector-ref ipiv k))
-				    (let ((ajk (magnitude (array-ref a j k))))
-				      (if (> ajk big)
-					  (begin (set! big ajk)
-						 (set! irow j)
-						 (set! icol k)))))
-				(kloop (fix:+ k 1))))))
-		    (jloop (fix:+ j 1)))))
-	    ;(bkpt "gug")
-	    (if (= *minimum-allowable-gj-pivot* big) (fail (singular-matrix-error)))
-	    (vector-set! ipiv icol true)
-	    ;; Output of jloop (above) is summarized in IROW, ICOL, IPIV
-	    ;;(bkpt "pivot found")
+            (let jloop ((j 0))                                ;runs over rows
+              (if (fix:= j n)
+                  'done
+                  (begin
+                    (if (not (vector-ref ipiv j))        ;row is free
+                        (let kloop ((k 0))              ;runs over columns
+                          (if (fix:= k n)
+                              'done
+                              (begin
+                                (if (not (vector-ref ipiv k))
+                                    (let ((ajk (magnitude (array-ref a j k))))
+                                      (if (> ajk big)
+                                          (begin (set! big ajk)
+                                                 (set! irow j)
+                                                 (set! icol k)))))
+                                (kloop (fix:+ k 1))))))
+                    (jloop (fix:+ j 1)))))
+            ;(bkpt "gug")
+            (if (= *minimum-allowable-gj-pivot* big) (fail (singular-matrix-error)))
+            (vector-set! ipiv icol true)
+            ;; Output of jloop (above) is summarized in IROW, ICOL, IPIV
+            ;;(bkpt "pivot found")
 
-	    ;; Pivot element must be on diagonal.
-	    ;; The following swaps two rows unless they are already 
-	    ;;   the same row.  It will work if the = test is removed.
-	    (if (not (fix:= irow icol))
-		(begin
-		  (let lloop ((l 0))
-		      (if (fix:= l n)
-			  'done
-			  (let ((dum (array-ref a irow l)))
-			    (array-set! a irow l
-					(array-ref a icol l))
-			    (array-set! a icol l dum)
-			    (lloop (fix:+ l 1)))))
-		  ;;more generally, b can be a matrix
-		  ;;if so,replace this loop by one similar to the
-		  ;;one above
-		  (let ((dum (vector-ref b irow)))
-		    (vector-set! b irow (vector-ref b icol))
-		    (vector-set! b icol dum))))
+            ;; Pivot element must be on diagonal.
+            ;; The following swaps two rows unless they are already
+            ;;   the same row.  It will work if the = test is removed.
+            (if (not (fix:= irow icol))
+                (begin
+                  (let lloop ((l 0))
+                    (if (fix:= l n)
+                        'done
+                        (let ((dum (array-ref a irow l)))
+                          (array-set! a irow l
+                                      (array-ref a icol l))
+                          (array-set! a icol l dum)
+                          (lloop (fix:+ l 1)))))
+                  ;;more generally, b can be a matrix
+                  ;;if so,replace this loop by one similar to the
+                  ;;one above
+                  (let ((dum (vector-ref b irow)))
+                    (vector-set! b irow (vector-ref b icol))
+                    (vector-set! b icol dum))))
 
-	    ;; We remember that we did this swap in information in INDXR and INDXC
-	    (vector-set! indxr i irow)
-	    (vector-set! indxc i icol)
+            ;; We remember that we did this swap in information in INDXR and INDXC
+            (vector-set! indxr i irow)
+            (vector-set! indxc i icol)
 
-	    ;;(bkpt "after swap")
-	    ;; Scale the icol row by 1/pivot, and set the diag element to 1/pivot.
-	    (let ((aii (array-ref a icol icol)))
-	      (set! pivinv (invert aii))
-	      (array-set! a icol icol 1))
-	    (let lloop ((l 0))
-	      (if (fix:= l n)
-		  'done
-		  (begin (array-set! a icol l
-				     (* (array-ref a icol l) pivinv))
-			 (lloop (fix:+ l 1)))))
-	    ;;more generally, as above....
-	    (vector-set! b icol (* (vector-ref b icol) pivinv))
+            ;;(bkpt "after swap")
+            ;; Scale the icol row by 1/pivot, and set the diag element to 1/pivot.
+            (let ((aii (array-ref a icol icol)))
+              (set! pivinv (invert aii))
+              (array-set! a icol icol 1))
+            (let lloop ((l 0))
+              (if (fix:= l n)
+                  'done
+                  (begin (array-set! a icol l
+                                     (* (array-ref a icol l) pivinv))
+                         (lloop (fix:+ l 1)))))
+            ;;more generally, as above....
+            (vector-set! b icol (* (vector-ref b icol) pivinv))
 
-	    ;;for each row, except the pivot row, do row reduction by
-	    ;;subtracting the appropriate multiple of the pivot row.
-	    (let llloop ((ll 0))
-	      (if (fix:= ll n)
-		  'done
-		  (begin
-		    (if (not (fix:= ll icol))
-			(let ((dum (array-ref a ll icol)))
-			  (array-set! a ll icol 0)
-			  (let lloop ((l 0))
-			    (if (fix:= l n)
-				'done
-				(begin
-				  (array-set! a ll l
-					      (- (array-ref a ll l)
-						 (* (array-ref a icol l)
-						    dum)))
-				  (lloop (fix:+ l 1)))))
-			  (vector-set! b ll
-				       (- (vector-ref b ll)
-					  (* (vector-ref b icol)
-					     dum)))))
-		    (llloop (fix:+ ll 1)))))
-	    (iloop (fix:+ i 1)))))
+            ;;for each row, except the pivot row, do row reduction by
+            ;;subtracting the appropriate multiple of the pivot row.
+            (let llloop ((ll 0))
+              (if (fix:= ll n)
+                  'done
+                  (begin
+                    (if (not (fix:= ll icol))
+                        (let ((dum (array-ref a ll icol)))
+                          (array-set! a ll icol 0)
+                          (let lloop ((l 0))
+                            (if (fix:= l n)
+                                'done
+                                (begin
+                                  (array-set! a ll l
+                                              (- (array-ref a ll l)
+                                                 (* (array-ref a icol l)
+                                                    dum)))
+                                  (lloop (fix:+ l 1)))))
+                          (vector-set! b ll
+                                       (- (vector-ref b ll)
+                                          (* (vector-ref b icol)
+                                             dum)))))
+                    (llloop (fix:+ ll 1)))))
+            (iloop (fix:+ i 1)))))
     ;;end of matrix reduction
 
     ;;interchange the columns of the matrix, according to the
     ;;permutation specified by INDEXR and INDEXC
     (let lloop ((l (fix:- n 1)))
       (if (fix:< l 0)
-	  'done
-	  (let ((kswap (vector-ref indxr l))
-		(cswap (vector-ref indxc l)))
-	    (if (not (fix:= kswap cswap))
-		(let kloop ((k 0))
-		  (if (fix:= k n)
-		      'done
-		      (let ((dum (array-ref a k kswap)))
-			(array-set! a k kswap
-				    (array-ref a k cswap))
-			(array-set! a k cswap dum)
-			(kloop (fix:+ k 1))))))
-	    (lloop (fix:- l 1))))))
+          'done
+          (let ((kswap (vector-ref indxr l))
+                (cswap (vector-ref indxc l)))
+            (if (not (fix:= kswap cswap))
+                (let kloop ((k 0))
+                  (if (fix:= k n)
+                      'done
+                      (let ((dum (array-ref a k kswap)))
+                        (array-set! a k kswap
+                                    (array-ref a k cswap))
+                        (array-set! a k cswap dum)
+                        (kloop (fix:+ k 1))))))
+            (lloop (fix:- l 1))))))
   (succeed b a))

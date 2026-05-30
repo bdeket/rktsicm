@@ -314,19 +314,19 @@
                        '(sqrt (+ (* a c) (* -1 (expt b 2)))))
     (check-simplified? (((R2-star dx) d/dx) R2-point)
                        '(/ (* b (sqrt a)) (sqrt (+ (* (expt a 2) c) (* -1 a (expt b 2)))))
-                       ;;same but simplifier can't 
+                       ;;same but simplifier can't
                        #;'(/ b (sqrt (+ (* a c) (* -1 (expt b 2))))))
     (check-simplified? (((R2-star dx) d/dy) R2-point)
                        '(/ (* c (sqrt a)) (sqrt (+ (* (expt a 2) c) (* -1 a (expt b 2)))))
-                       ;;same but simplifier can't 
+                       ;;same but simplifier can't
                        #;'(/ c (sqrt (+ (* a c) (* -1 (expt b 2))))))
     (check-simplified? (((R2-star dy) d/dx) R2-point)
                        '(/ (* -1 (expt a 2)) (* (sqrt a) (sqrt (+ (* (expt a 2) c) (* -1 a (expt b 2))))))
-                       ;;same but simplifier can't 
+                       ;;same but simplifier can't
                        #;'(/ (* -1 a) (sqrt (+ (* a c) (* -1 (expt b 2))))))
     (check-simplified? (((R2-star dy) d/dy) R2-point)
                        '(/ (* -1 b (sqrt a)) (sqrt (+ (* (expt a 2) c) (* -1 a (expt b 2)))))
-                       ;;same but simplifier can't 
+                       ;;same but simplifier can't
                        #;'(/ (* -1 b) (sqrt (+ (* a c) (* -1 (expt b 2))))))
     (check-simplified? ((R2-star (wedge dx dy)) R2-point)
                        '(/ 1 (sqrt (+ (* a c) (* -1 (expt b 2)))))))

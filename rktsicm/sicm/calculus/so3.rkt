@@ -41,24 +41,24 @@
 ;;; Of course, these have the generators.
 
 (pe ((D (lambda (xyz)
-	  (((D rotate-x) 'theta)
-	   ((rotate-x (- 'theta)) xyz))))
+          (((D rotate-x) 'theta)
+           ((rotate-x (- 'theta)) xyz))))
      (up 'x 'y 'z)))
 (down (up 0 0 0)
       (up 0 0 1)
       (up 0 -1 0))
 
 (pe ((D (lambda (xyz)
-	  (((D rotate-y) 'theta)
-	   ((rotate-y (- 'theta)) xyz))))
+          (((D rotate-y) 'theta)
+           ((rotate-y (- 'theta)) xyz))))
      (up 'x 'y 'z)))
 (down (up 0 0 -1)
       (up 0 0 0)
       (up 1 0 0))
 
 (pe ((D (lambda (xyz)
-	  (((D rotate-z) 'theta)
-	   ((rotate-z (- 'theta)) xyz))))
+          (((D rotate-z) 'theta)
+           ((rotate-z (- 'theta)) xyz))))
      (up 'x 'y 'z)))
 (down (up 0 1 0)
       (up -1 0 0)
@@ -74,37 +74,37 @@ that correspond to particular spatial rotations
 
 (define (equation-x p q)
   (let ((theta (ref q 0))
-	(phi (ref q 1))
-	(psi (ref q 2))
-	(a (ref p 0))
-	(b (ref p 1))
-	(c (ref p 2)))
+        (phi (ref q 1))
+        (psi (ref q 2))
+        (a (ref p 0))
+        (b (ref p 1))
+        (c (ref p 2)))
     ((D (lambda (eps)
-	  (- (* (rotate-z-tuple (+ phi (* a eps)))
-		(rotate-x-tuple (+ theta (* b eps)))
-		(rotate-z-tuple (+ psi (* c eps))))
-	     (* (rotate-x-tuple eps)
-		(rotate-z-tuple phi)
-		(rotate-x-tuple theta)
-		(rotate-z-tuple psi)))))
+          (- (* (rotate-z-tuple (+ phi (* a eps)))
+                (rotate-x-tuple (+ theta (* b eps)))
+                (rotate-z-tuple (+ psi (* c eps))))
+             (* (rotate-x-tuple eps)
+                (rotate-z-tuple phi)
+                (rotate-x-tuple theta)
+                (rotate-z-tuple psi)))))
      0)))
 ;;; kind of big
 
 (define (equation2-x p q)
   (let ((theta (ref q 0))
-	(phi (ref q 1))
-	(psi (ref q 2))
-	(a (ref p 0))
-	(b (ref p 1))
-	(c (ref p 2)))
+        (phi (ref q 1))
+        (psi (ref q 2))
+        (a (ref p 0))
+        (b (ref p 1))
+        (c (ref p 2)))
     ((D (lambda (eps)
-	  (- (* (rotate-z-tuple (+ phi (* a eps)))
-		(rotate-x-tuple (+ theta (* b eps)))
-		(rotate-z-tuple (+ psi (* c eps)))
-		(rotate-z-tuple (- psi))
-		(rotate-x-tuple (- theta))
-		(rotate-z-tuple (- phi)))
-	     (rotate-x-tuple eps))))
+          (- (* (rotate-z-tuple (+ phi (* a eps)))
+                (rotate-x-tuple (+ theta (* b eps)))
+                (rotate-z-tuple (+ psi (* c eps)))
+                (rotate-z-tuple (- psi))
+                (rotate-x-tuple (- theta))
+                (rotate-z-tuple (- phi)))
+             (rotate-x-tuple eps))))
      0)))
 
 (pe (equation2-x (up 'a 'b 'c) (up 'theta 'phi 'psi)))
@@ -128,7 +128,7 @@ that correspond to particular spatial rotations
    (lambda (p)
      (list->vector
       (map simplify
-	   (ultra-flatten (equation2-x p (up 'theta 'phi 'psi))))))
+           (ultra-flatten (equation2-x p (up 'theta 'phi 'psi))))))
    3 9 list))
 
 (pe ((cadr foo-x) #()))
@@ -152,19 +152,19 @@ that correspond to particular spatial rotations
 
 (define (equation2-z p q)
   (let ((theta (ref q 0))
-	(phi (ref q 1))
-	(psi (ref q 2))
-	(a (ref p 0))
-	(b (ref p 1))
-	(c (ref p 2)))
+        (phi (ref q 1))
+        (psi (ref q 2))
+        (a (ref p 0))
+        (b (ref p 1))
+        (c (ref p 2)))
     ((D (lambda (eps)
-	  (- (* (rotate-z-tuple (+ phi (* a eps)))
-		(rotate-x-tuple (+ theta (* b eps)))
-		(rotate-z-tuple (+ psi (* c eps)))
-		(rotate-z-tuple (- psi))
-		(rotate-x-tuple (- theta))
-		(rotate-z-tuple (- phi)))
-	     (rotate-z-tuple eps))))
+          (- (* (rotate-z-tuple (+ phi (* a eps)))
+                (rotate-x-tuple (+ theta (* b eps)))
+                (rotate-z-tuple (+ psi (* c eps)))
+                (rotate-z-tuple (- psi))
+                (rotate-x-tuple (- theta))
+                (rotate-z-tuple (- phi)))
+             (rotate-z-tuple eps))))
      0)))
 
 (pe (equation2-z (up 'a 'b 'c) (up 'theta 'phi 'psi)))
@@ -184,7 +184,7 @@ that correspond to particular spatial rotations
    (lambda (p)
      (list->vector
       (map simplify
-	   (ultra-flatten (equation2-z p (up 'theta 'phi 'psi))))))
+           (ultra-flatten (equation2-z p (up 'theta 'phi 'psi))))))
    3 9 list))
 
 (pe ((cadr foo-z) #()))
@@ -198,19 +198,19 @@ so
 
 (define (equation2-y p q)
   (let ((theta (ref q 0))
-	(phi (ref q 1))
-	(psi (ref q 2))
-	(a (ref p 0))
-	(b (ref p 1))
-	(c (ref p 2)))
+        (phi (ref q 1))
+        (psi (ref q 2))
+        (a (ref p 0))
+        (b (ref p 1))
+        (c (ref p 2)))
     ((D (lambda (eps)
-	  (- (* (rotate-z-tuple (+ phi (* a eps)))
-		(rotate-x-tuple (+ theta (* b eps)))
-		(rotate-z-tuple (+ psi (* c eps)))
-		(rotate-z-tuple (- psi))
-		(rotate-x-tuple (- theta))
-		(rotate-z-tuple (- phi)))
-	     (rotate-y-tuple eps))))
+          (- (* (rotate-z-tuple (+ phi (* a eps)))
+                (rotate-x-tuple (+ theta (* b eps)))
+                (rotate-z-tuple (+ psi (* c eps)))
+                (rotate-z-tuple (- psi))
+                (rotate-x-tuple (- theta))
+                (rotate-z-tuple (- phi)))
+             (rotate-y-tuple eps))))
      0)))
 
 (pe (equation2-y (up 'a 'b 'c) (up 'theta 'phi 'psi)))
@@ -230,7 +230,7 @@ so
    (lambda (p)
      (list->vector
       (map simplify
-	   (ultra-flatten (equation2-y p (up 'theta 'phi 'psi))))))
+           (ultra-flatten (equation2-y p (up 'theta 'phi 'psi))))))
    3 9 list))
 
 (pe ((cadr foo-y) #()))
@@ -302,13 +302,13 @@ so
 (pe (s:map
      (lambda (e~k)
        (s:map
-	(lambda (e_i)
-	  (s:map
-	   (lambda (e_j)
-	     ((e~k (commutator e_i e_j))
-	      (Euler-angles-chi-inverse (up 'theta 'phi 'psi))))
-	   so3-vector-basis))
-	so3-vector-basis))
+        (lambda (e_i)
+          (s:map
+           (lambda (e_j)
+             ((e~k (commutator e_i e_j))
+              (Euler-angles-chi-inverse (up 'theta 'phi 'psi))))
+           so3-vector-basis))
+        so3-vector-basis))
      so3-dual-basis))
 (up (down (down 0 0 0) (down 0 0 -1) (down 0 1 0))
     (down (down 0 0 1) (down 0 0 0) (down -1 0 0))
@@ -329,11 +329,11 @@ so
 #|
 (pe
  (let* ((gamma (compose
-		Euler-angles-chi-inverse
-		(up (literal-function 'f^theta)
-		    (literal-function 'f^phi)
-		    (literal-function 'f^psi))
-		time-chi)))
+                Euler-angles-chi-inverse
+                (up (literal-function 'f^theta)
+                    (literal-function 'f^phi)
+                    (literal-function 'f^psi))
+                time-chi)))
    ((((differential gamma) d/dt)
      (literal-manifold-function 'f Euler-angles))
     (time-chi-inverse 't))))
@@ -348,18 +348,18 @@ so
 
 ;;; components of the differential of d/dt on the Euler basis
 (pe (let* ((gamma (compose
-		   Euler-angles-chi-inverse
-		   (up (literal-function 'f^theta)
-		       (literal-function 'f^phi)
-		       (literal-function 'f^psi))
-		   time-chi))
-	   (Euler-basis-over-gamma
-	    (basis->basis-over-map gamma Euler-angles-basis))
-	   (1form-basis-over-gamma
-	    (basis->1form-basis Euler-basis-over-gamma)))
+                   Euler-angles-chi-inverse
+                   (up (literal-function 'f^theta)
+                       (literal-function 'f^phi)
+                       (literal-function 'f^psi))
+                   time-chi))
+           (Euler-basis-over-gamma
+            (basis->basis-over-map gamma Euler-angles-basis))
+           (1form-basis-over-gamma
+            (basis->1form-basis Euler-basis-over-gamma)))
       (s:map (lambda (w) ((w ((differential gamma) d/dt))
-			  (time-chi-inverse 't)))
-	     1form-basis-over-gamma)))
+                          (time-chi-inverse 't)))
+             1form-basis-over-gamma)))
 (up ((D f^theta) t) ((D f^phi) t) ((D f^psi) t))
 |#
 
@@ -369,18 +369,18 @@ computing components of quasi-velocity on so3-basis
 
 (pe
  (let* ((gamma (compose
-		Euler-angles-chi-inverse
-		(up (literal-function 'f^theta)
-		    (literal-function 'f^phi)
-		    (literal-function 'f^psi))
-		time-chi))
-	(basis-over-gamma (basis->basis-over-map gamma so3-basis))
-	(1form-basis (basis->1form-basis basis-over-gamma))
-	(vector-basis (basis->vector-basis basis-over-gamma)))
+                Euler-angles-chi-inverse
+                (up (literal-function 'f^theta)
+                    (literal-function 'f^phi)
+                    (literal-function 'f^psi))
+                time-chi))
+        (basis-over-gamma (basis->basis-over-map gamma so3-basis))
+        (1form-basis (basis->1form-basis basis-over-gamma))
+        (vector-basis (basis->vector-basis basis-over-gamma)))
    (s:map (lambda (w)
-	    ((w ((differential gamma) d/dt))
-	     (time-chi-inverse 't)))
-	  1form-basis)))
+            ((w ((differential gamma) d/dt))
+             (time-chi-inverse 't)))
+          1form-basis)))
 (up
  (+ (* (sin (f^phi t)) (sin (f^theta t)) ((D f^psi) t))
     (* (cos (f^phi t)) ((D f^theta) t)))
@@ -391,8 +391,8 @@ computing components of quasi-velocity on so3-basis
 compare to angular velocity components
 
 (pe ((Euler->omega (up (literal-function 'f^theta)
-		       (literal-function 'f^phi)
-		       (literal-function 'f^psi)))
+                       (literal-function 'f^phi)
+                       (literal-function 'f^psi)))
      't))
 (matrix-by-rows
  (list
@@ -429,7 +429,7 @@ ep(f) = e(f) M
 
 (pe (* (rotate-z-tuple 'phi)
        (* (rotate-x-tuple 'theta)
-	  (rotate-z-tuple 'psi))))
+          (rotate-z-tuple 'psi))))
 (down
  (up (+ (* -1 (sin psi) (cos theta) (sin phi)) (* (cos psi) (cos phi)))
      (+ (* (sin psi) (cos theta) (cos phi)) (* (sin phi) (cos psi)))
@@ -440,9 +440,9 @@ ep(f) = e(f) M
  (up (* (sin theta) (sin phi)) (* -1 (sin theta) (cos phi)) (cos theta)))
 
 (pe (* (down 'e_x 'e_y 'e_z)
-	(* (rotate-z-tuple 'phi)
-	   (* (rotate-x-tuple 'theta)
-	      (rotate-z-tuple 'psi)))))
+        (* (rotate-z-tuple 'phi)
+           (* (rotate-x-tuple 'theta)
+              (rotate-z-tuple 'psi)))))
 (down
  (+ (* -1 (sin psi) (cos theta) (sin phi) e_x)
     (* (sin psi) (cos theta) (cos phi) e_y)
@@ -461,18 +461,18 @@ ep(f) = e(f) M
 (pe ((dtheta
       (down
        (+ (* -1 (sin psi) (cos theta) (sin phi) e_x)
-	  (* (sin psi) (cos theta) (cos phi) e_y)
-	  (* (cos psi) (cos phi) e_x)
-	  (* (sin phi) (cos psi) e_y)
-	  (* (sin theta) (sin psi) e_z))
+          (* (sin psi) (cos theta) (cos phi) e_y)
+          (* (cos psi) (cos phi) e_x)
+          (* (sin phi) (cos psi) e_y)
+          (* (sin theta) (sin psi) e_z))
        (+ (* -1 (cos theta) (sin phi) (cos psi) e_x)
-	  (* (cos theta) (cos psi) (cos phi) e_y)
-	  (* -1 (sin psi) (cos phi) e_x)
-	  (* -1 (sin psi) (sin phi) e_y)
-	  (* (sin theta) (cos psi) e_z))
+          (* (cos theta) (cos psi) (cos phi) e_y)
+          (* -1 (sin psi) (cos phi) e_x)
+          (* -1 (sin psi) (sin phi) e_y)
+          (* (sin theta) (cos psi) e_z))
        (+ (* (sin theta) (sin phi) e_x)
-	  (* -1 (sin theta) (cos phi) e_y)
-	  (* (cos theta) e_z))))
+          (* -1 (sin theta) (cos phi) e_y)
+          (* (cos theta) e_z))))
      (Euler-angles-chi-inverse
       (up 'theta 'phi 'psi))))
 (down (cos psi) (* -1 (sin psi)) 0)
@@ -480,18 +480,18 @@ ep(f) = e(f) M
 (pe ((dphi
       (down
        (+ (* -1 (sin psi) (cos theta) (sin phi) e_x)
-	  (* (sin psi) (cos theta) (cos phi) e_y)
-	  (* (cos psi) (cos phi) e_x)
-	  (* (sin phi) (cos psi) e_y)
-	  (* (sin theta) (sin psi) e_z))
+          (* (sin psi) (cos theta) (cos phi) e_y)
+          (* (cos psi) (cos phi) e_x)
+          (* (sin phi) (cos psi) e_y)
+          (* (sin theta) (sin psi) e_z))
        (+ (* -1 (cos theta) (sin phi) (cos psi) e_x)
-	  (* (cos theta) (cos psi) (cos phi) e_y)
-	  (* -1 (sin psi) (cos phi) e_x)
-	  (* -1 (sin psi) (sin phi) e_y)
-	  (* (sin theta) (cos psi) e_z))
+          (* (cos theta) (cos psi) (cos phi) e_y)
+          (* -1 (sin psi) (cos phi) e_x)
+          (* -1 (sin psi) (sin phi) e_y)
+          (* (sin theta) (cos psi) e_z))
        (+ (* (sin theta) (sin phi) e_x)
-	  (* -1 (sin theta) (cos phi) e_y)
-	  (* (cos theta) e_z))))
+          (* -1 (sin theta) (cos phi) e_y)
+          (* (cos theta) e_z))))
      (Euler-angles-chi-inverse
       (up 'theta 'phi 'psi))))
 (down (/ (sin psi) (sin theta)) (/ (cos psi) (sin theta)) 0)
@@ -499,31 +499,31 @@ ep(f) = e(f) M
 (pe ((dpsi
       (down
        (+ (* -1 (sin psi) (cos theta) (sin phi) e_x)
-	  (* (sin psi) (cos theta) (cos phi) e_y)
-	  (* (cos psi) (cos phi) e_x)
-	  (* (sin phi) (cos psi) e_y)
-	  (* (sin theta) (sin psi) e_z))
+          (* (sin psi) (cos theta) (cos phi) e_y)
+          (* (cos psi) (cos phi) e_x)
+          (* (sin phi) (cos psi) e_y)
+          (* (sin theta) (sin psi) e_z))
        (+ (* -1 (cos theta) (sin phi) (cos psi) e_x)
-	  (* (cos theta) (cos psi) (cos phi) e_y)
-	  (* -1 (sin psi) (cos phi) e_x)
-	  (* -1 (sin psi) (sin phi) e_y)
-	  (* (sin theta) (cos psi) e_z))
+          (* (cos theta) (cos psi) (cos phi) e_y)
+          (* -1 (sin psi) (cos phi) e_x)
+          (* -1 (sin psi) (sin phi) e_y)
+          (* (sin theta) (cos psi) e_z))
        (+ (* (sin theta) (sin phi) e_x)
-	  (* -1 (sin theta) (cos phi) e_y)
-	  (* (cos theta) e_z))))
+          (* -1 (sin theta) (cos phi) e_y)
+          (* (cos theta) e_z))))
      (Euler-angles-chi-inverse
       (up 'theta 'phi 'psi))))
 (down (/ (* -1 (cos theta) (sin psi)) (sin theta))
       (/ (* -1 (cos psi) (cos theta)) (sin theta))
       1)
 
-#|	  
+#|
 d/dtheta (down (cos psi)
-	       (* -1 (sin psi))
-	       0)
+               (* -1 (sin psi))
+               0)
 d/dphi (down (/ (sin psi) (sin theta))
-	     (/ (cos psi) (sin theta))
-	     0)
+             (/ (cos psi) (sin theta))
+             0)
 d/dpsi (down (/ (* -1 (sin psi) (cos theta)) (sin theta))
       (/ (* -1 (cos psi) (cos theta)) (sin theta))
       1)
@@ -590,14 +590,14 @@ looks promising.
 (pe (s:map
      (lambda (e~k)
        (s:map
-	(lambda (e_i)
-	  (s:map
-	   (lambda (e_j)
-	     ((e~k (commutator e_i e_j))
-	      (Euler-angles-chi-inverse
-	       (up 'theta 'phi 'psi))))
-	   so3p-vector-basis))
-	so3p-vector-basis))
+        (lambda (e_i)
+          (s:map
+           (lambda (e_j)
+             ((e~k (commutator e_i e_j))
+              (Euler-angles-chi-inverse
+               (up 'theta 'phi 'psi))))
+           so3p-vector-basis))
+        so3p-vector-basis))
      so3p-dual-basis))
 
 (up (down (down 0 0 0) (down 0 0 1) (down 0 -1 0))
@@ -617,18 +617,18 @@ looks promising.
 
 (pe
  (let* ((gamma (compose
-		Euler-angles-chi-inverse
-		(up (literal-function 'f^theta)
-		    (literal-function 'f^phi)
-		    (literal-function 'f^psi))
-		time-chi))
-	(basis-over-gamma (basis->basis-over-map gamma so3p-basis))
-	(1form-basis (basis->1form-basis basis-over-gamma))
-	(vector-basis (basis->vector-basis basis-over-gamma)))
+                Euler-angles-chi-inverse
+                (up (literal-function 'f^theta)
+                    (literal-function 'f^phi)
+                    (literal-function 'f^psi))
+                time-chi))
+        (basis-over-gamma (basis->basis-over-map gamma so3p-basis))
+        (1form-basis (basis->1form-basis basis-over-gamma))
+        (vector-basis (basis->vector-basis basis-over-gamma)))
    (s:map (lambda (w)
-	    ((w ((differential gamma) d/dt))
-	     (time-chi-inverse 't)))
-	  1form-basis)))
+            ((w ((differential gamma) d/dt))
+             (time-chi-inverse 't)))
+          1form-basis)))
 
 (up
  (+ (* ((D f^phi) t) (sin (f^theta t)) (sin (f^psi t)))
@@ -641,8 +641,8 @@ looks promising.
 
 (pe ((Euler->omega-body
       (up (literal-function 'theta)
-	  (literal-function 'phi)
-	  (literal-function 'psi))) 't))
+          (literal-function 'phi)
+          (literal-function 'psi))) 't))
 (matrix-by-rows
  (list
   (+ (* (sin (theta t)) (sin (psi t)) ((D phi) t))
@@ -659,16 +659,16 @@ check the determining equation
 (pe (-
      (*
       ((so3-vector-basis
-	(literal-manifold-function 'f Euler-angles))
+        (literal-manifold-function 'f Euler-angles))
        (Euler-angles-chi-inverse
-	(up 'theta 'phi 'psi)))
+        (up 'theta 'phi 'psi)))
       (* (rotate-z-tuple 'phi)
-	 (* (rotate-x-tuple 'theta)
-	    (rotate-z-tuple 'psi))))
+         (* (rotate-x-tuple 'theta)
+            (rotate-z-tuple 'psi))))
      ((so3p-vector-basis
        (literal-manifold-function 'f Euler-angles))
       (Euler-angles-chi-inverse
-	(up 'theta 'phi 'psi)))))
+        (up 'theta 'phi 'psi)))))
 (down 0 0 0)
 
 |#
@@ -683,16 +683,16 @@ check the determining equation
 
 (define (Angles->M q)
   (let ((vartheta (ref q 0))
-	(varphi (ref q 1))
-	(varpsi (ref q 2)))
+        (varphi (ref q 1))
+        (varpsi (ref q 2)))
     (* (rotate-z-tuple varphi)
        (rotate-x-tuple vartheta)
        (rotate-y-tuple varpsi))))
 
 (define (Angles->M^-1 q)
   (let ((vartheta (ref q 0))
-	(varphi (ref q 1))
-	(varpsi (ref q 2)))
+        (varphi (ref q 1))
+        (varpsi (ref q 2)))
     (* (rotate-y-tuple (- varpsi))
        (rotate-x-tuple (- vartheta))
        (rotate-z-tuple (- varphi)))))
@@ -702,14 +702,14 @@ check the determining equation
 (define ((equation0 vartheta varphi varpsi) p)
   (let ((a (ref p 0)) (b (ref p 1)) (c (ref p 2)))
     (let ((M ((D (lambda (t) (- (* (Angles->M (up (+ vartheta (* a t))
-						  (+ varphi (* b t))
-						  (+ varpsi (* c t))))
-				   (Angles->M^-1 (up vartheta varphi varpsi)))
-				(rotate-x-tuple t))))
-		 0)))
-	 (up (ref M 0 1)
-	     (ref M 0 2)
-	     (ref M 1 2)))))
+                                                  (+ varphi (* b t))
+                                                  (+ varpsi (* c t))))
+                                   (Angles->M^-1 (up vartheta varphi varpsi)))
+                                (rotate-x-tuple t))))
+                 0)))
+         (up (ref M 0 1)
+             (ref M 0 2)
+             (ref M 1 2)))))
 (pe ((equation0 'vartheta 'varphi 'varpsi) (up 'a 'b 'c)))
 (up (+ (* c (sin vartheta)) b)
     (+ (* -1 c (cos varphi) (cos vartheta)) (* -1 a (sin varphi)))
@@ -721,28 +721,28 @@ check the determining equation
 (define ((equation1 vartheta varphi varpsi) p)
   (let ((a (ref p 0)) (b (ref p 1)) (c (ref p 2)))
     (let ((M ((D (lambda (t) (- (* (Angles->M (up (+ vartheta (* a t))
-						  (+ varphi (* b t))
-						  (+ varpsi (* c t))))
-				   (Angles->M^-1 (up vartheta varphi varpsi)))
-				(rotate-y-tuple t))))
-		 0)))
-	 (up (ref M 0 1)
-	     (ref M 0 2)
-	     (ref M 1 2)))))
+                                                  (+ varphi (* b t))
+                                                  (+ varpsi (* c t))))
+                                   (Angles->M^-1 (up vartheta varphi varpsi)))
+                                (rotate-y-tuple t))))
+                 0)))
+         (up (ref M 0 1)
+             (ref M 0 2)
+             (ref M 1 2)))))
 (pe ((cadr (solve (equation1 'vartheta 'varphi 'varpsi) 3 3 list)) #()))
 (up (sin varphi) (* -1 (tan vartheta) (cos varphi)) (/ (cos varphi) (cos vartheta)))
 
 (define ((equation2 vartheta varphi varpsi) p)
   (let ((a (ref p 0)) (b (ref p 1)) (c (ref p 2)))
     (let ((M ((D (lambda (t) (- (* (Angles->M (up (+ vartheta (* a t))
-						  (+ varphi (* b t))
-						  (+ varpsi (* c t))))
-				   (Angles->M^-1 (up vartheta varphi varpsi)))
-				(rotate-z-tuple t))))
-		 0)))
-	 (up (ref M 0 1)
-	     (ref M 0 2)
-	     (ref M 1 2)))))
+                                                  (+ varphi (* b t))
+                                                  (+ varpsi (* c t))))
+                                   (Angles->M^-1 (up vartheta varphi varpsi)))
+                                (rotate-z-tuple t))))
+                 0)))
+         (up (ref M 0 1)
+             (ref M 0 2)
+             (ref M 1 2)))))
 (pe ((cadr (solve (equation2 'vartheta 'varphi 'varpsi) 3 3 list)) #()))
 (up 0 1 0)
 
@@ -799,14 +799,14 @@ check the determining equation
 (pe (s:map
      (lambda (e~k)
        (s:map
-	(lambda (e_i)
-	  (s:map
-	   (lambda (e_j)
-	     ((e~k (commutator e_i e_j))
-	      (alternate-angles-chi-inverse
-	       (up 'vartheta 'varphi 'varpsi))))
-	   so3a-vector-basis))
-	so3a-vector-basis))
+        (lambda (e_i)
+          (s:map
+           (lambda (e_j)
+             ((e~k (commutator e_i e_j))
+              (alternate-angles-chi-inverse
+               (up 'vartheta 'varphi 'varpsi))))
+           so3a-vector-basis))
+        so3a-vector-basis))
      so3a-dual-basis))
 (up (down (down 0 0 0) (down 0 0 -1) (down 0 1 0))
     (down (down 0 0 1) (down 0 0 0) (down -1 0 0))
@@ -839,55 +839,55 @@ check the determining equation
     (* ea_z (cos vartheta) (cos varpsi))))
 
 (pe ((dvartheta (down
-	      (+ (* -1 ea_x (sin varpsi) (sin vartheta) (sin varphi))
-		 (* ea_y (sin varpsi) (sin vartheta) (cos varphi))
-		 (* ea_x (cos varpsi) (cos varphi))
-		 (* ea_y (sin varphi) (cos varpsi))
-		 (* -1 ea_z (cos vartheta) (sin varpsi)))
-	      (+ (* -1 ea_x (cos vartheta) (sin varphi))
-		 (* ea_y (cos vartheta) (cos varphi))
-		 (* ea_z (sin vartheta)))
-	      (+ (* ea_x (sin vartheta) (sin varphi) (cos varpsi))
-		 (* -1 ea_y (sin vartheta) (cos varpsi) (cos varphi))
-		 (* ea_x (sin varpsi) (cos varphi))
-		 (* ea_y (sin varpsi) (sin varphi))
-		 (* ea_z (cos vartheta) (cos varpsi)))))
+              (+ (* -1 ea_x (sin varpsi) (sin vartheta) (sin varphi))
+                 (* ea_y (sin varpsi) (sin vartheta) (cos varphi))
+                 (* ea_x (cos varpsi) (cos varphi))
+                 (* ea_y (sin varphi) (cos varpsi))
+                 (* -1 ea_z (cos vartheta) (sin varpsi)))
+              (+ (* -1 ea_x (cos vartheta) (sin varphi))
+                 (* ea_y (cos vartheta) (cos varphi))
+                 (* ea_z (sin vartheta)))
+              (+ (* ea_x (sin vartheta) (sin varphi) (cos varpsi))
+                 (* -1 ea_y (sin vartheta) (cos varpsi) (cos varphi))
+                 (* ea_x (sin varpsi) (cos varphi))
+                 (* ea_y (sin varpsi) (sin varphi))
+                 (* ea_z (cos vartheta) (cos varpsi)))))
      (alternate-angles-chi-inverse
       (up 'vartheta 'varphi 'varpsi))))
 (down (cos varpsi) 0 (sin varpsi))
 
 (pe ((dvarphi (down
-	      (+ (* -1 ea_x (sin varpsi) (sin vartheta) (sin varphi))
-		 (* ea_y (sin varpsi) (sin vartheta) (cos varphi))
-		 (* ea_x (cos varpsi) (cos varphi))
-		 (* ea_y (sin varphi) (cos varpsi))
-		 (* -1 ea_z (cos vartheta) (sin varpsi)))
-	      (+ (* -1 ea_x (cos vartheta) (sin varphi))
-		 (* ea_y (cos vartheta) (cos varphi))
-		 (* ea_z (sin vartheta)))
-	      (+ (* ea_x (sin vartheta) (sin varphi) (cos varpsi))
-		 (* -1 ea_y (sin vartheta) (cos varpsi) (cos varphi))
-		 (* ea_x (sin varpsi) (cos varphi))
-		 (* ea_y (sin varpsi) (sin varphi))
-		 (* ea_z (cos vartheta) (cos varpsi)))))
+              (+ (* -1 ea_x (sin varpsi) (sin vartheta) (sin varphi))
+                 (* ea_y (sin varpsi) (sin vartheta) (cos varphi))
+                 (* ea_x (cos varpsi) (cos varphi))
+                 (* ea_y (sin varphi) (cos varpsi))
+                 (* -1 ea_z (cos vartheta) (sin varpsi)))
+              (+ (* -1 ea_x (cos vartheta) (sin varphi))
+                 (* ea_y (cos vartheta) (cos varphi))
+                 (* ea_z (sin vartheta)))
+              (+ (* ea_x (sin vartheta) (sin varphi) (cos varpsi))
+                 (* -1 ea_y (sin vartheta) (cos varpsi) (cos varphi))
+                 (* ea_x (sin varpsi) (cos varphi))
+                 (* ea_y (sin varpsi) (sin varphi))
+                 (* ea_z (cos vartheta) (cos varpsi)))))
      (alternate-angles-chi-inverse
       (up 'vartheta 'varphi 'varpsi))))
 (down (/ (* -1 (sin varpsi)) (cos vartheta)) 0 (/ (cos varpsi) (cos vartheta)))
 
 (pe ((dvarpsi (down
-	      (+ (* -1 ea_x (sin varpsi) (sin vartheta) (sin varphi))
-		 (* ea_y (sin varpsi) (sin vartheta) (cos varphi))
-		 (* ea_x (cos varpsi) (cos varphi))
-		 (* ea_y (sin varphi) (cos varpsi))
-		 (* -1 ea_z (cos vartheta) (sin varpsi)))
-	      (+ (* -1 ea_x (cos vartheta) (sin varphi))
-		 (* ea_y (cos vartheta) (cos varphi))
-		 (* ea_z (sin vartheta)))
-	      (+ (* ea_x (sin vartheta) (sin varphi) (cos varpsi))
-		 (* -1 ea_y (sin vartheta) (cos varpsi) (cos varphi))
-		 (* ea_x (sin varpsi) (cos varphi))
-		 (* ea_y (sin varpsi) (sin varphi))
-		 (* ea_z (cos vartheta) (cos varpsi)))))
+              (+ (* -1 ea_x (sin varpsi) (sin vartheta) (sin varphi))
+                 (* ea_y (sin varpsi) (sin vartheta) (cos varphi))
+                 (* ea_x (cos varpsi) (cos varphi))
+                 (* ea_y (sin varphi) (cos varpsi))
+                 (* -1 ea_z (cos vartheta) (sin varpsi)))
+              (+ (* -1 ea_x (cos vartheta) (sin varphi))
+                 (* ea_y (cos vartheta) (cos varphi))
+                 (* ea_z (sin vartheta)))
+              (+ (* ea_x (sin vartheta) (sin varphi) (cos varpsi))
+                 (* -1 ea_y (sin vartheta) (cos varpsi) (cos varphi))
+                 (* ea_x (sin varpsi) (cos varphi))
+                 (* ea_y (sin varpsi) (sin varphi))
+                 (* ea_z (cos vartheta) (cos varpsi)))))
      (alternate-angles-chi-inverse
       (up 'vartheta 'varphi 'varpsi))))
 (down (* (sin varpsi) (tan vartheta)) 1 (* -1 (cos varpsi) (tan vartheta)))
@@ -958,14 +958,14 @@ d/dvarpsi
 (pe (s:map
      (lambda (e~k)
        (s:map
-	(lambda (e_i)
-	  (s:map
-	   (lambda (e_j)
-	     ((e~k (commutator e_i e_j))
-	      (alternate-angles-chi-inverse
-	       (up 'vartheta 'varphi 'varpsi))))
-	   so3ap-vector-basis))
-	so3ap-vector-basis))
+        (lambda (e_i)
+          (s:map
+           (lambda (e_j)
+             ((e~k (commutator e_i e_j))
+              (alternate-angles-chi-inverse
+               (up 'vartheta 'varphi 'varpsi))))
+           so3ap-vector-basis))
+        so3ap-vector-basis))
      so3ap-dual-basis))
 (up (down (down 0 0 0) (down 0 0 1) (down 0 -1 0))
     (down (down 0 0 -1) (down 0 0 0) (down 1 0 0))
@@ -985,10 +985,10 @@ d/dvarpsi
 check angular velocities in alternate angles
 
 (pe (let ((q (up (literal-function 'vartheta)
-		 (literal-function 'varphi)
-		 (literal-function 'varpsi))))
+                 (literal-function 'varphi)
+                 (literal-function 'varpsi))))
       (wcross->w (* (Angles->M^-1 (q 't))
-		    ((D (lambda (t) (Angles->M (q t)))) 't)))))
+                    ((D (lambda (t) (Angles->M (q t)))) 't)))))
 (up
  (+ (* -1 (cos (vartheta t)) (sin (varpsi t)) ((D varphi) t))
     (* ((D vartheta) t) (cos (varpsi t))))
@@ -998,18 +998,18 @@ check angular velocities in alternate angles
 
 (pe
  (let* ((gamma (compose
-		alternate-angles-chi-inverse
-		(up (literal-function 'vartheta)
-		    (literal-function 'varphi)
-		    (literal-function 'varpsi))
-		time-chi))
-	(basis-over-gamma (basis->basis-over-map gamma so3ap-basis))
-	(1form-basis (basis->1form-basis basis-over-gamma))
-	(vector-basis (basis->vector-basis basis-over-gamma)))
+                alternate-angles-chi-inverse
+                (up (literal-function 'vartheta)
+                    (literal-function 'varphi)
+                    (literal-function 'varpsi))
+                time-chi))
+        (basis-over-gamma (basis->basis-over-map gamma so3ap-basis))
+        (1form-basis (basis->1form-basis basis-over-gamma))
+        (vector-basis (basis->vector-basis basis-over-gamma)))
    (s:map (lambda (w)
-	    ((w ((differential gamma) d/dt))
-	     (time-chi-inverse 't)))
-	  1form-basis)))
+            ((w ((differential gamma) d/dt))
+             (time-chi-inverse 't)))
+          1form-basis)))
 (up
  (+ (* -1 (cos (vartheta t)) (sin (varpsi t)) ((D varphi) t))
     (* ((D vartheta) t) (cos (varpsi t))))
@@ -1028,42 +1028,42 @@ check angular velocities in alternate angles
 (define Jy (- (* z d/dx) (* x d/dz)))
 
 (pe (- (series:sum
-	(((exp (* 'alpha D))
-	  (lambda (alpha)
-	    (* (Euler->M
-		(series:sum
-		 (((exp (* alpha e_z)) Euler-angles-chi)
-		  ((point Euler-angles) (up 'theta 'phi 'psi)))
-		 1))
-	       (up 'x 'y 'z))))
-	 0)
-	5)
+        (((exp (* 'alpha D))
+          (lambda (alpha)
+            (* (Euler->M
+                (series:sum
+                 (((exp (* alpha e_z)) Euler-angles-chi)
+                  ((point Euler-angles) (up 'theta 'phi 'psi)))
+                 1))
+               (up 'x 'y 'z))))
+         0)
+        5)
        (series:sum
-	(((exp (* 'alpha Jz)) (chart R3-rect)) 
-	 ((point R3-rect)
-	  (* (Euler->M (up 'theta 'phi 'psi))
-	     (up 'x 'y 'z))))
-	5)))
+        (((exp (* 'alpha Jz)) (chart R3-rect))
+         ((point R3-rect)
+          (* (Euler->M (up 'theta 'phi 'psi))
+             (up 'x 'y 'z))))
+        5)))
 (up 0 0 0)
 
 
 (pe (- (series:sum
-	(((exp (* 'alpha D))
-	  (lambda (alpha)
-	    (* (Euler->M
-		(series:sum
-		 (((exp (* alpha e_x)) Euler-angles-chi)
-		  ((point Euler-angles) (up 'theta 'phi 'psi)))
-		 4))
-	       (up 'x 'y 'z))))
-	 0)
-	3)
+        (((exp (* 'alpha D))
+          (lambda (alpha)
+            (* (Euler->M
+                (series:sum
+                 (((exp (* alpha e_x)) Euler-angles-chi)
+                  ((point Euler-angles) (up 'theta 'phi 'psi)))
+                 4))
+               (up 'x 'y 'z))))
+         0)
+        3)
        (series:sum
-	(((exp (* 'alpha Jx)) (chart R3-rect)) 
-	 ((point R3-rect)
-	  (* (Euler->M (up 'theta 'phi 'psi))
-	     (up 'x 'y 'z))))
-	3)))
+        (((exp (* 'alpha Jx)) (chart R3-rect))
+         ((point R3-rect)
+          (* (Euler->M (up 'theta 'phi 'psi))
+             (up 'x 'y 'z))))
+        3)))
 (up 0 0 0)
 
 (M((exp(a*e_x)chi_SO3) m_SO3))*xyz_R3

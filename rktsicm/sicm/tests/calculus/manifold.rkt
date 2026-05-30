@@ -24,11 +24,11 @@
   (check-equal? (M 'embedding-dimension) (last d))
   (check-equal? (M 'distinguished-points) '()) ;; no points installed
   (check-method M 'add-distinguished-point! *exactly-two*)
-      
+
   (check-equal? (M 'patch-names) ptchs) ;; no patches installed
   (check-method M 'get-patch *exactly-one*)
   (check-exn #px"Unknown patch" (λ () ((M 'get-patch) (gensym))))
-      
+
   (check-exn #px"Unknown message: manifold generator" (λ () (M (gensym)))))
 (define (check-patch P M n d t)
         (check-equal? (M 'patch-names) (list n))
@@ -143,7 +143,7 @@
       (check-equal? ((C '->coords)) (cons fake 'point->coords))
       (check-equal? ((C 'check-point)) (cons fake 'check-point))
       (check-equal? ((C 'check-coords)) (cons fake 'check-coordinates))
-      
+
       (check-equal? (g:size (C 'typical-coords)) (car d))
       (check-equal? (C 'coordinate-prototype) (s:generate (car d) 'up (λ (i) (string->symbol (format "x~a" i)))))
       (check-method C 'set-coordinate-prototype! *exactly-one*)
@@ -189,7 +189,7 @@
                   '(up (sqrt (+ (expt r 2) (expt z 2)))
                        (acos (/ z (sqrt (+ (expt r 2) (expt z 2)))))
                        α)))
-   
+
    ;;; MANIFOLD
    ;; MANIFOLD-POINT
    ;; access-chains?
@@ -273,7 +273,7 @@
         (check-exn (pregexp (format "Bad coordinates: ~a" n)) (λ () ((C '->point) (up 1 2 3))))
         (check-exn (pregexp (format "Bad point: ~a" n)) (λ () ((C '->coords) #f)))
         (check-exn (pregexp (format "Bad point: ~a" n)) (λ () ((C '->coords) (make-manifold-point #f R4 #f #f))))))
-    
+
     (check-equal? (expression ((R4-rect '->coords) (make-manifold-point (up 't 'x 'y 'z) R4 #f #f)))
                   '(up t x y z))
     (check-equal? (expression ((R4-cyl '->coords) (make-manifold-point (up 't 'x 'y 'z) R4 #f #f)))
@@ -339,7 +339,7 @@
     "dimension"
     (check-equal? (dimension R2-rect) 2)
     (check-equal? (dimension S3-tilted) 3))
-   
+
    ))
 
 (module+ test

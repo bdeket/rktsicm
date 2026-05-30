@@ -195,7 +195,7 @@
      (check-ortho S1-circular (down 1))
      (check-ortho S1-slope (down (/ 2 (+ 1 (expt 'x0 2)))))
      (check-ortho S1-gnomic (down (/ 1 (+ 1 (expt 'x0 2))))))
-    
+
     (check-ortho R2-rect '(down (((partial 0) f) (up x0 x1))
                                 (((partial 1) f) (up x0 x1))))
     (check-ortho R2-polar '(down (((partial 0) f) (up r theta))
@@ -266,7 +266,7 @@
                                              (* x1 (f (up x0 x1)))
                                              (* 1/2 (((partial 1) f) (up x0 x1))))))
     (check-ortho S2p-gnomic 2gnom)
-    
+
     ;; very-slow
     #;(check-ortho S3-spherical '(down (((partial 0) f) (up x0 x1 x2))
                                      (/ (((partial 1) f) (up x0 x1 x2)) (sin x0))
@@ -445,7 +445,7 @@
                               (down  0 1 0 0)
                               (down  0 0 1 0)
                               (down  0 0 0 1)))
-    
+
     (let ([phi (literal-manifold-function 'phi SR)])
       (check-simplified? (((Laplacian g-Minkowski SR-basis) phi) an-event)
                          '(+ (* -1 (((partial 1) ((partial 1) phi)) (up t0 x0 y0 z0)))

@@ -619,7 +619,7 @@
                          (+ (* (cos (vartheta t)) (cos (varpsi t)) ((D varphi) t))
                             (* ((D vartheta) t) (sin (varpsi t))))))
     (check-simplified? (let* ((gamma (compose
-		alternate-angles-chi-inverse
+                alternate-angles-chi-inverse
                 (up (literal-function 'vartheta)
                     (literal-function 'varphi)
                     (literal-function 'varpsi))
@@ -656,7 +656,7 @@
                             0)
                            5)
                           (series:sum
-                           (((exp (* 'alpha Jz)) (chart R3-rect)) 
+                           (((exp (* 'alpha Jz)) (chart R3-rect))
                             ((point R3-rect)
                              (* (Euler->M (up 'theta 'phi 'psi))
                                 (up 'x 'y 'z))))
@@ -674,7 +674,7 @@
                             0)
                            3)
                           (series:sum
-                           (((exp (* 'alpha Jx)) (chart R3-rect)) 
+                           (((exp (* 'alpha Jx)) (chart R3-rect))
                             ((point R3-rect)
                              (* (Euler->M (up 'theta 'phi 'psi))
                                 (up 'x 'y 'z))))

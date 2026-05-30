@@ -9,10 +9,10 @@
 ;;; Rotation matrices
 
 (define (rotate-x-matrix-2 cos-angle sin-angle)
-  (matrix-by-rows 
-    (list           1               0              0)
-    (list           0       cos-angle   (- sin-angle))
-    (list           0       sin-angle      cos-angle)))
+  (matrix-by-rows
+   (list           1               0              0)
+   (list           0       cos-angle   (- sin-angle))
+   (list           0       sin-angle      cos-angle)))
 
 (define (rotate-x-matrix angle)
   (rotate-x-matrix-2 (cos angle) (sin angle)))
@@ -20,7 +20,7 @@
 (define Rx-matrix rotate-x-matrix)
 
 (define (rotate-y-matrix-2 cos-angle sin-angle)
-  (matrix-by-rows 
+  (matrix-by-rows
    (list     cos-angle     0  sin-angle)
    (list             0     1          0)
    (list (- sin-angle)     0  cos-angle)))
@@ -72,16 +72,16 @@
 
 (define (rotate-x-tuple-2 c s)
   (m->s (down 'ignore 'ignore 'ignore)
-	(rotate-x-matrix-2 c s)
-	(up 'ignore 'ignore 'ignore)))
+        (rotate-x-matrix-2 c s)
+        (up 'ignore 'ignore 'ignore)))
 
 (define (rotate-x-tuple angle)
   (rotate-x-tuple-2 (cos angle) (sin angle)))
 
 (define (rotate-y-tuple-2 c s)
   (m->s (down 'ignore 'ignore 'ignore)
-	(rotate-y-matrix-2 c s)
-	(up 'ignore 'ignore 'ignore)))
+        (rotate-y-matrix-2 c s)
+        (up 'ignore 'ignore 'ignore)))
 
 (define (rotate-y-tuple angle)
   (rotate-y-tuple-2 (cos angle) (sin angle)))
@@ -89,8 +89,8 @@
 
 (define (rotate-z-tuple-2 c s)
   (m->s (down 'ignore 'ignore 'ignore)
-	(rotate-z-matrix-2 c s)
-	(up 'ignore 'ignore 'ignore)))
+        (rotate-z-matrix-2 c s)
+        (up 'ignore 'ignore 'ignore)))
 
 (define (rotate-z-tuple angle)
   (rotate-z-tuple-2 (cos angle) (sin angle)))

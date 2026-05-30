@@ -6,7 +6,7 @@
 (require (for-syntax racket/base
                      racket/syntax)
          (only-in "../../rkt/glue.rkt" fix:> fix:+)
-		 (only-in "../../rkt/define.rkt" define default-object?)
+         (only-in "../../rkt/define.rkt" define default-object?)
          "../ghelper.rkt"
          "../numeric.rkt"
          "s-operator.rkt"
@@ -28,9 +28,9 @@
 ;for example generic:+ works on 2 arguments g:+ works on n arguments
 ;for most functions g:fct just references generic:fct
 
-;;;; Primitive Generic Operation Declarations 
+;;;; Primitive Generic Operation Declarations
 
-;;; Unary Operators 
+;;; Unary Operators
 
 ;;bdk;; insert 1
 (define-g g:type (make-generic-operator 1 'type))
@@ -56,7 +56,7 @@
   (make-generic-operator 1 'identity-like (lambda (x) g:identity)))
 
 
-;;; Generic tests are conservative.  
+;;; Generic tests are conservative.
 ;;; They will return #f unless the answer is known true.
 
 (define generic:zero?
@@ -69,7 +69,7 @@
 (define generic:one? (make-generic-operator 1 'one? (lambda (x) #f)))
 
 (define (g:one? x)
-    (if (number? x) (exact-one? x) (generic:one? x)))
+  (if (number? x) (exact-one? x) (generic:one? x)))
 
 
 (define-g g:identity? (make-generic-operator 1 'identity? (lambda (x) #f)))
@@ -121,7 +121,7 @@
 ;;bdk;; insert 2
 ;;bdk;; was g:transpose-1arg
 (define generic:transpose
- (make-generic-operator 1 'transpose))
+  (make-generic-operator 1 'transpose))
 
 (define-g g:dimension
   (make-generic-operator 1
@@ -145,10 +145,10 @@
 ;;; necessary because of a problem of load order.
 #; ;;bdk;; moved to s-operator
 (define (make-operator p #:optional name subtype arity . opts)
-   (if (default-object? name) (set! name #f))
-   (if (default-object? subtype) (set! subtype #f))
-   (if (default-object? arity) (set! arity (procedure-arity p)))
-   (make-apply-hook p `(*operator* ,subtype ,name ,arity ,@opts)))
+  (if (default-object? name) (set! name #f))
+  (if (default-object? subtype) (set! subtype #f))
+  (if (default-object? arity) (set! arity (procedure-arity p)))
+  (make-apply-hook p `(*operator* ,subtype ,name ,arity ,@opts)))
 
 
 (define generic:partial-derivative
@@ -206,37 +206,37 @@
 
 (define (g:+:bin x y)
   (cond ((and (number? x) (number? y)) (+ x y))
-	((g:zero? x) y)
-	((g:zero? y) x)
-	(else (generic:+ x y))))
+        ((g:zero? x) y)
+        ((g:zero? y) x)
+        (else (generic:+ x y))))
 
 
 (define generic:- (make-generic-operator 2 '-))
 
 (define (g:-:bin x y)
   (cond ((and (number? x) (number? y)) (- x y))
-	((g:zero? y) x)
-	((g:zero? x) (g:negate y))
-	(else (generic:- x y))))
+        ((g:zero? y) x)
+        ((g:zero? x) (g:negate y))
+        (else (generic:- x y))))
 
 
 (define generic:* (make-generic-operator 2 '*))
 
 (define (g:*:bin x y)
   (cond ((and (number? x) (number? y)) (* x y))
-	((exact-zero? x) (g:zero-like y))
-	((exact-zero? y) (g:zero-like x))
-	((g:one? x) y)
-	((g:one? y) x)
-	(else (generic:* x y))))
+        ((exact-zero? x) (g:zero-like y))
+        ((exact-zero? y) (g:zero-like x))
+        ((g:one? x) y)
+        ((g:one? y) x)
+        (else (generic:* x y))))
 
-;;; In g:*:bin we test for exact (numerical) zero 
-;;; because it is possible to produce a wrong-type 
+;;; In g:*:bin we test for exact (numerical) zero
+;;; because it is possible to produce a wrong-type
 ;;; zero here, as follows:
 
-;;;		  |0|             |0|
-;;;	  |a b c| |0|   |0|       |0|
-;;;	  |d e f| |0| = |0|, not  |0|
+;;;                  |0|             |0|
+;;;          |a b c| |0|   |0|       |0|
+;;;          |d e f| |0| = |0|, not  |0|
 
 ;;; We are less worried about the zero? below,
 ;;; because any invertible matrix is square.
@@ -246,10 +246,10 @@
 
 (define (g:/:bin x y)
   (cond ((and (number? x) (number? y)) (/ x y))
-	;; ((g:zero? x) (g:zero-like y))  ; Ancient bug!  No consequence.
-	;; ((g:zero? x) x)
-	((g:one? y) x)
-	(else (generic:/ x y))))
+        ;; ((g:zero? x) (g:zero-like y))  ; Ancient bug!  No consequence.
+        ;; ((g:zero? x) x)
+        ((g:one? y) x)
+        (else (generic:/ x y))))
 
 (define generic:expt (make-generic-operator 2 'expt))
 ;;bdk;; insert 3 end
@@ -291,7 +291,7 @@
 ;;bdk;; the nesting to make it possible to require litfun went to deep (cyclic dependencies)
 ;;bdk;; so in the end I opted to make it possible to extend the g:apply function at a later time
 ;;bdk;; for now, this is only happening in litfun.rkt
-(define-values (g:apply install-g:apply-case) 
+(define-values (g:apply install-g:apply-case)
   (let ([others (make-hash)]
         [notfound (gensym)])
 
@@ -305,12 +305,12 @@
 
     (define (install-g:apply-case pred fct)
       (hash-set! others pred fct))
-  
+
     (define  (g:apply f . apply-args)
       (when (null? apply-args) (error "No argument list for G:APPLY"))
 
       (define args (collapse apply-args))
-      
+
       (cond
         [(procedure? f)
          (apply f args)]
@@ -341,7 +341,7 @@
 (define (applicable-literal? f)
   (and (symbol? f) (*enable-literal-apply*)))
 
-;;; *enable-literal-apply* is modulated by with-literal-apply-enabled.  
+;;; *enable-literal-apply* is modulated by with-literal-apply-enabled.
 ;;; This procedure is defined in extapply.scm.
 ;;; This feature is used explicitly in ode/interface.scm.
 
@@ -352,16 +352,16 @@
 
 (define (g:=:n args)
   (cond ((null? args) #t)
-	((null? (cdr args)) #t)
-	(else
-	 (let lp ((args (cddr args))
-		  (larg (cadr args))
-		  (ans (g:=:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (car args)
-		   (and ans (g:=:bin larg (car args)))))))))
+        ((null? (cdr args)) #t)
+        (else
+         (let lp ((args (cddr args))
+                  (larg (cadr args))
+                  (ans (g:=:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (car args)
+                   (and ans (g:=:bin larg (car args)))))))))
 
 
 (define (g:< . args)
@@ -369,48 +369,48 @@
 
 (define (g:<:n args)
   (cond ((null? args) #t)
-	((null? (cdr args)) #t)
-	(else
-	 (let lp ((args (cddr args))
-		  (larg (cadr args))
-		  (ans (g:<:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (car args)
-		   (and ans (g:<:bin larg (car args)))))))))
+        ((null? (cdr args)) #t)
+        (else
+         (let lp ((args (cddr args))
+                  (larg (cadr args))
+                  (ans (g:<:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (car args)
+                   (and ans (g:<:bin larg (car args)))))))))
 
 (define (g:<= . args)
   (g:<=:n args))
 
 (define (g:<=:n args)
   (cond ((null? args) #t)
-	((null? (cdr args)) #t)
-	(else
-	 (let lp ((args (cddr args))
-		  (larg (cadr args))
-		  (ans (g:<=:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (car args)
-		   (and ans (g:<=:bin larg (car args)))))))))
+        ((null? (cdr args)) #t)
+        (else
+         (let lp ((args (cddr args))
+                  (larg (cadr args))
+                  (ans (g:<=:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (car args)
+                   (and ans (g:<=:bin larg (car args)))))))))
 
 (define (g:> . args)
   (g:>:n args))
 
 (define (g:>:n args)
   (cond ((null? args) #t)
-	((null? (cdr args)) #t)
-	(else
-	 (let lp ((args (cddr args))
-		  (larg (cadr args))
-		  (ans (g:>:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (car args)
-		   (and ans (g:>:bin larg (car args)))))))))
+        ((null? (cdr args)) #t)
+        (else
+         (let lp ((args (cddr args))
+                  (larg (cadr args))
+                  (ans (g:>:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (car args)
+                   (and ans (g:>:bin larg (car args)))))))))
 
 
 (define (g:>= . args)
@@ -418,79 +418,79 @@
 
 (define (g:>=:n args)
   (cond ((null? args) #t)
-	((null? (cdr args)) #t)
-	(else
-	 (let lp ((args (cddr args))
-		  (larg (cadr args))
-		  (ans (g:>=:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (car args)
-		   (and ans (g:>=:bin larg (car args)))))))))
+        ((null? (cdr args)) #t)
+        (else
+         (let lp ((args (cddr args))
+                  (larg (cadr args))
+                  (ans (g:>=:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (car args)
+                   (and ans (g:>=:bin larg (car args)))))))))
 
 (define (g:+ . args)
   (g:+:n args))
 
 (define (g:+:n args)
   (cond ((null? args) n:zero)
-	((null? (cdr args)) (car args))
-	(else
-	 (let lp ((args (cddr args))
-		  (ans (g:+:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (g:+:bin ans (car args))))))))
+        ((null? (cdr args)) (car args))
+        (else
+         (let lp ((args (cddr args))
+                  (ans (g:+:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (g:+:bin ans (car args))))))))
 
 (define (g:* . args)
   (g:*:n args))
 
 (define (g:*:n args)
   (cond ((null? args) n:one)
-	((null? (cdr args)) (car args))
-	(else
-	 (let lp ((args (cddr args))
-		  (ans (g:*:bin (car args) (cadr args))))
-	   (if (null? args)
-	       ans
-	       (lp (cdr args)
-		   (g:*:bin ans (car args))))))))
+        ((null? (cdr args)) (car args))
+        (else
+         (let lp ((args (cddr args))
+                  (ans (g:*:bin (car args) (cadr args))))
+           (if (null? args)
+               ans
+               (lp (cdr args)
+                   (g:*:bin ans (car args))))))))
 
 (define (g:- . args)
   (g:-:n args))
 
 (define (g:-:n args)
   (cond ((null? args) n:zero)
-	((null? (cdr args)) (g:negate (car args)))
-	(else
-	 (g:-:bin (car args)
-		  (g:+:n (cdr args))))))
+        ((null? (cdr args)) (g:negate (car args)))
+        (else
+         (g:-:bin (car args)
+                  (g:+:n (cdr args))))))
 
 (define (g:/ . args)
   (g:/:n args))
 
 (define (g:/:n args)
   (cond ((null? args) n:one)
-	((null? (cdr args)) (g:invert (car args)))
-	(else
-	 (g:/:bin (car args)
-		  (g:*:n (cdr args))))))
+        ((null? (cdr args)) (g:invert (car args)))
+        (else
+         (g:/:bin (car args)
+                  (g:*:n (cdr args))))))
 
 (define (g:gcd . args)
   (g:gcd:n args))
 
 (define (g:gcd:n args)
   (cond ((null? args) n:zero)
-	((null? (cdr args)) (car args))
-	(else
-	 (let lp
-	     ((as (cddr args))
-	      (ans (g:gcd:bin (car args) (cadr args))))
-	   (cond ((null? as) ans)
-		 ((g:one? ans) ans)
-		 (else
-		  (lp (cdr as) (g:gcd:bin ans (car as)))))))))
+        ((null? (cdr args)) (car args))
+        (else
+         (let lp
+           ((as (cddr args))
+            (ans (g:gcd:bin (car args) (cadr args))))
+           (cond ((null? as) ans)
+                 ((g:one? ans) ans)
+                 (else
+                  (lp (cdr as) (g:gcd:bin ans (car as)))))))))
 ;;bdk;; insert 4 end
 
 ;;bdk;; insert 11 : mathutil
@@ -498,9 +498,9 @@
   (if (fix:> low high)
       0
       (let lp ((i (fix:+ low 1)) (sum (f low)))
-	(if (fix:> i high)
-	    sum
-	    (lp (fix:+ i 1) (g:+ sum (f i)))))))
+        (if (fix:> i high)
+            sum
+            (lp (fix:+ i 1) (g:+ sum (f i)))))))
 ;;bdk;; insert 11 end
 
 

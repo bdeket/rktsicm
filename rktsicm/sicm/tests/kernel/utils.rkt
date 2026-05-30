@@ -82,7 +82,7 @@
       (check-equal? (procedure-arity F) (list 1 (arity-at-least 3)))
       (check-equal? (F 2) -2)
       (check-equal? (F 2 1/2 2 1/2 2 1/2) -1))
-    
+
     (check-exn #px"compose-bin\\+n: contract violation\n  expected: first procedure that accepts 2 argument\\(s\\)\n  given:"
                (λ () (compose-bin (λ (x) (- x)) (list (λ (x y) (* x y)) (λ y (apply * y))))))
     (let ([F (compose-bin (λ (x y) (- x y)) (list (λ (x y) (* x y)) (λ _ 3)))])

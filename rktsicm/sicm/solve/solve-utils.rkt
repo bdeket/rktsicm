@@ -31,8 +31,8 @@
   (*with-extra-equations* '()))
 
 
-;;; To collect all solutions of a set of equations.  
-;;; The initialization of the globals is locally done 
+;;; To collect all solutions of a set of equations.
+;;; The initialization of the globals is locally done
 ;;; by fluid binding.
 
 (define (solve-equations equations unknowns)
@@ -54,63 +54,63 @@
 
 (define (default-succeed result fail)
   (let ((result
-	 (make-solution
-	  (residual-equations result)
-	  (residual-variables result)
-	  (sort (map (lambda (s)
-		       (make-substitution
-			(substitution-variable s)
-			(substitution-expression s)
-			(sort (substitution-justifications s)
-			      expr:<)))
-		     (substitutions result))
-		(lambda (s1 s2)
-		  (expr:< (substitution-variable s1)
-			  (substitution-variable s2))))
-	  (tough-equations result))))
+         (make-solution
+          (residual-equations result)
+          (residual-variables result)
+          (sort (map (lambda (s)
+                       (make-substitution
+                        (substitution-variable s)
+                        (substitution-expression s)
+                        (sort (substitution-justifications s)
+                              expr:<)))
+                     (substitutions result))
+                (lambda (s1 s2)
+                  (expr:< (substitution-variable s1)
+                          (substitution-variable s2))))
+          (tough-equations result))))
     (cond ((and (null? (residual-variables result))
                 (null? (residual-equations result))
-		(null? (tough-equations result)))
-	   (accumulate-complete-solutions result))
-	  ((and (not (null? (residual-variables result)))
-		(null? (residual-equations result))
-		(null? (tough-equations result)))
-	   (accumulate-underdetermined-solutions result))
-	  ((and (not (null? (residual-variables result)))
-		(null? (residual-equations result))
+                (null? (tough-equations result)))
+           (accumulate-complete-solutions result))
+          ((and (not (null? (residual-variables result)))
+                (null? (residual-equations result))
+                (null? (tough-equations result)))
+           (accumulate-underdetermined-solutions result))
+          ((and (not (null? (residual-variables result)))
+                (null? (residual-equations result))
                 (not (null? (tough-equations result))))
-	   (accumulate-tough-equations-solutions result))
-	  ((and (null? (residual-variables result))
-		(not (null? (residual-equations result)))
-		(null? (tough-equations result)))
-	   (accumulate-residual-equation-solutions result))
-	  ((and (null? (residual-variables result))
-		(null? (residual-equations result))
-		(not (null? (tough-equations result))))
-	   (accumulate-extra-equations-solutions result))
-	  (else (error "How did I get here?"))))
+           (accumulate-tough-equations-solutions result))
+          ((and (null? (residual-variables result))
+                (not (null? (residual-equations result)))
+                (null? (tough-equations result)))
+           (accumulate-residual-equation-solutions result))
+          ((and (null? (residual-variables result))
+                (null? (residual-equations result))
+                (not (null? (tough-equations result))))
+           (accumulate-extra-equations-solutions result))
+          (else (error "How did I get here?"))))
   (fail))
 
 (define (default-fail)
   (cond ((not (null? (*complete-solutions*)))
-	 `(full-solutions
-	   ,@(collect-best-solutions (*complete-solutions*))))
-	((not (null? (*underdetermined-solutions*)))
-	 `(underdetermined
-	   ,@(collect-best-solutions (*underdetermined-solutions*))))
-	((not (null? (*with-residual-equations*)))
-	 `(parameters-constrained
-	   ,@(collect-best-solutions (*with-residual-equations*))))
-	((not (null? (*outstanding-contradictions*)))
-	 `(contradictions ,@(*outstanding-contradictions*)))
-	((not (null? (*with-tough-equations*)))
-	 `(tough-equations
-	   ,@(collect-best-solutions (*with-tough-equations*))))
-	((not (null? (*with-extra-equations*)))
-	 `(extra-equations
-	   ,@(collect-best-solutions (*with-extra-equations*))))
-	(else
-	  (error "How did I get here?"))))
+         `(full-solutions
+           ,@(collect-best-solutions (*complete-solutions*))))
+        ((not (null? (*underdetermined-solutions*)))
+         `(underdetermined
+           ,@(collect-best-solutions (*underdetermined-solutions*))))
+        ((not (null? (*with-residual-equations*)))
+         `(parameters-constrained
+           ,@(collect-best-solutions (*with-residual-equations*))))
+        ((not (null? (*outstanding-contradictions*)))
+         `(contradictions ,@(*outstanding-contradictions*)))
+        ((not (null? (*with-tough-equations*)))
+         `(tough-equations
+           ,@(collect-best-solutions (*with-tough-equations*))))
+        ((not (null? (*with-extra-equations*)))
+         `(extra-equations
+           ,@(collect-best-solutions (*with-extra-equations*))))
+        (else
+         (error "How did I get here?"))))
 
 (define (accumulate-complete-solutions result)
   (*complete-solutions*
@@ -126,9 +126,9 @@
 
 (define (accumulate-residual-equation-solutions result)
   (*with-residual-equations*
-	(lset-adjoin same-solution?
-		     (*with-residual-equations*)
-		     result)))
+   (lset-adjoin same-solution?
+                (*with-residual-equations*)
+                result)))
 
 (define (accumulate-tough-equations-solutions result)
   (*with-tough-equations*
@@ -150,29 +150,29 @@
 
 (define (same-residual-equations? sol1 sol2)
   (lset= same-equation?
-	 (residual-equations sol1)
-	 (residual-equations sol2)))
+         (residual-equations sol1)
+         (residual-equations sol2)))
 
 (define (same-residual-variables? sol1 sol2)
   (lset= same-variable?
-	 (residual-variables sol1)
-	 (residual-variables sol2)))
+         (residual-variables sol1)
+         (residual-variables sol2)))
 
 (define (same-substitutions? sol1 sol2)
   (lset= same-substitution?
-	 (substitutions sol1)
-	 (substitutions sol2)))
+         (substitutions sol1)
+         (substitutions sol2)))
 
 (define (same-tough-equations? sol1 sol2)
   (lset= same-equation?
-	 (tough-equations sol1)
-	 (tough-equations sol2)))
+         (tough-equations sol1)
+         (tough-equations sol2)))
 
 (define (same-equation? eq1 eq2)
   (and (same-expression? (equation-expression eq1)
-			 (equation-expression eq2))
+                         (equation-expression eq2))
        (same-justifications? (equation-justifications eq1)
-			     (equation-justifications eq2))))
+                             (equation-justifications eq2))))
 
 (define (same-expression? e1 e2)
   (let ((d (s:simplify (symb:- e1 e2))))
@@ -182,11 +182,11 @@
 
 (define (same-substitution? s1 s2)
   (and (same-variable? (substitution-variable s1)
-		       (substitution-variable s2))
+                       (substitution-variable s2))
        (same-expression? (substitution-expression s1)
-			 (substitution-expression s2))
+                         (substitution-expression s2))
        (same-justifications? (substitution-justifications s1)
-			     (substitution-justifications s2))))
+                             (substitution-justifications s2))))
 
 (define (same-justifications? js1 js2)
   (lset= same-justification? js1 js2))
@@ -201,40 +201,40 @@
 
 (define (equivalent-substitutions? sol1 sol2)
   (lset= equivalent-substitution?
-	 (substitutions sol1)
-	 (substitutions sol2)))
+         (substitutions sol1)
+         (substitutions sol2)))
 
 (define (equivalent-substitution? s1 s2)
   (and (same-variable? (substitution-variable s1)
-		       (substitution-variable s2))
+                       (substitution-variable s2))
        (same-expression? (substitution-expression s1)
-			 (substitution-expression s2))))
+                         (substitution-expression s2))))
 
 (define (one-of-each lists)
   (cond ((null? lists) '())
-	((null? (cdr lists)) (map list (car lists)))
-	(else
-	 (let ((heads (car lists))
-	       (tails (one-of-each (cdr lists))))
-	   (append-map (lambda (t)
-			 (map (lambda (h)
-				(cons h t))
-			      heads))
-		       tails)))))
+        ((null? (cdr lists)) (map list (car lists)))
+        (else
+         (let ((heads (car lists))
+               (tails (one-of-each (cdr lists))))
+           (append-map (lambda (t)
+                         (map (lambda (h)
+                                (cons h t))
+                              heads))
+                       tails)))))
 
 (define (minimum-length-head lst)
   (if (null? lst)
       lst
       (let lp ((lst (cdr lst)) (result (list (car lst))))
-	(cond ((null? lst) result)
-	      ((= (length (car lst)) (length (car result)))
-	       (lp (cdr lst) (cons (car lst) result)))
-	      (else result)))))
+        (cond ((null? lst) result)
+              ((= (length (car lst)) (length (car result)))
+               (lp (cdr lst) (cons (car lst) result)))
+              (else result)))))
 
 (define (substitution-variable-entry var solution)
   (find (lambda (subst)
-	  (simple:equal? var (substitution-variable subst)))
-	(substitutions solution)))
+          (simple:equal? var (substitution-variable subst)))
+        (substitutions solution)))
 
 (define (collect-best-solutions solutions)
   ;;assumption: in each solution substitutions are sorted by varname
@@ -247,32 +247,32 @@
                       (filter (lambda (sol)
                                 (equivalent-solutions? sol1 sol))
                               (cdr sols))))
-	       (subs  (substitutions sol1))
-	       (vars (map substitution-variable subs))
-	       (exprs (map substitution-expression subs))
-	       )
-	  (let ((req (residual-equations sol1))
-		(rev (residual-variables sol1))
-		(teq (tough-equations sol1))
-		(justs
-		 (one-of-each
-		  (map (lambda (sub)
-			 (let ((var (substitution-variable sub)))
-			   (minimum-length-head
-			    (delete-duplicates
-			     (sort 
-			      (map (lambda (solution)
-				     (substitution-justifications
-				      (substitution-variable-entry var solution)))
-				   equivalents)
-			      (lambda (j1 j2)
-				(< (length j1) (length j2))))))))
-		       subs))))
-	    (lp (lset-difference simple:equal? sols equivalents)
-		(lset-union simple:equal?
+               (subs  (substitutions sol1))
+               (vars (map substitution-variable subs))
+               (exprs (map substitution-expression subs))
+               )
+          (let ((req (residual-equations sol1))
+                (rev (residual-variables sol1))
+                (teq (tough-equations sol1))
+                (justs
+                 (one-of-each
+                  (map (lambda (sub)
+                         (let ((var (substitution-variable sub)))
+                           (minimum-length-head
+                            (delete-duplicates
+                             (sort
+                              (map (lambda (solution)
+                                     (substitution-justifications
+                                      (substitution-variable-entry var solution)))
+                                   equivalents)
+                              (lambda (j1 j2)
+                                (< (length j1) (length j2))))))))
+                       subs))))
+            (lp (lset-difference simple:equal? sols equivalents)
+                (lset-union simple:equal?
                             (map (lambda (just)
                                    (make-solution req
-                                                  rev 
+                                                  rev
                                                   (map (lambda (var expr j)
                                                          (make-substitution var
                                                                             expr

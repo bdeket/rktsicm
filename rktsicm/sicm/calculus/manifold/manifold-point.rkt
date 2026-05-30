@@ -29,7 +29,7 @@
   (lambda (point)
     (assert (eq? (embedded 'manifold) (point->manifold point)))
     (assert (= ((embedded 'manifold) 'embedding-dimension)
-               ((embedding 'manifold) 'embedding-dimension)))		 
+               ((embedding 'manifold) 'embedding-dimension)))
     (manifold-point (manifold-point-spec point)
                     (embedding 'manifold)
                     '())))

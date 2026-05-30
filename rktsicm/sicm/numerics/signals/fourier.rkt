@@ -41,7 +41,7 @@
 |#
 
 ;;; Today we will just specify the total number of samples.  This can
-;;; be changed to any power of two. 
+;;; be changed to any power of two.
 
 (define *nsamples*)
 
@@ -70,7 +70,7 @@
   (set! *time-domain-sampling-interval* (/ 1 *nsamples*))
   (set! *time-half-width* 1/2)
   'done)
-  
+
 (void
  (set-nsamples! 1024)
  )
@@ -78,21 +78,21 @@
 (define (set-time-period! new)
   (set! *time-half-width* new)
   (set! *time-domain-sampling-interval*
-	(/ (* 2 *time-half-width*) *nsamples*))
+        (/ (* 2 *time-half-width*) *nsamples*))
   (set! *frequency-half-width*
-	(/ *nsamples* (* 4 *time-half-width*)))
+        (/ *nsamples* (* 4 *time-half-width*)))
   (set! *frequency-domain-sampling-interval*
-	(/ (* 2 *frequency-half-width*) *nsamples*))
+        (/ (* 2 *frequency-half-width*) *nsamples*))
   'done)
 
 (define (set-frequency-period! new)
   (set! *frequency-half-width* new)
   (set! *frequency-domain-sampling-interval*
-	(/ (* 2 *frequency-half-width*) *nsamples*))
+        (/ (* 2 *frequency-half-width*) *nsamples*))
   (set! *time-half-width*
-	(/ *nsamples* (* 4 *frequency-half-width*)))
+        (/ *nsamples* (* 4 *frequency-half-width*)))
   (set! *time-domain-sampling-interval*
-	(/ (* 2 *time-half-width*) *nsamples*))
+        (/ (* 2 *time-half-width*) *nsamples*))
   'done)
 
 (define (Fourier-transform f)
@@ -100,45 +100,45 @@
   (assert (symmetric-span? (sigfun:span f)))
   (set-time-period! (sigfun:max (sigfun:span f)))
   (let ((period-span
-	 (sigfun:make-span (- *frequency-half-width*)
-			   (+ *frequency-half-width*))))
+         (sigfun:make-span (- *frequency-half-width*)
+                           (+ *frequency-half-width*))))
     (sigfun:make (g:* (* 2 *time-half-width*) ;=N*dt (flush 1/N in dft)
-		      (circular-interpolate
-		       (dft (samples *nsamples*
-				     (sigfun:procedure f)
-				     *time-half-width*))
-		       period-span))
-		 period-span)))
+                      (circular-interpolate
+                       (dft (samples *nsamples*
+                                     (sigfun:procedure f)
+                                     *time-half-width*))
+                       period-span))
+                 period-span)))
 
 (define (inverse-Fourier-transform F)
   (assert (sigfun? F))
   (assert (symmetric-span? (sigfun:span F)))
   (set-frequency-period! (sigfun:max (sigfun:span F)))
   (let ((period-span (sigfun:make-span (- *time-half-width*)
-				       (+ *time-half-width*))))
+                                       (+ *time-half-width*))))
     (sigfun:make (g:* *frequency-domain-sampling-interval*
-		      (circular-interpolate
-		       (idft (samples *nsamples*
-				      (sigfun:procedure F)
-				      *frequency-half-width*))
-		       period-span))
-		 period-span)))
+                      (circular-interpolate
+                       (idft (samples *nsamples*
+                                      (sigfun:procedure F)
+                                      *frequency-half-width*))
+                       period-span))
+                 period-span)))
 
 (define (circular-interpolate samples period-span)
   (let* ((nsamples (length samples))
-	 (minx (sigfun:min period-span))
-	 (maxx (sigfun:max period-span))
-	 (period (- maxx minx))
-	 (dx (/ period nsamples)))
+         (minx (sigfun:min period-span))
+         (maxx (sigfun:max period-span))
+         (period (- maxx minx))
+         (dx (/ period nsamples)))
     (define (interpolation x)
       (let* ((xpos (/ (- x minx) dx))
-	     (ixpos (floor->exact xpos))
-	     (xoffset (- xpos ixpos))
-	     (ilo (modulo ixpos nsamples))
-	     (stuff (list-tail samples ilo))
-	     (flo (car stuff))
-	     (fhi (if (null? (cdr stuff)) (car samples) (cadr stuff))))
-	(+ flo (* xoffset (- fhi flo)))))
+             (ixpos (floor->exact xpos))
+             (xoffset (- xpos ixpos))
+             (ilo (modulo ixpos nsamples))
+             (stuff (list-tail samples ilo))
+             (flo (car stuff))
+             (fhi (if (null? (cdr stuff)) (car samples) (cadr stuff))))
+        (+ flo (* xoffset (- fhi flo)))))
     interpolation))
 
 #|
@@ -156,7 +156,7 @@
   (signal->frequency-function
    (time-function->signal
     (sigfun:make (constant 1)
-		 (sigfun:make-span -10 10)))))
+                 (sigfun:make-span -10 10)))))
 
 (define mfdelta (magnitude fdelta))
 
@@ -177,7 +177,7 @@
   (signal->time-function
    (frequency-function->signal
     (sigfun:make (constant 1)
-		 (sigfun:make-span -25.6 25.6)))))
+                 (sigfun:make-span -25.6 25.6)))))
 
 (define mtdelta (magnitude tdelta))
 
@@ -197,13 +197,13 @@
   (assert (symmetric-span? (sigfun:span f)))
   (set-time-period! (sigfun:max (sigfun:span f)))
   (let ((period-span
-	 (sigfun:make-span (- *frequency-half-width*)
-			   (+ *frequency-half-width*))))
+         (sigfun:make-span (- *frequency-half-width*)
+                           (+ *frequency-half-width*))))
     (/ (apply +
-	      (map (compose square magnitude)
-		   (samples *nsamples*
-			    (sigfun:procedure f)
-			    *time-half-width*)))
+              (map (compose square magnitude)
+                   (samples *nsamples*
+                            (sigfun:procedure f)
+                            *time-half-width*)))
        *frequency-half-width*)))
 
 (define (frequency-domain-energy F)
@@ -211,12 +211,12 @@
   (assert (symmetric-span? (sigfun:span F)))
   (set-frequency-period! (sigfun:max (sigfun:span F)))
   (let ((period-span (sigfun:make-span (- *time-half-width*)
-				       (+ *time-half-width*))))
+                                       (+ *time-half-width*))))
     (/ (apply +
-	      (map (compose square magnitude)
-		   (samples *nsamples*
-			    (sigfun:procedure F)
-			    *frequency-half-width*)))
+              (map (compose square magnitude)
+                   (samples *nsamples*
+                            (sigfun:procedure F)
+                            *frequency-half-width*)))
        *time-half-width*)))
 
 #|

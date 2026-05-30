@@ -15,7 +15,7 @@
 ;;;; Signal Language, ideas stolen from SHE (Siebert/Abelson/Sussman).
 
 ;;; Signals are objects that can be specified as time functions or
-;;; frequency functions.  
+;;; frequency functions.
 
 (define (signal? x)
   (and (pair? x)
@@ -66,16 +66,16 @@
 
 (define (signal:->function encoding signal)
   (assert (or (eq? encoding '*time-function*)
-	      (eq? encoding '*frequency-function*)))
+              (eq? encoding '*frequency-function*)))
   (assert (signal? signal))
   (cond ((eq? encoding (signal:encoding signal))
-	 (signal:function signal))
-	((signal:encoded-as-time-function? signal)
-	 (Fourier-transform (signal:function signal)))
-	((signal:encoded-as-frequency-function? signal)
-	 (inverse-Fourier-transform (signal:function signal)))
-	(else
-	 (error "Unknown signal type" signal))))
+         (signal:function signal))
+        ((signal:encoded-as-time-function? signal)
+         (Fourier-transform (signal:function signal)))
+        ((signal:encoded-as-frequency-function? signal)
+         (inverse-Fourier-transform (signal:function signal)))
+        (else
+         (error "Unknown signal type" signal))))
 
 (define (signal->frequency-function signal)
   (signal:->function '*frequency-function* signal))
@@ -86,29 +86,29 @@
 (define ((signal->signal unary-op) sig)
   (assert (signal? sig))
   (signal:make (signal:encoding sig)
-	       (unary-op (signal:function sig))))
+               (unary-op (signal:function sig))))
 
 (define ((signal-domain->signal unary-op encoding) sig)
   (assert (signal? sig))
   (signal:make encoding
-	       (unary-op (signal:->function encoding sig))))
+               (unary-op (signal:->function encoding sig))))
 
 
 (define ((signalXsignal->signal binary-op) sig1 sig2)
   (assert (signal? sig1))
   (assert (signal? sig2))
   (signal:make (signal:encoding sig1)
-	       (binary-op
-		(signal:function sig1)
-		(signal:->function (signal:encoding sig1) sig2))))
+               (binary-op
+                (signal:function sig1)
+                (signal:->function (signal:encoding sig1) sig2))))
 
 (define ((signalXsignal-domain->signal binary-op encoding) sig1 sig2)
   (assert (signal? sig1))
   (assert (signal? sig2))
   (signal:make encoding
-	       (binary-op
-		(signal:->function encoding sig1)
-		(signal:->function encoding sig2))))
+               (binary-op
+                (signal:->function encoding sig1)
+                (signal:->function encoding sig2))))
 
 (define signal:negate    (signal->signal g:negate))
 
@@ -146,7 +146,7 @@
 
 (define (signal:reverse sig)
   (signal:make (signal:encoding sig)
-	       (sigfun:reverse (signal:function sig))))
+               (sigfun:reverse (signal:function sig))))
 
 (define (signal:dual sig)
   (time-function->signal (signal->frequency-function sig)))

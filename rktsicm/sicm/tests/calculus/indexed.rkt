@@ -44,7 +44,7 @@
     ;; zero arguments is valid, but is it usefull?
     (define H (declare-argument-types! (λ () (λ (pt) pt)) '()))
     (check-equal? (((typed->indexed H basis) '()) pt) pt)
-    
+
     (define (F v) (+ (* 2 (dy v)) (dx v)))
     (declare-argument-types! F (list vector-field?))
     (check-equal? (((typed->indexed F basis) '(0)) pt) 1)
@@ -105,7 +105,7 @@
     (skip ;;TODO: this should be an error - we can check arity
      (check-exn #px"Bad index types:\n\tassertion failed: "
                 (λ () (indexed->typed (declare-index-types! G (list up up down)) basis)))))
-   
+
    (test-case
     "count-occurrences"
     (check-equal? (count-occurrences up (list)) 0)
@@ -138,7 +138,7 @@
                   '())
     (check-equal? (index-types (i:contract (declare-index-types! (λ (w1 w2 w3 v1 v2) 1) (list up up up down down)) 1 0 1))
                   (list up up down)))
-   
+
    (test-case
     "typed->structure"
     (define-coordinates (up x y) R2-rect)
@@ -148,7 +148,7 @@
     ;; zero arguments is valid, but is it usefull?
     (define H (declare-argument-types! (λ () (λ (pt) pt)) '()))
     (check-equal? ((typed->structure H basis) pt) pt)
-    
+
     (define (F v) (+ (* 2 (dy v)) (dx v)))
     (declare-argument-types! F (list vector-field?))
     (check-equal? ((typed->structure F basis) pt) (down 1 2))
@@ -188,7 +188,7 @@
     (define 1F (literal-1form-field '1f R2-rect))
     (check-simplified? (((structure->typed (typed->structure G basis) basis) 1F V) pt)
                        ((G 1F V) pt))
-    
+
     (check-exn #px"assertion failed: \\(fix:= \\(length args\\) \\(length arg-types\\)\\)"
                (λ () ((structure->typed (typed->structure G basis) basis) 1F)))
     (check-exn #px"assertion failed: \\(arg-type arg\\)"
@@ -204,7 +204,7 @@
     (set-simplify-coeff-function! #f)
     (check-equal? ((simplify-coeff-function 'a) 'b) 'b)
     (check-equal? (maybe-simplify-coeff-functions g R2-basis) g)
-    
+
     (set-simplify-coeff-function! (λ (m) (λ (f) h)))
     (check-equal? ((simplify-coeff-function 'a) 'b) h)
     (check-equal? (maybe-simplify-coeff-functions g 'not-a-coordinate-basis) g)
@@ -230,7 +230,7 @@
     (check-equal? (* 'a zero-manifold-function) zero-manifold-function)
     (check-equal? (* one-manifold-function 'a) 'a)
     (check-equal? (* 'a one-manifold-function) 'a))
-   
+
    (test-case
     "indexed->typed / typed->indexed"
     (define-coordinates (up x y) R2-rect)

@@ -22,11 +22,11 @@
       (set! expand-multiplicities? #t))
   (let ((x (generate-uninterned-symbol 'x)))
     (let ((poly
-	   (m:determinant
-	    (g:- matrix (g:* x (m:make-identity (m:dimension matrix)))))))
+           (m:determinant
+            (g:- matrix (g:* x (m:make-identity (m:dimension matrix)))))))
       (pcf:expression-> (expression poly)
-			(lambda (pcf syms)
-			  (poly->roots pcf expand-multiplicities?))))))
+                        (lambda (pcf syms)
+                          (poly->roots pcf expand-multiplicities?))))))
 
 
 (define (real-matrix->eigenvalues-eigenvectors matrix #:optional cutoff)
@@ -34,33 +34,33 @@
       (set! cutoff (* 1000 n:machine-epsilon)))
   (let ((eigenvalues (matrix->eigenvalues matrix #f)))
     (map (lambda (root)
-	   (let ((m (car root))		; multiplicity
-		 (x (cdr root)))
-	     (svd (g:- matrix (g:* x (m:make-identity (m:dimension matrix))))
-		  (lambda (U SIGMA V W)
-		    (let ((n (vector-length W))
-			  (minw
-			   (* cutoff (apply max (map abs (vector->list W))))))
-		      (cons x
-			    (let lp ((i 0))
-			      (cond ((fix:= i n) '())
-				    ((< (abs (vector-ref W i)) cutoff)
-				     (cons (m:nth-col V i)
-					   (lp (fix:+ i 1))))
-				    (else
-				     (lp (fix:+ i 1)))))))))))
-	 eigenvalues)))
+           (let ((m (car root))                ; multiplicity
+                 (x (cdr root)))
+             (svd (g:- matrix (g:* x (m:make-identity (m:dimension matrix))))
+                  (lambda (U SIGMA V W)
+                    (let ((n (vector-length W))
+                          (minw
+                           (* cutoff (apply max (map abs (vector->list W))))))
+                      (cons x
+                            (let lp ((i 0))
+                              (cond ((fix:= i n) '())
+                                    ((< (abs (vector-ref W i)) cutoff)
+                                     (cons (m:nth-col V i)
+                                           (lp (fix:+ i 1))))
+                                    (else
+                                     (lp (fix:+ i 1)))))))))))
+         eigenvalues)))
 
 (define (matrix->eigenvalues-eigenvectors matrix)
   (let ((eigenvalues (matrix->eigenvalues matrix #f)))
     (map (lambda (root)
-	   (let ((m (car root))		; multiplicity
-		 (x (cdr root)))
-	     (cons x
-		   (lu-null-space
-		    (g:- matrix
-			 (g:* x (m:make-identity (m:dimension matrix))))))))
-	 eigenvalues)))
+           (let ((m (car root))                ; multiplicity
+                 (x (cdr root)))
+             (cons x
+                   (lu-null-space
+                    (g:- matrix
+                         (g:* x (m:make-identity (m:dimension matrix))))))))
+         eigenvalues)))
 
 #|
 ;;; For example, this system has 3 distinct eigenvalues and
@@ -68,8 +68,8 @@
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(2 -1 0)
-		     '(-1 2 -1)
-		     '(0 -1 2))))
+                     '(-1 2 -1)
+                     '(0 -1 2))))
 ((.585786437626913 #(.5000000000000014 .7071067811865455 .5000000000000014))
  (2. #(-.7071067811865475 0. .7071067811865475))
  (3.414213562373087 #(.5000000000000014 -.7071067811865455 .5000000000000014)))
@@ -80,8 +80,8 @@
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(0 0 0)
-		     '(0 1 0)
-		     '(0 0 1))))
+                     '(0 1 0)
+                     '(0 0 1))))
 ((0. #(1 0 0)) (1. #(0 0 1) #(0 1 0)))
 
 ;;; A real example: the standard map at a hyperbolic point.
@@ -89,12 +89,12 @@
 (pp (matrix->eigenvalues-eigenvectors
      (a^m_n->mmn
       (let ((K 1))
-	((D (lambda (v)
-	      (let ((x (ref v 0))
-		    (y (ref v 1)))
-		(let ((yp  (+ y (* K (sin x)))))
-		  (up (+ x yp) yp)))))
-	 (up 0 0))))))
+        ((D (lambda (v)
+              (let ((x (ref v 0))
+                    (y (ref v 1)))
+                (let ((yp  (+ y (* K (sin x)))))
+                  (up (+ x yp) yp)))))
+         (up 0 0))))))
 ((.38196601125010315 #(-.525731112119133 .8506508083520402))
  (2.6180339887498967 #(.8506508083520401 .5257311121191331)))
 
@@ -103,13 +103,13 @@
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(1 1)
-		     '(0 1))))
+                     '(0 1))))
 ((1. #(1 0)))
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(13 -4 2)
-		     '(-4 13 -2)
-		     '(2 -2 10))))
+                     '(-4 13 -2)
+                     '(2 -2 10))))
 ((9. #(-.4472135954999579 0. .8944271909999159)
      #(.7071067811865475 .7071067811865475 0.))
  (17.999999999999954
@@ -117,8 +117,8 @@
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(1 2 3)
-		     '(4 5 6)
-		     '(7 8 9))))
+                     '(4 5 6)
+                     '(7 8 9))))
 
 ((0.
   #(.4082482904638631 -.8164965809277261 .4082482904638631))
@@ -130,17 +130,17 @@
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(2 0 0 0)
-		     '(1 2 0 0)
-		     '(0 0 2 0)
-		     '(0 0 0 2))))
+                     '(1 2 0 0)
+                     '(0 0 2 0)
+                     '(0 0 0 2))))
 ((2. #(0. 0. 0. 1.) #(0. 0. 1. 0.) #(0. 1. 0. 0.)))
 
 
 (pp (matrix->eigenvalues-eigenvectors
      (matrix-by-rows '(2 0 0 0)
-		     '(1 2 0 0)
-		     '(0 0 2 0)
-		     '(0 0 1 2))))
+                     '(1 2 0 0)
+                     '(0 0 2 0)
+                     '(0 0 1 2))))
 ((2. #(0. 0. 0. 1.) #(0. 1. 0. 0.)))
 
 |#
@@ -185,7 +185,7 @@
  (8.265165042945835 #(.49999999999999994 .49999999999999967 .7071067811865474)))
 
 
-;;; Indeed 
+;;; Indeed
 (/ (* A #(-1/2 -1/2 (/ (sqrt 2) 2))) 7.7348349570559485)
 ;Value: #(-.49999999999994155 -.49999999999994155 .707106781186465)
 
@@ -208,12 +208,12 @@
 (pe (determinant (- A (* 'lam (m:identity-like A)))))
 (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16)
 
-((lambda (lam) 
+((lambda (lam)
    (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
  8)
 ;Value: 0
 
-((lambda (lam) 
+((lambda (lam)
    (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
  7.9999999999982006)
 ;Value: -1.1368683772161603e-13
@@ -221,10 +221,10 @@
 ;;; ugh!
 
 ;;; but I can generally not do better:
-(zbrent (lambda (lam) 
-	  (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
-	7.9999999999982006
-	8.0003)
+(zbrent (lambda (lam)
+          (+ (* -1 (expt lam 3)) (* 24 (expt lam 2)) (* -24567/128 lam) 8183/16))
+        7.9999999999982006
+        8.0003)
 ;Value: (#t 8.000000000001434 3)
 
 (- 8.000000000001434 8)

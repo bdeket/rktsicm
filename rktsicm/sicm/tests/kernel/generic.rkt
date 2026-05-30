@@ -52,21 +52,21 @@
     (check-equal? (generic:= 1 1) #f);; no generics loaded
     (check-equal? (g:=:bin 1 1) #t)
     (check-equal? (g:=:bin 'a 'a) #f)
-    
+
     (check-equal? (generic:< 1 2) #f);; no generics loaded
     (check-equal? (g:<:bin 1 2) #t)
     (check-equal? (g:<:bin 'a 'b) #f)
     (check-equal? (g:<:bin 'b 'a) #f)
-    
+
     (check-equal? (generic:<= 1 1) #f);; no generics loaded
     (check-equal? (g:<=:bin 1 1) #t)
     (check-equal? (g:<=:bin 'a 'a) #f)
-    
+
     (check-equal? (generic:> 2 1) #f);; no generics loaded
     (check-equal? (g:>:bin 2 1) #t)
     (check-equal? (g:>:bin 'a 'b) #f)
     (check-equal? (g:>:bin 'b 'a) #f)
-    
+
     (check-equal? (generic:>= 1 1) #f);; no generics loaded
     (check-equal? (g:>=:bin 1 1) #t)
     (check-equal? (g:>=:bin 'a 'a) #f))
@@ -78,28 +78,28 @@
     (check-equal? (g:=:n '(1 1 2 1)) #f)
     (check-equal? (g:=) #t)
     (check-equal? (g:= 1 1 2 1) #f)
-    
+
     (check-equal? (g:<:n '()) #t)
     (check-equal? (g:<:n '(any)) #t)
     (check-equal? (g:<:n '(1 2 3 4)) #t)
     (check-equal? (g:<:n '(1 2 2 3)) #f)
     (check-equal? (g:<) #t)
     (check-equal? (g:< 1 2 2 3) #f)
-    
+
     (check-equal? (g:<=:n '()) #t)
     (check-equal? (g:<=:n '(any)) #t)
     (check-equal? (g:<=:n '(1 2 2 4)) #t)
     (check-equal? (g:<=:n '(1 2 1 3)) #f)
     (check-equal? (g:<=) #t)
     (check-equal? (g:<= 1 2 1 4) #f)
-    
+
     (check-equal? (g:>:n '()) #t)
     (check-equal? (g:>:n '(any)) #t)
     (check-equal? (g:>:n '(4 3 2 1)) #t)
     (check-equal? (g:>:n '(4 2 2 1)) #f)
     (check-equal? (g:>) #t)
     (check-equal? (g:> 4 2 2 1) #f)
-    
+
     (check-equal? (g:>=:n '()) #t)
     (check-equal? (g:>=:n '(any)) #t)
     (check-equal? (g:>=:n '(4 2 2 1)) #t)
@@ -225,7 +225,7 @@
     (check-exn #px"Generic operator inapplicable:" (λ () (generic:expt 'a 'b)))
     (assign-operation generic:expt (λ lst (cons 'expt lst)) #:end? #t)
     (check-equal? (g:expt 'a 'b) '(expt a b)))
-   
+
    ))
 
 (module+ test

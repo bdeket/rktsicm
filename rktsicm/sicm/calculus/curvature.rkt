@@ -26,10 +26,10 @@
   (define (the-Riemann-tensor w x u v)
     (w (((Riemann-curvature nabla) u v) x)))
   (declare-argument-types! the-Riemann-tensor
-			   (list 1form-field?
-				 vector-field?
-				 vector-field?
-				 vector-field?))
+                           (list 1form-field?
+                                 vector-field?
+                                 vector-field?
+                                 vector-field?))
   the-Riemann-tensor)
 
 (define (Ricci nabla basis)
@@ -39,7 +39,7 @@
        ((Riemann nabla) wi u ei v))
      basis))
   (declare-argument-types! Ricci-tensor
-			   (list vector-field? vector-field?))
+                           (list vector-field? vector-field?))
   Ricci-tensor)
 
 
@@ -56,9 +56,9 @@
   (define (the-torsion w x y)
     (w ((torsion-vector nabla) x y)))
   (declare-argument-types! the-torsion
-			   (list 1form-field?
-				 vector-field?
-				 vector-field?))
+                           (list 1form-field?
+                                 vector-field?
+                                 vector-field?))
   the-torsion)
 
 
@@ -66,26 +66,26 @@
 
 (define (curvature-components nabla coord-sys)
   (let ((d/dxs (coordinate-system->vector-basis coord-sys))
-	(dxs (coordinate-system->1form-basis coord-sys))
-	(m ((point coord-sys) (up 'x 'y 'z))))
-    ((s:map 
+        (dxs (coordinate-system->1form-basis coord-sys))
+        (m ((point coord-sys) (up 'x 'y 'z))))
+    ((s:map
       (lambda (dx)
-	(s:map 
-	 (lambda (d/dx)
-	   (s:map
-	    (lambda (d/dy)
-	      (s:map 
-	       (lambda (d/dz)
-		 (dx (((Riemann-curvature nabla) d/dy d/dz)
-		      d/dx)))
-	       d/dxs))
-	    d/dxs))
-	 d/dxs))
+        (s:map
+         (lambda (d/dx)
+           (s:map
+            (lambda (d/dy)
+              (s:map
+               (lambda (d/dz)
+                 (dx (((Riemann-curvature nabla) d/dy d/dz)
+                      d/dx)))
+               d/dxs))
+            d/dxs))
+         d/dxs))
       dxs)
      m)))
 
 #|
-;;; General torsion is not too complicated to compute 
+;;; General torsion is not too complicated to compute
 
 (define-coordinates (up x y) R2-rect)
 
@@ -98,21 +98,21 @@
   (literal-manifold-function
    (string->symbol
     (string-append "G^"
-		   (number->string i)
-		   "_"
-		   (number->string j)
-		   (number->string k)))
+                   (number->string i)
+                   "_"
+                   (number->string j)
+                   (number->string k)))
    R2-rect))
-				    
+
 (define G
   (down (down (up (Gijk 0 0 0)
-		  (Gijk 1 0 0))
-	      (up (Gijk 0 1 0)
-		  (Gijk 1 1 0)))
-	(down (up (Gijk 0 0 1)
-		  (Gijk 1 0 1))
-	      (up (Gijk 0 1 1)
-		  (Gijk 1 1 1)))))
+                  (Gijk 1 0 0))
+              (up (Gijk 0 1 0)
+                  (Gijk 1 1 0)))
+        (down (up (Gijk 0 0 1)
+                  (Gijk 1 0 1))
+              (up (Gijk 0 1 1)
+                  (Gijk 1 1 1)))))
 
 
 (define CG (make-Christoffel G R2-rect-basis))
@@ -123,7 +123,7 @@
 (define w (literal-vector-field 'w R2-rect))
 (define f (literal-manifold-function 'f R2-rect))
 
-	      
+
 (clear-arguments)
 (suppress-arguments '((up x0 y0)))
 
@@ -140,7 +140,7 @@
    (* -1 G^0_10 w^0 ((partial 0) f) v^1))
 |#
 
-;;; Unfortunately, this says only that the 
+;;; Unfortunately, this says only that the
 ;;; Christoffel symbols are symmetric in the
 ;;; lower two indices iff the torsion is zero.
 |#
@@ -153,16 +153,16 @@
 (define a-function (literal-scalar-field 'f S2-spherical))
 
 ;;; the Christoffel symbols (for r=1) (p.341 mtw) are:
- 
+
 ;;; (the up-down-down Christoffel symbols do not depend on R)
 
 (define G-S2-1
   (make-Christoffel
-   (let ((zero  (lambda (point) 0))) 
+   (let ((zero  (lambda (point) 0)))
      (down (down (up zero zero)
-		 (up zero (/ 1 (tan theta))))
-	   (down (up zero (/ 1 (tan theta)))
-		 (up (- (* (sin theta) (cos theta))) zero))))
+                 (up zero (/ 1 (tan theta))))
+           (down (up zero (/ 1 (tan theta)))
+                 (up (- (* (sin theta) (cos theta))) zero))))
    S2-spherical-basis))
 
 (pec (((commutator d/dtheta d/dphi) a-function) a-point))
@@ -172,10 +172,10 @@
 
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (pec ((((nabla d/dtheta) d/dphi)
-	 a-function)
-	a-point)))
+         a-function)
+        a-point)))
 #| result:
 (/ (* (cos theta)
       (((partial 1) f) (up theta phi)))
@@ -184,36 +184,36 @@
 
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (pec ((((nabla d/dphi) ((nabla d/dtheta) d/dphi))
-	 a-function)
-	a-point)))
+         a-function)
+        a-point)))
 #| result:
 (* -1 (((partial 0) f) (up theta phi)) (expt (cos theta) 2))
 |#
 
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (for-each
    (lambda (x)
      (for-each
       (lambda (y)
-	(pec ((((torsion-vector nabla) x y)
-	       a-function)
-	      a-point)))
+        (pec ((((torsion-vector nabla) x y)
+               a-function)
+              a-point)))
       (list  d/dtheta d/dphi)))
    (list  d/dtheta d/dphi)))
 #| result:
-0					;four of these
+0                                        ;four of these
 |#
 
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (pec (((Riemann nabla)
-	 dphi d/dtheta d/dphi d/dtheta)
-	a-point)))
+         dphi d/dtheta d/dphi d/dtheta)
+        a-point)))
 #| Result:
 1
 |#
@@ -234,7 +234,7 @@
 
 (define G-S2-1
   (make-Christoffel
-   (let ((zero  (lambda (point) 0))) 
+   (let ((zero  (lambda (point) 0)))
      (down (down (up zero zero)
                  (up zero (/ 1 (tan theta))))
            (down (up zero (/ 1 (tan theta)))
@@ -243,14 +243,14 @@
 
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (for-each
    (lambda (x)
      (for-each
       (lambda (y)
-	(pec ((((torsion-vector nabla) x y)
-	       a-function)
-	      a-point)))
+        (pec ((((torsion-vector nabla) x y)
+               a-function)
+              a-point)))
       (list  d/dtheta d/dphi)))
    (list  d/dtheta d/dphi)))
 #| Result:
@@ -270,10 +270,10 @@
 #|
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (pec (((Riemann nabla)
-	 dphi d/dtheta d/dphi d/dtheta)
-	a-point)))
+         dphi d/dtheta d/dphi d/dtheta)
+        a-point)))
 #| Result:
 1
 |#
@@ -287,22 +287,22 @@
 
 (let ((nabla
        (covariant-derivative
-	(Christoffel->Cartan G-S2-1))))
+        (Christoffel->Cartan G-S2-1))))
   (for-each
    (lambda (alpha)
      (for-each
       (lambda (beta)
-	(for-each
-	 (lambda (gamma)
-	   (for-each
-	    (lambda (delta)
-	      (newline)
-	      (pe `(,alpha ,beta ,gamma ,delta))
-	      (pe (((Riemann nabla)
-		    alpha beta gamma delta)
-		   a-point)))
-	    (list d/dtheta d/dphi)))
-	 (list d/dtheta d/dphi)))
+        (for-each
+         (lambda (gamma)
+           (for-each
+            (lambda (delta)
+              (newline)
+              (pe `(,alpha ,beta ,gamma ,delta))
+              (pe (((Riemann nabla)
+                    alpha beta gamma delta)
+                   a-point)))
+            (list d/dtheta d/dphi)))
+         (list d/dtheta d/dphi)))
       (list d/dtheta d/dphi)))
    (list dtheta dphi)))
 
@@ -367,27 +367,27 @@
 ;;; only over the map.  The following does not work!
 
 (pec (let ((U (components->vector-field (lambda (x) 1) the-real-line 'U))
-	   (mu:N->M (compose (M '->point)
-			     (up (literal-function 'f^theta)
-				 (literal-function 'f^phi)))))
+           (mu:N->M (compose (M '->point)
+                             (up (literal-function 'f^theta)
+                                 (literal-function 'f^phi)))))
        (let* ((basis-over-mu (basis->basis-over-map mu:N->M S2-spherical-basis))
-	      (1form-basis (basis->1form-basis basis-over-mu))
-	      (vector-basis (basis->vector-basis basis-over-mu))
+              (1form-basis (basis->1form-basis basis-over-mu))
+              (vector-basis (basis->vector-basis basis-over-mu))
 
-	      (Cartan (Christoffel->Cartan G-S2-1))
-	      (variation (basis-components->vector-field
-			  (up (literal-function 'd_theta)
-			      (literal-function 'd_phi))
-			  vector-basis))
-	      (nabla (covariant-derivative-over-map Cartan mu:N->M))
-	      (nablau (nabla U))
-	      (d1 (nablau (nablau variation)))
-	      (d2 (((Riemann-curvature nabla) variation U) U))
-	      (deviation (+ d1 d2)))
-	 (s:map/r 
-	  (lambda (w)
-	    ((w deviation) ((the-real-line '->point) 'tau)))
-	  1form-basis))))
+              (Cartan (Christoffel->Cartan G-S2-1))
+              (variation (basis-components->vector-field
+                          (up (literal-function 'd_theta)
+                              (literal-function 'd_phi))
+                          vector-basis))
+              (nabla (covariant-derivative-over-map Cartan mu:N->M))
+              (nablau (nabla U))
+              (d1 (nablau (nablau variation)))
+              (d2 (((Riemann-curvature nabla) variation U) U))
+              (deviation (+ d1 d2)))
+         (s:map/r
+          (lambda (w)
+            ((w deviation) ((the-real-line '->point) 'tau)))
+          1form-basis))))
 (f^theta #[manifold-point 16])
 ;Wrong type argument -- LITERAL-FUNCTION
 
@@ -408,21 +408,21 @@
 (define s0
   (simplify
    (let* ( ;; d/dt and d/dn exist
-	  (mu:N->M (compose (M-rect '->point)
-			    (up f^theta f^phi)
-			    (R2-rect '->coords)))
-	  (basis-over-mu (basis->basis-over-map mu:N->M M-basis))
-	  (1form-basis (basis->1form-basis basis-over-mu))
-	  (Cartan (Christoffel->Cartan G-S2-1))
-	  (nabla (covariant-derivative Cartan mu:N->M))
-	  (nablau (nabla d/dt))
-	  (d1 (nablau (nablau ((differential mu:N->M) d/dn))))
-	  (d2 (((Riemann-curvature nabla) d/dn d/dt)
-	       ((differential mu:N->M) d/dt)))
-	  (deviation (+ d1 d2)))
-     (s:map/r 
+          (mu:N->M (compose (M-rect '->point)
+                            (up f^theta f^phi)
+                            (R2-rect '->coords)))
+          (basis-over-mu (basis->basis-over-map mu:N->M M-basis))
+          (1form-basis (basis->1form-basis basis-over-mu))
+          (Cartan (Christoffel->Cartan G-S2-1))
+          (nabla (covariant-derivative Cartan mu:N->M))
+          (nablau (nabla d/dt))
+          (d1 (nablau (nablau ((differential mu:N->M) d/dn))))
+          (d2 (((Riemann-curvature nabla) d/dn d/dt)
+               ((differential mu:N->M) d/dt)))
+          (deviation (+ d1 d2)))
+     (s:map/r
       (lambda (w)
-	((w deviation) ((R2-rect '->point) (up 'tau 0))))
+        ((w deviation) ((R2-rect '->point) (up 'tau 0))))
       1form-basis))))
 
 (define s1
@@ -496,41 +496,41 @@
 (define s0
   (simplify
    (let* ( ;; d/dt and d/dn exist
-	  (mu:N->M (compose 
-		    (M-rect '->point)
-		    (up f^theta f^phi)
-		    (R2-rect '->coords)))
-	  (basis-over-mu (basis->basis-over-map mu:N->M M-basis))
-	  (1form-basis (basis->1form-basis basis-over-mu))
-	  (Cartan (Christoffel->Cartan G-S2-1))
-	  (nabla (covariant-derivative Cartan mu:N->M))
-	  (nablau (nabla d/dt))
-	  (nablan (nabla d/dn))
-	  (deviation (nablan (nablau ((differential mu:N->M) d/dt)))))
-     (s:map/r 
+          (mu:N->M (compose
+                    (M-rect '->point)
+                    (up f^theta f^phi)
+                    (R2-rect '->coords)))
+          (basis-over-mu (basis->basis-over-map mu:N->M M-basis))
+          (1form-basis (basis->1form-basis basis-over-mu))
+          (Cartan (Christoffel->Cartan G-S2-1))
+          (nabla (covariant-derivative Cartan mu:N->M))
+          (nablau (nabla d/dt))
+          (nablan (nabla d/dn))
+          (deviation (nablan (nablau ((differential mu:N->M) d/dt)))))
+     (s:map/r
       (lambda (w)
-	((w deviation) ((R2-rect '->point) (up 'tau 0))))
+        ((w deviation) ((R2-rect '->point) (up 'tau 0))))
       1form-basis))))
 
 do all substitutions again...
 (pec s12)
 #| Result:
 (up
-	 (+ (* -2 eta phidot thetadot (expt (cos theta) 2))
-	    (* -2 (expt phidot 2) xi (expt (cos theta) 2))
-	    (* -1 eta phidotdot (cos theta) (sin theta))
-	    (* -2 etadot phidot (cos theta) (sin theta))
-	    (* (expt phidot 2) xi)
-	    xidotdot)
-	 (/
-	  (+ (* -1 eta (expt phidot 2) (expt (cos theta) 2) (sin theta))
-	     (* -2 phidot thetadot xi (sin theta))
-	     (* eta thetadotdot (cos theta))
-	     (* 2 etadot thetadot (cos theta))
-	     (* 2 phidot xidot (cos theta))
-	     (* phidotdot xi (cos theta))
-	     (* etadotdot (sin theta)))
-	  (sin theta)))
+         (+ (* -2 eta phidot thetadot (expt (cos theta) 2))
+            (* -2 (expt phidot 2) xi (expt (cos theta) 2))
+            (* -1 eta phidotdot (cos theta) (sin theta))
+            (* -2 etadot phidot (cos theta) (sin theta))
+            (* (expt phidot 2) xi)
+            xidotdot)
+         (/
+          (+ (* -1 eta (expt phidot 2) (expt (cos theta) 2) (sin theta))
+             (* -2 phidot thetadot xi (sin theta))
+             (* eta thetadotdot (cos theta))
+             (* 2 etadot thetadot (cos theta))
+             (* 2 phidot xidot (cos theta))
+             (* phidotdot xi (cos theta))
+             (* etadotdot (sin theta)))
+          (sin theta)))
 |#
 
 (pec s14)
@@ -566,33 +566,33 @@ shouldn't this be zero?
 (define S2-spherical-basis (coordinate-system->basis S2-spherical))
 
 ;;; The Christoffel symbols (for r=1) (p.341 MTW) are:
- 
+
 (define G-S2-1
   (make-Christoffel
-   (let ((zero  (lambda (point) 0))) 
+   (let ((zero  (lambda (point) 0)))
      (down (down (up zero zero)
-		 (up zero (/ 1 (tan theta))))
-	   (down (up zero (/ 1 (tan theta)))
-		 (up (- (* (sin theta) (cos theta))) zero))))
+                 (up zero (/ 1 (tan theta))))
+           (down (up zero (/ 1 (tan theta)))
+                 (up (- (* (sin theta) (cos theta))) zero))))
    S2-spherical-basis))
 
 
 ;;; Ordinary Lagrange Equations (= Geodesic Equations)
 
 (pec (let ((U d/dt)
-	   (mu:N->M (compose (S2-spherical '->point)
-			     (up (literal-function 'f^theta)
-				 (literal-function 'f^phi))
-			     (the-real-line '->coords))))
+           (mu:N->M (compose (S2-spherical '->point)
+                             (up (literal-function 'f^theta)
+                                 (literal-function 'f^phi))
+                             (the-real-line '->coords))))
        (let* ((basis-over-mu (basis->basis-over-map mu:N->M S2-spherical-basis))
-	      (1form-basis (basis->1form-basis basis-over-mu))
-	      (Cartan (Christoffel->Cartan G-S2-1)))
-	 (s:map/r 
-	  (lambda (w)
-	    ((w (((covariant-derivative Cartan mu:N->M) U)
-		 ((differential mu:N->M) U)))
-	     ((the-real-line '->point) 'tau)))
-	  1form-basis))))
+              (1form-basis (basis->1form-basis basis-over-mu))
+              (Cartan (Christoffel->Cartan G-S2-1)))
+         (s:map/r
+          (lambda (w)
+            ((w (((covariant-derivative Cartan mu:N->M) U)
+                 ((differential mu:N->M) U)))
+             ((the-real-line '->point) 'tau)))
+          1form-basis))))
 #| Result:
 (up
  (+ (((expt D 2) f^theta) tau)
@@ -605,29 +605,29 @@ shouldn't this be zero?
 ;;; Parallel transport of vector W over path mu
 
 (pec (let ((U d/dt)
-	   (mu:N->M (compose (S2-spherical '->point)
-			     (up (literal-function 'f^theta)
-				 (literal-function 'f^phi))
-			     (the-real-line '->coords))))
+           (mu:N->M (compose (S2-spherical '->point)
+                             (up (literal-function 'f^theta)
+                                 (literal-function 'f^phi))
+                             (the-real-line '->coords))))
        (let* ((basis-over-mu
-	       (basis->basis-over-map mu:N->M S2-spherical-basis))
-	      (1form-basis (basis->1form-basis basis-over-mu))
-	      (vector-basis (basis->vector-basis basis-over-mu))
-	      (Cartan (Christoffel->Cartan G-S2-1))
-	      (transported-vector-over-map 
-	       (basis-components->vector-field
-		(up (compose (literal-function 'w^0)
-			     (the-real-line '->coords))
-		    (compose (literal-function 'w^1)
-			     (the-real-line '->coords)))
-		vector-basis)))
-	 (s:map/r 
-	  (lambda (w)
-	    ((w
-	      (((covariant-derivative Cartan mu:N->M) U)
-	       transported-vector-over-map))
-	     ((the-real-line '->point) 'tau)))
-	  1form-basis))))
+               (basis->basis-over-map mu:N->M S2-spherical-basis))
+              (1form-basis (basis->1form-basis basis-over-mu))
+              (vector-basis (basis->vector-basis basis-over-mu))
+              (Cartan (Christoffel->Cartan G-S2-1))
+              (transported-vector-over-map
+               (basis-components->vector-field
+                (up (compose (literal-function 'w^0)
+                             (the-real-line '->coords))
+                    (compose (literal-function 'w^1)
+                             (the-real-line '->coords)))
+                vector-basis)))
+         (s:map/r
+          (lambda (w)
+            ((w
+              (((covariant-derivative Cartan mu:N->M) U)
+               transported-vector-over-map))
+             ((the-real-line '->point) 'tau)))
+          1form-basis))))
 #| Result:
 (up
  (+ ((D w^0) tau)
@@ -637,13 +637,13 @@ shouldn't this be zero?
        (* (cos (f^theta tau)) (w^1 tau) ((D f^theta) tau)))
     (sin (f^theta tau))))
 |#
- 
+
 #| was  ...  looks like right hand side
 
 (up (* (sin (theta tau)) (cos (theta tau)) (w^1 tau)
        ((D phi) tau))
     (/ (+ (* -1 (w^0 tau) (cos (theta tau)) ((D phi) tau))
-	  (* -1 ((D theta) tau) (cos (theta tau)) (w^1 tau)))
+          (* -1 ((D theta) tau) (cos (theta tau)) (w^1 tau)))
        (sin (theta tau))))
 
 |#
@@ -651,35 +651,35 @@ shouldn't this be zero?
 ;;; To set up for solving for the derivatives, we lift off of the path
 
 (pec (let ((U d/dt)
-	   (mu:N->M (compose (S2-spherical '->point)
-			     (up (literal-function 'f^theta)
-				 (literal-function 'f^phi))
-			     (the-real-line '->coords))))
+           (mu:N->M (compose (S2-spherical '->point)
+                             (up (literal-function 'f^theta)
+                                 (literal-function 'f^phi))
+                             (the-real-line '->coords))))
        (let* ((basis-over-mu (basis->basis-over-map mu:N->M S2-spherical-basis))
-	      (1form-basis (basis->1form-basis basis-over-mu))
-	      (vector-basis (basis->vector-basis basis-over-mu))
-	      (Cartan (Christoffel->Cartan G-S2-1))
-	      (transported-vector-over-map 
-	       (basis-components->vector-field
-		(up (compose (osculating-path (up 'tau 'w^0 'dw^0/dt))
-			     (the-real-line '->coords))
-		    (compose (osculating-path (up 'tau 'w^1 'dw^1/dt))
-			     (the-real-line '->coords)))
-		vector-basis)))
-	 (s:map/r 
-	  (lambda (w)
-	    ((w
-	      (((covariant-derivative Cartan mu:N->M)
-		U)
-	       transported-vector-over-map))
-	     ((the-real-line '->point) 'tau)))
-	  1form-basis))))
+              (1form-basis (basis->1form-basis basis-over-mu))
+              (vector-basis (basis->vector-basis basis-over-mu))
+              (Cartan (Christoffel->Cartan G-S2-1))
+              (transported-vector-over-map
+               (basis-components->vector-field
+                (up (compose (osculating-path (up 'tau 'w^0 'dw^0/dt))
+                             (the-real-line '->coords))
+                    (compose (osculating-path (up 'tau 'w^1 'dw^1/dt))
+                             (the-real-line '->coords)))
+                vector-basis)))
+         (s:map/r
+          (lambda (w)
+            ((w
+              (((covariant-derivative Cartan mu:N->M)
+                U)
+               transported-vector-over-map))
+             ((the-real-line '->point) 'tau)))
+          1form-basis))))
 #| Result:
 (up (+ dw^0/dt
        (* -1 (cos (f^theta tau)) ((D f^phi) tau) (sin (f^theta tau)) w^1))
     (/ (+ (* (sin (f^theta tau)) dw^1/dt)
-	  (* (cos (f^theta tau)) ((D f^phi) tau) w^0)
-	  (* (cos (f^theta tau)) ((D f^theta) tau) w^1))
+          (* (cos (f^theta tau)) ((D f^phi) tau) w^0)
+          (* (cos (f^theta tau)) ((D f^theta) tau) w^1))
        (sin (f^theta tau))))
 |#
 
@@ -694,59 +694,59 @@ shouldn't this be zero?
       (w^0 (literal-function 'w^0))
       (w^1 (literal-function 'w^1)))
   (pec (solve
-	(lambda (v)
-	  (let ((dw^0/dt (ref v 0))
-		(dw^1/dt (ref v 1)))
-	    (up
-	     (+ (* -1
-		   (w^1 tau)
-		   (sin (theta tau))
-		   (cos (theta tau))
-		   ((D phi) tau))
-		dw^0/dt)
-	     (+ (/ (* (w^0 tau) (cos (theta tau)) ((D phi) tau))
-		   (sin (theta tau)))
-		(/ (* (w^1 tau) ((D theta) tau) (cos (theta tau)))
-		   (sin (theta tau)))
-		dw^1/dt))))
-	2 2)))
+        (lambda (v)
+          (let ((dw^0/dt (ref v 0))
+                (dw^1/dt (ref v 1)))
+            (up
+             (+ (* -1
+                   (w^1 tau)
+                   (sin (theta tau))
+                   (cos (theta tau))
+                   ((D phi) tau))
+                dw^0/dt)
+             (+ (/ (* (w^0 tau) (cos (theta tau)) ((D phi) tau))
+                   (sin (theta tau)))
+                (/ (* (w^1 tau) ((D theta) tau) (cos (theta tau)))
+                   (sin (theta tau)))
+                dw^1/dt))))
+        2 2)))
 #| Result:
 (up (* (w^1 tau) (sin (f^theta tau)) (cos (f^theta tau)) ((D f^phi) tau))
     (/ (+ (* -1 (w^1 tau) (cos (f^theta tau)) ((D f^theta) tau))
-	  (* -1 (cos (f^theta tau)) ((D f^phi) tau) (w^0 tau)))
+          (* -1 (cos (f^theta tau)) ((D f^phi) tau) (w^0 tau)))
        (sin (f^theta tau))))
 |#
 
 (pec (let ((U d/dt)
-	   (mu:N->M (compose (S2-spherical '->point)
-			     (up (literal-function 'f^theta)
-				 (literal-function 'f^phi))
-			     (the-real-line '->coords))))
-       (solve 
-	(lambda (v)
-	  (let ((dw^0/dt (ref v 0))
-		(dw^1/dt (ref v 1)))
-	    (let* ((basis-over-mu (basis->basis-over-map mu:N->M S2-spherical-basis))
-		   (1form-basis (basis->1form-basis basis-over-mu))
-		   (vector-basis (basis->vector-basis basis-over-mu))
-		   (Cartan (Christoffel->Cartan G-S2-1))
-		   (transported-vector-over-map 
-		    (basis-components->vector-field
-		     (up (compose (osculating-path (up 'tau 'w^0 dw^0/dt))
-				  (the-real-line '->coords))
-			 (compose (osculating-path (up 'tau 'w^1 dw^1/dt))
-				  (the-real-line '->coords)))
-		     vector-basis)))
-	      (s:map/r 
-	       (lambda (w)
-		 ((w
-		   (((covariant-derivative Cartan mu:N->M)
-		     U)
-		    transported-vector-over-map))
-		  ((the-real-line '->point) 'tau)))
-	       1form-basis))))
-	(S2-spherical 'dimension)
-	(S2-spherical 'dimension))))
+           (mu:N->M (compose (S2-spherical '->point)
+                             (up (literal-function 'f^theta)
+                                 (literal-function 'f^phi))
+                             (the-real-line '->coords))))
+       (solve
+        (lambda (v)
+          (let ((dw^0/dt (ref v 0))
+                (dw^1/dt (ref v 1)))
+            (let* ((basis-over-mu (basis->basis-over-map mu:N->M S2-spherical-basis))
+                   (1form-basis (basis->1form-basis basis-over-mu))
+                   (vector-basis (basis->vector-basis basis-over-mu))
+                   (Cartan (Christoffel->Cartan G-S2-1))
+                   (transported-vector-over-map
+                    (basis-components->vector-field
+                     (up (compose (osculating-path (up 'tau 'w^0 dw^0/dt))
+                                  (the-real-line '->coords))
+                         (compose (osculating-path (up 'tau 'w^1 dw^1/dt))
+                                  (the-real-line '->coords)))
+                     vector-basis)))
+              (s:map/r
+               (lambda (w)
+                 ((w
+                   (((covariant-derivative Cartan mu:N->M)
+                     U)
+                    transported-vector-over-map))
+                  ((the-real-line '->point) 'tau)))
+               1form-basis))))
+        (S2-spherical 'dimension)
+        (S2-spherical 'dimension))))
 #| Result:
 (up
  (* w^1 (cos (f^theta tau)) (sin (f^theta tau)) ((D f^phi) tau))
@@ -764,14 +764,14 @@ shouldn't this be zero?
 
 (define-coordinates (up theta phi) M-rect)
 (define M-basis (coordinate-system->basis M-rect))
- 
+
 (define G-S2-1
   (make-Christoffel
-   (let ((zero  (lambda (point) 0))) 
+   (let ((zero  (lambda (point) 0)))
      (down (down (up zero zero)
-		 (up zero (/ 1 (tan theta))))
-	   (down (up zero (/ 1 (tan theta)))
-		 (up (- (* (sin theta) (cos theta))) zero))))
+                 (up zero (/ 1 (tan theta))))
+           (down (up zero (/ 1 (tan theta)))
+                 (up (- (* (sin theta) (cos theta))) zero))))
    M-basis))
 
 
@@ -779,9 +779,9 @@ shouldn't this be zero?
 
 (define mu:N->M
   (compose (M-rect '->point)
-	   (up (literal-function 'mu^theta)
-	       (literal-function 'mu^phi))
-	   (the-real-line '->coords)))
+           (up (literal-function 'mu^theta)
+               (literal-function 'mu^phi))
+           (the-real-line '->coords)))
 
 (define basis-over-mu
   (basis->basis-over-map mu:N->M M-basis))
@@ -789,18 +789,18 @@ shouldn't this be zero?
 (define w
   (basis-components->vector-field
    (up (compose (literal-function 'w^0)
-		(the-real-line '->coords))
+                (the-real-line '->coords))
        (compose (literal-function 'w^1)
-		(the-real-line '->coords)))
+                (the-real-line '->coords)))
    (basis->vector-basis basis-over-mu)))
 
 (pec (let ((Cartan (Christoffel->Cartan G-S2-1)))
-	(s:map/r 
-	 (lambda (omega)
-	   ((omega
-	     (((covariant-derivative Cartan mu:N->M) d/dt) w))
-	    ((the-real-line '->point) 'tau)))
-	 (basis->1form-basis basis-over-mu))))
+        (s:map/r
+         (lambda (omega)
+           ((omega
+             (((covariant-derivative Cartan mu:N->M) d/dt) w))
+            ((the-real-line '->point) 'tau)))
+         (basis->1form-basis basis-over-mu))))
 #| Result:
 (up
  (+ (* -1 (w^1 tau) ((D mu^phi) tau) (cos (mu^theta tau)) (sin (mu^theta tau)))
@@ -851,9 +851,9 @@ shouldn't this be zero?
     (+ v
        (* (compose (* sin cos) theta) betadot w1 d/dw0)
        (* -1
-	  (compose (/ cos sin) theta)
-	  (+ (* w0 betadot) (* w1 alphadot))
-	  d/dw1))))
+          (compose (/ cos sin) theta)
+          (+ (* w0 betadot) (* w1 alphadot))
+          d/dw1))))
 
 (define Gu (G d/dtheta))
 
@@ -861,14 +861,14 @@ shouldn't this be zero?
 
 (define (initial-state initial-coords w)
   (let ((theta0 (ref initial-coords 0))
-	(phi0 (ref initial-coords 1)))
+        (phi0 (ref initial-coords 1)))
     (let ((dummy
-	   ((states '->point)
-	    (up theta0 phi0 'foo 'bar))))
+           ((states '->point)
+            (up theta0 phi0 'foo 'bar))))
       ((states '->point)
        (up theta0 phi0
-	   ((dw0 w) dummy)
-	   ((dw1 w) dummy))))))
+           ((dw0 w) dummy)
+           ((dw1 w) dummy))))))
 
 
 (pec ((dw0 (commutator Gu Gv))
@@ -913,20 +913,20 @@ shouldn't this be zero?
     (+ v
        (* (compose (* sin cos) Theta) betadot w1 d/dw0)
        (* -1
-	  (compose (/ cos sin) Theta)
-	  (+ (* w0 betadot) (* w1 alphadot))
-	  d/dw1))))
+          (compose (/ cos sin) Theta)
+          (+ (* w0 betadot) (* w1 alphadot))
+          d/dw1))))
 
 (define Gu (G d/dTheta))
 (define Gv (G d/dPhi))
 
 (define (initial-state initial-coords w)
   (let ((Theta0 (ref initial-coords 0))
-	(Phi0 (ref initial-coords 1)))
+        (Phi0 (ref initial-coords 1)))
     (let ((m ((M-rect '->point) (up Theta0 Phi0))))
       ((states '->point)
        (up Theta0 Phi0
-	   ((dtheta w) m) ((dphi w) m))))))
+           ((dtheta w) m) ((dphi w) m))))))
 
 
 (pec ((dw0 (commutator Gu Gv))
@@ -954,11 +954,11 @@ gamma(t)->M
 
 dgamma(d/dt)(f)(t) is the velocity vector, a vector over the map gamma
 
-when gamma is an integral curve of v, then 
+when gamma is an integral curve of v, then
 v(f)(gamma(t)) = dgamma(d/dt)(f)(t)
 
 let w be an arbitrary vector over the map
-w(f)(t) = d/dtheta (f)(gamma(t)) a_0(t) + d/dphi (f)(gamma(t)) a_1(t) 
+w(f)(t) = d/dtheta (f)(gamma(t)) a_0(t) + d/dphi (f)(gamma(t)) a_1(t)
 
 
 

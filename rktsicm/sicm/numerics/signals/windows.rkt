@@ -11,14 +11,14 @@
 
 (define ((hanning n) f)
   (let* ((span (sigfun:span f))
-	 (tmin (sigfun:min span))
-	 (tmax (sigfun:max span))
-	 (p (/ n:2pi (- tmax tmin)))
-	 (A (sqrt 2/3)))
+         (tmin (sigfun:min span))
+         (tmax (sigfun:max span))
+         (p (/ n:2pi (- tmax tmin)))
+         (A (sqrt 2/3)))
     (sigfun:make (lambda (t)
-		   (* (expt (* A
-			       (- 1
-				  (cos (* p (- t tmin)))))
-			    n)
-		      ((sigfun:procedure f) t)))
-		 span)))
+                   (* (expt (* A
+                               (- 1
+                                  (cos (* p (- t tmin)))))
+                            n)
+                      ((sigfun:procedure f) t)))
+                 span)))

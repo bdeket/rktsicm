@@ -38,7 +38,7 @@
 (define (mod:unary-combine uop)
   (define (moduop x)
     (assert (modint? x)
-	    "Not a modular integer" (list uop x))
+            "Not a modular integer" (list uop x))
     (let ((modulus (mod:modulus x)))
       (mod:make-internal
        (uop (mod:residue x) modulus)
@@ -54,16 +54,16 @@
   (define (euclid a p cont)
     (if (int:= a 1)
         (cont 1 0)
-	(let ((qr (integer-divide p a)))
-	  (let ((q (integer-divide-quotient qr))
-		(r (integer-divide-remainder qr)))
-	    (euclid r a
-		    (lambda (x y)
-		      (cont (int:- y (int:* q x))
-			    x)))))))
+        (let ((qr (integer-divide p a)))
+          (let ((q (integer-divide-quotient qr))
+                (r (integer-divide-remainder qr)))
+            (euclid r a
+                    (lambda (x y)
+                      (cont (int:- y (int:* q x))
+                            x)))))))
   (euclid a p
-	  (lambda (x y)
-	    (mod:reduce x p))))
+          (lambda (x y)
+            (mod:reduce x p))))
 
 #|
 (define (testinv n p)
@@ -78,14 +78,14 @@
 (define (mod:binary-combine bop)
   (define (modbop x y)
     (assert (and (modint? x) (modint? y))
-	    "Not modular integers" (list bop x y))
+            "Not modular integers" (list bop x y))
     (let ((modulus (mod:modulus x)))
       (assert (int:= modulus (mod:modulus y))
-	      "Not same modulus" (list bop x y))
+              "Not same modulus" (list bop x y))
       (mod:make-internal
        (bop (mod:residue x)
-	    (mod:residue y)
-	    modulus)
+            (mod:residue y)
+            modulus)
        modulus)))
   modbop)
 
@@ -106,10 +106,10 @@
     (modint:* x x p))
   (let lp ((exponent exponent))
     (cond ((int:= exponent 0) 1)
-	  ((even? exponent)
-	   (square (lp (quotient exponent 2))))
-	  (else
-	   (modint:* base (lp (int:- exponent 1)) p)))))
+          ((even? exponent)
+           (square (lp (quotient exponent 2))))
+          (else
+           (modint:* base (lp (int:- exponent 1)) p)))))
 
 
 (define mod:+ (mod:binary-combine modint:+))
@@ -117,19 +117,19 @@
 (define mod:- (mod:binary-combine modint:-))
 
 (define mod:* (mod:binary-combine modint:*))
-   
+
 (define mod:/ (mod:binary-combine modint:/))
 
 (define mod:expt (mod:binary-combine modint:expt))
 
 (define (mod:= x y)
   (assert (and (modint? x) (modint? y))
-	  "Not modular integers -- =" (list x y))
+          "Not modular integers -- =" (list x y))
   (let ((modulus (mod:modulus x)))
     (assert (int:= modulus (mod:modulus y))
-	    "Not same modulus -- =" (list x y))
+            "Not same modulus -- =" (list x y))
     (int:= (modulo (mod:residue x) modulus)
-	   (modulo (mod:residue y) modulus))))
+           (modulo (mod:residue y) modulus))))
 
 ;;; Chinese Remainder Algorithm
 ;;;   Takes a list of modular integers, m[i] (modulo p[i])
@@ -139,24 +139,24 @@
 (define (mod:chinese-remainder . modints)
   (assert (for-all? modints modint?))
   (let ((moduli (map mod:modulus modints))
-	(residues (map mod:residue modints)))
+        (residues (map mod:residue modints)))
     ((modint:chinese-remainder moduli) residues)))
 
 (define (modint:chinese-remainder moduli)
   (let ((prod (apply * moduli)))
     (let ((cofactors
-	   (map (lambda (p)
-		  (quotient prod p))
-		moduli)))
+           (map (lambda (p)
+                  (quotient prod p))
+                moduli)))
       (let ((f
-	     (map (lambda (c p)
-		    (* c (modint:invert c p)))
-		  cofactors
-		  moduli)))
+             (map (lambda (c p)
+                    (* c (modint:invert c p)))
+                  cofactors
+                  moduli)))
         (lambda (residues)
           (mod:reduce
-	   (apply + (map * residues f))
-	   prod))))))
+           (apply + (map * residues f))
+           prod))))))
 
 #|
 (define a1 (mod:make 2 5))
@@ -191,20 +191,20 @@
 (define (test p)
   (let jlp ((j (- p)))
     (cond ((int:= j p) 'ok)
-	  (else
-	   (let ilp ((i (- p)))
-	     ;;(write-line `(trying ,i ,j)) 
-	     (cond ((int:= i p) (jlp (int:+ j 1)))
-		   ((int:= (modulo i p) 0) (ilp (int:+ i 1)))
-		   (else
-		    (let ((jp (mod:make j p))
-			  (ip (mod:make i p)))
-		      (let ((b (mod:/ jp ip)))
-			(if (mod:= (mod:* b ip) jp)
-			    (ilp (int:+ i 1))
-			    (begin (write-line `(problem dividing ,j ,i))
-				   (write-line `((/ ,jp ,ip) =  ,(mod:/ jp ip)))
-				   (write-line `((* ,b ,ip) = ,(mod:* b ip))))))))))))))
+          (else
+           (let ilp ((i (- p)))
+             ;;(write-line `(trying ,i ,j))
+             (cond ((int:= i p) (jlp (int:+ j 1)))
+                   ((int:= (modulo i p) 0) (ilp (int:+ i 1)))
+                   (else
+                    (let ((jp (mod:make j p))
+                          (ip (mod:make i p)))
+                      (let ((b (mod:/ jp ip)))
+                        (if (mod:= (mod:* b ip) jp)
+                            (ilp (int:+ i 1))
+                            (begin (write-line `(problem dividing ,j ,i))
+                                   (write-line `((/ ,jp ,ip) =  ,(mod:/ jp ip)))
+                                   (write-line `((* ,b ,ip) = ,(mod:* b ip))))))))))))))
 
 (test 47)
 ;Value: ok

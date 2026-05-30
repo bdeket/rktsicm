@@ -12,7 +12,7 @@
 ;;; modified by mh 12/6/87
 ;;; $Header: unimin.scm,v 1.4 88/01/26 07:45:38 GMT gjs Exp $
 ;;; 7/5/87 UNIMIN.SCM -- first compilation of routines for univariate
-;;;			 optimization.
+;;;                         optimization.
 #|
 |#
 
@@ -32,7 +32,7 @@
 (define (golden-section-min f a b good-enuf?)
   (define g1 (/ (- (sqrt 5) 1) 2))
   (define g2 (- 1 g1))
-  (define (new-left lo-x hi-x) 
+  (define (new-left lo-x hi-x)
     (+ (* g2 hi-x) (* g1 lo-x)))
   (define (new-right lo-x hi-x)
     (+ (* g2 lo-x) (* g1 hi-x)))
@@ -71,7 +71,7 @@
 ;;; convergence criteria.
 
 (define (gsmin f a b . params)
-  (let ((ok? 
+  (let ((ok?
          (if (null? params)
              (lambda (a minx b fa fminx fb count)
                (close-enuf? (max fa fb) fminx (* 10 n:machine-epsilon)))
@@ -89,7 +89,7 @@
     (golden-section-min f a b ok?)))
 
 (define (gsmax f a b . params)
-  (let ((ok? 
+  (let ((ok?
          (if (null? params)
              (lambda (a minx b fa fminx fb count)
                (close-enuf? (max fa fb) fminx (* 10 n:machine-epsilon)))
@@ -130,14 +130,14 @@
                   (list x fx count)
                   (begin
                     (if (> (abs e) tol)
-                      (let* ((t1 (* (- x w) (- fx fv)))
-                             (t2 (* (- x v) (- fx fw)))
-                             (t3 (- (* (- x v) t2) (* (- x w) t1)))
-                             (t4 (* 2 (- t2 t1))))
-                        (set! p (if (positive? t4) (- t3) t3))
-                        (set! q (abs t4))
-                        (set! old-e e)
-                        (set! e d)))
+                        (let* ((t1 (* (- x w) (- fx fv)))
+                               (t2 (* (- x v) (- fx fw)))
+                               (t3 (- (* (- x v) t2) (* (- x w) t1)))
+                               (t4 (* 2 (- t2 t1))))
+                          (set! p (if (positive? t4) (- t3) t3))
+                          (set! q (abs t4))
+                          (set! old-e e)
+                          (set! e d)))
                     (if (and (< (abs p) (abs (* 0.5 q old-e)))
                              (> p (* q (- a x)))
                              (< p (* q (- b x))))
@@ -145,11 +145,11 @@
                         (begin (set! d (/ p q))
                                (set! u (+ x d))
                                (if (< (min (- u a) (- b u)) 2tol)
-                                 (set! d (if (< x m) tol (- tol)))))
+                                   (set! d (if (< x m) tol (- tol)))))
                         ;;else, golden section step
                         (begin (set! e (if (< x m) (- b x) (- a x)))
                                (set! d (* g e))))
-                    (set! u (+ x (if (> (abs d) tol) 
+                    (set! u (+ x (if (> (abs d) tol)
                                      d
                                      (if (positive? d) tol (- tol)))))
                     (set! fu (f u))
@@ -163,7 +163,7 @@
                                    (begin (set! v w) (set! fv fw)
                                           (set! w u) (set! fw fu))
                                    (if (or (<= fu fv) (= v x) (= v w))
-                                     (begin (set! v u) (set! fv fu))))))
+                                       (begin (set! v u) (set! fv fu))))))
                     (loop (+ count 1))))))))))
 
 (define (brent-max f a b eps)
@@ -171,7 +171,7 @@
   (let ((result (brent-min -f a b eps)))
     (list (car result) (- (cadr result)) (caddr result))))
 
-                           
+
 ;;; Given a function f, a starting point and a step size, try to bracket
 ;;; a local extremum for f. Return a list (retcode a b c fa fb fc iter-count)
 ;;; where a < b < c, and fa, fb, fc are the function values at these
@@ -207,14 +207,14 @@
 
 ;;; Given a function f on [a, b] and N > 0, examine f at the endpoints
 ;;; a, b, and at N equally-separated interior points. From this form a
-;;; list of brackets (p q) in each of which a local maximum is trapped. 
+;;; list of brackets (p q) in each of which a local maximum is trapped.
 ;;; Then apply Golden Section to all these brackets and return a list of
 ;;; pairs (x fx) representing the local maxima.
 
 (define (local-maxima f a b n ftol)
   (let* ((h (/ (- b a) (+ n 1)))
-         (xlist (generate-list 
-                 (+ n 2) 
+         (xlist (generate-list
+                 (+ n 2)
                  (lambda (i) (if (= i (+ n 1)) b (+ a (* i h))))))
          (flist (map f xlist))
          (xi (lambda(i) (list-ref xlist i)))
@@ -225,29 +225,29 @@
          (brack2 (if (> (fi (+ n 1)) (fi n))
                      (cons (list (xi n) (xi (+ n 1))) brack1)
                      brack1))
-         (bracketlist 
+         (bracketlist
           (let loop ((i 1) (b brack2))
             (if (> i n)
                 b
-                (if (and (<= (fi (- i 1)) (fi i)) 
+                (if (and (<= (fi (- i 1)) (fi i))
                          (>= (fi i) (fi (+ i 1))))
-                    (loop (+ i 1) (cons (list (xi (- i 1)) 
+                    (loop (+ i 1) (cons (list (xi (- i 1))
                                               (xi (+ i 1))) b))
                     (loop (+ i 1) b)))))
-         (locmax (lambda (int) (gsmax f (car int) (cadr int) 
+         (locmax (lambda (int) (gsmax f (car int) (cadr int)
                                       'function-tol ftol))))
     (map locmax bracketlist)))
-                   
+
 (define (local-minima f a b n ftol)
   (let* ((g (lambda (x) (- (f x))))
          (result (local-maxima g a b n ftol))
          (flip (lambda (r) (list (car r) (- (cadr r)) (caddr r)))))
     (map flip result)))
-       
+
 
 (define (estimate-global-max f a b n ftol)
   (let ((local-maxs (local-maxima f a b n ftol)))
-    (let loop ((best-so-far (car local-maxs)) 
+    (let loop ((best-so-far (car local-maxs))
                (unexamined (cdr local-maxs)))
       (if (null? unexamined)
           best-so-far
@@ -258,7 +258,7 @@
 
 (define (estimate-global-min f a b n ftol)
   (let ((local-mins (local-minima f a b n ftol)))
-    (let loop ((best-so-far (car local-mins)) 
+    (let loop ((best-so-far (car local-mins))
                (unexamined (cdr local-mins)))
       (if (null? unexamined)
           best-so-far

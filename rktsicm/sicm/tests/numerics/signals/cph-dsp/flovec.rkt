@@ -7,12 +7,12 @@
 
 (define F (flo:make-initialized-vector 5 values))
 (define G (flo:make-vector 8 3))
-   
+
 (provide the-tests)
 (define the-tests
   (test-suite
    "numerics/signals/cph-dsp/flovec"
-   
+
    (check-equal? (flonum-vector->vector F)
                  #(0. 1. 2. 3. 4.))
    (check-equal? (flonum-vector->list F)

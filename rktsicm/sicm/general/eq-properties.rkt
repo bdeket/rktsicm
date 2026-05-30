@@ -65,18 +65,18 @@
   (let ((plist (hash-table/get eq-properties node '())))
     (let ((vcell (assq property plist)))
       (if vcell
-	  (set-cdr! vcell value)
-	  (hash-table/put! eq-properties node
-			   (cons (cons property value)
-				 plist)))))
+          (set-cdr! vcell value)
+          (hash-table/put! eq-properties node
+                           (cons (cons property value)
+                                 plist)))))
   node)
 
 (define (eq-get node property)
   (let ((plist (hash-table/get eq-properties node '())))
     (let ((vcell (assq property plist)))
       (if vcell
-	  (cdr vcell)
-	  #f))))
+          (cdr vcell)
+          #f))))
 
 (define (eq-rem! node . properties)
   (let ([plist (assq-del* properties
@@ -86,19 +86,19 @@
   (for-each
    (lambda (property)
      (let ((plist
-	    (hash-table/get eq-properties node '())))
+            (hash-table/get eq-properties node '())))
        (let ((vcell (assq property plist)))
-	 (if vcell
-	     (hash-table/put! eq-properties node
-			      (delq! vcell plist))))))
+         (if vcell
+             (hash-table/put! eq-properties node
+                              (delq! vcell plist))))))
    properties)
   node)
 
 (define (eq-adjoin! node property new)
   (eq-put! node property
-	   (lset-adjoin eq?
-			(or (eq-get node property) '())
-			new))
+           (lset-adjoin eq?
+                        (or (eq-get node property) '())
+                        new))
   node)
 
 (define (eq-delete! node property obj)
@@ -112,7 +112,7 @@
 
 (define (eq-clone! source target)
   (hash-table/put! eq-properties target
-    (hash-table/get eq-properties source '()))
+                   (hash-table/get eq-properties source '()))
   #;
   (let ((plist (hash-table/get eq-properties source #f)))
     (if plist
@@ -122,19 +122,19 @@
 (define (eq-label! node . plist)
   (let loop ((plist plist))
     (cond ((null? plist) node)
-	  ((null? (cdr plist)) (error "Malformed plist"))
-	  (else
-	   (eq-put! node (car plist) (cadr plist))
-	   (loop (cddr plist))))))
+          ((null? (cdr plist)) (error "Malformed plist"))
+          (else
+           (eq-put! node (car plist) (cadr plist))
+           (loop (cddr plist))))))
 
 ;;; Path names are built with properties.
 
 (define (eq-path path)
   (define (lp node)
     (if node
-	(if (pair? path)
-	    (eq-get ((eq-path (cdr path)) node)
-		    (car path))
-	    node)
-	#f))
+        (if (pair? path)
+            (eq-get ((eq-path (cdr path)) node)
+                    (car path))
+            node)
+        #f))
   lp)

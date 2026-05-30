@@ -162,7 +162,7 @@
                           ((((Lie-derivative X) Y) f) m_0))
                        0)
     (check-simplified? (- ((D (lambda (t)
-                                (- ((Y f) ((phi^X t) m_0)) 
+                                (- ((Y f) ((phi^X t) m_0))
                                    ((((pushforward-vector (phi^X t) (phi^X (- t)))
                                       Y)
                                      f)

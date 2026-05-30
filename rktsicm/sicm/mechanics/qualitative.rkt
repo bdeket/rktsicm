@@ -19,46 +19,46 @@
     ((iterated-map T n) (+ xe (* dx (/ param (expt A n))))
                         (+ ye (* dy (/ param (expt A n))))
                         cons
-			(lambda ()
-			  (error "Failed")))))
+                        (lambda ()
+                          (error "Failed")))))
 
 (define (fixed-point-eigen T xe ye eps cont)
-  (let ((M00 ((richardson-derivative 
-	       (lambda (dx)
-		 (T (+ xe dx) ye 
-		    (lambda (x y)
-		      ((principal-value n:pi) (- x xe)))
-		    'failure))
-	       eps)
-	      0.0))
-	(M01 ((richardson-derivative 
-	       (lambda (dx)
-		 (T xe (+ ye dx) 
-		    (lambda (x y)
-		      ((principal-value n:pi) (- x xe)))
-		    'failure))
-	       eps)
-	      0.0))
-	(M10 ((richardson-derivative 
-	       (lambda (dx)
-		 (T (+ xe dx) ye
-		    (lambda (x y) y)
-		    'failure))
-	       eps)
-	      0.0))
-	(M11 ((richardson-derivative 
-	       (lambda (dx)
-		 (T xe (+ ye dx)
-		    (lambda (x y) y)
-		    'failure))
-	       eps)
-	      0.0)))
+  (let ((M00 ((richardson-derivative
+               (lambda (dx)
+                 (T (+ xe dx) ye
+                    (lambda (x y)
+                      ((principal-value n:pi) (- x xe)))
+                    'failure))
+               eps)
+              0.0))
+        (M01 ((richardson-derivative
+               (lambda (dx)
+                 (T xe (+ ye dx)
+                    (lambda (x y)
+                      ((principal-value n:pi) (- x xe)))
+                    'failure))
+               eps)
+              0.0))
+        (M10 ((richardson-derivative
+               (lambda (dx)
+                 (T (+ xe dx) ye
+                    (lambda (x y) y)
+                    'failure))
+               eps)
+              0.0))
+        (M11 ((richardson-derivative
+               (lambda (dx)
+                 (T xe (+ ye dx)
+                    (lambda (x y) y)
+                    'failure))
+               eps)
+              0.0)))
     (let ((trace (+ M00 M11))
-	  (determinant (- (* M00 M11) (* M01 M10))))
-      (quadratic 1. (- trace) determinant 
-       (lambda (root1 root2)
-	 (cont root1 M01 (- root1 M00)
-	       root2 M01 (- root2 M00)))))))
+          (determinant (- (* M00 M11) (* M01 M10))))
+      (quadratic 1. (- trace) determinant
+                 (lambda (root1 root2)
+                   (cont root1 M01 (- root1 M00)
+                         root2 M01 (- root2 M00)))))))
 
 #| in open.scm
 
@@ -83,11 +83,11 @@
 ;;; Poincare-Birkhoff
 
 (define (radially-mapping-points map Jmin Jmax phi eps)
-  (bisect 
-    (lambda (J) 
-      ((principal-value n:pi)
-       (- phi (map phi J (lambda (phip Jp) phip) list))))
-    Jmin Jmax eps))
+  (bisect
+   (lambda (J)
+     ((principal-value n:pi)
+      (- phi (map phi J (lambda (phip Jp) phip) list))))
+   Jmin Jmax eps))
 
 ;;; See indexed/driven-pend-evolution.scm
 
@@ -118,7 +118,7 @@
 
 (define (orbit-stream the-map x y)
   (cons-stream (list x y)
-               (the-map x y 
+               (the-map x y
                        (lambda (nx ny)
                          (orbit-stream the-map nx ny))
                        (lambda () 'fail))))
@@ -127,7 +127,7 @@
   (insert! ((principal-value cut) (car (head orbit)))
            list
            (lambda (nlist position)
-             (cons-stream 
+             (cons-stream
                position
                (position-stream cut (tail orbit) nlist)))))
 
@@ -165,11 +165,11 @@
 
 (define (which-way? rotation-number x0 y0 map)
   (let ((pv (principal-value (+ x0 n:pi))))
-    (let lp ((n 0) 
+    (let lp ((n 0)
              (z x0) (zmin (- x0 n:2pi)) (zmax (+ x0 n:2pi))
              (x x0) (xmin (- x0 n:2pi)) (xmax (+ x0 n:2pi)) (y y0))
       (let ((nz (pv (+ z (* n:2pi rotation-number)))))
-        (map x y 
+        (map x y
              (lambda (nx ny)
                (let ((nx (pv nx)))
                  (cond ((< x0 z zmax)
@@ -180,7 +180,7 @@
                         (if (< xmin x x0)
                             (lp (+ n 1) nz z zmax nx x xmax ny)
                             (if (< x xmin) -1 1)))
-                       (else 
+                       (else
                         (lp (+ n 1) nz zmin zmax nx xmin xmax ny)))))
              (lambda ()
                (error "Map failed" x y)))))))
@@ -189,12 +189,12 @@
 (define ((iterated-map map n) x y continue fail)
   (when (fix:< n 0) (error "iterated-map: cannot invert map"))
   (let loop ((x x) (y y) (i n))
-    (if (fix:= i 0) 
-	(continue x y)
-	(map x y
-	     (lambda (nx ny)
-	       (loop nx ny (fix:- i 1)))
-	     fail))))
+    (if (fix:= i 0)
+        (continue x y)
+        (map x y
+             (lambda (nx ny)
+               (loop nx ny (fix:- i 1)))
+             fail))))
 
 (define ((standard-map K) x y continue fail)
   (let ((yp (flo:pv (flo:+ y (flo:* K (flo:sin x))))))

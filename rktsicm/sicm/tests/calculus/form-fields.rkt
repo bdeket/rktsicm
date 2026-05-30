@@ -87,12 +87,12 @@
                        '(up (sin a) (sin b)))
     (check-simplified? (((coordinate-system->1form-basis R2-rect) vf) ((R2-polar '->point) #[a b]))
                        '(up (sin (* a (cos b))) (sin (* a (sin b)))))
-    
+
     (define fb (basis-components->1form-field (R2-rect '->coords) (coordinate-system->1form-basis R2-rect)))
     (check-ff fb)
     (check-simplified? ((fb vf) ((R2-rect '->point) #[a b]))
                        '(up (up (* a (sin a)) (* b (sin a))) (up (* a (sin b)) (* b (sin b)))))
-    
+
     (define ff (components->1form-field (up x (* 2 y)) R2-rect))
     (define bc (1form-field->basis-components ff (coordinate-system->vector-basis R2-rect)))
     (check-simplified? (bc ((R2-rect '->point) #(a b)))

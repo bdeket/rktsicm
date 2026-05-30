@@ -29,19 +29,19 @@
 
 (define (differential->terms diff)
   (cond ((differential? diff)
-	 (filter (lambda (term)
-		   (not (g:zero? (differential-coefficient term))))
-		 (differential-term-list diff)))
-	((g:zero? diff) '())
-	(else (list (make-differential-term '() diff)))))
+         (filter (lambda (term)
+                   (not (g:zero? (differential-coefficient term))))
+                 (differential-term-list diff)))
+        ((g:zero? diff) '())
+        (else (list (make-differential-term '() diff)))))
 
 (define (terms->differential terms)
   (cond ((null? terms) n:zero)
-	((and (null? (cdr terms))
-	      (null? (differential-tags (car terms))))
-	 (differential-coefficient (car terms)))
-	(else
-	 (make-differential-quantity terms))))
+        ((and (null? (cdr terms))
+              (null? (differential-tags (car terms))))
+         (differential-coefficient (car terms)))
+        (else
+         (make-differential-quantity terms))))
 ;;bdk;; insert 1 end
 
 ;;; Each differential term has a list of tags.  The tags represent the
@@ -65,7 +65,7 @@
 (define (differential-of x)
   (let lp ((x x))
     (if (differential? x)
-	(lp (differential-coefficient
-	     (car (differential-term-list x))))
-	x)))
+        (lp (differential-coefficient
+             (car (differential-term-list x))))
+        x)))
 ;;bdk;; insert 3 end

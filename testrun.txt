@@ -167,10 +167,10 @@
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
 1708             2   69 16.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
-runtime: 3.9166666666666665m
+runtime: 3.8833333333333333m
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1708             2   69 22.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
-runtime: 4.2m
+1708             2   69 25.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
+runtime: 4.9m
 
 Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz 12-cores 4000MHz

@@ -58,23 +58,23 @@
 
 
     ;; Simplify relative to existing tables
-    (define (simplify-expression expr)	
+    (define (simplify-expression expr)
       (backsubstitute (analyze-expression expr)))
 
 
     ;; Analyze relative to existing tables
     (define (analyze-expression expr)
       (parameterize ([incremental-simplifier #f])
-	(base-simplify (analyze expr))))
+        (base-simplify (analyze expr))))
 
 
     ;; Set up new analysis
-    (define (new-analysis)		
+    (define (new-analysis)
       (auxiliary-variable-table (make-hash))
       (reverse-table (make-weak-hasheq))
       #|
       (set! auxiliary-variable-table
-	    ((weak-hash-table/constructor equal-hash-mod equal? #t)))
+            ((weak-hash-table/constructor equal-hash-mod equal? #t)))
       (set! reverse-table (make-eq-hash-table))
       |#
       (uorder '())
@@ -91,77 +91,77 @@
     ;; Get kernel table
     (define (get-auxiliary-variable-defs)
       (map (lambda (entry)
-	     (list (cdr entry) (car entry)))
-	   (hash-table->alist (auxiliary-variable-table))))
+             (list (cdr entry) (car entry)))
+           (hash-table->alist (auxiliary-variable-table))))
 
     ;; Implementation -----------------------
 
     (define (analyze expr)
       (let ((vars (sort (variables-in expr) variable<?)))
-	(uorder
-	      (append (map add-symbol! (priority))
-                      ;;bdk;; avoid double entries, otherwise both (vless? x y) and (vless? y x) can be true...
-		      (remove* (priority) vars))))
+        (uorder
+         (append (map add-symbol! (priority))
+                 ;;bdk;; avoid double entries, otherwise both (vless? x y) and (vless? y x) can be true...
+                 (remove* (priority) vars))))
       (ianalyze expr))
 
     (define (ianalyze expr)
       (if (and (pair? expr) (not (eq? (car expr) 'quote)))
-	  (let ((sexpr (map ianalyze expr)))
-	    ;; At this point all subexpressions are canonical.
-	    (if (and (memq (operator sexpr) known-operators)
-		     (not (and *inhibit-expt-simplify*
-			       (expt? sexpr)
-			       (not (exact-integer?
+          (let ((sexpr (map ianalyze expr)))
+            ;; At this point all subexpressions are canonical.
+            (if (and (memq (operator sexpr) known-operators)
+                     (not (and *inhibit-expt-simplify*
+                               (expt? sexpr)
+                               (not (exact-integer?
                                      (cadr (operands sexpr)))))))
-		sexpr
-		(let ((as-seen (expression-seen sexpr)))
-		  (if as-seen
-		      as-seen
-		      (new-kernels sexpr)))))
-	  expr))
+                sexpr
+                (let ((as-seen (expression-seen sexpr)))
+                  (if as-seen
+                      as-seen
+                      (new-kernels sexpr)))))
+          expr))
 
     (define (new-kernels expr)
       (let ((sexpr (map base-simplify expr)))
-	(let ((v (hash-table/get symbolic-operator-table
-				 (operator sexpr)
-				 #f)))
-	  (if v
-	      (let ((w (apply v (operands sexpr))))
-		(if (and (pair? w) (eq? (operator w) (operator sexpr)))
-		    (add-symbols! w)
-		    (ianalyze w)))		      
-	      (add-symbols! sexpr)))))
+        (let ((v (hash-table/get symbolic-operator-table
+                                 (operator sexpr)
+                                 #f)))
+          (if v
+              (let ((w (apply v (operands sexpr))))
+                (if (and (pair? w) (eq? (operator w) (operator sexpr)))
+                    (add-symbols! w)
+                    (ianalyze w)))
+              (add-symbols! sexpr)))))
 
     (define (base-simplify expr)
       (if (and (pair? expr) (not (eq? (car expr) 'quote)))
-	  (expression-> expr ->expression vless?)
-	  expr))
+          (expression-> expr ->expression vless?)
+          expr))
 
     (define (backsubstitute expr)
       (define lp
-	(lambda (expr)
-	  (cond ((pair? expr) (map lp expr))
-		((symbol? expr)
-		 (let ((v (hash-table/get (reverse-table) expr #f)))
-		   (if v (lp v) expr)))
-		(else expr))))
+        (lambda (expr)
+          (cond ((pair? expr) (map lp expr))
+                ((symbol? expr)
+                 (let ((v (hash-table/get (reverse-table) expr #f)))
+                   (if v (lp v) expr)))
+                (else expr))))
       (lp expr))
 
     (define (add-symbols! expr)
       (let ((new (map add-symbol! expr)))
-	(add-symbol! new)))
+        (add-symbol! new)))
 
     (define (add-symbol! expr)
       (if (and (pair? expr) (not (eq? (car expr) 'quote)))
-	  (let ((as-seen (expression-seen expr)))
-	    (if as-seen
-		as-seen
-		(let ((newvar
-		       (generate-uninterned-symbol "kernel")))
-		  (hash-table/put! (auxiliary-variable-table) expr newvar)
-		  (hash-table/put! (reverse-table) newvar expr)
-		  newvar)))
-	  expr))
+          (let ((as-seen (expression-seen expr)))
+            (if as-seen
+                as-seen
+                (let ((newvar
+                       (generate-uninterned-symbol "kernel")))
+                  (hash-table/put! (auxiliary-variable-table) expr newvar)
+                  (hash-table/put! (reverse-table) newvar expr)
+                  newvar)))
+          expr))
 
     (define (expression-seen expr)
       (hash-table/get (auxiliary-variable-table) expr #f))
@@ -169,22 +169,22 @@
 
     (define (vless? var1 var2)
       (let ((in (memq var1 (uorder))))
-	(cond (in
-	       (cond ((memq var2 in) true)
-		     ((memq var2 (uorder)) false)
-		     (else true)))
-	      ((memq var2 (uorder)) false)
-	      (else
-	       (variable<? var1 var2)))))
+        (cond (in
+               (cond ((memq var2 in) true)
+                     ((memq var2 (uorder)) false)
+                     (else true)))
+              ((memq var2 (uorder)) false)
+              (else
+               (variable<? var1 var2)))))
 
     (new-analysis)
 
     (vector simplify
-	    simplify-expression
-	    new-analysis
-	    set-priority!
-	    analyze-expression
-	    get-auxiliary-variable-defs)))
+            simplify-expression
+            new-analysis
+            set-priority!
+            analyze-expression
+            get-auxiliary-variable-defs)))
 
 
 (define (default-simplifier analyzer) (vector-ref analyzer 0))
@@ -207,7 +207,7 @@
 (define fpf:simplify
   (hash-memoize-1arg
    (compose canonical-copy
-	    (expression-simplifier fpf:analyzer))))
+            (expression-simplifier fpf:analyzer))))
 
 
 (define pcf:analyzer
@@ -219,7 +219,7 @@
 (define pcf:simplify
   (hash-memoize-1arg
    (compose canonical-copy
-	    (expression-simplifier pcf:analyzer))))
+            (expression-simplifier pcf:analyzer))))
 
 
 (define rcf:analyzer
@@ -230,7 +230,7 @@
 (define rcf:simplify
   (hash-memoize-1arg
    (compose canonical-copy
-	    (expression-simplifier rcf:analyzer))))
+            (expression-simplifier rcf:analyzer))))
 
 #|
 ((initializer rcf:analyzer))

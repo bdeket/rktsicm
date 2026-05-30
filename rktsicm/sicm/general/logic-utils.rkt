@@ -26,14 +26,14 @@
 (define (assert p #:optional error-comment irritant)
   (if (not p)
       (begin
-	(if (not (default-object? irritant))
-	    (pp irritant))
-	(error (if (default-object? error-comment)
-		   "Failed assertion"
-		   error-comment)))))
+        (if (not (default-object? irritant))
+            (pp irritant))
+        (error (if (default-object? error-comment)
+                   "Failed assertion"
+                   error-comment)))))
 
 (define (with-protection protected-value-thunk untrusted-thunk
-          #:optional violation-thunk)
+                         #:optional violation-thunk)
   (let ((saved-value (protected-value-thunk))
         (return-value (untrusted-thunk)))
     (if (not (equal? saved-value (protected-value-thunk)))
@@ -96,15 +96,15 @@
 (define (forall l p?)
   (let loop ((l l))
     (cond ((null? l) true)
-	  ((p? (car l)) (loop (cdr l)))
-	  (else false))))
+          ((p? (car l)) (loop (cdr l)))
+          (else false))))
 
 
 (define (exists p? l)
   (let loop ((l l))
     (cond ((null? l) false)
-	  ((p? (car l)) true)
-	  (else (loop (cdr l))))))
+          ((p? (car l)) true)
+          (else (loop (cdr l))))))
 |#
 
 (define (&or disjuncts)

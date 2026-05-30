@@ -82,7 +82,7 @@
     (check-within (simplify ((find-path L 0 100 5 75 3) 't))
                   (simplify (- 100 (* 5/2 't) (* 1/2 't 't) (* ~0 't 't 't) (* ~0 't 't 't 't)))
                   1e-3))
-   
+
    (test-case
     "free-particle"
     (define ((L-free-particle mass) local)
@@ -101,14 +101,14 @@
                            (+ path dpath)
                            t1
                            t2)))
-    (check-= ((varied-free-particle-action 3.0 test-path 
+    (check-= ((varied-free-particle-action 3.0 test-path
                                            (coordinate-tuple sin cos square)
                                            0.0 10.0)
               0.001)
              436.29121428571443 1e-10)
     (check-within (minimize
-                   (varied-free-particle-action 3.0 test-path 
-                                                (coordinate-tuple sin cos square) 
+                   (varied-free-particle-action 3.0 test-path
+                                                (coordinate-tuple sin cos square)
                                                 0.0 10.0)
                    -2.0 1.0)
                   '(-5.828670879282072e-16 435.00000000000085 5)

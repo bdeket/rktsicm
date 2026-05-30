@@ -12,10 +12,10 @@
 
 ;;bdk;; start original file
 
-;;;; Primitive Generic Operation Declarations 
+;;;; Primitive Generic Operation Declarations
 
 
-;;; Unary Operators 
+;;; Unary Operators
 
 ;;bdk;; moved to cstm/generic 1
 (define (g:transpose thing #:optional shape)
@@ -31,11 +31,11 @@
 
 (define (g:expt x y)
   (cond ((and (number? x) (number? y)) (n:expt x y))
-	;;((g:zero? x) x) ;No! consider 0^{-1}
-	((g:one? x) x)
-	((g:zero? y) (g:one-like x))
-	((g:one? y) x)
-	(else (generic:expt x y))))
+        ;;((g:zero? x) x) ;No! consider 0^{-1}
+        ((g:one? x) x)
+        ((g:zero? y) (g:one-like x))
+        ((g:one? y) x)
+        (else (generic:expt x y))))
 
 
 ;;bdk;; moved to cstm/generic 4

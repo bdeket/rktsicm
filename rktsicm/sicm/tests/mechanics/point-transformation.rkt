@@ -47,8 +47,8 @@
                             (- (* (cos (* n t)) y) (* (sin (* n t)) x))
                             z))))
     (define (C-rotating n) (F->CT (rotating n)))
-    (define a-state 
-      (up 't 
+    (define a-state
+      (up 't
           (coordinate-tuple 'x 'y 'z)
           (momentum-tuple 'p_x 'p_y 'p_z)))
     (check-simplified? ((canonical-K? (C-rotating 'n) (F->K (rotating 'n))) a-state)

@@ -16,14 +16,14 @@
 (define (symbolic-operator operator-symbol)
   (let ((v (hash-table/get symbolic-operator-table operator-symbol #f)))
     (if v
-	v
-	(error "Undefined symbolic operator" operator-symbol))))
+        v
+        (error "Undefined symbolic operator" operator-symbol))))
 
 (define (symbolic-environment-maker [env (make-empty-namespace)][base scmutils-base-environment])
   (let ((e (extend-environment env base)))
     (let ((d
-	   (lambda (name value)
-	     (environment-define e name value))))
+           (lambda (name value)
+             (environment-define e name value))))
 
       (d '*environment* 'symbolic-environment)
 
@@ -41,7 +41,7 @@
       |#
       (d 'zero? (symbolic-operator 'zero?))
       (d 'one? (symbolic-operator 'one?))
-      ;;	(d 'identity? (symbolic-operator 'identity?))
+      ;;        (d 'identity? (symbolic-operator 'identity?))
 
       (d 'negate (symbolic-operator 'negate))
       (d 'invert (symbolic-operator 'invert))
@@ -78,7 +78,7 @@
       (d 'abs (symbolic-operator 'abs))
 
       ;; (d 'derivative (symbolic-operator 'derivative))
-      
+
       ;; Binary (and nary) operators from generic.scm
 
       (d 'expt (symbolic-operator 'expt))

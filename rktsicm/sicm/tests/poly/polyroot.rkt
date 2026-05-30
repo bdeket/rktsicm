@@ -214,7 +214,7 @@
                     (zero-divide-at -7.934925000125151e-90 in polisher))
                   1e-308)
     (set-polyroot-settings! #:wallp? #f))
-   
+
    (test-case
     "poly->roots"
     (define (<< x y) (or (< (real-part x) (real-part y))

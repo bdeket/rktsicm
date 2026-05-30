@@ -128,7 +128,7 @@
     (check-equal? (type-expression->type-tag (-> Real Complex))   (abstract-type-tag *function*))
     (check-exn #px"Unknown type combinator" (λ () (type-expression->type-tag '(something-stupid))))
     (check-exn #px"Unknown primitive type" (λ () (type-expression->type-tag 'something-stupid))))
-   
+
    (test-case
     "typed-function"
     (check-false (f:domain-types +))

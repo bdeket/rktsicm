@@ -21,18 +21,18 @@
 
 (define (sigfun:make procedure span)
   (list '*signal-function*
-	span
-	(lambda (x)
-	  (cond ((< x (sigfun:min span)) 0)
-		((< x (sigfun:max span))
-		 (procedure x))
-		(else 0)))))
+        span
+        (lambda (x)
+          (cond ((< x (sigfun:min span)) 0)
+                ((< x (sigfun:max span))
+                 (procedure x))
+                (else 0)))))
 
 (define (sigfun:span signal-function)
   (cadr signal-function))
 
 (define (sigfun:procedure signal-function)
-  (caddr signal-function))				   
+  (caddr signal-function))
 
 
 ;;; For convenience, the span can be specified as either a single
@@ -43,7 +43,7 @@
 (define (sigfun:make-span minx #:optional maxx)
   (if (default-object? maxx)
       (begin (set! maxx minx)
-	     (set! minx (- maxx))))
+             (set! minx (- maxx))))
   (assert (< minx maxx))
   (cons minx maxx))
 
@@ -53,31 +53,31 @@
 
 (define ((sigfun:unary-op op) sigfun)
   (sigfun:make (op (sigfun:procedure sigfun))
-	       (sigfun:span sigfun)))
+               (sigfun:span sigfun)))
 
 #|
 ;;; Looks wrong...  Must intersect spans
 (define ((sigfun:binary-op op) sigfun1 sigfun2)
   (let ((span1 (sigfun:span sigfun1))
-	(span2 (sigfun:span sigfun2)))
+        (span2 (sigfun:span sigfun2)))
     (sigfun:make (lambda (x)
-		   (op ((sigfun:procedure sigfun1) x)
-		       ((sigfun:procedure sigfun2) x)))
-		 (sigfun:make-span
-		  (min (sigfun:min span1) (sigfun:min span2))
-		  (max (sigfun:max span1) (sigfun:max span2))))))
+                   (op ((sigfun:procedure sigfun1) x)
+                       ((sigfun:procedure sigfun2) x)))
+                 (sigfun:make-span
+                  (min (sigfun:min span1) (sigfun:min span2))
+                  (max (sigfun:max span1) (sigfun:max span2))))))
 |#
 
 (define ((sigfun:binary-op op) sigfun1 sigfun2)
   (let ((span1 (sigfun:span sigfun1))
-	(span2 (sigfun:span sigfun2)))
+        (span2 (sigfun:span sigfun2)))
     (sigfun:make (lambda (x)
-		   (op ((sigfun:procedure sigfun1) x)
-		       ((sigfun:procedure sigfun2) x)))
-		 (sigfun:make-span
-		  (max (sigfun:min span1) (sigfun:min span2))
-		  (min (sigfun:max span1) (sigfun:max span2))))))
-	
+                   (op ((sigfun:procedure sigfun1) x)
+                       ((sigfun:procedure sigfun2) x)))
+                 (sigfun:make-span
+                  (max (sigfun:min span1) (sigfun:min span2))
+                  (min (sigfun:max span1) (sigfun:max span2))))))
+
 
 
 (define sigfun:make-rectangular (sigfun:binary-op g:make-rectangular))
@@ -141,18 +141,18 @@
 
 (define (sigfun:shift sigfun shift)
   (sigfun:make (g:arg-shift (sigfun:procedure sigfun) shift)
-	       (sigfun:span sigfun)))
+               (sigfun:span sigfun)))
 
 
 (define (sigfun:reverse sigfun)
   (let ((span (sigfun:span sigfun)))
     (sigfun:make (lambda (x) ((sigfun:procedure sigfun) (- x)))
-		 (sigfun:make-span (sigfun:max span) (sigfun:min span)))))
+                 (sigfun:make-span (sigfun:max span) (sigfun:min span)))))
 
 
 (define (sigfun:apply sigfun args)
   (g:apply (sigfun:procedure sigfun) args))
-  
+
 
 
 (assign-operation 'negate          sigfun:negate         sigfun?)
@@ -221,10 +221,10 @@
 
 (define (sigfun:dB cutoff return sigfun)
   (let ((span (sigfun:span sigfun))
-	(epsilon (expt 10 (/ cutoff 20))))
+        (epsilon (expt 10 (/ cutoff 20))))
     (sigfun:make (compose (safe-dB epsilon return)
-			  (sigfun:procedure sigfun))
-		 span)))
+                          (sigfun:procedure sigfun))
+                 span)))
 
 
 (define ((safe-dB epsilon return) x)

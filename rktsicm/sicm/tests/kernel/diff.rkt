@@ -190,7 +190,7 @@
                         ((0) (* (log y) (expt y x) dx))
                         ((1) (* dy x (expt y (+ -1 x))))
                         ((0 1) (* dy (+ (* dx (expt y (+ -1 x))) (* x (log y) (expt y (+ -1 x)) dx))))))
-    
+
     ;; more expt !!
     (check-equal? (expression (diff:exp X))
                   (eMDT (() (exp x))
@@ -355,12 +355,12 @@
     ;; series of fun => replace-dx-fun
     ;; series of op => replace-dx-op
     (check-equal? ((replace-differential-tag 1 3) 'any) 'any)
-    
-    
-    
-    
+
+
+
+
     extract-dx-operator
-    
+
     replace-dx-function
     replace-dx-operator
     )
@@ -400,7 +400,7 @@
     ;; (replace-dx-function newtag oldtag) vs (replace-differential-tag oldtag newtag)
 
     (define (F o) (λ (x) (d:+ x (MDT ((,o) 5)))))
-    
+
     (let ([c (+ 1 (make-differential-tag))]
           [n 3] [o 0])
       ;; not realistic since c should be a new tag:
@@ -442,7 +442,7 @@
                                   (list (MDT ((0) 2) ((1) 1))))
                          0)
                   (MDT ((0) 5) ((3) 7) ((0) 2) ((1) 1))))
-   
+
    ))
 
 (module+ test

@@ -57,7 +57,7 @@
     ;; unreachable: same check in frame-maker
     (check-exn #px"assertion failed: \\(event\\? event\\)"
                (λ () ((event->coords the-ether) 'not-an-event))))
-   
+
    (test-case
     "coordinates->event"
     (define dir (up 1 0 0)) (define v/c 'v)

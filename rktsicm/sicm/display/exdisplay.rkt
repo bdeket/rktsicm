@@ -26,7 +26,7 @@
                              car
                              (λ (l) (2d:unparse-matrix uptable (list l))))
                          (cdr args))))
-  
+
 
 (define derivative-symbol 'D)
 
@@ -64,17 +64,17 @@
 ;;; ^{f + {{g}\over {h}}}}}$$
 
 ;;; (2d-show-expression test)
-;;;                Df(b)        
-;;;     alpha + ------------    
-;;;             alpha + beta    
+;;;                Df(b)
+;;;     alpha + ------------
+;;;             alpha + beta
 ;;; ----------------------------
 ;;;                            g
 ;;;                        f + -
 ;;;          /         2 \     h
-;;;         |  a + c + -  |     
-;;; x + y   |          x  |     
-;;; ----- + |  ---------  |     
-;;;   2      \    d e    /      
+;;;         |  a + c + -  |
+;;; x + y   |          x  |
+;;; ----- + |  ---------  |
+;;;   2      \    d e    /
 
 ;;; Unlike Jaffer's code, this version does not handle line breaks.  We
 ;;; can extend it some day.
@@ -106,56 +106,56 @@
 (define enable-tex-display #t)
 
 ;;bdk;;internal packaging managed with provides
-;;brm;;(let ()					;package all stuff internally
+;;brm;;(let ()                                        ;package all stuff internally
 
 ;;brm;;(define display-in-screen-window
 ;;brm;;  (let ((count 0))
 ;;brm;;    (lambda (tex-string)
 ;;brm;;      (let* ((dirname (->namestring (user-homedir-pathname)))
-;;brm;;	     (file-name (string-append dirname
-;;brm;;				       "temp-display"
-;;brm;;				       (number->string count)))
-;;brm;;	     (complete-tex-input (string-append
-;;brm;;				  ;;" \\magnification=\\magstep2\n"
-;;brm;;				  ;;"\\hsize=48pc  \\hoffset=-4pc  "
-;;brm;;				  "\\voffset=-6pc "
-;;brm;;				  "\\hsize=48pc " " \\hoffset=-6pc  "
-;;brm;;				  boxit-string "\n"
-;;brm;;				  tex-string
-;;brm;;				  "\\vfil\\bye")))
-;;brm;;	(with-output-to-file
-;;brm;;	    (string-append file-name ".tex")
-;;brm;;	  (lambda () (display complete-tex-input)))
-;;brm;;	#|
-;;brm;;	(working-unix/system (string-append "cd " dirname ";"
-;;brm;;					    " tex " file-name
-;;brm;;					    " > //dev//null 2>&1 "))
-;;brm;;	(working-unix/system
-;;brm;;	 (string-append "xdvi " file-name ".dvi "
-;;brm;;			"-s 4 "
-;;brm;;			"-yoffset 3.5 "
-;;brm;;			"-geometry 900x400+1+1; "
-;;brm;;			"//bin//rm " file-name ".*"
-;;brm;;			))
-;;brm;;	|#
-;;brm;;	(run-shell-command
-;;brm;;	 (string-append "cd " dirname ";"
-;;brm;;			" tex " file-name
-;;brm;;			" > /dev/null 2>&1 ")
-;;brm;;	 'output #f
-;;brm;;	 'shell-file-name "/bin/sh")
-;;brm;;	(run-shell-command
-;;brm;;	 (string-append "xdvi " file-name ".dvi "
-;;brm;;			"-s 4 "
-;;brm;;			"-yoffset 3.5 "
-;;brm;;			"-geometry 900x400+1+1"
-;;brm;;			" > /dev/null 2>&1; "
-;;brm;;			"/bin/rm " file-name ".*"
-;;brm;;			)
-;;brm;;	 'output #f
-;;brm;;	 'shell-file-name "/bin/sh")
-;;brm;;	(set! count (+ count 1))
-;;brm;;	))))
+;;brm;;             (file-name (string-append dirname
+;;brm;;                                       "temp-display"
+;;brm;;                                       (number->string count)))
+;;brm;;             (complete-tex-input (string-append
+;;brm;;                                  ;;" \\magnification=\\magstep2\n"
+;;brm;;                                  ;;"\\hsize=48pc  \\hoffset=-4pc  "
+;;brm;;                                  "\\voffset=-6pc "
+;;brm;;                                  "\\hsize=48pc " " \\hoffset=-6pc  "
+;;brm;;                                  boxit-string "\n"
+;;brm;;                                  tex-string
+;;brm;;                                  "\\vfil\\bye")))
+;;brm;;        (with-output-to-file
+;;brm;;            (string-append file-name ".tex")
+;;brm;;          (lambda () (display complete-tex-input)))
+;;brm;;        #|
+;;brm;;        (working-unix/system (string-append "cd " dirname ";"
+;;brm;;                                            " tex " file-name
+;;brm;;                                            " > //dev//null 2>&1 "))
+;;brm;;        (working-unix/system
+;;brm;;         (string-append "xdvi " file-name ".dvi "
+;;brm;;                        "-s 4 "
+;;brm;;                        "-yoffset 3.5 "
+;;brm;;                        "-geometry 900x400+1+1; "
+;;brm;;                        "//bin//rm " file-name ".*"
+;;brm;;                        ))
+;;brm;;        |#
+;;brm;;        (run-shell-command
+;;brm;;         (string-append "cd " dirname ";"
+;;brm;;                        " tex " file-name
+;;brm;;                        " > /dev/null 2>&1 ")
+;;brm;;         'output #f
+;;brm;;         'shell-file-name "/bin/sh")
+;;brm;;        (run-shell-command
+;;brm;;         (string-append "xdvi " file-name ".dvi "
+;;brm;;                        "-s 4 "
+;;brm;;                        "-yoffset 3.5 "
+;;brm;;                        "-geometry 900x400+1+1"
+;;brm;;                        " > /dev/null 2>&1; "
+;;brm;;                        "/bin/rm " file-name ".*"
+;;brm;;                        )
+;;brm;;         'output #f
+;;brm;;         'shell-file-name "/bin/sh")
+;;brm;;        (set! count (+ count 1))
+;;brm;;        ))))
 
 
 (define boxit-string
@@ -184,9 +184,9 @@
   (newline)
   (newline)
   (for-each (lambda (line)
-	      (for-each display (line-elements line))
-	      (newline))
-	    (box-lines box))
+              (for-each display (line-elements line))
+              (newline))
+            (box-lines box))
   (newline))
 
 
@@ -208,7 +208,7 @@
 
 (define (make-box voffset width binding-power lines)
   (append (list 'box voffset width binding-power)
-	  lines))
+          lines))
 
 (define (explicit-box? elt)
   (and (pair? elt)
@@ -241,16 +241,16 @@
 ;;;power
 (define (make-box-with-bp bp box)
   (make-box (box-voffset box)
-	    (box-width box)
-	    bp
-	    (box-lines box)))
+            (box-width box)
+            bp
+            (box-lines box)))
 
 (define (make-empty-box width height)
   (let ((lines (make-list height (make-blank-line width))))
-    (make-box 0		       ;v-offset arbitrary
-	      width
-	      max-bp	       ;binding power arbitrary
-	      lines)))
+    (make-box 0                       ;v-offset arbitrary
+              width
+              max-bp               ;binding power arbitrary
+              lines)))
 
 
 ;;; A LINE is a list of strings (the line-elements of the line)
@@ -283,45 +283,45 @@
 
 (define (join2-right box1 box2)
   (let ((v1 (box-voffset box1))
-	(v2 (box-voffset box2))
-	(blank1 (make-blank-line (box-width box1)))
-	(blank2 (make-blank-line (box-width box2))))
+        (v2 (box-voffset box2))
+        (blank1 (make-blank-line (box-width box1)))
+        (blank2 (make-blank-line (box-width box2))))
     (make-box (max v1 v2)
-	      (+ (box-width box1) (box-width box2))
-	      (box-binding-power box1)
-	      (cond ((> v1 v2)
-		     ;;must pad box2 on top to start
-		     (join-lines-horiz
-		      (box-lines box1)
-		      (append (make-list (- v1 v2) blank2)
-			      (box-lines box2))
-		      blank1
-		      blank2))
-		    ((> v2 v1)
-		     ;;must pad box1 on top
-		     (join-lines-horiz
-		      (append (make-list (- v2 v1) blank1)
-			      (box-lines box1))
-		      (box-lines box2)
-		      blank1
-		      blank2))
-		    (else (join-lines-horiz (box-lines box1)
-					    (box-lines box2)
-					    blank1
-					    blank2))))))
+              (+ (box-width box1) (box-width box2))
+              (box-binding-power box1)
+              (cond ((> v1 v2)
+                     ;;must pad box2 on top to start
+                     (join-lines-horiz
+                      (box-lines box1)
+                      (append (make-list (- v1 v2) blank2)
+                              (box-lines box2))
+                      blank1
+                      blank2))
+                    ((> v2 v1)
+                     ;;must pad box1 on top
+                     (join-lines-horiz
+                      (append (make-list (- v2 v1) blank1)
+                              (box-lines box1))
+                      (box-lines box2)
+                      blank1
+                      blank2))
+                    (else (join-lines-horiz (box-lines box1)
+                                            (box-lines box2)
+                                            blank1
+                                            blank2))))))
 
 (define (join-lines-horiz lines1 lines2 blank1 blank2)
   (cond ((null? lines1)
-	 (map (lambda (line2) (make-line (append (line-elements blank1)
-						 (line-elements line2))))
-	      lines2))
-	((null? lines2)
-	 (map (lambda (line1) (make-line (append (line-elements line1)
-						 (line-elements blank2))))
-	      lines1))
-	(else (cons (make-line (append (line-elements (car lines1))
-				       (line-elements (car lines2))))
-		    (join-lines-horiz (cdr lines1) (cdr lines2) blank1 blank2)))))
+         (map (lambda (line2) (make-line (append (line-elements blank1)
+                                                 (line-elements line2))))
+              lines2))
+        ((null? lines2)
+         (map (lambda (line1) (make-line (append (line-elements line1)
+                                                 (line-elements blank2))))
+              lines1))
+        (else (cons (make-line (append (line-elements (car lines1))
+                                       (line-elements (car lines2))))
+                    (join-lines-horiz (cdr lines1) (cdr lines2) blank1 blank2)))))
 
 
 ;;; Glue boxes vertically.  The boxes will all be extended to the
@@ -329,7 +329,7 @@
 ;;; The voffset will be the voffset of the first box.  (I.e., the
 ;;; first box will stay at the same level, and the other boxes will be
 ;;; appended below it.)  The binding power will be the binding power
-;;; of the first box. 
+;;; of the first box.
 
 (define (glue-vert boxes)
   (if (null? (cdr boxes))
@@ -339,23 +339,23 @@
 
 (define (glue-below box1 box2)
   (let* ((new-width (max (box-width box1) (box-width box2)))
-	 (nbox1 (pad-box-centered-to-width new-width box1))
-	 (nbox2 (pad-box-centered-to-width new-width box2)))
+         (nbox1 (pad-box-centered-to-width new-width box1))
+         (nbox2 (pad-box-centered-to-width new-width box2)))
     (make-box
      (box-voffset box1)
      new-width
      (box-binding-power box1)
      (append (box-lines nbox1) (box-lines nbox2)))))
-    
 
-;;; Glue-above is similar to glue-below below, except that the 
+
+;;; Glue-above is similar to glue-below below, except that the
 ;;; v-offset of the top line in box2 remains
 ;;; what it was, and box1 is glued in above it.
 
 (define (glue-above box1 box2)
   (let* ((new-width (max (box-width box1) (box-width box2)))
-	 (nbox1 (pad-box-centered-to-width new-width box1))
-	 (nbox2 (pad-box-centered-to-width new-width box2)))
+         (nbox1 (pad-box-centered-to-width new-width box1))
+         (nbox2 (pad-box-centered-to-width new-width box2)))
     (make-box
      (+ (box-voffset box2) (length (box-lines box1)))
      new-width
@@ -368,19 +368,19 @@
 
 (define (pad-box-centered-to-width width box)
   (let* ((extra (- width (box-width box)))
-	 (extra-left (floor->exact (/ extra 2)))
-	 (extra-right (- extra extra-left))
-	 (pad-left (make-blank-line-elts extra-left))
-	 (pad-right (make-blank-line-elts extra-right)))
+         (extra-left (floor->exact (/ extra 2)))
+         (extra-right (- extra extra-left))
+         (pad-left (make-blank-line-elts extra-left))
+         (pad-right (make-blank-line-elts extra-right)))
     (make-box (box-voffset box)
-	      width
-	      (box-binding-power box)
-	      (map (lambda (line)
-		     (make-line 
-		      (append pad-left
-			      (line-elements line)
-			      pad-right)))
-		   (box-lines box)))))
+              width
+              (box-binding-power box)
+              (map (lambda (line)
+                     (make-line
+                      (append pad-left
+                              (line-elements line)
+                              pad-right)))
+                   (box-lines box)))))
 
 
 ;;; pad the box on both the top and the bottom so it will be centeted
@@ -390,15 +390,15 @@
 
 (define (pad-box-centered-to-height height box)
   (let* ((extra (- height (box-nlines box)))
-	 (extra-top (floor->exact (/ extra 2)))
-	 (extra-bottom (- extra extra-top))
-	 (width (box-width box)))
+         (extra-top (floor->exact (/ extra 2)))
+         (extra-bottom (- extra extra-top))
+         (width (box-width box)))
     (let ((padded-box
-	   (glue-below (glue-above (make-empty-box width extra-top)
-				   box)
-		       (make-empty-box width extra-bottom))))
+           (glue-below (glue-above (make-empty-box width extra-top)
+                                   box)
+                       (make-empty-box width extra-bottom))))
       (shift-top-to (- (box-nlines padded-box) 1)
-		    padded-box))))
+                    padded-box))))
 
 ;;; Offsetting boxes vertically
 
@@ -415,9 +415,9 @@
 ;;; Shift the box so that the top of the box is now at n
 (define (shift-top-to n box)
   (make-box n
-	    (box-width box)
-	    (box-binding-power box)
-	    (box-lines box)))
+            (box-width box)
+            (box-binding-power box)
+            (box-lines box)))
 
 
 ;;;Create a box from a list of strings, on string per line.  The
@@ -425,41 +425,41 @@
 
 (define (strings->vbox voffset strings)
   (let* ((width (apply max (map string-length strings)))
-	 (padded-strings
-	  (map (lambda (string)
-		 (string-append (make-string
-				 (- width (string-length string))
-				 #\space)
-				string))
-	       strings))
-	 (lines (map (lambda (string)
-		       (make-line (list string)))
-		     padded-strings)))
+         (padded-strings
+          (map (lambda (string)
+                 (string-append (make-string
+                                 (- width (string-length string))
+                                 #\space)
+                                string))
+               strings))
+         (lines (map (lambda (string)
+                       (make-line (list string)))
+                     padded-strings)))
     (make-box voffset
-	      width
-	      max-bp
-	      lines)))
+              width
+              max-bp
+              lines)))
 
-;;; List utility: 
+;;; List utility:
 ;;;Interpolate element between all items in the list
 
 (define (interpolate element list)
   (cond ((null? list) '())
-	((null? (cdr list)) list)
-	(else (cons (car list)
-		    (cons element
-			  (interpolate element (cdr list)))))))
+        ((null? (cdr list)) list)
+        (else (cons (car list)
+                    (cons element
+                          (interpolate element (cdr list)))))))
 
 ;;; Binding powers of elements, and required binding powers.  An element
 ;;; on the left will be parenthesized if it is used in a context on the
 ;;; right that appears above it in the table.
-;;; 
+;;;
 ;;; max-bp                    200
 ;;; one-char symbol           200
 ;;; parenthesized thing       200
-;;; 
+;;;
 ;;; n-char symbol             190        product set off with dots in Tex
-;;; 
+;;;
 ;;; subscripted               140
 ;;; superscripted             140
 ;;; derivative                140
@@ -469,7 +469,7 @@
 ;;;                                      base of exponentiation  140
 ;;;                                      item to be subscripted 140
 ;;;                                      subscript 140
-;;;                                      item to be differentiated 140                
+;;;                                      item to be differentiated 140
 ;;; expt                      130
 ;;; application               130
 ;;;                                      operator of application 130
@@ -501,23 +501,23 @@
 (define (2d:parenthesize uptable box)
   (let ((n (box-nlines box)))
     (cond ((= n 0) "()")
-	  ((<= n 2)
-	   (make-box-with-bp max-bp
-			     (glue-horiz (list "(" box ")"))))
-	  (else
-	   (let ((left-paren
-		  (strings->vbox
-		   (box-voffset box)
-		   (append           '(" / ")
-		    (make-list (- n 2) "|  ")
+          ((<= n 2)
+           (make-box-with-bp max-bp
+                             (glue-horiz (list "(" box ")"))))
+          (else
+           (let ((left-paren
+                  (strings->vbox
+                   (box-voffset box)
+                   (append           '(" / ")
+                                     (make-list (- n 2) "|  ")
                                      '(" \\ "))))
-		 (right-paren
-		  (strings->vbox
-		   (box-voffset box)
-		   (append           '(" \\ ")
-		    (make-list (- n 2) "  |")
+                 (right-paren
+                  (strings->vbox
+                   (box-voffset box)
+                   (append           '(" \\ ")
+                                     (make-list (- n 2) "  |")
                                      '(" / ")))))
-	     (make-box-with-bp max-bp (glue-horiz (list left-paren box right-paren))))))))
+             (make-box-with-bp max-bp (glue-horiz (list left-paren box right-paren))))))))
 
 (define (tex:parenthesize uptable box)
   (make-box-with-bp max-bp (glue-horiz (list "\\left( " box " \\right)"))))
@@ -530,13 +530,13 @@
 
 (define (unparse-default uptable args)
   (make-box-with-bp 130
-		    (glue-horiz
-		     (list (insure-bp uptable 130 (car args))
-			   ((cadr (assq 'parenthesize uptable))
-			    uptable
-			    (if (null? (cdr args))
-				""
-				(glue-horiz (interpolate ", " (cdr args)))))))))
+                    (glue-horiz
+                     (list (insure-bp uptable 130 (car args))
+                           ((cadr (assq 'parenthesize uptable))
+                            uptable
+                            (if (null? (cdr args))
+                                ""
+                                (glue-horiz (interpolate ", " (cdr args)))))))))
 
 (define (unparse-equality uptable args)
   (let ((args (map (lambda (a) (insure-bp uptable 100 a)) args)))
@@ -552,8 +552,8 @@
 
 (define (unparse-negation uptable args)
   (make-box-with-bp 99
-		    (glue-horiz
-		     (list  "- " (insure-bp uptable 101 (car args))))))
+                    (glue-horiz
+                     (list  "- " (insure-bp uptable 101 (car args))))))
 
 (define (unparse-signed-sum uptable signs terms)
   (let ((args (map (lambda (a) (insure-bp uptable 100 a)) terms)))
@@ -563,14 +563,14 @@
 (define (interpolate-signs signs args)
   (define (interp signs args)
     (cond ((null? args) '())
-	  ((null? (cdr args)) args)
-	  (else (cons (car args)
-		      (cons (if (eq? (car signs) '-) " - " " + ")
-			    (interp (cdr signs) (cdr args)))))))
+          ((null? (cdr args)) args)
+          (else (cons (car args)
+                      (cons (if (eq? (car signs) '-) " - " " + ")
+                            (interp (cdr signs) (cdr args)))))))
   (let ((after-first-sign (interp (cdr signs) args)))
     (if (eq? (car signs) '-)
-	(cons " - " after-first-sign)
-	after-first-sign)))
+        (cons " - " after-first-sign)
+        after-first-sign)))
 
 
 (define (2d:unparse-product uptable args)
@@ -587,33 +587,33 @@
 (define (interpolate-for-tex-product list)
   (define (separator a1 a2)
     (if (or (= (box-binding-power a1) 190)
-	    (= (box-binding-power a2) 190))
-	" \\cdot "
-	" "))
+            (= (box-binding-power a2) 190))
+        " \\cdot "
+        " "))
   (cond ((null? list) '())
-	((null? (cdr list)) list)
-	(else (cons (car list)
-		    (cons (separator (car list) (cadr list))
-			  (interpolate-for-tex-product (cdr list)))))))
+        ((null? (cdr list)) list)
+        (else (cons (car list)
+                    (cons (separator (car list) (cadr list))
+                          (interpolate-for-tex-product (cdr list)))))))
 
 (define (2d:unparse-quotient uptable args)
   (let* ((box1 (car args))
-	 (box2 (cadr args))
-	 (width (max (box-width box1) (box-width box2)))
-	 (rule-box (make-string width #\-)))
+         (box2 (cadr args))
+         (width (max (box-width box1) (box-width box2)))
+         (rule-box (make-string width #\-)))
     (make-box-with-bp 120
-		      (glue-below
-		       (glue-above box1 rule-box)
-		       box2))))
+                      (glue-below
+                       (glue-above box1 rule-box)
+                       box2))))
 
 (define (tex:unparse-quotient uptable args)
   (let ((box1 (car args))
-	(box2 (cadr args)))
+        (box2 (cadr args)))
     (make-box-with-bp 120
-		      (glue-horiz
-		       (list  "{" "{" box1 "}"
-			     "\\over "
-			       "{" box2 "}" "}")))))
+                      (glue-horiz
+                       (list  "{" "{" box1 "}"
+                              "\\over "
+                              "{" box2 "}" "}")))))
 
 
 (define (2d:unparse-expt uptable  args)
@@ -622,20 +622,20 @@
   ;;otherwise raise so that bottom of expt is one above the top of the
   ;;base
   (let* ((base (insure-bp uptable 140 (car args)))
-	 (expt (insure-bp uptable 100 (cadr args)))
-	 (shift-expt
-	  (if (>= (box-nlines base) (box-nlines expt))
-	      (shift-zero-to (+ (box-voffset base) 1)
-			     expt)
-	      (shift-bottom-to (+ (box-voffset base) 1)
-			       expt))))
+         (expt (insure-bp uptable 100 (cadr args)))
+         (shift-expt
+          (if (>= (box-nlines base) (box-nlines expt))
+              (shift-zero-to (+ (box-voffset base) 1)
+                             expt)
+              (shift-bottom-to (+ (box-voffset base) 1)
+                               expt))))
     (make-box-with-bp
      130
      (glue-horiz (list base shift-expt)))))
 
 (define (tex:unparse-expt uptable args)
   (let ((base (insure-bp uptable 140 (car args)))
-	(expt (insure-bp uptable 100 (cadr args))))
+        (expt (insure-bp uptable 100 (cadr args))))
     (make-box-with-bp
      130
      (glue-horiz (list "{" base "}^{" expt "}")))))
@@ -643,72 +643,72 @@
 
 (define (2d:unparse-superscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	;;bdk;;(script (insure-bp uptable 140 (cadr args)))
+        ;;bdk;;(script (insure-bp uptable 140 (cadr args)))
         (script (->scriptbox 140 uptable args)))
     (make-box-with-bp
      140
      (glue-horiz
       (list top
-	    (shift-top-to (+ (box-voffset top) (box-nlines top) (box-nlines script) -1)
-			  script))))))
+            (shift-top-to (+ (box-voffset top) (box-nlines top) (box-nlines script) -1)
+                          script))))))
 
 
 (define (tex:unparse-superscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	(scripts
-	 (map (lambda (ss)
-		(insure-bp uptable 140 ss))
-	      (cdr args))))
+        (scripts
+         (map (lambda (ss)
+                (insure-bp uptable 140 ss))
+              (cdr args))))
     (make-box-with-bp
      140
      (glue-horiz
       (append (list "{")
-	      (list top)
-	      (list "}^{")
-	      (let lp ((scripts scripts))
-		(if (null? (cdr scripts))
-		    (list (car scripts))
-		    (append (list (car scripts))
-			    (list ", ")
-			    (lp (cdr scripts)))))
-	      (list "}"))))))
+              (list top)
+              (list "}^{")
+              (let lp ((scripts scripts))
+                (if (null? (cdr scripts))
+                    (list (car scripts))
+                    (append (list (car scripts))
+                            (list ", ")
+                            (lp (cdr scripts)))))
+              (list "}"))))))
 
 (define (2d:unparse-subscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	;;bdk;;(script (insure-bp uptable 140 (cadr args)))
+        ;;bdk;;(script (insure-bp uptable 140 (cadr args)))
         (script (->scriptbox 140 uptable args)))
     (make-box-with-bp
      140
      (glue-horiz
       (list top
-	    (shift-top-to (- (box-voffset top) (box-nlines top))
-			  script))))))
+            (shift-top-to (- (box-voffset top) (box-nlines top))
+                          script))))))
 
 
 (define (tex:unparse-subscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	(scripts
-	 (map (lambda (ss)
-		(insure-bp uptable 140 ss))
-	      (cdr args))))
+        (scripts
+         (map (lambda (ss)
+                (insure-bp uptable 140 ss))
+              (cdr args))))
     (make-box-with-bp
      140
      (glue-horiz
       (append (list "{")
-	      (list top)
-	      (list "}_{")
-	      (let lp ((scripts scripts))
-		(if (null? (cdr scripts))
-		    (list (car scripts))
-		    (append (list (car scripts))
-			    (list ", ")
-			    (lp (cdr scripts)))))
-	      (list "}"))))))
+              (list top)
+              (list "}_{")
+              (let lp ((scripts scripts))
+                (if (null? (cdr scripts))
+                    (list (car scripts))
+                    (append (list (car scripts))
+                            (list ", ")
+                            (lp (cdr scripts)))))
+              (list "}"))))))
 
 #|
 (define (tex:unparse-subscript uptable args)
   (let ((top (insure-bp uptable 140 (car args)))
-	(script (insure-bp uptable 140 (cadr args))))
+        (script (insure-bp uptable 140 (cadr args))))
     (make-box-with-bp
      140
      (glue-horiz (list top "_{" script "}")))))
@@ -754,7 +754,7 @@
 (define (tex:unparse-primed uptable args)
   (let ((top (insure-bp uptable 140 (car args))))
     (make-box-with-bp 140
-     (glue-horiz (list "{" top "}^\\prime")))))
+                      (glue-horiz (list "{" top "}^\\prime")))))
 
 (define (2d:unparse-primed uptable args)
   (make-box-with-bp
@@ -764,7 +764,7 @@
 (define (tex:unparse-primeprimed uptable args)
   (let ((top (insure-bp uptable 140 (car args))))
     (make-box-with-bp 140
-     (glue-horiz (list "{" top "}^{\\prime\\prime}")))))
+                      (glue-horiz (list "{" top "}^{\\prime\\prime}")))))
 
 (define (2d:unparse-primeprimed uptable args)
   (make-box-with-bp
@@ -782,28 +782,28 @@
   (make-box-with-bp
    140
    (glue-horiz (list (2d:unparse-expt uptable (list "D" "2"))
-		     (insure-bp uptable 140 (car args))))))
+                     (insure-bp uptable 140 (car args))))))
 
 
 (define (tex:unparse-second-derivative uptable args)
   (make-box-with-bp
    140
    (glue-horiz (list (tex:unparse-expt uptable (list "D" "2"))
-		     (insure-bp uptable 140 (car args))))))
+                     (insure-bp uptable 140 (car args))))))
 
 ;;; This does not work with multiple subscripts
 (define (2d:unparse-partial-derivative uptable args)
   (make-box-with-bp
    140
    (glue-horiz (list (2d:unparse-subscript uptable (list* "D" (cdr args))) ;;bdk;; partial can have more than 1 arg
-		     (insure-bp uptable 140 (car args))))))
+                     (insure-bp uptable 140 (car args))))))
 
 (define (tex:unparse-partial-derivative uptable args)
   (make-box-with-bp
    140
    (glue-horiz
     (list (tex:unparse-subscript uptable (cons "\\partial" (cdr args)))
-	  (insure-bp uptable 140 (car args))))))
+          (insure-bp uptable 140 (car args))))))
 
 (define (tex:unparse-partial uptable args)
   (make-box-with-bp
@@ -825,14 +825,14 @@
 ;;; vector is printed as column matrix
 (define (2d:unparse-vector uptable args)
   (2d:unparse-matrix uptable
-		     (map list args)))
+                     (map list args)))
 
 
 ;;; a vector will be displayed as a 1-column matrix
 (define (tex:unparse-vector uptable args)
   ;;args here is the list of vector elements
   (tex:unparse-matrix uptable
-		      (map list args)))
+                      (map list args)))
 
 ;;; matrix list is a list of rows where each row is a list
 (define (2d:unparse-matrix uptable matrix-list)
@@ -841,99 +841,99 @@
   (define (transpose matrix-lists)
     (apply map (cons list matrix-lists)))
   (let* ((matrix-with-widended-columns
-	  (transpose
-	   (map (lambda (column)
-		  (let ((width (apply max (map box-width column))))
-		    (map (lambda (element)
-			   (pad-box-centered-to-width width element))
-			 column)))
-		(transpose matrix-list))))
-	 ;;pad all elts in each row to the max height
-	 (matrix-with-lengthened-rows
-	  (map (lambda (row)
-		 (let ((height  (apply max (map box-nlines row))))
-		   (map (lambda (element)    
-			  (pad-box-centered-to-height height element))
-			row)))
-	       matrix-with-widended-columns))
-	 ;;glue elts in each row together, separated by two spaces
-	 (row-boxes
-	  (map (lambda (row) (glue-horiz (interpolate "  " row)))
-	       matrix-with-lengthened-rows))
-	 ;;glue the rows together, with separated by blank lines
-	 (separated-row-boxes
-	  (interpolate (make-empty-box (box-width (car row-boxes)) 1)
-		       row-boxes))
-	 (all-elts
-	  (glue-vert separated-row-boxes))
-	 ;;surround matrix by brackets
-	 (with-brackets
-	  (glue-horiz
-	   (list (strings->vbox (box-voffset all-elts)
-				(make-list (box-nlines all-elts) "["))
-		 all-elts
-		 (strings->vbox (box-voffset all-elts)
-				(make-list (box-nlines all-elts) "]"))))))
+          (transpose
+           (map (lambda (column)
+                  (let ((width (apply max (map box-width column))))
+                    (map (lambda (element)
+                           (pad-box-centered-to-width width element))
+                         column)))
+                (transpose matrix-list))))
+         ;;pad all elts in each row to the max height
+         (matrix-with-lengthened-rows
+          (map (lambda (row)
+                 (let ((height  (apply max (map box-nlines row))))
+                   (map (lambda (element)
+                          (pad-box-centered-to-height height element))
+                        row)))
+               matrix-with-widended-columns))
+         ;;glue elts in each row together, separated by two spaces
+         (row-boxes
+          (map (lambda (row) (glue-horiz (interpolate "  " row)))
+               matrix-with-lengthened-rows))
+         ;;glue the rows together, with separated by blank lines
+         (separated-row-boxes
+          (interpolate (make-empty-box (box-width (car row-boxes)) 1)
+                       row-boxes))
+         (all-elts
+          (glue-vert separated-row-boxes))
+         ;;surround matrix by brackets
+         (with-brackets
+          (glue-horiz
+           (list (strings->vbox (box-voffset all-elts)
+                                (make-list (box-nlines all-elts) "["))
+                 all-elts
+                 (strings->vbox (box-voffset all-elts)
+                                (make-list (box-nlines all-elts) "]"))))))
     ;;center matrix vertically
     (shift-top-to
      (floor->exact (/ (box-nlines with-brackets) 2))
      with-brackets)))
-	 
+
 (define (tex:unparse-matrix uptable matrix-list)
   (let* ((displaystyle-rows
-	  (map (lambda (row)
-		 (map (lambda (elt)
-			(glue-horiz (list "\\displaystyle{ "
-					  elt
-					  "}")))
-		      row))
-	       matrix-list))
-	 (separated-rows
-	  (map (lambda (row) (glue-horiz (interpolate " & " row)))
-	       displaystyle-rows))
-	 (separated-columns
-	  (glue-horiz (interpolate " \\cr \\cr " separated-rows))))
+          (map (lambda (row)
+                 (map (lambda (elt)
+                        (glue-horiz (list "\\displaystyle{ "
+                                          elt
+                                          "}")))
+                      row))
+               matrix-list))
+         (separated-rows
+          (map (lambda (row) (glue-horiz (interpolate " & " row)))
+               displaystyle-rows))
+         (separated-columns
+          (glue-horiz (interpolate " \\cr \\cr " separated-rows))))
     #;
     (glue-horiz
      (list "\\left\\{ \\matrix{ "
-	   separated-columns
-	   "} \\right\\}"))
+           separated-columns
+           "} \\right\\}"))
     (glue-horiz
      (list "\\left\\lgroup \\matrix{ "
-	   separated-columns
-	   "} \\right\\rgroup"))))
-	 
+           separated-columns
+           "} \\right\\rgroup"))))
+
 (define (tex:unparse-up uptable matrix-list)
   (let* ((displaystyle-rows
-	  (map (lambda (row)
-		 (map (lambda (elt)
-			(glue-horiz (list "\\displaystyle{ "
-					  elt
-					  "}")))
-		      row))
-	       matrix-list))
-	 (separated-rows
-	  (map (lambda (row) (glue-horiz (interpolate " & " row)))
-	       displaystyle-rows))
-	 (separated-columns
-	  (glue-horiz (interpolate " \\cr \\cr " separated-rows))))
+          (map (lambda (row)
+                 (map (lambda (elt)
+                        (glue-horiz (list "\\displaystyle{ "
+                                          elt
+                                          "}")))
+                      row))
+               matrix-list))
+         (separated-rows
+          (map (lambda (row) (glue-horiz (interpolate " & " row)))
+               displaystyle-rows))
+         (separated-columns
+          (glue-horiz (interpolate " \\cr \\cr " separated-rows))))
     (glue-horiz
      (list left-up-delimiter separated-columns right-up-delimiter))))
 
 (define (tex:unparse-down uptable matrix-list)
   (let* ((displaystyle-rows
-	  (map (lambda (row)
-		 (map (lambda (elt)
-			(glue-horiz (list "\\displaystyle{ "
-					  elt
-					  "}")))
-		      row))
-	       matrix-list))
-	 (separated-rows
-	  (map (lambda (row) (glue-horiz (interpolate " & " row)))
-	       displaystyle-rows))
-	 (separated-columns
-	  (glue-horiz (interpolate " \\cr \\cr " separated-rows))))
+          (map (lambda (row)
+                 (map (lambda (elt)
+                        (glue-horiz (list "\\displaystyle{ "
+                                          elt
+                                          "}")))
+                      row))
+               matrix-list))
+         (separated-rows
+          (map (lambda (row) (glue-horiz (interpolate " & " row)))
+               displaystyle-rows))
+         (separated-columns
+          (glue-horiz (interpolate " \\cr \\cr " separated-rows))))
     (glue-horiz
      (list left-down-delimiter separated-columns right-down-delimiter))))
 
@@ -945,7 +945,7 @@
     (default ,unparse-default)
     (= ,unparse-equality)
     (+ ,unparse-sum)
-    ;;need sum (in addition to +) as an internal hook for 
+    ;;need sum (in addition to +) as an internal hook for
     ;;process-sum
     (sum ,unparse-sum)
     (- ,unparse-difference)
@@ -982,7 +982,7 @@
     (default ,unparse-default)
     (= ,unparse-equality)
     (+ ,unparse-sum)
-    ;;need sum (in addition to +) as an internal hook for 
+    ;;need sum (in addition to +) as an internal hook for
     ;;process-sum
     (sum ,unparse-sum)
     (- ,unparse-difference)
@@ -1015,108 +1015,108 @@
 
 (define tex:symbol-substs
   (append `((derivative "D")
-	    (acos "\\arccos")
-	    (asin "\\arcsin")
-	    (atan "\\arctan")
-	    )
-	  (map (lambda (string)
-		 (list (string->symbol string)
-		       (string-append "\\" string)))
-	       '(
-		 "alpha" "beta" "gamma" "delta" "epsilon" "zeta" "eta" "theta"
-		 "iota" "kappa" "lambda" "mu" "nu" "xi"
-		 ;; "omicron" does not appear in tex
-		 "pi" "rho" "tau" "upsilon" "phi" "chi" "psi" "omega"
-		 "varepsilon" "vartheta" "varpi" "varrho" "varsigma" "varphi"
+            (acos "\\arccos")
+            (asin "\\arcsin")
+            (atan "\\arctan")
+            )
+          (map (lambda (string)
+                 (list (string->symbol string)
+                       (string-append "\\" string)))
+               '(
+                 "alpha" "beta" "gamma" "delta" "epsilon" "zeta" "eta" "theta"
+                         "iota" "kappa" "lambda" "mu" "nu" "xi"
+                         ;; "omicron" does not appear in tex
+                         "pi" "rho" "tau" "upsilon" "phi" "chi" "psi" "omega"
+                         "varepsilon" "vartheta" "varpi" "varrho" "varsigma" "varphi"
 
-		 ;;"Alpha" "Beta"
-		 "Gamma" "Delta"
-		 ;;"Epsilon" "Zeta" "Eta" 
-		 "Theta"
-		 ;;"Iota" "Kappa"
-		 "Lambda"
-		 ;;"Mu" "Nu"
-		 "Xi"
-		 ;;"Omicron"
-		 "Pi"
-		 ;;"Rho" "Tau"
-		 "Upsilon" "Phi"
-		 ;;"Chi"
-		 "Psi" "Omega"
+                         ;;"Alpha" "Beta"
+                         "Gamma" "Delta"
+                         ;;"Epsilon" "Zeta" "Eta"
+                         "Theta"
+                         ;;"Iota" "Kappa"
+                         "Lambda"
+                         ;;"Mu" "Nu"
+                         "Xi"
+                         ;;"Omicron"
+                         "Pi"
+                         ;;"Rho" "Tau"
+                         "Upsilon" "Phi"
+                         ;;"Chi"
+                         "Psi" "Omega"
 
-		 "aleph" "hbar" "nabla" "top" "bot" "mho" "Re" "Im"
-		 "infty" "Box" "diamond" "Diamond" "triangle"
+                         "aleph" "hbar" "nabla" "top" "bot" "mho" "Re" "Im"
+                         "infty" "Box" "diamond" "Diamond" "triangle"
 
-		 "sin" "cos" "tan" "cot" "sec" "csc" "log" "exp"
-		 ))
-	  (map (lambda (string)
-		 (list (string->symbol string)
-		       (string-append "{\\rm\\ " string " }")))
+                         "sin" "cos" "tan" "cot" "sec" "csc" "log" "exp"
+                         ))
+          (map (lambda (string)
+                 (list (string->symbol string)
+                       (string-append "{\\rm\\ " string " }")))
                '("&meter" "&kilogram" "&second"
-                 "&ampere" "&kelvin" "&mole"
-                 "&candela" "&radian"
+                          "&ampere" "&kelvin" "&mole"
+                          "&candela" "&radian"
 
-                 "&newton" "&joule" "&coulomb"
-                 "&watt" "&volt" "&ohm"
-                 "&siemens" "&farad" "&weber"
-                 "&henry" "&hertz" "&tesla"
-                 "&pascal" "&katal" "&becquerel"
-                 "&gray" "&sievert" "&inch"
-                 "&pound" "&slug" "&foot"
-                 "&mile" "&dyne" "&calorie"
-                 "&day" "&year" "&sidereal-year"
-                 "&AU" "&arcsec" "&pc"
-                 "&ly" "&esu" "&ev"))))
+                          "&newton" "&joule" "&coulomb"
+                          "&watt" "&volt" "&ohm"
+                          "&siemens" "&farad" "&weber"
+                          "&henry" "&hertz" "&tesla"
+                          "&pascal" "&katal" "&becquerel"
+                          "&gray" "&sievert" "&inch"
+                          "&pound" "&slug" "&foot"
+                          "&mile" "&dyne" "&calorie"
+                          "&day" "&year" "&sidereal-year"
+                          "&AU" "&arcsec" "&pc"
+                          "&ly" "&esu" "&ev"))))
 
 ;;; Actual unparsing procedure.  Symbol-substs is a table of special symbols
 ;;; to be substituted for.  UPtable is an unparsing table.
 
 (define (unparse exp symbol-substs uptable)
   (let ((exp (unparse-special-convert exp))
-	(up (lambda (exp) (unparse exp symbol-substs uptable))))
+        (up (lambda (exp) (unparse exp symbol-substs uptable))))
     (cond ((null? exp) "")
-	  ((number? exp) (unparse-number exp symbol-substs uptable))
-	  ((symbol? exp) (unparse-symbol exp symbol-substs uptable))
-	  ((up-maker? exp)
-	   ((cadr (assq 'column uptable))
-	    uptable
-	    (map list (map up (cdr exp)))))
-	  ((down-maker? exp)
-	   ((cadr (assq 'row uptable))
-	    uptable
-	    ;; For horizontal format
-	    ;;(list (map up (cdr exp)))
-	    ;; For vertical format
-	    (map list (map up (cdr exp)))))
-	  ((vector-maker? exp)
-	   ((cadr (assq 'vector uptable))
-	    uptable
-	    (map up (cdr exp))))
-	  ((matrix-by-rows-maker? exp)
-	   ((cadr (assq 'matrix uptable))
-	    uptable
-	    (map (lambda (row) (cdr (map up row)))
-		 (cdr exp))))
-	  ((eq? (car exp) '+)
-	   (process-sum exp symbol-substs uptable))
-	  ((symbol? (car exp))
-	   (let ((proc (assq (car exp) uptable)))
-	     (if proc
-		 ((cadr proc) uptable (map up (cdr exp)))
-		 ((cadr (assq 'default uptable)) uptable (map up exp)))))
-	  (else
-	   (let ((proc (assq 'default uptable)))
-	     ((cadr proc) uptable (map up exp)))))))
+          ((number? exp) (unparse-number exp symbol-substs uptable))
+          ((symbol? exp) (unparse-symbol exp symbol-substs uptable))
+          ((up-maker? exp)
+           ((cadr (assq 'column uptable))
+            uptable
+            (map list (map up (cdr exp)))))
+          ((down-maker? exp)
+           ((cadr (assq 'row uptable))
+            uptable
+            ;; For horizontal format
+            ;;(list (map up (cdr exp)))
+            ;; For vertical format
+            (map list (map up (cdr exp)))))
+          ((vector-maker? exp)
+           ((cadr (assq 'vector uptable))
+            uptable
+            (map up (cdr exp))))
+          ((matrix-by-rows-maker? exp)
+           ((cadr (assq 'matrix uptable))
+            uptable
+            (map (lambda (row) (cdr (map up row)))
+                 (cdr exp))))
+          ((eq? (car exp) '+)
+           (process-sum exp symbol-substs uptable))
+          ((symbol? (car exp))
+           (let ((proc (assq (car exp) uptable)))
+             (if proc
+                 ((cadr proc) uptable (map up (cdr exp)))
+                 ((cadr (assq 'default uptable)) uptable (map up exp)))))
+          (else
+           (let ((proc (assq 'default uptable)))
+             ((cadr proc) uptable (map up exp)))))))
 
-	   
+
 (define (unparse-number n symbol-substs uptable)
   (cond ((and (real? n) (< n 0))
-	 (unparse `(- ,(- n)) symbol-substs uptable))
-	((and (rational? n) (exact? n) (not (= (denominator n) 1)))
-	 (unparse `(/ ,(numerator n) ,(denominator n))
-		  symbol-substs
-		  uptable))
-	(else (number->string n))))
+         (unparse `(- ,(- n)) symbol-substs uptable))
+        ((and (rational? n) (exact? n) (not (= (denominator n) 1)))
+         (unparse `(/ ,(numerator n) ,(denominator n))
+                  symbol-substs
+                  uptable))
+        (else (number->string n))))
 
 
 ;;; symbols are treated as follows: some symbols are looked for and
@@ -1130,16 +1130,16 @@
 (define (unparse-symbol symbol symbol-substs uptable)
   (let ((s (assq symbol symbol-substs)))
     (if s
-	(cadr s)
-	(let ((string (symbol->string symbol)))
-	  (split-at-underscore-or-caret
-	   string
-	   (lambda (before at after)
-	     (if (not before)		;no underscore or caret in symbol
-		 (unparse-string string symbol-substs uptable)
-		 (unparse `(,at ,(string->symbol before) ,(string->symbol after))
-			  symbol-substs
-			  uptable))))))))
+        (cadr s)
+        (let ((string (symbol->string symbol)))
+          (split-at-underscore-or-caret
+           string
+           (lambda (before at after)
+             (if (not before)                ;no underscore or caret in symbol
+                 (unparse-string string symbol-substs uptable)
+                 (unparse `(,at ,(string->symbol before) ,(string->symbol after))
+                          symbol-substs
+                          uptable))))))))
 
 
 (define dotdot-string "dotdot")
@@ -1159,76 +1159,76 @@
   (if (= (string-length string) 1)
       string
       (cond ((string-search-forward dotdot-string string)
-	     => (lambda (n)
-		  (if (= (+ n dotdot-string-length) ;terminal dotdot
-			 (string-length string))
-		      (unparse `(dotdotted
-				 ,(string->symbol (string-head string n)))
-			       symbol-substs uptable)
-		      (make-box-with-bp 190 string))))
+             => (lambda (n)
+                  (if (= (+ n dotdot-string-length) ;terminal dotdot
+                         (string-length string))
+                      (unparse `(dotdotted
+                                 ,(string->symbol (string-head string n)))
+                               symbol-substs uptable)
+                      (make-box-with-bp 190 string))))
             ((string-search-forward dot-string string)
-	     => (lambda (n)
-		  (if (= (+ n dot-string-length) ;terminal dot
-			 (string-length string))
-		      (unparse `(dotted
-				 ,(string->symbol (string-head string n)))
-			       symbol-substs uptable)
-		      (make-box-with-bp 190 string))))
-	    ((string-search-forward primeprime-string string)
-	     => (lambda (n)
-		  (if (= (+ n primeprime-string-length) ;terminal primeprime
-			 (string-length string))
-		      (unparse `(primeprimed
-				 ,(string->symbol (string-head string n)))
-			       symbol-substs uptable)
-		      (make-box-with-bp 190 string))))
+             => (lambda (n)
+                  (if (= (+ n dot-string-length) ;terminal dot
+                         (string-length string))
+                      (unparse `(dotted
+                                 ,(string->symbol (string-head string n)))
+                               symbol-substs uptable)
+                      (make-box-with-bp 190 string))))
+            ((string-search-forward primeprime-string string)
+             => (lambda (n)
+                  (if (= (+ n primeprime-string-length) ;terminal primeprime
+                         (string-length string))
+                      (unparse `(primeprimed
+                                 ,(string->symbol (string-head string n)))
+                               symbol-substs uptable)
+                      (make-box-with-bp 190 string))))
             ((string-search-forward prime-string string)
-	     => (lambda (n)
-		  (if (= (+ n prime-string-length) ;terminal prime
-			 (string-length string))
-		      (unparse `(primed
-				 ,(string->symbol (string-head string n)))
-			       symbol-substs uptable)
-		      (make-box-with-bp 190 string))))
-	    (else
-	     (make-box-with-bp 190 string)))))
+             => (lambda (n)
+                  (if (= (+ n prime-string-length) ;terminal prime
+                         (string-length string))
+                      (unparse `(primed
+                                 ,(string->symbol (string-head string n)))
+                               symbol-substs uptable)
+                      (make-box-with-bp 190 string))))
+            (else
+             (make-box-with-bp 190 string)))))
 |#
 
 (define (unparse-string string symbol-substs uptable)
   (define (for-terminal special-string special-string-length special-symbol)
     (let ((n (string-search-forward special-string string)))
       (if (and n (= (+ n special-string-length) (string-length string)))
-	  (unparse `(,special-symbol
-		     ,(string->symbol (string-head string n)))
-		   symbol-substs uptable)
-	  #f)))
+          (unparse `(,special-symbol
+                     ,(string->symbol (string-head string n)))
+                   symbol-substs uptable)
+          #f)))
   (cond ((= (string-length string) 1) string)
-	((for-terminal dotdot-string     dotdot-string-length     'dotdotted))
-	((for-terminal dot-string        dot-string-length        'dotted))
-	((for-terminal primeprime-string primeprime-string-length 'primeprimed))
-	((for-terminal prime-string      prime-string-length      'primed))
-	(else (make-box-with-bp 190 string))))
+        ((for-terminal dotdot-string     dotdot-string-length     'dotdotted))
+        ((for-terminal dot-string        dot-string-length        'dotted))
+        ((for-terminal primeprime-string primeprime-string-length 'primeprimed))
+        ((for-terminal prime-string      prime-string-length      'primed))
+        (else (make-box-with-bp 190 string))))
 
 #|
 (define (split-at-underscore-or-caret string cont)
   ;;cont = (lambda (before after) ...)
   (let ((index (string-find-next-char string #\_)))
     (if (not index)
-	(cont #f #f)
-	(cont (string-head string index)
-	      (string-tail string (+ index 1))))))
+        (cont #f #f)
+        (cont (string-head string index)
+              (string-tail string (+ index 1))))))
 |#
 
 (define (split-at-underscore-or-caret string cont)
   ;;cont = (lambda (before at after) ...)
   (let ((index (string-find-next-char-in-set string (char-set #\^ #\_))))
     (if (not index)
-	(cont #f #f #f)
-	(cont (string-head string index)
-	      (if (char=? (string-ref string index) #\^)
-		  'superscript
-		  'subscript)
-	      (string-tail string (+ index 1))))))
+        (cont #f #f #f)
+        (cont (string-head string index)
+              (if (char=? (string-ref string index) #\^)
+                  'superscript
+                  'subscript)
+              (string-tail string (+ index 1))))))
 
 
 
@@ -1244,33 +1244,33 @@
 
 (define (unparse-special-convert exp)
   (cond ((and
-	  ;;((expt derivative n) f) --> (nth-derivative f n)
-	  (pair? exp)
-	  (pair? (car exp))
-	  (= (length exp) 2)
-	  (= (length (car exp)) 3)
-	  (eq? (caar exp) 'expt)
-	  (or (eq? (cadar exp) 'derivative)
-	      (eq? (cadar exp) derivative-symbol)))
-	 (let ((exponent (list-ref (car exp) 2))
-	       (base (cadr exp)))
-	   (if (eq? exponent 2)
-	       `(second-derivative ,base)
-	       `(nth-derivative ,base ,exponent))))
-	((and
-	  ;;((partial x) f) --> (partial-derivative f x)
-	  (pair? exp)
-	  (pair? (car exp))
-	  (= (length exp) 2)
-	  (eq? (caar exp) 'partial))
-	 `(partial-derivative ,(cadr exp) ,@(cdr (car exp))))
-	((and
-	  ;;(- x) --> (negation x)
-	  (pair? exp)
-	  (eq? (car exp) '-)
-	  (eq? (length exp) 2))
-	 `(negation ,(cadr exp)))
-	(else exp)))
+          ;;((expt derivative n) f) --> (nth-derivative f n)
+          (pair? exp)
+          (pair? (car exp))
+          (= (length exp) 2)
+          (= (length (car exp)) 3)
+          (eq? (caar exp) 'expt)
+          (or (eq? (cadar exp) 'derivative)
+              (eq? (cadar exp) derivative-symbol)))
+         (let ((exponent (list-ref (car exp) 2))
+               (base (cadr exp)))
+           (if (eq? exponent 2)
+               `(second-derivative ,base)
+               `(nth-derivative ,base ,exponent))))
+        ((and
+          ;;((partial x) f) --> (partial-derivative f x)
+          (pair? exp)
+          (pair? (car exp))
+          (= (length exp) 2)
+          (eq? (caar exp) 'partial))
+         `(partial-derivative ,(cadr exp) ,@(cdr (car exp))))
+        ((and
+          ;;(- x) --> (negation x)
+          (pair? exp)
+          (eq? (car exp) '-)
+          (eq? (length exp) 2))
+         `(negation ,(cadr exp)))
+        (else exp)))
 
 ;;; for a sum, find all terms of the form (* -1 .....) and make them
 ;;; appear without the -1 and with a negative sign in the sum
@@ -1278,94 +1278,94 @@
 (define (process-sum exp symbol-substs uptable)
   (let ((terms (cdr exp)))
     (cond ((null? terms)
-	   (unparse 0 symbol-substs uptable))
-	  ((null? (cdr terms))
-	   (unparse (car terms) symbol-substs uptable))
-	  (else
-	   (let ((signed-terms
-		  (map (lambda (term)
-			 (cond ((and (pair? term) (eq? (car term) '*))
-				(let ((first-factor (cadr term)))
-				  (if (and (real? first-factor) (negative? first-factor))
-				      (if (and (= first-factor -1) (not (null? (cddr term))))
-					  (list '- (cons '* (cddr term)))
-					  (list '- (cons '* (cons (- first-factor) (cddr term)))))
-				      (list '+ term))))
-			       ((and (pair? term) (eq? (car term) '/))
-				(let ((numer (cadr term)))
-				  (cond ((and (real? numer) (negative? numer))
-					 (list '- (cons '/ (cons (- numer) (cddr term)))))
-					((and (pair? numer) (eq? (car numer) '*))
-					 (let ((first-factor (cadr numer)))
-					   (if (and (real? first-factor) (negative? first-factor))
-					       (if (and (= first-factor -1) (not (null? (cddr numer))))
-						   (list '-
-							 (cons '/
-							       (cons (cons '* (cddr numer))
-								     (cddr term))))
-						   (list '-
-							 (cons '/
-							       (cons (cons '*
-									   (cons (- first-factor)
-										 (cddr numer)))
-								     (cddr term)))))
-					       (list '+ term))))
-					(else
-					 (list '+ term)))))
-			       (else
-				(list '+ term))))
-		       terms)))
-	     (let ((processed-terms
-		    (map (lambda (exp) (unparse exp symbol-substs uptable))
-			 (map cadr signed-terms))))
-	       ((cadr (assq 'signed-sum uptable))
-		uptable
-		(map car signed-terms)
-		processed-terms
-		)))))))
+           (unparse 0 symbol-substs uptable))
+          ((null? (cdr terms))
+           (unparse (car terms) symbol-substs uptable))
+          (else
+           (let ((signed-terms
+                  (map (lambda (term)
+                         (cond ((and (pair? term) (eq? (car term) '*))
+                                (let ((first-factor (cadr term)))
+                                  (if (and (real? first-factor) (negative? first-factor))
+                                      (if (and (= first-factor -1) (not (null? (cddr term))))
+                                          (list '- (cons '* (cddr term)))
+                                          (list '- (cons '* (cons (- first-factor) (cddr term)))))
+                                      (list '+ term))))
+                               ((and (pair? term) (eq? (car term) '/))
+                                (let ((numer (cadr term)))
+                                  (cond ((and (real? numer) (negative? numer))
+                                         (list '- (cons '/ (cons (- numer) (cddr term)))))
+                                        ((and (pair? numer) (eq? (car numer) '*))
+                                         (let ((first-factor (cadr numer)))
+                                           (if (and (real? first-factor) (negative? first-factor))
+                                               (if (and (= first-factor -1) (not (null? (cddr numer))))
+                                                   (list '-
+                                                         (cons '/
+                                                               (cons (cons '* (cddr numer))
+                                                                     (cddr term))))
+                                                   (list '-
+                                                         (cons '/
+                                                               (cons (cons '*
+                                                                           (cons (- first-factor)
+                                                                                 (cddr numer)))
+                                                                     (cddr term)))))
+                                               (list '+ term))))
+                                        (else
+                                         (list '+ term)))))
+                               (else
+                                (list '+ term))))
+                       terms)))
+             (let ((processed-terms
+                    (map (lambda (exp) (unparse exp symbol-substs uptable))
+                         (map cadr signed-terms))))
+               ((cadr (assq 'signed-sum uptable))
+                uptable
+                (map car signed-terms)
+                processed-terms
+                )))))))
 
 (set! internal-show-expression void)
 ;;brm;;  (lambda (exp)
 ;;brm;;    (set! last-tex-string-generated (expression->tex-string exp))
 ;;brm;;    (let ((name (graphics-type-name (graphics-type #f))))
 ;;brm;;      (if (and (memq name '(x x11)) enable-tex-display)
-;;brm;;	  (begin (display-in-screen-window last-tex-string-generated)
-;;brm;;		 (newline)
-;;brm;;		 (newline)
-;;brm;;		 ;;  (display tex-string)
-;;brm;;		 ;;  (newline)
-;;brm;;		 ;;  (newline)
-;;brm;;		 )
-;;brm;;	  (2d-show-expression exp)))))
+;;brm;;          (begin (display-in-screen-window last-tex-string-generated)
+;;brm;;                 (newline)
+;;brm;;                 (newline)
+;;brm;;                 ;;  (display tex-string)
+;;brm;;                 ;;  (newline)
+;;brm;;                 ;;  (newline)
+;;brm;;                 )
+;;brm;;          (2d-show-expression exp)))))
 
 
 (set! 2d-show-expression
       (lambda (exp)
-	(2d-display-box
-	 (unparse exp 2d:symbol-substs 2d:unparse-table))))
+        (2d-display-box
+         (unparse exp 2d:symbol-substs 2d:unparse-table))))
 
 
 (set! expression->tex-string
       (lambda (exp)
-	(let* ((one-line-box (unparse exp tex:symbol-substs tex:unparse-table))
-	       (tex-string
-		(with-output-to-string
-		  (lambda ()
-		    (for-each display
-			      (line-elements (car (box-lines one-line-box))))))))
-	  (string-append "\\boxit{ " "$$" tex-string "$$" "}"))))
+        (let* ((one-line-box (unparse exp tex:symbol-substs tex:unparse-table))
+               (tex-string
+                (with-output-to-string
+                  (lambda ()
+                    (for-each display
+                              (line-elements (car (box-lines one-line-box))))))))
+          (string-append "\\boxit{ " "$$" tex-string "$$" "}"))))
 
 #|
 ;;; Beal's folly.
 (set! expression->tex-string
       (lambda (exp)
-	(let* ((one-line-box (unparse exp tex:symbol-substs tex:unparse-table))
-	       (tex-string
-		(with-output-to-string
-		  (lambda ()
-		    (for-each display
-			      (line-elements (car (box-lines one-line-box))))))))
-	  (string-append "\\boxit{ " "$" tex-string "$" "}"))))
+        (let* ((one-line-box (unparse exp tex:symbol-substs tex:unparse-table))
+               (tex-string
+                (with-output-to-string
+                  (lambda ()
+                    (for-each display
+                              (line-elements (car (box-lines one-line-box))))))))
+          (string-append "\\boxit{ " "$" tex-string "$" "}"))))
 |#
 
 ;;brm;;(set! display-tex-string display-in-screen-window)

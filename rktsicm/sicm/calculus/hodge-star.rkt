@@ -21,78 +21,78 @@
 ;;;             an orthonormal basis
 ;;;             a basis
 
-;;; if the spec is a basis that needs to be orthonormalized, 
+;;; if the spec is a basis that needs to be orthonormalized,
 ;;; the optional orthonormalize? argument must be a coordinate system
 
-(define (Hodge-star metric spec #:optional orthonormalize?)  
+(define (Hodge-star metric spec #:optional orthonormalize?)
   (let* ((basis
-	  (if (basis? spec)
-	      (if (default-object? orthonormalize?)
-		  spec
-		  ;; orthonormalize? must be a coordinate system
-		  (orthonormalize spec metric orthonormalize?))
-	      ;; spec must be a coordinate system.
-	      (if (default-object? orthonormalize?)
-		  (coordinate-system->basis spec)
-		  (orthonormalize (coordinate-system->basis spec)
-				  metric
-				  spec))))
-	 (vector-basis (basis->vector-basis basis))
-	 (on-vector-basis (ultra-flatten vector-basis))
-	 (basis-check
-	  (matrix-by-row-list
-	   (map (lambda (ei) (map (lambda (ej) (metric ei ej))
-				  on-vector-basis))
-		on-vector-basis)))
-	 (bsigns
-	  (make-initialized-list (basis->dimension basis)
-				 (lambda (i) (matrix-ref basis-check i i))))
-	 (on-1form-basis (ultra-flatten (basis->1form-basis basis))))
+          (if (basis? spec)
+              (if (default-object? orthonormalize?)
+                  spec
+                  ;; orthonormalize? must be a coordinate system
+                  (orthonormalize spec metric orthonormalize?))
+              ;; spec must be a coordinate system.
+              (if (default-object? orthonormalize?)
+                  (coordinate-system->basis spec)
+                  (orthonormalize (coordinate-system->basis spec)
+                                  metric
+                                  spec))))
+         (vector-basis (basis->vector-basis basis))
+         (on-vector-basis (ultra-flatten vector-basis))
+         (basis-check
+          (matrix-by-row-list
+           (map (lambda (ei) (map (lambda (ej) (metric ei ej))
+                                  on-vector-basis))
+                on-vector-basis)))
+         (bsigns
+          (make-initialized-list (basis->dimension basis)
+                                 (lambda (i) (matrix-ref basis-check i i))))
+         (on-1form-basis (ultra-flatten (basis->1form-basis basis))))
     (define (the-star pform-field)
       (assert (or (function? pform-field) (form-field? pform-field)))
       (let ((p (get-rank pform-field)))
-	(if (= p 0)
-	    (* pform-field (apply wedge on-1form-basis))
-	    (let* ((pvect-basis-lists
-		    (combinations on-vector-basis p))
-		   (coeffs
-		    (map (lambda (pvect)
-			   (apply pform-field pvect))
-			 pvect-basis-lists))
-		   (pform-basis-lists
-		    (combinations on-1form-basis p))
-		   (n-p:form-basis-lists
-		    (map (lambda (1fbl)
-			   (list-difference on-1form-basis 1fbl))
-			 pform-basis-lists))
-		   (n-p:basis
-		    (map (lambda (n-p:basis-list)
-			   (apply wedge n-p:basis-list))
-			 n-p:form-basis-lists))
-		   (signs
-		    (map (lambda (bsign-list p:basis-list n-p:basis-list)
-			   (* (apply * bsign-list)
-			      (permutation-parity
-			       (append p:basis-list n-p:basis-list)
-			       on-1form-basis)))
-			 (combinations bsigns p)
-			 pform-basis-lists
-			 n-p:form-basis-lists))
-		   (val
-		    (apply +
-			   (map (lambda (sign coeff basis-element)
-				  (* sign coeff basis-element))
-				signs
-				coeffs
-				n-p:basis))))
-	      val))))
+        (if (= p 0)
+            (* pform-field (apply wedge on-1form-basis))
+            (let* ((pvect-basis-lists
+                    (combinations on-vector-basis p))
+                   (coeffs
+                    (map (lambda (pvect)
+                           (apply pform-field pvect))
+                         pvect-basis-lists))
+                   (pform-basis-lists
+                    (combinations on-1form-basis p))
+                   (n-p:form-basis-lists
+                    (map (lambda (1fbl)
+                           (list-difference on-1form-basis 1fbl))
+                         pform-basis-lists))
+                   (n-p:basis
+                    (map (lambda (n-p:basis-list)
+                           (apply wedge n-p:basis-list))
+                         n-p:form-basis-lists))
+                   (signs
+                    (map (lambda (bsign-list p:basis-list n-p:basis-list)
+                           (* (apply * bsign-list)
+                              (permutation-parity
+                               (append p:basis-list n-p:basis-list)
+                               on-1form-basis)))
+                         (combinations bsigns p)
+                         pform-basis-lists
+                         n-p:form-basis-lists))
+                   (val
+                    (apply +
+                           (map (lambda (sign coeff basis-element)
+                                  (* sign coeff basis-element))
+                                signs
+                                coeffs
+                                n-p:basis))))
+              val))))
     ;;(assert (orthonormal? basis-check))  ;Currently assumed OK.
     the-star))
 
 (define (orthonormalize basis metric coordinate-system)
-    (let ((ovb (Gram-Schmidt (basis->vector-basis basis) metric)))
-      (make-basis ovb
-		  (vector-basis->dual ovb coordinate-system))))
+  (let ((ovb (Gram-Schmidt (basis->vector-basis basis) metric)))
+    (make-basis ovb
+                (vector-basis->dual ovb coordinate-system))))
 
 #|
 (define-coordinates (up x y) R2-rect)
@@ -107,7 +107,7 @@
 
 (define E2-star
   (Hodge-star E2-metric
-	      (coordinate-system->basis R2-rect)))
+              (coordinate-system->basis R2-rect)))
 #| E2-star |#
 
 ((E2-star omega)
@@ -160,7 +160,7 @@
 #|
 (define E3-star
   (Hodge-star E3-metric
-	      (coordinate-system->basis R3-rect)))
+              (coordinate-system->basis R3-rect)))
 |#
 
 (((- (E3-star (lambda (pt) 1))
@@ -220,9 +220,9 @@
 |#
 
 (pec (((E3-star
-	(+ (* (literal-scalar-field 'alpha R3-rect) (wedge dx dy))
-	   (* (literal-scalar-field 'beta R3-rect) (wedge dy dz))
-	   (* (literal-scalar-field 'gamma R3-rect) (wedge dz dx))))
+        (+ (* (literal-scalar-field 'alpha R3-rect) (wedge dx dy))
+           (* (literal-scalar-field 'beta R3-rect) (wedge dy dz))
+           (* (literal-scalar-field 'gamma R3-rect) (wedge dz dx))))
        (literal-vector-field 'u R3-rect))
       R3-point)
      (compose arg-suppressor simplify))
@@ -435,9 +435,9 @@ alpha
 (define L2-vector-basis (basis->vector-basis L2-basis))
 
 (s:foreach (lambda (v)
-	     (pe ((v (literal-manifold-function 'f R2-rect))
-		  R2-point)))
-	   L2-vector-basis)
+             (pe ((v (literal-manifold-function 'f R2-rect))
+                  R2-point)))
+           L2-vector-basis)
 #|
 (/ (((partial 0) f) (up t0 x0)) c)
 (((partial 1) f) (up t0 x0))
@@ -446,9 +446,9 @@ alpha
 (define L2-1form-basis (vector-basis->dual L2-vector-basis R2-rect))
 
 (s:foreach (lambda (omega)
-	     (pe ((omega (literal-vector-field 'v R2-rect))
-		  R2-point)))
-	   L2-1form-basis)
+             (pe ((omega (literal-vector-field 'v R2-rect))
+                  R2-point)))
+           L2-1form-basis)
 #|
 (* c (v^0 (up t0 x0)))
 (v^1 (up t0 x0))
@@ -469,7 +469,7 @@ alpha
 
 (define L2-constant-basis
   (make-basis L2-constant-vector-basis
-	      L2-constant-1form-basis))
+              L2-constant-1form-basis))
 
 (define L2-Hodge-star
   (Hodge-star L2-metric L2-constant-basis))
@@ -486,18 +486,18 @@ alpha
 ;;; As desired.
 
 (pec (((L2-Hodge-star
-	(* (literal-manifold-function 'alpha R2-rect)
-	   (* c dt)))
+        (* (literal-manifold-function 'alpha R2-rect)
+           (* c dt)))
        (literal-vector-field 'u R2-rect))
       R2-point))
 #| Result:
 (* -1 (alpha (up t0 x0)) (u^1 (up t0 x0)))
   = -alpha dx(u)
-|# 
+|#
 
 (pec (((L2-Hodge-star
-	(* (literal-manifold-function 'alpha R2-rect)
-	   dx))
+        (* (literal-manifold-function 'alpha R2-rect)
+           dx))
        (literal-vector-field 'u R2-rect))
       R2-point))
 #| Result:
@@ -507,7 +507,7 @@ alpha
 
 (pec ((L2-Hodge-star
        (* (literal-manifold-function 'alpha R2-rect)
-	  (wedge (* c dt) dx)))
+          (wedge (* c dt) dx)))
       R2-point))
 #| Result:
 (* -1 (alpha (up t0 x0)))
@@ -577,7 +577,7 @@ alpha
 
 (define SR-constant-basis
   (make-basis SR-constant-vector-basis
-	      SR-constant-1form-basis))
+              SR-constant-1form-basis))
 
 (define (g-Lorentz u v)
   (+ (* (dx u) (dx v))
@@ -622,12 +622,12 @@ alpha
 
 (define (((ip metric basis) X) alpha)
   (let ((k (get-rank alpha))
-	(n (basis->dimension basis))
-	(dual (Hodge-star metric basis)))
+        (n (basis->dimension basis))
+        (dual (Hodge-star metric basis)))
     (let ((sign (if (even? (* k (- n k))) +1 -1)))
       (* sign
-	 (dual (wedge (dual alpha)
-		      ((lower metric) X)))))))
+         (dual (wedge (dual alpha)
+                      ((lower metric) X)))))))
 
 
 (install-coordinates R3-rect (up 'x 'y 'z))
@@ -649,16 +649,16 @@ alpha
      (* (literal-manifold-function 'gamma R3-rect) (wedge dz dx))))
 
 (pec (- (((((ip E3-metric R3-basis) u) omega) v) R3-point)
-	((((interior-product u) omega) v) R3-point)))
+        ((((interior-product u) omega) v) R3-point)))
 #| Result:
 0
 |#
 
-(define theta 
+(define theta
   (* (literal-scalar-field 'delta R3-rect) (wedge dx dy dz)))
 
 (pec (- (((((ip E3-metric R3-basis) u) theta) v w) R3-point)
-	((((interior-product u) theta) v w) R3-point)))
+        ((((interior-product u) theta) v w) R3-point)))
 #| Result:
 0
 |#
@@ -687,14 +687,14 @@ alpha
 
 (define L4-constant-basis
   (make-basis L4-constant-vector-basis
-	      L4-constant-1form-basis))
+              L4-constant-1form-basis))
 
 (define SR-star
   (Hodge-star g-Lorentz L4-constant-basis))
 
 (pec (((SR-star
-	(* (literal-manifold-function 'Bx SR)
-	   (wedge dy dz)))
+        (* (literal-manifold-function 'Bx SR)
+           (wedge dy dz)))
        (* (/ 1 c) d/dt)
        d/dx)
       an-event))
@@ -721,7 +721,7 @@ alpha
      (* Ez (wedge dx dy))))
 
 (pec (((- (SR-star (Faraday 'Ex 'Ey 'Ez 'Bx 'By 'Bz))
-	  (Maxwell 'Ex 'Ey 'Ez 'Bx 'By 'Bz))
+          (Maxwell 'Ex 'Ey 'Ez 'Bx 'By 'Bz))
        (literal-vector-field 'u SR)
        (literal-vector-field 'v SR))
       an-event))
@@ -733,7 +733,7 @@ alpha
 ;;; **F + F = 0
 
 (pec (((+ ((compose SR-star SR-star) (Faraday 'Ex 'Ey 'Ez 'Bx 'By 'Bz))
-	  (Faraday 'Ex 'Ey 'Ez 'Bx 'By 'Bz))
+          (Faraday 'Ex 'Ey 'Ez 'Bx 'By 'Bz))
        (literal-vector-field 'u SR)
        (literal-vector-field 'v SR))
       an-event))
@@ -797,18 +797,18 @@ alpha
 
 ;;; Maxwell's equations in the form language are:
 ;;; dF=0, d(*F)=4pi *J
-  
+
 (define F
   (Faraday (literal-manifold-function 'Ex SR)
-	   (literal-manifold-function 'Ey SR)
-	   (literal-manifold-function 'Ez SR)
-	   (literal-manifold-function 'Bx SR)
-	   (literal-manifold-function 'By SR)
-	   (literal-manifold-function 'Bz SR)))
+           (literal-manifold-function 'Ey SR)
+           (literal-manifold-function 'Ez SR)
+           (literal-manifold-function 'Bx SR)
+           (literal-manifold-function 'By SR)
+           (literal-manifold-function 'Bz SR)))
 
 ;;; div B = 0
 (pec (((d F) d/dx d/dy d/dz) an-event))
-#| Result: 
+#| Result:
 (+ (((partial 1) Bx) (up t0 x0 y0 z0))
    (((partial 2) By) (up t0 x0 y0 z0))
    (((partial 3) Bz) (up t0 x0 y0 z0)))

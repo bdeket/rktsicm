@@ -22,10 +22,10 @@
 
 (define (x->xms x)
   (let* ((d (truncate x))
-	 (dd (- x d))
-	 (m (truncate (* 60 dd)))
-	 (ddm (- dd (/ m 60)))
-	 (s (* 3600 ddm)))
+         (dd (- x d))
+         (m (truncate (* 60 dd)))
+         (ddm (- dd (/ m 60)))
+         (s (* 3600 ddm)))
     (list d m s)))
 
 (define dms->d xms->x)

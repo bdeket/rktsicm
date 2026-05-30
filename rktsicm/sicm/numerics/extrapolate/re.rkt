@@ -27,16 +27,16 @@
 (define (accelerate-zeno-sequence seq p)
   (let* ((2^p (expt 2 p)) (2^p-1 (- 2^p 1)))
     (map-streams (lambda (Rh Rh/2)
-                    (/ (- (* 2^p Rh/2) Rh)
-                       2^p-1))
+                   (/ (- (* 2^p Rh/2) Rh)
+                      2^p-1))
                  seq
                  (tail seq))))
 
 (define (make-zeno-tableau seq p q)
   (define (sequences seq order)
     (cons-stream seq
-    		 (sequences (accelerate-zeno-sequence seq order)
-		 	    (+ order q))))
+                 (sequences (accelerate-zeno-sequence seq order)
+                            (+ order q))))
   (sequences seq p))
 
 (define (first-terms-of-zeno-tableau tableau)
@@ -51,27 +51,27 @@
     (let loop ((s s) (count 2))
       ;;(write-line 'main-loop)
       (let* ((h1 (head s)) (t (tail s)) (h2 (head t)))
-	;;(write-line (list count h1 h2))	
+        ;;(write-line (list count h1 h2))
         (cond ((ok? h1 h2 tolerance) h2)
               ((and (positive? M) (>= count M))
-	       ((default-lookup 'IFFAIL 
-                                (lambda args 
-                                  (error "STREAM-LIMIT not reached" M))
-                                optionals)
-	        'stream-limit
+               ((default-lookup 'IFFAIL
+                  (lambda args
+                    (error "STREAM-LIMIT not reached" M))
+                  optionals)
+                'stream-limit
                 'not-converged
-		M
-		h1
-		h2))
+                M
+                h1
+                h2))
               (else (loop t (+ count 1))))))))
 
 (define (richardson-limit f start-h ord inc tolerance . opts)
   (apply stream-limit
-	 (richardson-sequence (make-zeno-sequence f start-h)
-			      ord
-			      inc)
-	 tolerance
-	 opts))
+         (richardson-sequence (make-zeno-sequence f start-h)
+                              ord
+                              inc)
+         tolerance
+         opts))
 
 #|
 ;;; Archimedean computation of Pi.
@@ -146,18 +146,18 @@
   (let ((log2 (log 2)))
     (lambda (s)
       (let* ((s0 (head s)) (st (tail s))
-             (s1 (head st)) (s2 (head (tail st))))
-	(cons-stream (/ (log (abs (/ (- s0 s1) (- s1 s2))))
-			log2)
-	             (ord-estimate-stream st))))))
+                           (s1 (head st)) (s2 (head (tail st))))
+        (cons-stream (/ (log (abs (/ (- s0 s1) (- s1 s2))))
+                        log2)
+                     (ord-estimate-stream st))))))
 
 (define (guess-integer-convergent s)
   (let* ((s0 (head s)) (st (tail s))
-	 (s1 (head st)) (s2 (head (tail st))))
+                       (s1 (head st)) (s2 (head (tail st))))
     (let* ((N (round s0))
            (e2 (magnitude (- s2 N)))
-	   (e1 (magnitude (- s1 N)))
-	   (e0 (magnitude (- s0 N))))
+           (e1 (magnitude (- s1 N)))
+           (e0 (magnitude (- s0 N))))
       (if (and (<= e2 e1) (<= e1 e0))
           N
           (guess-integer-convergent st)))))
@@ -174,33 +174,33 @@
 
 ;;; For example, we can make a Richardson extrapolation to get the
 ;;; first derivative of a function to a required tolerance.
-		
+
 (define richardson-derivative
   (let ((log2 (log 2.)))
     (define (rderiv f tolerance #:optional plausible-h)
       (define (the-richardson-derivative x)
-	(let ((h
-	       (if (default-object? plausible-h)
-		   (if (zero? x)
-		       0.1
-		       (* 0.5 (magnitude x)))
-		   plausible-h)))
-	  (let* ((delta (- (f (+ x h)) (f (- x h))))
-		 (roundoff (* n:machine-epsilon
-			      (+ 1 (floor (magnitude (/ (f x)
-							(if (zero? delta)
-							    1
-							    delta)))))))
-		 (n (floor (/ (log (/ tolerance roundoff)) log2))))
-	    (richardson-limit (lambda (dx)
-				(/ (- (f (+ x dx))
-				      (f (- x dx)))
-				   (* 2 dx)))
-			      h
-			      2
-			      2
-			      tolerance
-			      'MAXTERMS (+ n 1)))))
+        (let ((h
+               (if (default-object? plausible-h)
+                   (if (zero? x)
+                       0.1
+                       (* 0.5 (magnitude x)))
+                   plausible-h)))
+          (let* ((delta (- (f (+ x h)) (f (- x h))))
+                 (roundoff (* n:machine-epsilon
+                              (+ 1 (floor (magnitude (/ (f x)
+                                                        (if (zero? delta)
+                                                            1
+                                                            delta)))))))
+                 (n (floor (/ (log (/ tolerance roundoff)) log2))))
+            (richardson-limit (lambda (dx)
+                                (/ (- (f (+ x dx))
+                                      (f (- x dx)))
+                                   (* 2 dx)))
+                              h
+                              2
+                              2
+                              tolerance
+                              'MAXTERMS (+ n 1)))))
       the-richardson-derivative)
     rderiv))
 
@@ -209,26 +209,26 @@
   (let ((log4 (log 4)))
     (lambda (f tolerance)
       (lambda (x)
-	(let* ((plausible-h (* 0.5 (magnitude x)))
-	       (h (if (zero? plausible-h) 0.1 plausible-h))
+        (let* ((plausible-h (* 0.5 (magnitude x)))
+               (h (if (zero? plausible-h) 0.1 plausible-h))
                (2fx (* 2 (f x)))
-	       (delta (+ (f (+ x h h)) (- 2fx) (f (- x h h))))
-	       (roundoff (* n:machine-epsilon
-			    (+ 1 (floor (magnitude (/ 2fx
-						      (if (zero? delta)
-							  1
-							  delta)))))))
-	       (n (floor (/ (log (/ tolerance roundoff)) log4))))
-	  (richardson-limit (lambda (h)
-			      (/ (+ (f (+ x h h))
-				    (* -2 (f x))
-				    (f (- x h h)))
-				 (* 4 h h)))
-			    h
-			    2
-			    2
-			    tolerance
-			    'MAXTERMS (+ n 1)))))))
+               (delta (+ (f (+ x h h)) (- 2fx) (f (- x h h))))
+               (roundoff (* n:machine-epsilon
+                            (+ 1 (floor (magnitude (/ 2fx
+                                                      (if (zero? delta)
+                                                          1
+                                                          delta)))))))
+               (n (floor (/ (log (/ tolerance roundoff)) log4))))
+          (richardson-limit (lambda (h)
+                              (/ (+ (f (+ x h h))
+                                    (* -2 (f x))
+                                    (f (- x h h)))
+                                 (* 4 h h)))
+                            h
+                            2
+                            2
+                            tolerance
+                            'MAXTERMS (+ n 1)))))))
 
 ;;; Romberg integration is the result of a Richardson extrapolation
 ;;; of the trapezoid method.
@@ -237,52 +237,52 @@
   (define (trapezoid-sums f a b)
     (define (next-S S n)
       (let* ((h (/ (- b a) 2 n))
-	     (fx (lambda (i) (f (+ a (* (+ i i -1) h))))))
-	(+ (/ S 2) (* h (sigma fx 1 n)))))
+             (fx (lambda (i) (f (+ a (* (+ i i -1) h))))))
+        (+ (/ S 2) (* h (sigma fx 1 n)))))
     (define (S-and-n-stream S n)
       (cons-stream (list S n)
-		   (S-and-n-stream (next-S S n) (* n 2))))
+                   (S-and-n-stream (next-S S n) (* n 2))))
     (let* ((h (- b a))
-	   (S (* (/ h 2) (+ (f a) (f b)))))
+           (S (* (/ h 2) (+ (f a) (f b)))))
       (map-stream car (S-and-n-stream S 1))))
   (stream-limit
-   (richardson-sequence (trapezoid-sums f a b) 
-			2
-			2)
+   (richardson-sequence (trapezoid-sums f a b)
+                        2
+                        2)
    tolerance))
 
 ;;; Given a sequence (stream) of abscissas and ordinates for a function,
-;;; the following procedure constructs a sequence of constant terms of 
-;;; polynomials that interpolate the successive initial segments of the 
+;;; the following procedure constructs a sequence of constant terms of
+;;; polynomials that interpolate the successive initial segments of the
 ;;; given sequences.
 ;;; This is done by incrementally constructing a Neville-like tableau
 ;;; for the interpolating polynomials, specialized for argument 0.
 
 (define polynomial-extrapolation
   (letrec ((pt-lp
-             (lambda (xs ys xstate ystate)
-               (let ((x (head xs)))
-                 (letrec ((poly-lp
-                            (lambda (y xstate ystate)
-                              (if (null? ystate)
-                                  (list y)
-                                  (cons y
-                                        (poly-lp (/ (- (* y (car xstate))
-                                                       (* x (car ystate)))
-                                                    (- (car xstate) x))
-                                                 (cdr xstate)
-                                                 (cdr ystate)))))))
-                   (let ((new (poly-lp (head ys) xstate ystate)))
-                     (cons-stream (car (last-pair new))
-                                  (pt-lp (tail xs)
-                                         (tail ys)
-                                         (cons x xstate)
-                                         new))))))))
+            (lambda (xs ys xstate ystate)
+              (let ((x (head xs)))
+                (letrec ((poly-lp
+                          (lambda (y xstate ystate)
+                            (if (null? ystate)
+                                (list y)
+                                (cons y
+                                      (poly-lp (/ (- (* y (car xstate))
+                                                     (* x (car ystate)))
+                                                  (- (car xstate) x))
+                                               (cdr xstate)
+                                               (cdr ystate)))))))
+                  (let ((new (poly-lp (head ys) xstate ystate)))
+                    (cons-stream (car (last-pair new))
+                                 (pt-lp (tail xs)
+                                        (tail ys)
+                                        (cons x xstate)
+                                        new))))))))
     (lambda (abscissas ordinates)
       (pt-lp abscissas ordinates '() '()))))
 
 ;;; Given a sequence (stream) of abscissas and ordinates for a function,
-;;; the following procedure constructs a sequence of constant terms of 
+;;; the following procedure constructs a sequence of constant terms of
 ;;; rational functions that interpolate the successive initial segments
 ;;; of the given sequences.
 ;;; This is done by incrementally constructing a Bulirsch-Stoer tableau
@@ -290,27 +290,27 @@
 
 (define rational-extrapolation
   (letrec ((pt-lp
-             (lambda (xs ys xstate ystate)
-               (let ((x (head xs)))
-                 (letrec ((rat-lp
-                            (lambda (y xstate ystate z)
-                              (if (null? ystate)
-                                  (list y)
-				  (let ((u (* (/ (car xstate) x) 
-                                              (- (car ystate) z))))
-                                    (cons y
-                                      (rat-lp
-                                        (/ (+ (* y (- u (car ystate)))
-                                              (* z (car ystate)))
-                                           (- u (- y z)))
-                                        (cdr xstate)
-                                        (cdr ystate)
-					(car ystate))))))))
-                   (let ((new (rat-lp (head ys) xstate ystate 0)))
-                     (cons-stream (car (last-pair new))
-                                  (pt-lp (tail xs)
-                                         (tail ys)
-                                         (cons x xstate)
-                                         new))))))))
+            (lambda (xs ys xstate ystate)
+              (let ((x (head xs)))
+                (letrec ((rat-lp
+                          (lambda (y xstate ystate z)
+                            (if (null? ystate)
+                                (list y)
+                                (let ((u (* (/ (car xstate) x)
+                                            (- (car ystate) z))))
+                                  (cons y
+                                        (rat-lp
+                                         (/ (+ (* y (- u (car ystate)))
+                                               (* z (car ystate)))
+                                            (- u (- y z)))
+                                         (cdr xstate)
+                                         (cdr ystate)
+                                         (car ystate))))))))
+                  (let ((new (rat-lp (head ys) xstate ystate 0)))
+                    (cons-stream (car (last-pair new))
+                                 (pt-lp (tail xs)
+                                        (tail ys)
+                                        (cons x xstate)
+                                        new))))))))
     (lambda (abscissas ordinates)
       (pt-lp abscissas ordinates '() '()))))

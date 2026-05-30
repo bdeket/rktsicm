@@ -29,8 +29,8 @@
   `(,@head ,x ,@(cdr tail))
   #; ;;bdk;; above is slightly more efficient
   (append (list-head lst i)
-	  (list x)
-	  (cdr (list-tail lst i))))
+          (list x)
+          (cdr (list-tail lst i))))
 
 ;;;           Structural Vectors
 #|
@@ -44,9 +44,9 @@ make-initialized-vector
   (let ((ans (make-vector size)))
     (let loop ((i 0))
       (if (fix:= i size)
-	  ans
-	  (begin (vector-set! ans i (proc i))
-		 (loop (fix:+ i 1)))))))
+          ans
+          (begin (vector-set! ans i (proc i))
+                 (loop (fix:+ i 1)))))))
 |#
 
 (define generate-vector make-initialized-vector)
@@ -62,11 +62,11 @@ make-initialized-vector
      (build-vector len (λ (i) (apply f (map (λ (v) (vector-ref v i)) vectors))))])
   #; ;;bdk;; ^^mine does some extra checks and changes so 0 args restuls in empty vector
   (make-initialized-vector
-    (vector-length (car vectors))
-    (lambda (i)
-      (apply f
-	     (map (lambda (v) (vector-ref v i))
-		  vectors)))))
+   (vector-length (car vectors))
+   (lambda (i)
+     (apply f
+            (map (lambda (v) (vector-ref v i))
+                 vectors)))))
 
 (define (vector-forall p? . vectors)
   (cond
@@ -76,16 +76,16 @@ make-initialized-vector
      (unless (andmap (λ (x) (= (vector-length x) len)) (cdr vectors))
        (raise-argument-error 'vector-forall "same-length vectors" vectors))
      (for/and ([i (in-range len)])
-            (apply p? (map (λ (v) (vector-ref v i)) vectors)))])
+       (apply p? (map (λ (v) (vector-ref v i)) vectors)))])
   #; ;;bdk;; ^^mine does some extra checks and changes so 0 args restuls in #t
   (let lp ((i (fix:- (vector-length (car vectors)) 1)))
     (cond ((fix:= i 0)
-	   (apply p? (map (lambda (v) (vector-ref  v i))
-			  vectors)))
-	  ((apply p? (map (lambda (v) (vector-ref  v i))
-			  vectors))
-	   (lp (fix:- i 1)))
-	  (else #f))))
+           (apply p? (map (lambda (v) (vector-ref  v i))
+                          vectors)))
+          ((apply p? (map (lambda (v) (vector-ref  v i))
+                          vectors))
+           (lp (fix:- i 1)))
+          (else #f))))
 
 (define (vector-exists p? . vectors)
   (cond
@@ -95,37 +95,37 @@ make-initialized-vector
      (unless (andmap (λ (x) (= (vector-length x) len)) (cdr vectors))
        (raise-argument-error 'vector-exists "same-length vectors" vectors))
      (for/or ([i (in-range len)])
-            (apply p? (map (λ (v) (vector-ref v i)) vectors)))])
+       (apply p? (map (λ (v) (vector-ref v i)) vectors)))])
   #; ;;bdk;; ^^mine does some extra checks and changes so 0 args restuls in #f
   (let lp ((i (fix:- (vector-length (car vectors)) 1)))
     (cond ((fix:= i 0)
-	   (apply p? (map (lambda (v) (vector-ref  v i))
-			  vectors)))
-	  ((apply p? (map (lambda (v) (vector-ref  v i))
-			  vectors))
-	   #t)
-	  (else 
-	   (lp (fix:- i 1))))))
+           (apply p? (map (lambda (v) (vector-ref  v i))
+                          vectors)))
+          ((apply p? (map (lambda (v) (vector-ref  v i))
+                          vectors))
+           #t)
+          (else
+           (lp (fix:- i 1))))))
 
 
 (define (vector-accumulate acc fun init v)
   (let ((l (vector-length v)))
     (if (fix:= l 0)
-	init
-	(let loop ((i 1)
-		   (ans (fun (vector-ref v 0))))
-	  (if (fix:= i l)
-	      ans
-	      (loop (fix:+ i 1)
-		    (acc ans (fun (vector-ref v i)))))))))
+        init
+        (let loop ((i 1)
+                   (ans (fun (vector-ref v 0))))
+          (if (fix:= i l)
+              ans
+              (loop (fix:+ i 1)
+                    (acc ans (fun (vector-ref v i)))))))))
 
 
 (define (vector-with-substituted-coord v i x)
   (make-initialized-vector (vector-length v)
-    (lambda (j)
-      (if (fix:= j i)
-	  x
-	  (vector-ref v j)))))
+                           (lambda (j)
+                             (if (fix:= j i)
+                                 x
+                                 (vector-ref v j)))))
 
 ;;;      Structural 2-dimensional arrays
 
@@ -144,21 +144,21 @@ make-initialized-vector
      (make-initialized-vector
       cols
       (lambda (col)
-	(proc row col))))))
-    
+        (proc row col))))))
+
 (define ((array-elementwise f) . arrays)
   (generate-array
-    (num-rows (car arrays))
-    (num-cols (car arrays))
-    (lambda (i j)
-      (apply f
-	     (map (lambda (m)
-		    (array-ref m i j))
-		  arrays)))))
+   (num-rows (car arrays))
+   (num-cols (car arrays))
+   (lambda (i j)
+     (apply f
+            (map (lambda (m)
+                   (array-ref m i j))
+                 arrays)))))
 
 (define (array-copy m)
   (generate-array (num-rows m) (num-cols m)
-    (lambda (i j) (array-ref m i j))))
+                  (lambda (i j) (array-ref m i j))))
 
 
 (define (num-rows array)
@@ -175,18 +175,18 @@ make-initialized-vector
 
 (define (nth-col M j)
   (generate-vector (num-rows M)
-		   (lambda (i)
-		     (array-ref M i j))))
+                   (lambda (i)
+                     (array-ref M i j))))
 
 (define (array-with-substituted-row A i V)
   (vector-with-substituted-coord A i V))
 
 (define (array-with-substituted-col A k V)
   (generate-array (num-rows A) (num-cols A)
-    (lambda (i j)
-      (if (fix:= j k)
-	  (vector-ref V i)
-	  (array-ref A i j)))))
+                  (lambda (i j)
+                    (if (fix:= j k)
+                        (vector-ref V i)
+                        (array-ref A i j)))))
 
 (define (array-by-rows M)
   (apply vector (map list->vector M)))
@@ -196,6 +196,5 @@ make-initialized-vector
 
 (define (transpose-array M)
   (generate-array (num-cols M) (num-rows M)
-    (lambda (i j) (array-ref M j i))))
+                  (lambda (i j) (array-ref M j i))))
 
-  

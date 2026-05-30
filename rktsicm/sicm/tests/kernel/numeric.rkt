@@ -73,7 +73,7 @@
                   (lp> (+ k 1) (+ sum (* a (expt r k))))))
             (write-line
              `(g:sigma
-               ,(g:sigma				;generic sigma is naive
+               ,(g:sigma                                ;generic sigma is naive
                  (lambda (k)
                    (exact->inexact (* a (expt r k))))
                  0 n)))
@@ -86,7 +86,7 @@
                ,(sigma-KahanBabushkaNeumaier
                  (lambda (k)
                    (exact->inexact (* a (expt r k))))
-                 0 n)))  
+                 0 n)))
             (write-line
              `(explicit-formula
                ,(exact->inexact (/ (* a (- 1 (expt r (+ n 1))))
@@ -256,7 +256,7 @@
     (check-true (apply > (vector->list (softmax (vector 6 5 4 3 2 -4)))))
     (check-= (apply + (vector->list (softmax (vector 6 5 4 3 2 -4)))) 1. (* 3 n:machine-epsilon))
     (check-true (andmap (λ (x) (<= 0. x 1.)) (vector->list (softmax (vector 6 5 4 3 2 -4))))))
-   
+
    ))
 
 (module+ test

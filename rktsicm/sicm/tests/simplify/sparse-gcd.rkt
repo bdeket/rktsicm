@@ -89,7 +89,7 @@
     (check-equal? (sparse-univariate-gcd '( ((4) . 2) ) '( ((3) . 3) )) '( ((3) . 1) ))
     (check-equal? (sparse-univariate-gcd '( ((4) . 3) ) '( ((3) . 9) )) '( ((3) . 3) ))
     (check-equal? (sparse-univariate-gcd '( ((4) . 3) ((0) . 6) ) '( ((3) . 9) )) '( ((0) . 3) ))
-    
+
     (set!-ugcd-wallp? #t)
     (check-equal? (out->string (sparse-univariate-gcd '( ((4) . 3) ((0) . 6) ) '( ((3) . 9) )))
                   (string-append "'((ppu: (((4) . 1) ((0) . 2))) (ppv: (((3) . 1))))\n"
@@ -177,7 +177,7 @@
     #;(check-not-false (regexp-match #px"'\\(Too many GkTerms\\)"
                                      ???))
     (set!-sgcd-wallp? #f)
-    
+
     (set!-sgcd-tuning? #t)
     (random-seed 1)
     (check-equal? (out->string (sparse-multivariate-gcd-helper '( ((0 0 0) . 3) ) '( ((0 0 0) . 6) ) 3 '(0 0 0) vector error))
@@ -340,7 +340,7 @@
    ;;Test repaired by gjs on 16 Aug 2021
    (test-case
     "1"
-    
+
     (define d1 '(+ (expt x1 2) x1 3))
     (define f1 '(+ (* 2 (expt x1 2)) (* 2 x1) 1))
     (define g1 '(+ (expt x1 2) (* 2 x1) 2))

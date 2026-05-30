@@ -21,7 +21,7 @@
     (check-true  (H-state? (up 't (up 'q) (down 'p))))
     (check-false (H-state? (up 't (down 'q) (up 'p))))
     (check-false (H-state? (up 't (down 'q) (down 'p))))
-    
+
     (check-false (compatible-H-state? (up 't 'q 'p)))
     (check-true  (compatible-H-state? (down 't 'q 'p)))
     (check-false (compatible-H-state? (down 't 'q (up 'p))))
@@ -112,7 +112,7 @@
     "Legendre-transform"
     (check-true (operator? Legendre-transform))
     (check-equal? (operator-name Legendre-transform) 'Legendre-transform))
-   
+
    (test-case
     "Lagrangian->Hamiltonian"
     (check-true (operator? Lagrangian->Hamiltonian))
@@ -138,7 +138,7 @@
                         '(error -> not quadratic)))
     (check-exn #px"Legendre Transform Failure: not quadratic"
                (λ () ((Hamiltonian->Lagrangian H) (up 't (up 'q0 'q1) (up 'p0 'p1))))))
-   
+
    (test-case
     "comm/anticom"
     (define H (literal-function 'H (Hamiltonian 2)))
@@ -195,7 +195,7 @@
         (+ (/ (square p) (* 2 m))
            (V (ref q 0) (ref q 1)))))
     (check-simplified? (((Hamilton-equations
-                          (H-rectangular 
+                          (H-rectangular
                            'm
                            (literal-function 'V (-> (X Real Real) Real))))
                          (coordinate-tuple (literal-function 'x)
@@ -239,7 +239,7 @@
                 (+ (square rdot)
                    (square (* r phidot))) )
              (V r)))))
-    (check-simplified? ((Lagrangian->Hamiltonian 
+    (check-simplified? ((Lagrangian->Hamiltonian
                          (L-central-polar 'm (literal-function 'V)))
                         (->H-state 't
                                    (coordinate-tuple 'r 'phi)
@@ -248,7 +248,7 @@
                            (/ (* 1/2 (expt p_r 2)) m)
                            (/ (* 1/2 (expt p_phi 2)) (* m (expt r 2)))))
     (check-simplified? (((Hamilton-equations
-                          (Lagrangian->Hamiltonian 
+                          (Lagrangian->Hamiltonian
                            (L-central-polar 'm (literal-function 'V))))
                          (coordinate-tuple (literal-function 'r)
                                            (literal-function 'phi))
@@ -264,7 +264,7 @@
                              ((D V) (r t))
                              (/ (* -1 (expt (p_phi t) 2)) (* m (expt (r t) 3))))
                           ((D p_phi) t))))
-    ;;; If we substitute a Coulomb potential in for V we get the equations 
+    ;;; If we substitute a Coulomb potential in for V we get the equations
     ;;;  for satellite motion around a spherical primary.
     (check-simplified? (((Hamilton-equations
                           (Lagrangian->Hamiltonian
@@ -287,7 +287,7 @@
    (test-case
     "L-harmonic"
     (define ((L-harmonic m k) local)
-      (let ((q (coordinate local)) 
+      (let ((q (coordinate local))
             (v (velocity local)))
         (- (* 1/2 m (square v))
            (* 1/2 k (square q)))))
@@ -418,7 +418,7 @@
              (* 1/2 C
                 (square (+ psidot (* phidot (cos theta)))))
              (* -1 gMR (cos theta))))))
-    (check-simplified? ((Lagrangian->Hamiltonian (L-axisymmetric-top 'A 'C 'gMR)) 
+    (check-simplified? ((Lagrangian->Hamiltonian (L-axisymmetric-top 'A 'C 'gMR))
                         (->H-state 't
                                    (vector 'theta 'phi 'psi)
                                    (vector 'p_theta 'p_phi 'p_psi)))
@@ -526,8 +526,8 @@
     (define Ly (- (* Sz Spx) (* Spz Sx)))
     (define Lz (- (* Sx Spy) (* Spx Sy)))
     (define L (down Lx Ly Lz))
-    (define 3-state 
-      (->H-state 't 
+    (define 3-state
+      (->H-state 't
                  (coordinate-tuple 'x 'y 'z)
                  (momentum-tuple 'p_x 'p_y 'p_z)))
     (check-simplified? ((Poisson-bracket Lx L) 3-state)
@@ -547,7 +547,7 @@
                                             (compose Ly (C-rotating 'n))) )
                         3-state)
                        0)
-    ;;; Poisson brackets in terms of J 
+    ;;; Poisson brackets in terms of J
     ;;;  Guaranteed to work only for scalar valued functions
     (define (J-func DH)
       (->H-state 0
@@ -555,15 +555,15 @@
                  (- (ref DH 1))))
     (define ((PB f g) s)
       (* ((D f) s) (J-func ((D g) s))))
-    (define a-state 
-      (->H-state 't 
+    (define a-state
+      (->H-state 't
                  (coordinate-tuple 'x 'y 'z)
                  (momentum-tuple 'p_x 'p_y 'p_z)))
     (check-simplified? ((- (Poisson-bracket Lx Ly) Lz) a-state) 0)
     (check-simplified? ((- (PB Lx Ly) Lz) a-state) 0)
     (let ()
       (define ((L-harmonic m k) local)
-        (let ((q (coordinate local)) 
+        (let ((q (coordinate local))
               (v (velocity local)))
           (- (* 1/2 m (square v))
              (* 1/2 k (square q)))))
@@ -573,13 +573,13 @@
       (define (H-harmonic m k)
         (Lagrangian->Hamiltonian (L-harmonic m k)))
       (check-simplified? (- ((Poisson-bracket (H-harmonic 'm 'k)
-                                              ((component 0) coordinate)) 
+                                              ((component 0) coordinate))
                              a-state)
                             ((PB (H-harmonic 'm 'k)
                                  (compose (component 0) coordinate))
                              a-state))
                          0)
-      (check-simplified? (- ((Poisson-bracket (H-harmonic 'm 'k) coordinate) 
+      (check-simplified? (- ((Poisson-bracket (H-harmonic 'm 'k) coordinate)
                              a-state)
                             ((PB (H-harmonic 'm 'k) coordinate)
                              a-state))

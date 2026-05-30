@@ -10,12 +10,12 @@
    "numerics/functions/elliptic"
    (test-case "elliptic-integral-F"
               (define (elliptic-integral-F-check phi k)
-                (definite-integral 
+                (definite-integral
                   (lambda (theta) (/ 1. (sqrt (- 1. (square (* k (sin theta)))))))
                   0. phi 1.e-13))
-              
+
               (check-within (elliptic-integral-F-check 1. .9) 1.159661070732225  1e-13)
-              
+
               (check-within (elliptic-integral-F 1. .9)       1.159661070732199  1e-15)
               (check-within (elliptic-integral-F n:pi/2 .9)   2.2805491384227703 1e-15)
               (check-within (first-elliptic-integral .9)      2.2805491384227703 1e-15)
@@ -23,7 +23,7 @@
 
    (test-case "elliptic-integral-E"
               (define (elliptic-integral-E-check phi k)
-                (definite-integral 
+                (definite-integral
                   (lambda (theta) (sqrt (- 1. (square (* k (sin theta))))))
                   0. phi 1.e-13))
 

@@ -47,8 +47,8 @@
 
 (define ((vector-field-procedure components coordinate-system) f)
   (compose (* (D (compose f (coordinate-system '->point)))
-	      components)
-	   (coordinate-system '->coords)))
+              components)
+           (coordinate-system '->coords)))
 
 ;; (define (components->vector-field components coordinate-system #:optional name)
 ;;   (if (default-object? name) (set! name `(vector-field ,components)))
@@ -64,7 +64,7 @@
   (if (default-object? name) (set! name `(vector-field ,components)))
   (let ((vfp (vector-field-procedure components coordinate-system)))
     (procedure->vector-field (samritchie-memoizer vfp) name)))
-   
+
 
 ;;; We can extract the components function for a vector field, given a
 ;;; coordinate system.
@@ -73,7 +73,7 @@
   ;;bdk;; make curry explicit to force early error
   (assert (vector-field? vf) "Bad vector field: vector-field->components")
   (λ (coords)
-    ((vf (coordinate-system '->coords)) 
+    ((vf (coordinate-system '->coords))
      ((coordinate-system '->point) coords))))
 
 (define (vf:zero f)
@@ -103,22 +103,22 @@
 (define (literal-vector-field name coordinate-system)
   (let ((n (coordinate-system 'dimension)))
     (let ((function-signature
-	   (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
+           (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
       (let ((components
-	     (s:generate n 'up (lambda (i)
-				 (literal-function (string->symbol
-						    (string-append
-						     (symbol->string name)
-						     "^"
-						     (number->string i)))
-						   function-signature)))))
-	(components->vector-field components coordinate-system name)))))
+             (s:generate n 'up (lambda (i)
+                                 (literal-function (string->symbol
+                                                    (string-append
+                                                     (symbol->string name)
+                                                     "^"
+                                                     (number->string i)))
+                                                   function-signature)))))
+        (components->vector-field components coordinate-system name)))))
 
 ;;; For any coordinate system we can make a coordinate basis.
 
 (define ((coordinate-basis-vector-field-procedure coordinate-system . i) f)
   (compose ((apply partial i) (compose f (coordinate-system '->point)))
-	   (coordinate-system '->coords)))
+           (coordinate-system '->coords)))
 
 ;; (define (coordinate-basis-vector-field coordinate-system name . i)
 ;;   (procedure->vector-field
@@ -137,11 +137,11 @@
 #|
 (define (coordinate-system->vector-basis coordinate-system)
   (s:map (lambda (chain)
-	   (apply coordinate-basis-vector-field
-		  coordinate-system
-		  `(e ,@chain)
-		  chain))
-	 (coordinate-system 'dual-chains)))
+           (apply coordinate-basis-vector-field
+                  coordinate-system
+                  `(e ,@chain)
+                  chain))
+         (coordinate-system 'dual-chains)))
 |#
 
 (define (coordinate-system->vector-basis coordinate-system)
@@ -152,7 +152,7 @@
 
 (define ((coordinate-system->vector-basis-procedure coordinate-system) f)
   (compose (D (compose f (coordinate-system '->point)))
-	   (coordinate-system '->coords)))
+           (coordinate-system '->coords)))
 |#
 
 ;;; Given a vector basis, can make a vector field as a linear
@@ -164,12 +164,12 @@
    (lambda (f)
      (lambda (point)
        (* ((vector-basis f) point)
-	  (components point))))
+          (components point))))
    `(+ ,@(map (lambda (component basis-element)
-		`(* ,(diffop-name component)
-		    ,(diffop-name basis-element)))
-	      (s:fringe components)
-	      (s:fringe vector-basis)))))
+                `(* ,(diffop-name component)
+                    ,(diffop-name basis-element)))
+              (s:fringe components)
+              (s:fringe vector-basis)))))
 
 
 ;;; And the inverse
@@ -185,7 +185,7 @@
   (* ((vector-basis f) point)
      (components point)))
 
-;;; We note problems, due to tuple arithmetic 
+;;; We note problems, due to tuple arithmetic
 
 (define (basis-components->vector-field components vector-basis)
   (* vector-basis components))
@@ -266,7 +266,7 @@
 ;;; has length 1
 
 ;;; so these coordinate basis vectors are not normalized
-;;; Introduce 
+;;; Introduce
 (define e-theta (* (/ 1 r) d/dtheta))
 (define e-r d/dr)
 (define e-z d/dzeta)
@@ -321,9 +321,9 @@
 #|
 (define R3-point ((R3-rect '->point) (up 'x0 'y0 'z0)))
 
-;;; The following does not work.  
+;;; The following does not work.
 ;;;  One cannot add to a manifold point.
- 
+
 (series:print
  (((exp (* x d/dy))
    (literal-function 'f (-> (UP Real Real Real) Real)))
@@ -357,7 +357,7 @@
    (* (((partial 2) f) (up x0 y0 z0)) (v^2 (up x0 y0 z0))))
 |#
 
-;;; Consider the following vector field 
+;;; Consider the following vector field
 
 (define circular (- (* x d/dy) (* y d/dx)))
 
@@ -388,10 +388,10 @@
           manifold-function)
          manifold-point)
   (series:sum
-    (((exp (* delta-t vector-field))
-      manifold-function)
-     manifold-point)
-    order))
+   (((exp (* delta-t vector-field))
+     manifold-function)
+    manifold-point)
+   order))
 
 #|
 (install-coordinates R2-rect (up 'x 'y))

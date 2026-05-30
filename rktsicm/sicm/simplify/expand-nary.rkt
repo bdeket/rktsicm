@@ -35,10 +35,10 @@
      (reduce (lambda (x y) `(+ ,x ,y))
              0
              (cons* a b c d)) )
-  ( (* (? a) (? b) (? c) (?? d))
-    (reduce (lambda (x y) `(* ,x ,y))
-            0
-            (cons* a b c d)) )
+   ( (* (? a) (? b) (? c) (?? d))
+     (reduce (lambda (x y) `(* ,x ,y))
+             0
+             (cons* a b c d)) )
    ( (- (? a) (? b) (? c) (?? d))
      none
      (- (: a) (+ (: b) (: c) (:: d))) )
@@ -49,14 +49,14 @@
 
 #|
 
-(pp 
+(pp
  (expand-nary
   '(+ a b c d e f)))
 (+ f (+ e (+ d (+ c (+ b a)))))
 
 
 
-(pp 
+(pp
  (expand-nary
   '(let* ((G44125 (expt dt 3)) (G44128 (* (expt m 3) (expt r_0 4))))
      (up

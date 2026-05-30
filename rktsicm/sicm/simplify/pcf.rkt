@@ -19,15 +19,15 @@
 (define (pcf:expression-> expr cont #:optional less?)
   ;; cont = (lambda (poly vars) ... )
   (let ((evars
-	 (sort (list-difference (variables-in expr)
-				pcf:operators-known)
-		(if (default-object? less?) variable<? less?))))
+         (sort (list-difference (variables-in expr)
+                                pcf:operators-known)
+               (if (default-object? less?) variable<? less?))))
     (cont ((expression-walker
-	    (pair-up evars
-		     (poly:new-variables (length evars))
-		     pcf:operator-table))
-	   expr)
-	  evars)))
+            (pair-up evars
+                     (poly:new-variables (length evars))
+                     pcf:operator-table))
+           expr)
+          evars)))
 
 ;;bdk;; moved to pcfpf/pcf 2
 

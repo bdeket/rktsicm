@@ -43,9 +43,9 @@
   (if (null? weak-list)
       #f
       (let ((a (weak-car weak-list)))
-	(if (equal? obj a)
-	    a
-	    (get-weak-member obj (weak-cdr weak-list))))))
+        (if (equal? obj a)
+            a
+            (get-weak-member obj (weak-cdr weak-list))))))
 
 
 ;;; Looks for obj as the key in a weak alist.
@@ -56,16 +56,16 @@
   (if (null? weak-alist)
       #f
       (let ((pair (car weak-alist)))
-	(if pair                        ;not dead pair
-	    (let ((a (weak-car pair)))
-	      (if (gc-reclaimed-object? a)
-		  (begin (set-car! weak-alist #f)
-			 #f)            ;kill this pair
-		  (if (equal? obj a)
-		      a
-		      (weak-find obj
+        (if pair                        ;not dead pair
+            (let ((a (weak-car pair)))
+              (if (gc-reclaimed-object? a)
+                  (begin (set-car! weak-alist #f)
+                         #f)            ;kill this pair
+                  (if (equal? obj a)
+                      a
+                      (weak-find obj
                                  (cdr weak-alist)))))
-	    (weak-find obj (cdr weak-alist))))))
+            (weak-find obj (cdr weak-alist))))))
 
 (define (weak-length weak-list)
   (if (weak-pair? weak-list)
@@ -81,24 +81,24 @@
 (define (weak-finder same?)
   (define (the-finder obj weak-alist)
     (if (null? weak-alist)
-	#f
-	(let ((pair (car weak-alist)))
-	  (cond ((weak-pair? pair)
-		 (let ((a (weak-car pair)))
-		   (if (gc-reclaimed-object? a)
-		       (begin (set-car! weak-alist #f)
-			      #f)
+        #f
+        (let ((pair (car weak-alist)))
+          (cond ((weak-pair? pair)
+                 (let ((a (weak-car pair)))
+                   (if (gc-reclaimed-object? a)
+                       (begin (set-car! weak-alist #f)
+                              #f)
                        (if (same? obj a)
-			   (weak-cdr pair)
-			   (the-finder obj
+                           (weak-cdr pair)
+                           (the-finder obj
                                        (cdr weak-alist))))))
-		((pair? pair)
-		 (let ((a (car pair)))
-		   (if (same? obj a)
-		       (cdr pair)
-		       (the-finder obj (cdr weak-alist)))))
-		(else
-		 (the-finder obj (cdr weak-alist)))))))
+                ((pair? pair)
+                 (let ((a (car pair)))
+                   (if (same? obj a)
+                       (cdr pair)
+                       (the-finder obj (cdr weak-alist)))))
+                (else
+                 (the-finder obj (cdr weak-alist)))))))
   the-finder)
 
 (define weak-find-equal? (weak-finder equal?))
@@ -134,49 +134,49 @@
 (define (clean-weak-list weak-list)
   (let clean-head ((this weak-list))
     (if (weak-pair? this)
-	(let ((next (weak-cdr this)))
-	  (if (gc-reclaimed-object? (weak-car this))
-	      (clean-head next)
-	      (begin
-		(let clean-tail ((this next) (prev this))
-		  (if (weak-pair? this)
-		      (let ((next (weak-cdr this)))
-			(if (gc-reclaimed-object? (weak-car this))
-			    (begin
-			      (weak-set-cdr! prev next)
-			      (clean-tail next prev))
-			    (clean-tail next this)))))
-		this)))
-	this)))
+        (let ((next (weak-cdr this)))
+          (if (gc-reclaimed-object? (weak-car this))
+              (clean-head next)
+              (begin
+                (let clean-tail ((this next) (prev this))
+                  (if (weak-pair? this)
+                      (let ((next (weak-cdr this)))
+                        (if (gc-reclaimed-object? (weak-car this))
+                            (begin
+                              (weak-set-cdr! prev next)
+                              (clean-tail next prev))
+                            (clean-tail next this)))))
+                this)))
+        this)))
 
 (define (clean-weak-alist weak-alist)
   (clean-alist weak-alist
-	       (lambda (p)
-		 (if (not (weak-pair? p))
-		     (raise-argument-error 'clean-weak-alist "weak-alist" weak-alist))
-		 (not (gc-reclaimed-object? (weak-car p))))))
+               (lambda (p)
+                 (if (not (weak-pair? p))
+                     (raise-argument-error 'clean-weak-alist "weak-alist" weak-alist))
+                 (not (gc-reclaimed-object? (weak-car p))))))
 
 (define (clean-subtable-alist alist)
   (clean-alist alist
                (lambda (p)
                  (if (not (pair? p))
-                   (raise-argument-error 'clean-subtable-alist "weak-alist" alist))
+                     (raise-argument-error 'clean-subtable-alist "weak-alist" alist))
                  (clean-expression-table (cdr p)))))
 
 (define (clean-alist alist clean-association)
   (let clean-head ((this alist))
     (if (pair? this)
-	(let ((next (cdr this)))
-	  (if (clean-association (car this))
-	      (begin
-		(let clean-tail ((this next) (prev this))
-		  (if (pair? this)
-		      (let ((next (cdr this)))
-			(if (clean-association (car this))
-			    (clean-tail next this)
-			    (begin
-			      (set-cdr! prev next)
-			      (clean-tail next prev))))))
-		this)
-	      (clean-head next)))
-	this)))
+        (let ((next (cdr this)))
+          (if (clean-association (car this))
+              (begin
+                (let clean-tail ((this next) (prev this))
+                  (if (pair? this)
+                      (let ((next (cdr this)))
+                        (if (clean-association (car this))
+                            (clean-tail next this)
+                            (begin
+                              (set-cdr! prev next)
+                              (clean-tail next prev))))))
+                this)
+              (clean-head next)))
+        this)))

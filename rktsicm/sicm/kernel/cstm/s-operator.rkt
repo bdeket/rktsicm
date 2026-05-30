@@ -19,7 +19,7 @@
 (define (operator? x)
   (and (apply-hook? x)
        (eq? (car (apply-hook-extra x))
-	    operator-type-tag)))
+            operator-type-tag)))
 ;;bdk;; insert 2 end
 
 ;;bdk;; insert 3

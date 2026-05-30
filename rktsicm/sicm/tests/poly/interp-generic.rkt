@@ -7,8 +7,8 @@
 (define the-tests
   (test-suite
    "poly/interp-generic"
-   ;;; If run in generic environment we can look at the kind of thing that 
-   ;;; this code does, by partial evaluation... an excellent aid to debugging. 
+   ;;; If run in generic environment we can look at the kind of thing that
+   ;;; this code does, by partial evaluation... an excellent aid to debugging.
    (check-simplified? ((Lagrange-interpolation-function '(y1 y2 y3 y4) '(x1 x2 x3 x4)) 'x1)
                       'y1)
    (check-simplified? ((Lagrange-interpolation-function '(y1 y2 y3 y4) '(x1 x2 x3 x4)) 'x2)

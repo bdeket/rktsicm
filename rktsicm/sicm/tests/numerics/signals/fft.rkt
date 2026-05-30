@@ -8,12 +8,12 @@
 
 (define 2pi (* 8 (atan 1 1)))
 (define ftsg (make-transform-pair-GJS 16))
-(define ftg (cadr ftsg))		; This gets the transform.
-(define iftg (caddr ftsg))		; This gets the inverse transform.
+(define ftg (cadr ftsg))                ; This gets the transform.
+(define iftg (caddr ftsg))                ; This gets the inverse transform.
 
 (define ftsc (make-transform-pair-CPH 16))
-(define ftc (cadr ftsc))		; This gets the transform.
-(define iftc (caddr ftsc))		; This gets the inverse transform.
+(define ftc (cadr ftsc))                ; This gets the transform.
+(define iftc (caddr ftsc))                ; This gets the inverse transform.
 
 (define sig1 (m-cycles-cos-in-n-samples 2 16))
 (define sig2 (m-cycles-sin-in-n-samples 2 16))

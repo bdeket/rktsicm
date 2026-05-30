@@ -178,7 +178,7 @@
     (check-two '(1 1) (list '(1 0 0) '(2 2) '(1 2)  #(2)))
     (check-two #(1 1) (list #(1 0 0) #(2 2) #(1 2)))
     (check-false (expr:< #(1 2) #(1 2)))
-    
+
     ;; !?! if it is not part of the standard set it can only be compared with
     ;; something outside of the standard set...
     (check-false (expr:< undefined-value 1))
@@ -189,10 +189,10 @@
     (if (< (equal-hash-code default-object) (equal-hash-code undefined-value))
         (check-true (expr:< default-object undefined-value))
         (check-true (expr:< undefined-value default-object)))
-    
-    
+
+
     (check-true (expr:= '(+ 4 5) '(+ 4 5))))
-   
+
    ))
 
 (module+ test

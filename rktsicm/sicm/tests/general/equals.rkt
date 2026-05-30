@@ -39,7 +39,7 @@
     (check-true (simple:equal? (vector (vector "1")) (vector (vector "1"))))
     (check-true (simple:equal? (vector (list 1)) (vector (list 1))))
     (check-true (simple:equal? (list (vector 1)) (list (vector 1))))
-    
+
     (define A (hash 1 2))
     (check-true (simple:equal? A A))
     (check-true (simple:equal? (list (vector A)) (list (vector A))))

@@ -47,13 +47,13 @@
 
 (define (u:value x)
   (cond ((with-units? x) (cadr x))
-	((units? x) 1)
-	(else x)))
+        ((units? x) 1)
+        (else x)))
 
 (define (u:units x)
   (cond ((with-units? x) (caddr x))
-	((units? x) x)
-	(else &unitless)))
+        ((units? x) x)
+        (else &unitless)))
 
 (define (units:= x y)
   (or (g:zero? x)
@@ -76,13 +76,13 @@
 (define (u:type x)
   (g:type (u:value x)))
 
-(define (u:zero-like x)			;can add to anything with same units
+(define (u:zero-like x)                        ;can add to anything with same units
   (with-units (g:zero-like (u:value x))
-    (u:units x)))
+              (u:units x)))
 
-(define (u:one-like x)			;can multiply anything with same units
+(define (u:one-like x)                        ;can multiply anything with same units
   (with-units (g:one-like (u:value x))
-    &unitless))
+              &unitless))
 
 (define (u:zero? x)
   (g:zero? (u:value x)))
@@ -133,31 +133,31 @@
 
 (define (u:+ x y)
   (cond ((g:zero? x) y)
-	((g:zero? y) x)
-	((units:= x y)
-	 (with-units (g:+ (u:value x) (u:value y)) (u:units x)))
-	((and *permissive-units*
-	      (or (without-units? x) (without-units? y)))
-	 (g:+ (u:value x) (u:value y)))
-	(else (error "Units do not match: +" x y))))
+        ((g:zero? y) x)
+        ((units:= x y)
+         (with-units (g:+ (u:value x) (u:value y)) (u:units x)))
+        ((and *permissive-units*
+              (or (without-units? x) (without-units? y)))
+         (g:+ (u:value x) (u:value y)))
+        (else (error "Units do not match: +" x y))))
 
 (define (u:- x y)
   (cond ((g:zero? y) x)
-	((g:zero? x) (u:negate y))
-	((units:= x y)
-	 (with-units (g:- (u:value x) (u:value y)) (u:units x)))	
-	((and *permissive-units*
-	      (or (without-units? x) (without-units? y)))
-	 (g:- (u:value x) (u:value y)))
-	(else (error "Units do not match: -" x y))))
+        ((g:zero? x) (u:negate y))
+        ((units:= x y)
+         (with-units (g:- (u:value x) (u:value y)) (u:units x)))
+        ((and *permissive-units*
+              (or (without-units? x) (without-units? y)))
+         (g:- (u:value x) (u:value y)))
+        (else (error "Units do not match: -" x y))))
 
 (define (u:* x y)
   (with-units (g:* (u:value x) (u:value y))
-    (*units (u:units x) (u:units y))))
+              (*units (u:units x) (u:units y))))
 
 (define (u:/ x y)
   (with-units (g:/ (u:value x) (u:value y))
-    (/units (u:units x) (u:units y))))
+              (/units (u:units x) (u:units y))))
 
 (define (u:*u x u)
   (u:* x (with-units 1 u)))
@@ -187,19 +187,19 @@
 (define (u:expt x y)
   (if (unitless-quantity? y)
       (with-units (g:expt (u:value x) (u:value y))
-	(expt-units (u:units x) (u:value y)))
+                  (expt-units (u:units x) (u:value y)))
       (error "Exponent must be unitless: expt" x y)))
 
 
 (define (u:make-rectangular x y)
   (cond ((g:zero? y) x)
-	((g:zero? x)
-	 (with-units (g:make-rectangular (u:value x) (u:value y)) (u:units y)))
-	((units:= x y)
-	 (with-units (g:make-rectangular (u:value x) (u:value y)) (u:units x)))
-	((and *permissive-units* (or (without-units? x) (without-units? y)))
-	 (g:make-rectangular (u:value x) (u:value y)))
-	(else (error "Units do not match: make-rectangular" x y))))
+        ((g:zero? x)
+         (with-units (g:make-rectangular (u:value x) (u:value y)) (u:units y)))
+        ((units:= x y)
+         (with-units (g:make-rectangular (u:value x) (u:value y)) (u:units x)))
+        ((and *permissive-units* (or (without-units? x) (without-units? y)))
+         (g:make-rectangular (u:value x) (u:value y)))
+        (else (error "Units do not match: make-rectangular" x y))))
 
 (define (u:make-polar r theta)
   (if (angular? theta)
@@ -219,16 +219,16 @@
 
 (define (u:angle z)
   (with-units (g:angle (u:value z)) angular))
-	       
+
 (define (u:conjugate z)
   (with-units (g:conjugate (u:value z)) (u:units z)))
 
 (define (u:atan2 y x)
   (cond ((units:= x y)
-	 (with-units (g:atan2 (u:value y) (u:value x)) angular))
-	((and *permissive-units* (or (without-units? x) (without-units? y)))
-	 (g:atan2 (u:value y) (u:value x)))
-	(else (error "Units do not match: atan2" y x))))
+         (with-units (g:atan2 (u:value y) (u:value x)) angular))
+        ((and *permissive-units* (or (without-units? x) (without-units? y)))
+         (g:atan2 (u:value y) (u:value x)))
+        (else (error "Units do not match: atan2" y x))))
 
 (define (non-unit? x)
   (not (and (pair? x) (eq? (car x) '*unit*))))
@@ -352,8 +352,8 @@
 #|
 (pe (definite-integral
       (lambda (r)
-	(/ (* :G earth-mass (& 1 &kilogram))
-	   (square (+ earth-radius r))))
+        (/ (* :G earth-mass (& 1 &kilogram))
+           (square (+ earth-radius r))))
       (& 0 &meter) (& 1 &meter)))
 (& 9.824031599863007 &joule)
 |#

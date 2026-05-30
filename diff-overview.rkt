@@ -298,7 +298,7 @@
 
 (define (trim-whitespace lines)
   (for/list ([l (in-list lines)])
-    (cons (regexp-replace #px"\\s*$" (regexp-replace #px"^\\s*" (car l) "") "")
+    (cons (regexp-replace* #px"\\s+" (regexp-replace #px"\\s*$" (regexp-replace #px"^\\s*" (car l) "") "") " ")
           (cdr l))))
 
 ;***************************************************************************************************

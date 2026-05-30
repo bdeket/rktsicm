@@ -93,7 +93,7 @@
     (define chi-R2 (R2 '->coords))
     (define chi-inverse-R2 (R2 '->point))
     (define R2-basis (coordinate-system->basis R2))
-    (check-simplified? (s:sigma/r (lambda (e) 
+    (check-simplified? (s:sigma/r (lambda (e)
                                     ((e (compose (literal-function 'f (-> (UP Real Real) Real))
                                                  chi-R2))
                                      (chi-inverse-R2 (up 'x0 'y0))))

@@ -16,20 +16,20 @@
 ;;bdk;; insert 1
 (define (poly/gcd-classical u v)
   (cond ((explicit-pcf? u)
-	 (cond ((explicit-pcf? v)
-		(poly/gcd-euclid u v))
-	       ((explicit-fpf? v)
-		(poly/gcd-euclid u (fpf->pcf v)))
-	       (else (error "What do I do here?"))))
-	((explicit-fpf? u)
-	 (cond ((explicit-pcf? v)
-		(pcf->fpf
-		 (poly/gcd-euclid (fpf->pcf u) v)))
-	       ((explicit-fpf? v)
-		(pcf->fpf
-		 (poly/gcd-euclid (fpf->pcf u)
-				  (fpf->pcf v))))
-	       (else (error "What do I do here?"))))
+         (cond ((explicit-pcf? v)
+                (poly/gcd-euclid u v))
+               ((explicit-fpf? v)
+                (poly/gcd-euclid u (fpf->pcf v)))
+               (else (error "What do I do here?"))))
+        ((explicit-fpf? u)
+         (cond ((explicit-pcf? v)
+                (pcf->fpf
+                 (poly/gcd-euclid (fpf->pcf u) v)))
+               ((explicit-fpf? v)
+                (pcf->fpf
+                 (poly/gcd-euclid (fpf->pcf u)
+                                  (fpf->pcf v))))
+               (else (error "What do I do here?"))))
         (else (error "What do I do here?"))))
 
 ;;bdk;; insert 1 end
@@ -38,28 +38,28 @@
 (define (gcd-check-same-arity u v)
   (let ((au (poly:arity u)))
     (if (not (fix:= au (poly:arity v)))
-	(error "Unequal arities -- poly:gcd" u v))
+        (error "Unequal arities -- poly:gcd" u v))
     au))
-    
+
 (define (gcd-target-type u)
   (cond ((explicit-pcf? u) '*pcf*)
-	((explicit-fpf? u) '*fpf*)
-	(else
-	 (error "Unknown type: gcd-target-type" u))))
+        ((explicit-fpf? u) '*fpf*)
+        (else
+         (error "Unknown type: gcd-target-type" u))))
 
 (define (poly->sparse p)
   (cond ((explicit-pcf? p) (pcf->sparse p))
-	((explicit-fpf? p) (fpf:terms p))
-	(else
-	 (error "Unknown type: poly->sparse" p))))
+        ((explicit-fpf? p) (fpf:terms p))
+        (else
+         (error "Unknown type: poly->sparse" p))))
 
 (define (sparse->poly s type)
   (cond ((eq? type '*pcf*)
-	 (sparse->pcf s))
-	((eq? type '*fpf*)
-	 (fpf:make (sort s sparse-term->)))
-	(else
-	 (error "Unknown type: sparse->poly" s type))))  
+         (sparse->pcf s))
+        ((eq? type '*fpf*)
+         (fpf:make (sort s sparse-term->)))
+        (else
+         (error "Unknown type: sparse->poly" s type))))
 
 (define (fpf->pcf p)
   (sparse->pcf (fpf:terms p)))
@@ -71,20 +71,20 @@
   (let lp ((p p) (arity (poly:arity p)))
     ;;(pp `((p ,p) (arity ,arity)))
     (if (base? p)
-	(if (zero? p)
-	    '()
-	    (list (sparse-term (make-list arity 0) p)))
-	(let ((degree (poly:degree p))
-	      (c (poly:leading-coefficient p))
-	      (r (poly:except-leading-term arity p)))
-	  ;;(pp (list degree c r))
-	  (sparse-combine-like-terms
-	   (append
-	    (map (lambda (s-term)
-		   (sparse-term (cons degree (sparse-exponents s-term))
-				(sparse-coefficient s-term)))
-		 (lp c (fix:- arity 1)))
-	    (lp r arity)))))))
+        (if (zero? p)
+            '()
+            (list (sparse-term (make-list arity 0) p)))
+        (let ((degree (poly:degree p))
+              (c (poly:leading-coefficient p))
+              (r (poly:except-leading-term arity p)))
+          ;;(pp (list degree c r))
+          (sparse-combine-like-terms
+           (append
+            (map (lambda (s-term)
+                   (sparse-term (cons degree (sparse-exponents s-term))
+                                (sparse-coefficient s-term)))
+                 (lp c (fix:- arity 1)))
+            (lp r arity)))))))
 
 (define (sparse->pcf s)
   (if (null? s)
@@ -95,12 +95,12 @@
             (if (sparse-constant? s)
                 (sparse-coefficient (car s))
                 (error "Bad sparse -- sparse->pcf" s))
-	(a-reduce poly:+
-		  (map (lambda (sterm)
-			 (poly:* (sparse-coefficient sterm)
-				 (a-reduce poly:*
-					   (map poly:expt
-						v
-						(sparse-exponents sterm)))))
-		       s))))))
+            (a-reduce poly:+
+                      (map (lambda (sterm)
+                             (poly:* (sparse-coefficient sterm)
+                                     (a-reduce poly:*
+                                               (map poly:expt
+                                                    v
+                                                    (sparse-exponents sterm)))))
+                           s))))))
 ;;bdk;; insert 2 end

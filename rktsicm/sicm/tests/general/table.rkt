@@ -76,7 +76,7 @@
     (define table (make-table 'test assq))
     (store! 2 table 'A 'B)
     (check-equal? (get table 'A 'B) 2))
-   
+
    (test-case
     "AList - lookup"
     (check-exn #px"key not in table -- LOOKUP" (λ () (lookup 'A '())))
@@ -108,7 +108,7 @@
     (check-equal? (disassoc 'A '()) '())
     (check-equal? (disassoc 'A '((B 2)(A 1))) '((B 2))))
 
-   
+
    (test-case
     "PList - default-lookup"
     (check-equal? (default-lookup 'name 'default '()) 'default)
@@ -121,7 +121,7 @@
     (check-equal? ((table-of eq? '(A B) '(1 2)) 'B) 2)
     (check-exn #px"Key not in table" (λ () ((table-of eq? '(A B) '(1 2)) 'C))))
 
-   
+
    ))
 
 (module+ test

@@ -23,7 +23,7 @@
          x)))
 (define bar
   '(define cons-unique
-     (let ((the-pair (cons #f #f)))  
+     (let ((the-pair (cons #f #f)))
        (define (hashcons x y)
          (set-car! the-pair x)
          (set-cdr! the-pair y)
@@ -47,11 +47,11 @@
    "general/hashcons"
    (test-case
     "canonical-copy"
-    
+
     (define cfoo (canonical-copy foo))
     (define cbar (canonical-copy bar))
     (define baz (caddr (caddr (caddr (caddr (caddr cfoo))))))
-    
+
     (check-true (eq? cfoo (canonical-copy foo)))
     (check-true (eq? cfoo (canonical-copy cfoo)))
     (check-false (eq? (caddr (caddr (caddr (caddr (caddr foo)))))

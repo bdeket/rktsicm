@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require rackunit
-         (only-in "../../kernel.rkt") ;; generics need to be loaded 
+         (only-in "../../kernel.rkt") ;; generics need to be loaded
          "../../kernel/mathutil.rkt"
          "../../kernel/express.rkt"
          "../helper+scm.rkt"
@@ -148,7 +148,7 @@
       (check-equal? (procedure-arity F) (list 1 (arity-at-least 3)))
       (check-equal? (F 2) -2)
       (check-equal? (F 2 1/2 2 1/2 2 1/2) -1))
-    
+
     (check-exn #px"g:compose-bin\\+n: contract violation\n  expected: first procedure that accepts 2 argument\\(s\\)\n  given:"
                (λ () (g:compose-bin (λ (x) (- x)) (list (λ (x y) (* x y)) (λ y (apply * y))))))
     (let ([F (g:compose-bin (λ (x y) (- x y)) (list (λ (x y) (* x y)) (λ _ 3)))])
@@ -172,7 +172,7 @@
     (check-exn #px"" (λ () (u:compose-bin F F)))
     (check-not-exn (λ () (g:compose-bin F F)))
     )
-   
+
    ))
 
 (module+ test

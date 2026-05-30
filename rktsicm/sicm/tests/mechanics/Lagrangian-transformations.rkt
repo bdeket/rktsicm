@@ -55,8 +55,8 @@
    ;**************************************************************************************************
    (check-simplified? (velocity
                        ((F->C p->r)
-                        (->local 't 
-                                 (coordinate-tuple 'r 'phi) 
+                        (->local 't
+                                 (coordinate-tuple 'r 'phi)
                                  (velocity-tuple 'rdot 'phidot))))
                       '(up (+ (* -1 r phidot (sin phi)) (* rdot (cos phi)))
                            (+ (* r phidot (cos phi)) (* rdot (sin phi)))))
@@ -71,7 +71,7 @@
       (compose (L-central-rectangular m V)
                (F->C p->r)))
     (check-simplified? ((L-central-polar 'm (literal-function 'V))
-                        (->local 't (coordinate-tuple 'r 'phi) 
+                        (->local 't (coordinate-tuple 'r 'phi)
                                  (velocity-tuple 'rdot 'phidot)))
                        '(+ (* 1/2 m (expt phidot 2) (expt r 2))
                            (* 1/2 m (expt rdot 2))
@@ -120,7 +120,7 @@
               (y (- (y_s t) (* l (cos theta)))))
           (coordinate-tuple x y))))
     (define (L-pend m l g y_s)
-      (compose (Lf m g) 
+      (compose (Lf m g)
                (F->C (dp-coordinates l y_s))))
     (check-simplified? ((L-pend 'm 'l 'g (literal-function 'y_s))
                         (->local 't 'theta 'thetadot))
@@ -162,7 +162,7 @@
             (v (velocity local)))
         (ref (cross-product q (* m v)) 2)))
     (check-simplified? ((compose (ang-mom-z 'm) (F->C s->r))
-                        (->local 't 
+                        (->local 't
                                  (coordinate-tuple 'r 'theta 'phi)
                                  (velocity-tuple 'rdot 'thetadot 'phidot)))
                        '(* m (expt r 2) phidot (expt (sin theta) 2)))

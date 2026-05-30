@@ -18,14 +18,14 @@
 
 (define (m:antisymmetric? A)
   (m:zero? ((m:elementwise careful-simplify)
-	    (matrix+matrix (transpose A) A))))
+            (matrix+matrix (transpose A) A))))
 
 (define (antisymmetric->column-matrix A)
   (assert (m:antisymmetric? A))
   (assert (rkt:= (m:dimension A) 3))
   (column-matrix (matrix-ref A 2 1)
-		 (matrix-ref A 0 2)
-		 (matrix-ref A 1 0)))
+                 (matrix-ref A 0 2)
+                 (matrix-ref A 1 0)))
 
 (define (3vector-components->antisymmetric v)
   (matrix-by-rows
@@ -45,10 +45,10 @@
 
 ;;; Suggested by Jack Wisdom on 30 Sept 2019.
 (define (((M-of-q->omega-of-t M-of-q) q) t)
-   (define M-of-t (compose M-of-q q))
-   (antisymmetric->column-matrix
-    (* ((D M-of-t) t)
-       (transpose (M-of-t t)))))
+  (define M-of-t (compose M-of-q q))
+  (antisymmetric->column-matrix
+   (* ((D M-of-t) t)
+      (transpose (M-of-t t)))))
 
 (define (((M-of-q->omega-body-of-t M-of-q) q) t)
   (* (transpose (M-of-q (q t)))
@@ -68,20 +68,20 @@
 (define ((T-body A B C) omega-body)
   (* 1/2
      (+ (* A (square (ref omega-body 0)))
-	(* B (square (ref omega-body 1)))
-	(* C (square (ref omega-body 2))))))
+        (* B (square (ref omega-body 1)))
+        (* C (square (ref omega-body 2))))))
 
 #|
 (define ((L-body A B C) omega-body)
   (column-matrix (* A (ref omega-body 0))
-		 (* B (ref omega-body 1))
-		 (* C (ref omega-body 2))))
+                 (* B (ref omega-body 1))
+                 (* C (ref omega-body 2))))
 |#
 
 (define ((L-body A B C) omega-body)
   (down (* A (ref omega-body 0))
-	(* B (ref omega-body 1))
-	(* C (ref omega-body 2))))
+        (* B (ref omega-body 1))
+        (* C (ref omega-body 2))))
 
 (define (((L-space M) A B C) omega-body)
   (* ((L-body A B C) omega-body)
@@ -91,11 +91,11 @@
 
 (define (Euler->M angles)
   (let ((theta (ref angles 0))
-	(phi (ref angles 1))
-	(psi (ref angles 2)))
+        (phi (ref angles 1))
+        (psi (ref angles 2)))
     (* (rotate-z-matrix phi)
        (* (rotate-x-matrix theta)
-	  (rotate-z-matrix psi)))))
+          (rotate-z-matrix psi)))))
 
 (define ((Euler->omega angles-path) t)
   (define (M-on-path t)
@@ -113,16 +113,16 @@
 (show-expression
   ((Euler->omega-body
     (up (literal-function 'theta)
-	(literal-function 'phi)
-	(literal-function 'psi)))
+        (literal-function 'phi)
+        (literal-function 'psi)))
    't))
 (matrix-by-rows
  (list (+ (* (sin (theta t)) (sin (psi t)) ((D phi) t))
-	  (* ((D theta) t) (cos (psi t)))))
+          (* ((D theta) t) (cos (psi t)))))
  (list (+ (* (sin (theta t)) (cos (psi t)) ((D phi) t))
-	  (* -1 ((D theta) t) (sin (psi t)))))
+          (* -1 ((D theta) t) (sin (psi t)))))
  (list (+ (* (cos (theta t)) ((D phi) t))
-	  ((D psi) t))))
+          ((D psi) t))))
 |#
 
 #|
@@ -134,15 +134,15 @@
   't))
 (matrix-by-rows
  (list (+ (* (sin (theta t)) (sin (psi t)) ((D phi) t))
-	  (* ((D theta) t) (cos (psi t)))))
+          (* ((D theta) t) (cos (psi t)))))
  (list (+ (* (sin (theta t)) (cos (psi t)) ((D phi) t))
-	  (* -1 ((D theta) t) (sin (psi t)))))
+          (* -1 ((D theta) t) (sin (psi t)))))
  (list (+ (* (cos (theta t)) ((D phi) t))
-	  ((D psi) t))))
+          ((D psi) t))))
 
 (show-expression
  ((M->omega-body Euler->M)
-  (up 't 
+  (up 't
       (up 'theta 'phi 'psi)
       (up 'thetadot 'phidot 'psidot))))
 (matrix-by-rows
@@ -214,7 +214,7 @@
 #|
 (define ((Euler-state->L-space A B C) local)
   (let ((angles (coordinate local)))
-    (((L-space (Euler->M angles)) A B C) 
+    (((L-space (Euler->M angles)) A B C)
      (Euler-state->omega-body local))))
 |#
 
@@ -251,7 +251,7 @@
 
 (print-expression
  (determinant
-  (((compose (partial 2) (partial 2)) 
+  (((compose (partial 2) (partial 2))
     (T-body-Euler 'A 'B 'C))
    an-Euler-state)))
 (* A B C (expt (sin theta) 2))
@@ -268,8 +268,8 @@
 
 (define ((monitor-errors win A B C L0 E0) state)
   (let ((t (time state))
-	(L ((L-space-Euler A B C) state))
-	(E ((T-body-Euler A B C) state)))
+        (L ((L-space-Euler A B C) state))
+        (E ((T-body-Euler A B C) state)))
     (plot-point win t (relative-error (ref L 0) (ref L0 0)))
     (plot-point win t (relative-error (ref L 1) (ref L0 1)))
     (plot-point win t (relative-error (ref L 2) (ref L0 2)))
@@ -286,10 +286,10 @@
 
 (let ((A 1.) (B (sqrt 2.)) (C 2.)
       (state0 (up 0.0
-		  (up 1. 0. 0.)
-		  (up 0.1 0.1 0.1))))
+                  (up 1. 0. 0.)
+                  (up 0.1 0.1 0.1))))
   (let ((L0 ((L-space-Euler A B C) state0))
-	(E0 ((T-body-Euler A B C) state0)))
+        (E0 ((T-body-Euler A B C) state0)))
     ((evolve rigid-sysder A B C)
      state0
      (monitor-errors win A B C L0 E0)
@@ -308,8 +308,8 @@
 
 #|
 (show-expression
- ((T-body-Euler 'A 'A 'C) 
-   (up 't 
+ ((T-body-Euler 'A 'A 'C)
+   (up 't
        (up 'theta 'phi 'psi)
        (up 'thetadot 'phidot 'psidot))))
 (+ (* 1/2 A (expt phidot 2) (expt (sin theta) 2))
@@ -323,25 +323,25 @@
 
 (print-expression
   (let ((Euler (up 'theta 'phi 'psi))
-	(v (up 'x 'y 'z)))
+        (v (up 'x 'y 'z)))
     (let ((M (Euler->M Euler)))
       (- (* (3vector-components->antisymmetric (* M v))
-	    M)
-	 (* M
-	    (3vector-components->antisymmetric v))))))
+            M)
+         (* M
+            (3vector-components->antisymmetric v))))))
 (matrix-by-rows (list 0 0 0) (list 0 0 0) (list 0 0 0))
 |#
 
-#| 
+#|
 ;;; Configuration equations for Euler's equations with Euler angles
-   
+
 (print-expression
   (let ((Euler (up (literal-function 'theta)
-				 (literal-function 'phi)
-				 (literal-function 'psi))))
-    (antisymmetric->column-matrix 
+                                 (literal-function 'phi)
+                                 (literal-function 'psi))))
+    (antisymmetric->column-matrix
      (* (transpose ((Euler->M Euler) 't))
-	((D (Euler->M Euler)) 't)))))
+        ((D (Euler->M Euler)) 't)))))
 (matrix-by-rows
  (list
   (+ (* ((D phi) t) (sin (psi t)) (sin (theta t)))
@@ -371,7 +371,7 @@
 (define ((V_eff p A C gMR) theta)
   (+ (/ (square p) (* 2 C))
      (* (/ (square p) (* 2 A))
-	(square (tan (/ theta 2))))
+        (square (tan (/ theta 2))))
      (* gMR (cos theta))))
 
 
@@ -391,39 +391,39 @@
 (define (quaternion-state->omega-body s)
   (let ((q (coordinates s)) (qdot (velocities s)))
     (let* ((m^2 (dot-product q q)))
-      (let ((omega^a 
+      (let ((omega^a
              (/ (* 2 (dot-product q (* q:i qdot))) m^2))
-            (omega^b 
+            (omega^b
              (/ (* 2 (dot-product q (* q:j qdot))) m^2))
-            (omega^c 
+            (omega^c
              (/ (* 2 (dot-product q (* q:k qdot))) m^2)))
         (up omega^a omega^b omega^c)))))
 
 (define (quaternion-state->omega-space s)
   (define q:a
     (matrix-by-rows (list  0 +1  0  0)
-		    (list -1  0  0  0)
-		    (list  0  0  0 +1)
-		    (list  0  0 -1  0)))
+                    (list -1  0  0  0)
+                    (list  0  0  0 +1)
+                    (list  0  0 -1  0)))
   (define q:b
     (matrix-by-rows (list  0  0 +1  0)
-		    (list  0  0  0 -1)
-		    (list -1  0  0  0)
-		    (list  0 +1  0  0)))
+                    (list  0  0  0 -1)
+                    (list -1  0  0  0)
+                    (list  0 +1  0  0)))
   (define q:c
     (matrix-by-rows (list  0  0  0 +1)
-		    (list  0  0 +1  0)
-		    (list  0 -1  0  0)
-		    (list -1  0  0  0)))
+                    (list  0  0 +1  0)
+                    (list  0 -1  0  0)
+                    (list -1  0  0  0)))
   (let ((q (coordinates s))
-	(qdot (velocities s)))
+        (qdot (velocities s)))
     (let ((Q (up->column-matrix q))
-	  (QdotT (m:transpose (up->column-matrix qdot))))
+          (QdotT (m:transpose (up->column-matrix qdot))))
       (let ((m^2 (ref (* (m:transpose Q) Q) 0 0)))
-	(let ((omega^x (/ (ref (* -2 QdotT q:a Q) 0 0) m^2))
-	      (omega^y (/ (ref (* -2 QdotT q:b Q) 0 0) m^2))
-	      (omega^z (/ (ref (* -2 QdotT q:c Q) 0 0) m^2)))
-	  (up omega^x omega^y omega^z))))))
+        (let ((omega^x (/ (ref (* -2 QdotT q:a Q) 0 0) m^2))
+              (omega^y (/ (ref (* -2 QdotT q:b Q) 0 0) m^2))
+              (omega^z (/ (ref (* -2 QdotT q:c Q) 0 0) m^2)))
+          (up omega^x omega^y omega^z))))))
 
 (define ((qw-state->L-body A B C) qw-state)
   ((L-body A B C) (ref qw-state 2)))
@@ -436,18 +436,18 @@
 
 (define ((T-quaternion-state A B C) s)
   (let ((q (coordinates s))
-	(qdot (velocities s)))
+        (qdot (velocities s)))
     (let ((Q (up->column-matrix q))
-	  (Qdot (up->column-matrix qdot)))
+          (Qdot (up->column-matrix qdot)))
       (let ((m^2 (ref (* (m:transpose Q) Q) 0 0)))
-	(let ((x (/ (* q:i Qdot) m^2))
-	      (y (/ (* q:j Qdot) m^2))
-	      (z (/ (* q:k Qdot) m^2))
-	      (M (* Q (m:transpose Q))))
-	  (* 2
-	     (+ (* A (ref (* (m:transpose x) M x) 0 0))
-		(* B (ref (* (m:transpose y) M y) 0 0))
-		(* C (ref (* (m:transpose z) M z) 0 0)))))))))
+        (let ((x (/ (* q:i Qdot) m^2))
+              (y (/ (* q:j Qdot) m^2))
+              (z (/ (* q:k Qdot) m^2))
+              (M (* Q (m:transpose Q))))
+          (* 2
+             (+ (* A (ref (* (m:transpose x) M x) 0 0))
+                (* B (ref (* (m:transpose y) M y) 0 0))
+                (* C (ref (* (m:transpose z) M z) 0 0)))))))))
 
 
 #|
@@ -494,7 +494,7 @@
                        (up 0.1 0.1 0.1)))
       (M (Euler->M (coordinates Euler-state)))
       (q (quaternion->vector (rotation-matrix->quaternion M)))
-      (qw-state0 
+      (qw-state0
        (up (time Euler-state)
            q
            (Euler-state->omega-body Euler-state))))

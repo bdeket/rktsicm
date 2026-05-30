@@ -63,7 +63,7 @@
       (int 'set-method! 'open-open)
       (int 'integral))
     (check-= (bar) -.5772156648993277 1e-10))
-   
+
    ))
 
 (module+ test

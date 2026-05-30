@@ -99,7 +99,7 @@
           qc-stepper))
       qc-stepper-maker)))
 
-(define *qc-trigger-point* 1.0)	 ; GJS
+(define *qc-trigger-point* 1.0)         ; GJS
 (define *qc-damping* .9)
 
 (define *qc-halfstep-reduction-factor* 0.3) ;must be less than .5
@@ -116,13 +116,13 @@
 #| For example:
 
 ((advance-generator
-  ((quality-control rk4 4)		;integration method
-   (lambda (v) v)			;x' = x
-   .0001))				;error tolerated
- #(1.0)					;initial state (at t = t0)
- 1.0					;proceed to t = t0 + 1
- 1.0					;first step no larger than .1
- 0.5					;no step larger than .5
+  ((quality-control rk4 4)                ;integration method
+   (lambda (v) v)                        ;x' = x
+   .0001))                                ;error tolerated
+ #(1.0)                                        ;initial state (at t = t0)
+ 1.0                                        ;proceed to t = t0 + 1
+ 1.0                                        ;first step no larger than .1
+ 0.5                                        ;no step larger than .5
  (lambda (ns dt h cont)
    (pp ns)
    (cont))
@@ -136,37 +136,37 @@
 ;Value: (#(2.7182707063734948) 1. .4041654277154577)
 |#
 
-(define (rk4 der tolerance)		;ignores tolerance
+(define (rk4 der tolerance)                ;ignores tolerance
   (define 2* (v:scale 2.0))
   (define 1/2* (v:scale 0.5))
-  (define 1/6* (v:scale (/ 1.0 6.0)))  
+  (define 1/6* (v:scale (/ 1.0 6.0)))
   (lambda (state)
     (let ((dydx (der state)))
       (define (rkstep h succeed fail)
-	(let* ((h* (v:scale h))
-	       (k0 (h* dydx))
-	       (k1 (h* (der (vector+vector state (1/2* k0)))))
-	       (k2 (h* (der (vector+vector state (1/2* k1)))))
-	       (k3 (h* (der (vector+vector state k2)))))
-	  (succeed
-	   (vector+vector state
-			  (1/6* (vector+vector (vector+vector k0 (2* k1))
-					       (vector+vector (2* k2) k3))))
-	   1)))
+        (let* ((h* (v:scale h))
+               (k0 (h* dydx))
+               (k1 (h* (der (vector+vector state (1/2* k0)))))
+               (k2 (h* (der (vector+vector state (1/2* k1)))))
+               (k3 (h* (der (vector+vector state k2)))))
+          (succeed
+           (vector+vector state
+                          (1/6* (vector+vector (vector+vector k0 (2* k1))
+                                               (vector+vector (2* k2) k3))))
+           1)))
       rkstep)))
 
 
 (add-integrator! 'rkqc
- (lambda (derivative lte-tolerance start-state
-		     step-required h-suggested max-h continue done)
-   ((advance-generator ((quality-control rk4 4) derivative lte-tolerance))
-    start-state
-    step-required
-    h-suggested
-    max-h
-    continue
-    done))
- '(derivative lte-tolerance start-state step-required h-suggested max-h continue done))
+                 (lambda (derivative lte-tolerance start-state
+                                     step-required h-suggested max-h continue done)
+                   ((advance-generator ((quality-control rk4 4) derivative lte-tolerance))
+                    start-state
+                    step-required
+                    h-suggested
+                    max-h
+                    continue
+                    done))
+                 '(derivative lte-tolerance start-state step-required h-suggested max-h continue done))
 
 ;;; The following are predictor-corrector methods.
 
@@ -177,14 +177,14 @@
 #| For example:
 
 ((advance-generator
-  ((quality-control c-trapezoid 2)	;integration method
-   (lambda (v) v)			;x' = x
-   0.0001				;qc error tolerated
-   1.0e-5))				;corrector convergence
- #(1.0)					;initial state (at t = t0)
- 1.0					;proceed to t = t0 + 1
- 0.1					;first step no larger than .1
- 0.5					;no step larger than .5
+  ((quality-control c-trapezoid 2)        ;integration method
+   (lambda (v) v)                        ;x' = x
+   0.0001                                ;qc error tolerated
+   1.0e-5))                                ;corrector convergence
+ #(1.0)                                        ;initial state (at t = t0)
+ 1.0                                        ;proceed to t = t0 + 1
+ 0.1                                        ;first step no larger than .1
+ 0.5                                        ;no step larger than .5
  (lambda (ns dt h cont)
    (pp ns)
    (cont))
@@ -206,48 +206,48 @@
 
 (define (c-trapezoid f qc-tolerance #:optional convergence-tolerance)
   (let ((error-measure
-	 (parse-error-measure
-	  (if (default-object? convergence-tolerance)
-	      qc-tolerance
-	      convergence-tolerance))))
+         (parse-error-measure
+          (if (default-object? convergence-tolerance)
+              qc-tolerance
+              convergence-tolerance))))
     (lambda (xn)
       (let ((d (f xn)))
-	(define (trapstep dt succeed fail)
-	  (let* ((dt/2 (* dt 0.5))
-		 (predicted (vector+vector xn (scalar*vector dt d)))
-		 (corrected
-		  (vector+vector xn
-				 (scalar*vector dt/2
-						(vector+vector (f predicted) d)))))
-	    (let lp ((predicted predicted) (corrected corrected) (count 1))
-	      (let ((verr (error-measure predicted corrected)))
-		(if (< verr 2.0)
-		    (succeed corrected count)
-		    (let* ((ncorr
-			    (vector+vector xn
-					   (scalar*vector dt/2
-							  (vector+vector (f corrected)
-									 d))))
-			   (nverr (error-measure ncorr corrected)))
-		      (if (< nverr verr)
-			  (lp corrected ncorr (fix:+ count 1))
-			  (begin (if pc-wallp? (write-line `(pc failed: ,nverr ,verr)))
-				 (fail)))))))))
-	trapstep))))
+        (define (trapstep dt succeed fail)
+          (let* ((dt/2 (* dt 0.5))
+                 (predicted (vector+vector xn (scalar*vector dt d)))
+                 (corrected
+                  (vector+vector xn
+                                 (scalar*vector dt/2
+                                                (vector+vector (f predicted) d)))))
+            (let lp ((predicted predicted) (corrected corrected) (count 1))
+              (let ((verr (error-measure predicted corrected)))
+                (if (< verr 2.0)
+                    (succeed corrected count)
+                    (let* ((ncorr
+                            (vector+vector xn
+                                           (scalar*vector dt/2
+                                                          (vector+vector (f corrected)
+                                                                         d))))
+                           (nverr (error-measure ncorr corrected)))
+                      (if (< nverr verr)
+                          (lp corrected ncorr (fix:+ count 1))
+                          (begin (if pc-wallp? (write-line `(pc failed: ,nverr ,verr)))
+                                 (fail)))))))))
+        trapstep))))
 
 (add-integrator! 'ctqc
- (lambda (derivative lte-tolerance convergence-tolerance start-state
-		     step-required h-suggested max-h continue done)
-   ((advance-generator
-     ((quality-control c-trapezoid 2) derivative lte-tolerance convergence-tolerance))
-    start-state
-    step-required
-    h-suggested
-    max-h
-    continue
-    done))
- '(derivative lte-tolerance convergence-tolerance start-state
-	      step-required h-suggested max-h continue done))
+                 (lambda (derivative lte-tolerance convergence-tolerance start-state
+                                     step-required h-suggested max-h continue done)
+                   ((advance-generator
+                     ((quality-control c-trapezoid 2) derivative lte-tolerance convergence-tolerance))
+                    start-state
+                    step-required
+                    h-suggested
+                    max-h
+                    continue
+                    done))
+                 '(derivative lte-tolerance convergence-tolerance start-state
+                              step-required h-suggested max-h continue done))
 
 ;;; A trapezoid method:  xn+1 is found by Newton iteration, rather
 ;;;   than corrector iteration as in c-trapezoid, above.
@@ -257,16 +257,16 @@
 #|  For example:
 
 ((advance-generator
-  ((quality-control n-trapezoid 2)	;integration method
-   (lambda (v cont)			;x' = x
+  ((quality-control n-trapezoid 2)        ;integration method
+   (lambda (v cont)                        ;x' = x
      (cont v (array->matrix #(#(1.0)))))
-   0.0001				;qc-error tolerated
-   1					;state dimension
-   1.0e-5))				;corrector convergence
- #(1.0)					;initial state (at t = t0)
- 1.0					;proceed to t = t0 + 1
- 0.1					;first step no larger than .1
- 0.5					;no step larger than .5
+   0.0001                                ;qc-error tolerated
+   1                                        ;state dimension
+   1.0e-5))                                ;corrector convergence
+ #(1.0)                                        ;initial state (at t = t0)
+ 1.0                                        ;proceed to t = t0 + 1
+ 0.1                                        ;first step no larger than .1
+ 0.5                                        ;no step larger than .5
  (lambda (ns dt h cont)
    (pp ns)
    (cont))
@@ -288,61 +288,61 @@
 
 (define (n-trapezoid f-df qc-tolerance dimension #:optional convergence-tolerance)
   (let* ((convergence-tolerance
-	  (if (default-object? convergence-tolerance)
-	      qc-tolerance
-	      convergence-tolerance))
-	 (error-measure (parse-error-measure convergence-tolerance))
-	 (clip-vector (vector-clipper dimension))
-	 (pad-vector (vector-padder dimension))
-	 (I (m:make-identity (J-dimension dimension))))
+          (if (default-object? convergence-tolerance)
+              qc-tolerance
+              convergence-tolerance))
+         (error-measure (parse-error-measure convergence-tolerance))
+         (clip-vector (vector-clipper dimension))
+         (pad-vector (vector-padder dimension))
+         (I (m:make-identity (J-dimension dimension))))
     (lambda (xn)
       (f-df xn
-	    (lambda (fn dfn)
-	      (define (trapstep h succeed fail)
-		(let ((h/2 (* h 0.5))
-		      (predicted (vector+vector xn (scalar*vector h fn))))
-		  (define (corrector xn+1)
-		    (f-df xn+1
-			  (lambda (fn+1 dfn+1)
-			    (let ((A (matrix-matrix (scalar*matrix h/2 dfn+1) I))
-				  (b (vector-vector xn+1
-				       (vector+vector xn
-					 (scalar*vector h/2
-							(vector+vector fn fn+1))))))
-			      (gauss-jordan-invert-and-solve
-			       A (clip-vector b)
-			       (lambda (dx . ignore)
-				 (vector+vector (pad-vector dx) xn+1))
-			       (lambda ()
-				 (if pc-wallp? (pp `(gj failed: ,A ,b)))
-				 (fail)))))))
-		  (let lp ((predicted predicted)
-			   (corrected (corrector predicted))
-			   (count 1))
-		    (let ((verr (error-measure predicted corrected)))
-		      (if (< verr 2.0)
-			  (succeed corrected count)
-			  (let* ((ncorr (corrector corrected))
-				 (nverr (error-measure ncorr corrected)))
-			    (if (< nverr verr)
-				(lp corrected ncorr (fix:+ count 1))
-				(begin (if pc-wallp?
-					   (write-line `(gj nr failed: ,nverr ,verr)))
-				       (fail)))))))))
-	      trapstep)))))
+            (lambda (fn dfn)
+              (define (trapstep h succeed fail)
+                (let ((h/2 (* h 0.5))
+                      (predicted (vector+vector xn (scalar*vector h fn))))
+                  (define (corrector xn+1)
+                    (f-df xn+1
+                          (lambda (fn+1 dfn+1)
+                            (let ((A (matrix-matrix (scalar*matrix h/2 dfn+1) I))
+                                  (b (vector-vector xn+1
+                                                    (vector+vector xn
+                                                                   (scalar*vector h/2
+                                                                                  (vector+vector fn fn+1))))))
+                              (gauss-jordan-invert-and-solve
+                               A (clip-vector b)
+                               (lambda (dx . ignore)
+                                 (vector+vector (pad-vector dx) xn+1))
+                               (lambda ()
+                                 (if pc-wallp? (pp `(gj failed: ,A ,b)))
+                                 (fail)))))))
+                  (let lp ((predicted predicted)
+                           (corrected (corrector predicted))
+                           (count 1))
+                    (let ((verr (error-measure predicted corrected)))
+                      (if (< verr 2.0)
+                          (succeed corrected count)
+                          (let* ((ncorr (corrector corrected))
+                                 (nverr (error-measure ncorr corrected)))
+                            (if (< nverr verr)
+                                (lp corrected ncorr (fix:+ count 1))
+                                (begin (if pc-wallp?
+                                           (write-line `(gj nr failed: ,nverr ,verr)))
+                                       (fail)))))))))
+              trapstep)))))
 
 (add-integrator!
  'ntqc
  (lambda (derivative-and-jacobian
-	  dimension
-	  lte-tolerance
-	  convergence-tolerance
-	  start-state
-	  step-required
-	  h-suggested
-	  max-h
-	  continue
-	  done)
+          dimension
+          lte-tolerance
+          convergence-tolerance
+          start-state
+          step-required
+          h-suggested
+          max-h
+          continue
+          done)
    ((advance-generator
      ((quality-control n-trapezoid 2)
       derivative-and-jacobian lte-tolerance dimension convergence-tolerance))

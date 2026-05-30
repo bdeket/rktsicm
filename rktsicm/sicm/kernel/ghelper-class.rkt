@@ -85,7 +85,7 @@
             (or (and (tree-rst? branch) (andmap pred? args) (tree-han branch))
                 (and (pred? (car args)) (loop (cdr args) branch))))]))
      (tree-han TREE)))
-    
+
   (define operator
     (procedure-rename
      (make-plain-procedure-stx 'make-generic-operator

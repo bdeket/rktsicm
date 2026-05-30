@@ -11,7 +11,7 @@
 ;;bdk;; start original file
 
 ;;;;           Variational Mechanics
-  
+
 ;;; Caution... This file is case sensitive!
 
 ;;; However, there are alternative names for the actual data types.
@@ -46,8 +46,8 @@
 (define (state->n-dof state)
   (let ((q (vector-ref state 1)))
     (if (up? q)
-	(s:length q)
-	1)))
+        (s:length q)
+        1)))
 
 
 ;;; Selectors are provided for the components of a state.
@@ -55,7 +55,7 @@
 (define (state->t state)
   (if (not (and (vector? state) (fix:> (vector-length state) 0)))
       (error "Cannot extract time from" state))
- (ref state 0))
+  (ref state 0))
 
 (define (state->q state)
   (if (not (and (vector? state) (fix:> (vector-length state) 1)))
@@ -71,7 +71,7 @@
   (if (not (and (vector? state) (fix:> (vector-length state) 3)))
       (error "Cannot extract acceleration from" state))
   (ref state 3))
-    
+
 (define time state->t)
 
 (define coordinate state->q)
@@ -89,25 +89,25 @@
 (define (literal-Lagrangian-state n-dof)
   (up (literal-number (generate-uninterned-symbol 't))
       (s:generate n-dof 'up
-		  (lambda (i)
-		    (literal-number (generate-uninterned-symbol 'x))))
+                  (lambda (i)
+                    (literal-number (generate-uninterned-symbol 'x))))
       (s:generate n-dof 'up
-		  (lambda (i)
-		    (literal-number (generate-uninterned-symbol 'v))))))
+                  (lambda (i)
+                    (literal-number (generate-uninterned-symbol 'v))))))
 
 ;;;; Chapter 1
 
 ;;; Paths in the configuration manifold are functions that give a
 ;;; configuration for each time.  From such a path we can construct a
-;;; path in the kinematic state space.  If such a path is described 
+;;; path in the kinematic state space.  If such a path is described
 ;;; in terms of generalized coordinates, we have
 
 #|
 (define (path->state-path q)
   (lambda (t)
     (->local t
-	     (q t)
-	     ((D q) t))))
+             (q t)
+             ((D q) t))))
 |#
 
 (define (path->state-path q #:optional n)
@@ -117,13 +117,13 @@
   (lambda (t)
     (list->vector
      (cons t
-	   (cons (q t)
-		 (let lp ((i (fix:- n 2)) (fi (D q)))
-		   (if (fix:= i 0)
-		       '()
-		       (cons (fi t)
-			     (lp (- i 1)
-				 (D fi))))))))))
+           (cons (q t)
+                 (let lp ((i (fix:- n 2)) (fi (D q)))
+                   (if (fix:= i 0)
+                       '()
+                       (cons (fi t)
+                             (lp (- i 1)
+                                 (D fi))))))))))
 
 (define Gamma path->state-path)
 
@@ -136,20 +136,20 @@
   (list->vector
    (stream-head
     (cons-stream t
-		 (cons-stream (q t)
-			      (map-stream (lambda (e) (((expt D e) q) t)) 
-					  natural-number-stream)))
+                 (cons-stream (q t)
+                              (map-stream (lambda (e) (((expt D e) q) t))
+                                          natural-number-stream)))
     n)))
 |#
 
 #|
-;;; Can we do it this way?  No...  
+;;; Can we do it this way?  No...
 ;;;  We don't know number of degrees of freedom when we build state vector.
 
 (define (path->state q)
   (->local identity
-	   q
-	   (D q)))
+           q
+           (D q)))
 |#
 
 ;;; A Lagrangian is an example of an L-function.
@@ -167,8 +167,8 @@
 (show-expression
  ((L-free-particle 'm)
   (->local 't
-	   (coordinate-tuple 'x 'y 'z)
-	   (velocity-tuple 'xdot 'ydot 'zdot))))
+           (coordinate-tuple 'x 'y 'z)
+           (velocity-tuple 'xdot 'ydot 'zdot))))
 (+ (* 1/2 m (expt xdot 2))
    (* 1/2 m (expt ydot 2))
    (* 1/2 m (expt zdot 2)))
@@ -177,8 +177,8 @@
  ((compose
    (L-free-particle 'm)
    (Gamma (coordinate-tuple (literal-function 'x)
-			    (literal-function 'y)
-			    (literal-function 'z))))
+                            (literal-function 'y)
+                            (literal-function 'z))))
   't))
 (+ (* 1/2 (expt ((D x) t) 2) m)
    (* 1/2 (expt ((D y) t) 2) m)
@@ -190,11 +190,11 @@
 (define ((Lagrange-equations Lagrangian #:optional dissipation-function) q)
   (let ((state-path (Gamma q)))
     (if (default-object? dissipation-function)
-	(- (D (compose ((partial 2) Lagrangian) state-path))
-	   (compose ((partial 1) Lagrangian) state-path))
-	(- (D (compose ((partial 2) Lagrangian) state-path))
-	   (compose ((partial 1) Lagrangian) state-path)
-	   (- (compose ((partial 2) dissipation-function) state-path))))))
+        (- (D (compose ((partial 2) Lagrangian) state-path))
+           (compose ((partial 1) Lagrangian) state-path))
+        (- (D (compose ((partial 2) Lagrangian) state-path))
+           (compose ((partial 1) Lagrangian) state-path)
+           (- (compose ((partial 2) dissipation-function) state-path))))))
 
 
 #|
@@ -208,8 +208,8 @@
 #|
 (define (test-path t)
   (coordinate-tuple (+ (* 'a t) 'a0)
-		    (+ (* 'b t) 'b0)
-		    (+ (* 'c t) 'c0)))
+                    (+ (* 'b t) 'b0)
+                    (+ (* 'c t) 'c0)))
 
 (print-expression
  (((Lagrange-equations (L-free-particle 'm))
@@ -227,7 +227,7 @@
 ;;;  spring constant, k, and mass, m.
 
 (define ((L-harmonic m k) local)
-  (let ((q (coordinate local)) 
+  (let ((q (coordinate local))
         (v (velocity local)))
     (- (* 1/2 m (square v))
        (* 1/2 k (square q)))))
@@ -257,7 +257,7 @@
  (((Lagrange-equations
     (L-uniform-acceleration 'm 'g))
    (coordinate-tuple (literal-function 'x)
-		     (literal-function 'y)))
+                     (literal-function 'y)))
   't))
 (down (* m (((expt D 2) x) t))
       (+ (* g m) (* m (((expt D 2) y) t))))
@@ -270,7 +270,7 @@
        (V (sqrt (square q))))))
 
 (show-expression
- (((Lagrange-equations 
+ (((Lagrange-equations
     (L-central-rectangular 'm (literal-function 'V)))
    (coordinate-tuple (literal-function 'x) (literal-function 'y)))
   't))
@@ -286,7 +286,7 @@
 #|
 ;;; Consider planar motion in a central force field, with an arbitrary
 ;;; potential, U, depending only on the radius.  The generalized
-;;; coordinates are polar. 
+;;; coordinates are polar.
 
 
 (define ((L-central-polar m V) local)
@@ -305,7 +305,7 @@
  (((Lagrange-equations
     (L-central-polar 'm (literal-function 'V)))
    (coordinate-tuple (literal-function 'r)
-		     (literal-function 'phi)))
+                     (literal-function 'phi)))
   't))
 (down
  (+ (* -1 m (r t) (expt ((D phi) t) 2))
@@ -320,16 +320,16 @@
 
 (define ((L-coupled-harmonic m k) state)
   (let ((q (coordinate state))
-	(qdot (velocity state)))
+        (qdot (velocity state)))
     (- (* 1/2 qdot m qdot)
        (* 1/2 q k q))))
 
 (show-expression
  (((Lagrange-equations
     (L-coupled-harmonic (down (down 'm_1 0) (down 0 'm_2))
-			(down (down 'k_1 'c) (down 'c 'k_2))))
+                        (down (down 'k_1 'c) (down 'c 'k_2))))
    (coordinate-tuple (literal-function 'x)
-		     (literal-function 'y)))
+                     (literal-function 'y)))
   't))
 (down (+ (* c (y t)) (* k_1 (x t)) (* m_1 (((expt D 2) x) t)))
       (+ (* c (x t)) (* k_2 (y t)) (* m_2 (((expt D 2) y) t))))
@@ -338,27 +338,27 @@
 #|
 ;;; Pendulum of mass m2 and length b, hanging from a support of mass
 ;;; m1 that is free to move horizontally (from Groesberg, Advanced
-;;; Mechanics, p. 72) 
+;;; Mechanics, p. 72)
 
 (define ((L-sliding-pend m1 m2 b g) state)
   (let ((q (coordinate state))
-	(qdot (velocity state)))
+        (qdot (velocity state)))
     (let* ((x (ref q 0))
-	   (xdot (ref qdot 0))
-	   (theta (ref q 1))
-	   (thetadot (ref qdot 1))
-	   (rel-pend-vel
-	    (* b thetadot (velocity-tuple (cos theta) (sin theta))))
-	   (pend-vel (+ rel-pend-vel (velocity-tuple xdot 0)))
-	   (Tpend (* 1/2 m2 (square pend-vel)))
-	   (Tsupport (* 1/2 m1 (square xdot)))
-	   (V (- (* m2 g b (cos theta)))))
+           (xdot (ref qdot 0))
+           (theta (ref q 1))
+           (thetadot (ref qdot 1))
+           (rel-pend-vel
+            (* b thetadot (velocity-tuple (cos theta) (sin theta))))
+           (pend-vel (+ rel-pend-vel (velocity-tuple xdot 0)))
+           (Tpend (* 1/2 m2 (square pend-vel)))
+           (Tsupport (* 1/2 m1 (square xdot)))
+           (V (- (* m2 g b (cos theta)))))
       (+ Tpend Tsupport (- V)))))
 
 (show-expression
  (((Lagrange-equations (L-sliding-pend 'm_1 'm_2 'b 'g))
    (coordinate-tuple (literal-function 'x)
-		     (literal-function 'theta)))
+                     (literal-function 'theta)))
   't))
 (down
  (+ (* -1 b m_2 (sin (theta t)) (expt ((D theta) t) 2))
@@ -375,24 +375,24 @@
 (define ((F-sliding-pend l) state)
   (let ((q (coordinate state)))
     (let ((x (ref q 0))
-	  (theta (ref q 1)))
+          (theta (ref q 1)))
       (up (up x 0)
-	  (up (+ x (* l (sin theta)))
-	      (* -1 l (cos theta)))))))
+          (up (+ x (* l (sin theta)))
+              (* -1 l (cos theta)))))))
 
 (define ((2-free m1 m2 g) state)
   (let ((v1 (ref (velocity state) 0))
-	(v2 (ref (velocity state) 1))
-	(h1 (ref (coordinate state) 0 1))
-	(h2 (ref (coordinate state) 1 1)))
+        (v2 (ref (velocity state) 1))
+        (h1 (ref (coordinate state) 0 1))
+        (h2 (ref (coordinate state) 1 1)))
     (- (+ (* 1/2 m1 (square v1))
-	  (* 1/2 m2 (square v2)))
+          (* 1/2 m2 (square v2)))
        (+ (* m1 g h1)
-	  (* m2 g h2)))))
+          (* m2 g h2)))))
 
 (define (L-sliding-pend m1 m2 l g)
   (compose (2-free m1 m2 g)
-	   (F->C (F-sliding-pend l))))
+           (F->C (F-sliding-pend l))))
 
 
 (show-expression
@@ -409,14 +409,14 @@
  (+ (* (expt b 2) m_2 (((expt D 2) theta) t))
     (* b g m_2 (sin (theta t)))
     (* b m_2 (cos (theta t)) (((expt D 2) x) t))))
-|# 
+|#
 
 #|
 ;;; Consider a simple pendulum with Rayleigh dissipation:
 
 (define ((L-pendulum g m l) state)
   (let ((theta (coordinate state))
-	(thetadot (velocity state)))
+        (thetadot (velocity state)))
     (+ (* 1/2 m (square (* l thetadot)))
        (* g m l (cos theta)))))
 
@@ -426,7 +426,7 @@
 
 (show-expression
  (((Lagrange-equations (L-pendulum 'g 'm 'l)
-		       (Rayleigh-dissipation 'k))
+                       (Rayleigh-dissipation 'k))
    (literal-function 'theta))
   't))
 (+ (* 2 k ((D theta) t))
@@ -439,13 +439,13 @@
 
 (define ((L-two-particle m1 m2) local)
   (let ((x (coordinate local))
-	(v (velocity local))
-	(V (literal-function 'V (-> (X (^ Real 2) (^ Real 2)) Real))))
+        (v (velocity local))
+        (V (literal-function 'V (-> (X (^ Real 2) (^ Real 2)) Real))))
     (let ((x1 (ref x 0)) (x2 (ref x 1))
           (v1 (ref v 0)) (v2 (ref v 1)))
       (- (+ (* 1/2 m1 (square v1))
-	    (* 1/2 m2 (square v2)))
-	 (V x1 x2)))))
+            (* 1/2 m2 (square v2)))
+         (V x1 x2)))))
 
 (show-expression
  (((Lagrange-equations (L-two-particle 'm_1 'm_2))
@@ -466,9 +466,9 @@
      (((partial 1 1) V) (up (x_1 t) (y_1 t)) (up (x_2 t) (y_2 t))))))
 |#
 
-;;; For integrating Lagrange's equations we need them in a form which 
+;;; For integrating Lagrange's equations we need them in a form which
 ;;; has the highest derivative isolated.
-;;; The following is an explicit solution for the second-derivative 
+;;; The following is an explicit solution for the second-derivative
 ;;; from Lagrange's equations, based on the operator form above:
 
 #|
@@ -478,15 +478,15 @@
     (let ((dP/dq ((partial 1) P))
           (dP/dqdot ((partial 2) P))
           (dP/dt ((partial 0) P))
-	  (qdot state->qdot))
+          (qdot state->qdot))
       (/ (- F (+ (* dP/dq qdot) dP/dt))
-	 dP/dqdot))))
+         dP/dqdot))))
 
 (define (Lagrangian->acceleration L)
   (let ((P ((partial 2) L))
         (F ((partial 1) L)))
     (/ (- F
-          (+ ((partial 0) P) 
+          (+ ((partial 0) P)
              (* ((partial 1) P) velocity)))
        ((partial 2) P))))
 
@@ -494,12 +494,12 @@
   (let ((P ((partial 2) L))
         (F ((partial 1) L)))
     (* (s:inverse (velocity state)
-		  (((partial 2) P) state)
-		  (velocity state))
+                  (((partial 2) P) state)
+                  (velocity state))
        ((- F
-	   (+ ((partial 0) P) 
-	      (* ((partial 1) P) velocity)))
-	state))))
+           (+ ((partial 0) P)
+              (* ((partial 1) P) velocity)))
+        state))))
 |#
 
 #|
@@ -508,66 +508,66 @@
 (define ((Lagrangian->acceleration L #:optional dissipation-function) state)
   (if (default-object? dissipation-function)
       (let ((P ((partial 2) L))
-	    (F ((partial 1) L)))
-	(* (s:inverse (velocity state)
-		      (((partial 2) P) state)
-		      (velocity state))
-	   ((- F
-	       (+ ((partial 0) P) 
-		  (* ((partial 1) P) velocity)))
-	    state)))
+            (F ((partial 1) L)))
+        (* (s:inverse (velocity state)
+                      (((partial 2) P) state)
+                      (velocity state))
+           ((- F
+               (+ ((partial 0) P)
+                  (* ((partial 1) P) velocity)))
+            state)))
       (let ((P ((partial 2) L))
-	    (F ((partial 1) L))
-	    (Diss ((partial 2) dissipation-function)))
-	(* (s:inverse (velocity state)
-		      (((partial 2) P) state)
-		      (velocity state))
-	   ((- (- F Diss)
-	       (+ ((partial 0) P) 
-		  (* ((partial 1) P) velocity)))
-	    state)))))
+            (F ((partial 1) L))
+            (Diss ((partial 2) dissipation-function)))
+        (* (s:inverse (velocity state)
+                      (((partial 2) P) state)
+                      (velocity state))
+           ((- (- F Diss)
+               (+ ((partial 0) P)
+                  (* ((partial 1) P) velocity)))
+            state)))))
 
 (define ((Lagrangian->acceleration L #:optional dissipation-function) state)
   (if (default-object? dissipation-function)
       (let ((P ((partial 2) L))
-	    (F ((partial 1) L)))
-	(let ((minv
-	       (s:inverse (velocity state)
-			  (((partial 2) P) state)
-			  (velocity state))))
-	  (* minv
-	     ((- F
-		 (+ ((partial 0) P) 
-		    (* ((partial 1) P) velocity)))
-	      state))))
+            (F ((partial 1) L)))
+        (let ((minv
+               (s:inverse (velocity state)
+                          (((partial 2) P) state)
+                          (velocity state))))
+          (* minv
+             ((- F
+                 (+ ((partial 0) P)
+                    (* ((partial 1) P) velocity)))
+              state))))
       (let ((P ((partial 2) L))
-	    (F ((partial 1) L))
-	    (Diss ((partial 2) dissipation-function)))
-	(let ((minv
-	       (s:inverse (velocity state)
-			  (((partial 2) P) state)
-			  (velocity state))))
+            (F ((partial 1) L))
+            (Diss ((partial 2) dissipation-function)))
+        (let ((minv
+               (s:inverse (velocity state)
+                          (((partial 2) P) state)
+                          (velocity state))))
 
-	  (* minv
-	     ((- (- F Diss)
-		 (+ ((partial 0) P) 
-		    (* ((partial 1) P) velocity)))
-	      state))))))
+          (* minv
+             ((- (- F Diss)
+                 (+ ((partial 0) P)
+                    (* ((partial 1) P) velocity)))
+              state))))))
 |#
 
 (define ((Lagrangian->acceleration L #:optional dissipation-function) state)
   (let ((P ((partial 2) L))
-	(F ((partial 1) L)))
+        (F ((partial 1) L)))
     (if (default-object? dissipation-function)
-	(solve-linear-left (((partial 2) P) state)
+        (solve-linear-left (((partial 2) P) state)
                            ((- F
-                               (+ ((partial 0) P) 
+                               (+ ((partial 0) P)
                                   (* ((partial 1) P) velocity)))
                             state))
-	(solve-linear-left (((partial 2) P) state)
+        (solve-linear-left (((partial 2) P) state)
                            ((- (- F
                                   ((partial 2) dissipation-function))
-                               (+ ((partial 0) P) 
+                               (+ ((partial 0) P)
                                   (* ((partial 1) P) velocity)))
                             state)))))
 
@@ -578,8 +578,8 @@
 (show-expression
  ((Lagrangian->acceleration (L-sliding-pend 'm_1 'm_2 'b 'g))
   (->local 't
-	   (coordinate-tuple 'x 'theta)
-	   (velocity-tuple 'xdot 'thetadot))))
+           (coordinate-tuple 'x 'theta)
+           (velocity-tuple 'xdot 'thetadot))))
 (up
  (+
   (/ (* b m_2 (expt thetadot 2) (sin theta))
@@ -601,15 +601,15 @@
   (let ((local-path (qv->local-path q v)))
     (- (D local-path)
        (compose (local-state-derivative L)
-		local-path))))
+                local-path))))
 
 (define ((local-state-derivative L) local)
   (->local 1
-	   (velocity local)
-	   ((Lagrangian->acceleration L) local)))
+           (velocity local)
+           ((Lagrangian->acceleration L) local)))
 
 (define Lagrange-equations-first-order
-        Lagrange-equations-1)
+  Lagrange-equations-1)
 
 (define ((qv->local-path q v) t)
   (->local t (q t) (v t)))
@@ -650,22 +650,22 @@
 (define (Lagrangian->state-derivative L #:optional dissipation-function)
   (if (default-object? dissipation-function)
       (let ((acceleration (Lagrangian->acceleration L)))
-	(lambda (state)
-	  (up
-	   1
-	   (velocity state)
-	   (acceleration state))))
+        (lambda (state)
+          (up
+           1
+           (velocity state)
+           (acceleration state))))
       (let ((acceleration (Lagrangian->acceleration L dissipation-function)))
-	(lambda (state)
-	  (up
-	   1
-	   (velocity state)
-	   (acceleration state))))))
+        (lambda (state)
+          (up
+           1
+           (velocity state)
+           (acceleration state))))))
 
 #|
 (print-expression
  ((Lagrangian->state-derivative (L-pendulum 'g 'm 'l)
-			       (Rayleigh-dissipation 'k))
+                               (Rayleigh-dissipation 'k))
   (up 't 'theta 'thetadot)))
 (up 1
     thetadot
@@ -673,7 +673,7 @@
        (/ (* -2 k thetadot) (* (expt l 2) m))))
 |#
 
-;;; Given a Lagrangian, we can make an energy function on (t, Q, Qdot). 
+;;; Given a Lagrangian, we can make an energy function on (t, Q, Qdot).
 
 (define (Lagrangian->energy L)
   (let ((P ((partial 2) L)))
@@ -681,11 +681,11 @@
 
 
 ;;; On a trajectory there may be power lost (if dissipation)
-;;;  The following produces the power lost.  
+;;;  The following produces the power lost.
 
 (define ((Lagrangian->power-loss L) q)
   (D (compose (Lagrangian->energy L)
-	      (Gamma q))))
+              (Gamma q))))
 
 #|
 ;;; Alternatively
@@ -693,7 +693,7 @@
 (define ((Lagrangian->power-loss L) q)
   (- (* ((Lagrange-equations L) q) (D q))
      (compose ((partial 0) L)
-	      (Gamma q))))
+              (Gamma q))))
 |#
 
 #|
@@ -703,7 +703,7 @@
 (show-expression
  ((compose
    (Lagrangian->energy (L-central-polar 'm (literal-function 'U)))
-   (Gamma 
+   (Gamma
     (coordinate-tuple (literal-function 'r) (literal-function 'phi))))
   't))
 (+ (* 1/2 m (expt (r t) 2) (expt ((D phi) t) 2))
@@ -765,7 +765,7 @@
 
 (show-expression
  (((partial 2) (L3-central 'm (literal-function 'V)))
-  (->local 't 
+  (->local 't
            (coordinate-tuple 'r 'theta 'phi)
            (velocity-tuple 'rdot 'thetadot 'phidot))))
 (down (* m rdot)

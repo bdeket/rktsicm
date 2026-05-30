@@ -18,25 +18,25 @@
 
 (define (curl metric orthonormal-basis)
   (let ((star (Hodge-star metric orthonormal-basis))
-	(sharp (raise metric orthonormal-basis))
-	(flat (lower metric)))
+        (sharp (raise metric orthonormal-basis))
+        (flat (lower metric)))
     (compose sharp star d flat)))
 
 (define (divergence metric orthonormal-basis)
   (let ((star (Hodge-star metric orthonormal-basis))
-	(flat (lower metric)))
+        (flat (lower metric)))
     (compose star d star flat)))
 
 (define (Laplacian metric orthonormal-basis)
   (compose (divergence metric orthonormal-basis)
-	   (gradient metric orthonormal-basis)))
+           (gradient metric orthonormal-basis)))
 
 #|
 ;;; Alternative divergence
 
 (define (((divergence1 Cartan) v) point)
   (let ((basis (Cartan->basis Cartan))
-	(nabla (covariant-derivative Cartan)))
+        (nabla (covariant-derivative Cartan)))
     (contract
      (lambda (ei wi)
        ((wi ((nabla ei) v)) point))
@@ -49,17 +49,17 @@
   (let ((gij (coordinate-system->metric-components coordinate-system)))
     ; (assert (diagonal? gij))
     (s:generate (coordinate-system 'dimension) 'down
-     (lambda (i)
-       (sqrt (ref gij i i))))))
+                (lambda (i)
+                  (sqrt (ref gij i i))))))
 
 (define (coordinate-system->orthonormal-vector-basis coordsys)
   (s:generate (coordsys 'dimension) 'down
-    (lambda (i)
-      (* (ref (coordinate-system->vector-basis coordsys) i)
-	 (/ 1
-	    (compose
-	     (ref (coordinate-system->Lame-coefficients coordsys) i)
-	     (chart coordsys)))))))
+              (lambda (i)
+                (* (ref (coordinate-system->vector-basis coordsys) i)
+                   (/ 1
+                      (compose
+                       (ref (coordinate-system->Lame-coefficients coordsys) i)
+                       (chart coordsys)))))))
 
 #|
 ;;; Test setup for spherical system
@@ -79,25 +79,25 @@
 (define (spherical-metric v1 v2)
   (+ (* (dr v1) (dr v2))
      (* (square r)
-	(+ (* (dtheta v1) (dtheta v2))
-	   (* (expt (sin theta) 2)
-	      (dphi v1) (dphi v2))))))
+        (+ (* (dtheta v1) (dtheta v2))
+           (* (expt (sin theta) 2)
+              (dphi v1) (dphi v2))))))
 
 (define spherical-Gamma
   (make-Christoffel
    (let ((O (lambda x 0)))
      (down
       (down (up O O O)
-	    (up O (/ 1 r) O)
-	    (up O O (/ 1 r)))
+            (up O (/ 1 r) O)
+            (up O O (/ 1 r)))
       (down (up O (/ 1 r) O)
-	    (up (* -1 r) O O)
-	    (up O O (/ (cos theta) (sin theta))))
+            (up (* -1 r) O O)
+            (up O O (/ (cos theta) (sin theta))))
       (down (up O O (/ 1 r))
-	    (up O O (/ (cos theta) (sin theta)))
-	    (up (* -1 r (expt (sin theta) 2))
-		(* -1 (sin theta) (cos theta))
-		O))))
+            (up O O (/ (cos theta) (sin theta)))
+            (up (* -1 r (expt (sin theta) 2))
+                (* -1 (sin theta) (cos theta))
+                O))))
    (coordinate-system->basis spherical)))
 
 
@@ -126,11 +126,11 @@
 
 (define orthonormal-spherical-1form-basis
   (vector-basis->dual orthonormal-spherical-vector-basis
-		      spherical))
+                      spherical))
 
 (define orthonormal-spherical-basis
   (make-basis orthonormal-spherical-vector-basis
-	      orthonormal-spherical-1form-basis))
+              orthonormal-spherical-1form-basis))
 
 (define v
   (+ (* (literal-manifold-function 'v^0 spherical) e_0)
@@ -232,8 +232,8 @@
 (s:map/r
  (lambda (u)
    (s:map/r (lambda (v)
-	      ((g-Minkowski u v) an-event))
-	    SR-vector-basis))
+              ((g-Minkowski u v) an-event))
+            SR-vector-basis))
  SR-vector-basis)
 #|
 (down (down -1 0 0 0)

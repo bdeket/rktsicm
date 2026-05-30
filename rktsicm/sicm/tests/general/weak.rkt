@@ -14,9 +14,9 @@
     (check-equal? (weak-car W0) 1)
     (check-true (weak-pair/car? W0))
     (check-equal? (weak-cdr W0) 2)
-    
+
     (check-true (weak-pair? W0))
-    
+
     ;; force GC
     (define W1 (weak-cons (list 1.5) (list 5.8)))
     (weak-set-cdr! W1 (list 6.9))

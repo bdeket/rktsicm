@@ -11,8 +11,8 @@
 ;;;; Chirp z-transform
 ;;;   from  Rabiner, Schaffer, Rader, BSTJ, May-June 1969
 
-;;; Gives the z-transform of N samples of data (given as a list) 
-;;;   at M points in the z-plane, starting at z=A.  
+;;; Gives the z-transform of N samples of data (given as a list)
+;;;   at M points in the z-plane, starting at z=A.
 ;;;   Subsequent points are at z=A*W^{-k}, for k=0,1,...,M-1.
 
 
@@ -22,7 +22,7 @@
 
 (define (Fourier-expanded M f0 f1 data)
   (let ((A (exp (* n:2pi +i f0)))
-	(W (exp (* n:2pi -i (/ (- f1 f0) M)))))
+        (W (exp (* n:2pi -i (/ (- f1 f0) M)))))
     (chirp-z M A W data)))
 
 ;;; Coded by JW in April 2017.
@@ -31,27 +31,27 @@
 (define (chirp-z M A W data)
   (let ((N (length data)))
     (let ((L
-	   (inexact->exact (expt 2
-				 (ceiling (/ (log (+ N M -1))
-					     (log 2))))))
+           (inexact->exact (expt 2
+                                 (ceiling (/ (log (+ N M -1))
+                                             (log 2))))))
           (data (list->vector data)))
       (let ((yn
              (generate-list L
-               (lambda (n)
-                 (if (< n N)
-                     (* (expt A (- n))
-                        (expt W (/ (* n n) 2))
-                        (vector-ref data n))
-                     0))))
+                            (lambda (n)
+                              (if (< n N)
+                                  (* (expt A (- n))
+                                     (expt W (/ (* n n) 2))
+                                     (vector-ref data n))
+                                  0))))
             (vn
              (generate-list L
-               (lambda (n) 
-                 (cond ((< n M) 
-                        (/ 1 (expt W (/ (* n n) 2))))
-                       ((and (<= (+ (- L N) 1) n) (< n L))
-                        (/ 1 (expt W (/ (* (- L n) (- L n)) 2))))
-                       (else 
-                        0))))))
+                            (lambda (n)
+                              (cond ((< n M)
+                                     (/ 1 (expt W (/ (* n n) 2))))
+                                    ((and (<= (+ (- L N) 1) n) (< n L))
+                                     (/ 1 (expt W (/ (* (- L n) (- L n)) 2))))
+                                    (else
+                                     0))))))
         (let ((fft-transform-pair (make-transform-pair L)))
           (let ((Yr ((transform-pair->fft fft-transform-pair) yn))
                 (Vr ((transform-pair->fft fft-transform-pair) vn)))
@@ -61,25 +61,25 @@
                       ((transform-pair->ift fft-transform-pair) Wr))))
                 (let ((Xk
                        (generate-list M
-                         (lambda (k)
-                           (* (expt W (/ (* k k) 2))
-                              (vector-ref gk k))))))
-		  Xk)))))))))
+                                      (lambda (k)
+                                        (* (expt W (/ (* k k) 2))
+                                           (vector-ref gk k))))))
+                  Xk)))))))))
 
-(define (Hanning data)			;data is a list of numbers
+(define (Hanning data)                        ;data is a list of numbers
   (let ((N (length data)))
     (let lp ((data data) (i 0) (ans '()))
       (if (< i N)
-	  (lp (cdr data)
-	      (+ i 1)
-	      (cons (* (car data)
-		       (square (sin (/ (* n:pi i)
-				       (- N 1)))))
-		    ans))
-	  (reverse ans)))))
+          (lp (cdr data)
+              (+ i 1)
+              (cons (* (car data)
+                       (square (sin (/ (* n:pi i)
+                                       (- N 1)))))
+                    ans))
+          (reverse ans)))))
 
 #|
-;;; Demonstration of use of Fourier-expanded 
+;;; Demonstration of use of Fourier-expanded
 ;;; and Hanning window.
 
 (define win (frame 0 1024 -2.0 +2.0 1000 200 1500 100))
@@ -114,14 +114,14 @@
 (define (plot-data win data)
   (let ((N (length data)))
     (for-each (lambda (n)
-		(plot-point win n (ref data n)))
-	      (iota N))))
+                (plot-point win n (ref data n)))
+              (iota N))))
 
 (define data
   (generate-list 1024
-		 (lambda (n)
-		   (+ (cos (* 8  (/ n 1024) n:2pi))
-		      (sin (* 12 (/ n 1024) n:2pi))))))
+                 (lambda (n)
+                   (+ (cos (* 8  (/ n 1024) n:2pi))
+                      (sin (* 12 (/ n 1024) n:2pi))))))
 
 (plot-data win data)
 
@@ -129,7 +129,7 @@
 
 (plot-data win1 bar)
 ;;; We see the positive and negative frequency
-;;; components displayed and separated.  
+;;; components displayed and separated.
 ;;; Note that the magnitudes of the lines are 0.5.
 
 
@@ -138,17 +138,17 @@
        (dft (Hanning data))))
 
 (plot-data win2 goosh)
-;;; The Hanning window broadens the spectral lines, 
-;;; as expected (it is an apodized aperture).  It 
+;;; The Hanning window broadens the spectral lines,
+;;; as expected (it is an apodized aperture).  It
 ;;; halves the peak magnitudes of the lines.
 
 
 (define foosh
   (map magnitude
        (Fourier-expanded 1000
-			 (/ 5 1000)
-			 (/ 15 1000)
-			 data)))
+                         (/ 5 1000)
+                         (/ 15 1000)
+                         data)))
 
 (plot-data win3 foosh)
 ;;; The spectrum is expanded to look at the details
@@ -159,12 +159,12 @@
 (define boosh
   (map magnitude
        (Fourier-expanded 1000
-			 (/ 5 1000)
-			 (/ 15 1000)
-			 (Hanning data))))
+                         (/ 5 1000)
+                         (/ 15 1000)
+                         (Hanning data))))
 
 (plot-data win4 boosh)
-;;; The Hanning window suppresses the sidelobes, 
+;;; The Hanning window suppresses the sidelobes,
 ;;; but it decreases the resolution, as expected.
 |#
 
@@ -175,28 +175,28 @@
   (let ((N (length data)))
     (let lp ((data data) (i 0) (ans '()))
       (if (< i N)
-	  (let ((d (car data)))
-	    (lp (cdr data)
-		(+ i 1)
-		(cons (list (car d)
-			    (* (cadr d)
-			       (square (sin (/ (* n:pi i)
-					       (- N 1))))))
-		      ans)))
-	  (reverse ans)))))
+          (let ((d (car data)))
+            (lp (cdr data)
+                (+ i 1)
+                (cons (list (car d)
+                            (* (cadr d)
+                               (square (sin (/ (* n:pi i)
+                                               (- N 1))))))
+                      ans)))
+          (reverse ans)))))
 
 (define (apply-hanning-0 data)
   (let ((N (length data)))
     (let lp ((data data) (i 0) (ans '()))
       (if (< i N)
-	  (let ((d (car data)))
-	    (lp (cdr data)
-		(+ i 1)
-		(cons (* d
-			 (square (sin (/ (* n:pi i)
-					 (- N 1)))))
-		      ans)))
-	  (reverse ans)))))
+          (let ((d (car data)))
+            (lp (cdr data)
+                (+ i 1)
+                (cons (* d
+                         (square (sin (/ (* n:pi i)
+                                         (- N 1)))))
+                      ans)))
+          (reverse ans)))))
 |#
 
-				   
+

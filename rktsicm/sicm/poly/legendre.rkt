@@ -20,15 +20,15 @@
 
 (define legendre-polynomials
   (cons-stream poly:one
-    (cons-stream poly:identity
-      (map-streams (lambda (p1 p2)
-		     (let* ((n (+ (poly:degree p1) 1))
-			    (a (/ (- (* 2 n) 1) n))
-			    (b (/ (- n 1) n)))
-		       (poly:- (poly:* (poly:scale poly:identity a) p1)
-			       (poly:scale p2 b))))
-		   (tail legendre-polynomials)
-		   legendre-polynomials))))
+               (cons-stream poly:identity
+                            (map-streams (lambda (p1 p2)
+                                           (let* ((n (+ (poly:degree p1) 1))
+                                                  (a (/ (- (* 2 n) 1) n))
+                                                  (b (/ (- n 1) n)))
+                                             (poly:- (poly:* (poly:scale poly:identity a) p1)
+                                                     (poly:scale p2 b))))
+                                         (tail legendre-polynomials)
+                                         legendre-polynomials))))
 
 (define (legendre-polynomial n)
   (stream-ref legendre-polynomials n))

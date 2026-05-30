@@ -36,7 +36,7 @@
                   #(((data . base)) (2)))
     (check-equal? ((match:eqv +inf.0) `(4 2) '((data . base)) vector)
                   #f))
-   
+
    (test-case
     "datum=?"
     (check-true  (datum=? +inf.0 (/ 1 0.)))
@@ -47,7 +47,7 @@
     "match:bind | lookup | value"
     (check-equal? (match:bind 'var 'obj '((data . base)))
                   '((var . obj) (data . base)))
-   
+
     (check-equal? (match:lookup 'var '((a . b)(var . val)(c . d)))
                   '(var . val))
     (check-equal? (match:lookup 'val '((a . b)(var . val)(c . d)))
@@ -55,7 +55,7 @@
 
     (check-equal? (match:value '(var . val))
                   'val))
-   
+
    (test-case
     "match:element"
     (check-equal? ((match:element 'var) '(val rst) '((data . base)(var . val)) vector)
@@ -119,7 +119,7 @@
                   #f)
     (check-equal? ((match:reverse-segment 'var) '() `((data . base)(var . ,(match:make-segment (cons 'a end) end))) vector)
                   #f)
-    
+
     (check-exn #px"Bad segment--reverse"
                (λ () ((match:reverse-segment 'var) '(a list) `((data . base)(var . ,(match:make-segment '(not) '(here)))) vector))))
 

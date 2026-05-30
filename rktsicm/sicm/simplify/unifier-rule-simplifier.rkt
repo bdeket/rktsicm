@@ -29,21 +29,21 @@
 (define (rule-simplifier the-rules)
   (define (simplify-expression expression)
     (if (pair? expression)
-	(let ((ssubs (map simplify-expression expression)))
-	  (let ((result (try-rules ssubs the-rules)))
-	    (if result
-		(simplify-expression result)
-		ssubs)))
-	expression))
+        (let ((ssubs (map simplify-expression expression)))
+          (let ((result (try-rules ssubs the-rules)))
+            (if result
+                (simplify-expression result)
+                ssubs)))
+        expression))
   (rule-memoize simplify-expression))
 
 
 (define (try-rules expression the-rules)
   (define (scan rules)
     (if (null? rules)
-	#f
-	(or ((car rules) expression)
-	    (scan (cdr rules)))))
+        #f
+        (or ((car rules) expression)
+            (scan (cdr rules)))))
   (scan the-rules))
 
 
@@ -67,29 +67,29 @@
 (define (rule-simplifier the-rules)
   (define (simplify-exprs exprs resimp?)
     (let ((result
-	   (let lp ((exprs exprs))
-	     (cond ((null? exprs) '())
-		   ((try-rules (car exprs) the-rules)
-		    => (lambda (result)
-			 (set! resimp? #t)
-			 (cons (if (pair? result)
-				   (lp result)
-				   result)
-			       (cdr exprs))))
-		   (else
-		    (cons (car exprs)
-			  (lp (cdr exprs))))))))
+           (let lp ((exprs exprs))
+             (cond ((null? exprs) '())
+                   ((try-rules (car exprs) the-rules)
+                    => (lambda (result)
+                         (set! resimp? #t)
+                         (cons (if (pair? result)
+                                   (lp result)
+                                   result)
+                               (cdr exprs))))
+                   (else
+                    (cons (car exprs)
+                          (lp (cdr exprs))))))))
       (if resimp?
-	  (simplify-expression result)
-	  result)))
+          (simplify-expression result)
+          result)))
   (define (simplify-expression expression)
     (if (pair? expression)
-	(let ((result (try-rules expression the-rules)))
-	  (if result
-	      (if (pair? result)
-		  (simplify-exprs result #t)
-		  result)
-	      (simplify-exprs expression #f)))
-	expression))
+        (let ((result (try-rules expression the-rules)))
+          (if result
+              (if (pair? result)
+                  (simplify-exprs result #t)
+                  result)
+              (simplify-exprs expression #f)))
+        expression))
   (rule-memoize simplify-expression))
 |#
