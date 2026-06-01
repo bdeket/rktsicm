@@ -1,7 +1,8 @@
 #lang scribble/manual
 
 @(require (for-label (except-in racket +)
-                     (only-in sicm simplify g:simplify g:+ +)))
+                     (only-in sicm simplify g:simplify g:+ +)
+                     (only-in sicm/general/notes show-notes)))
 
 @title[#:tag "SICM"]{SICM}
 
@@ -16,17 +17,22 @@ The following main language is provided:
 @codeblock{#lang sicm}
 
 @para{}
-Additionaly some other intermediate languages are defined.
+Additionaly two other intermediate languages are defined.
 
 @para{}
 @codeblock{#lang s-exp sicm/kernel}
 The kernel functions, with applicable structures and with racket's base mathematical functions prepended with "rkt:". Note that some functions in this language will not work since not all generics have been loaded. Most importantly @racket[g:simplify].
 
 @para{}
-Lastly, a minimum working language on top of the kernel language:
+A minimum working language on top of the kernel language:
 @codeblock{#lang s-exp sicm/generic}
 This loads @racket[simplify] and binds all mathematical symbols to their generic function. ie: @racket[+] will be bound to @racket[g:+] etc.
 The mechanics and calculus modules are defined in this language.
+
+@para{}
+An optional module @racket[sicm/repl] can be instantiated to have automatic simplification turned on in the repl.
+@margin-note{In DrRacket the prompt is not changed. Suggestions on how to do this or an alternative approach are welkom.}
+Additionally in the racket REPL it will show a prompt as @racket["?> "] instead of @racket["> "] when there were assumptions made during the last simplification. These notes can be checked with @racket[show-notes].
 
 @local-table-of-contents[#:style 'immediate-only]
 

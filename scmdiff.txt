@@ -29,6 +29,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/numerics.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/parameters.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/poly/domain.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/poly.scm
+could not find: ../../racket/test/sicm/scmutils-20230902/repl.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/simplify.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/solve.scm
 could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
@@ -80,7 +81,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
  2 difference(s) found in kernel/structs
 11 difference(s) found in kernel/strutl
  3 difference(s) found in kernel/types
- 8 difference(s) found in kernel/utils
+10 difference(s) found in kernel/utils
  8 difference(s) found in kernel/vectors
  4 difference(s) found in mechanics/Hamiltonian
  1 difference(s) found in mechanics/Noether

@@ -41,7 +41,7 @@
     (check-equal? (call-with-output-string (λ (out)
                                              (parameterize ([current-output-port out])
                                                (show-notes))))
-                  "\n#| \n'test\n'(rule-22)\n|#"))
+                  "#| \n'test\n'(rule-22)\n|#\n"))
    ))
 
 (module+ test

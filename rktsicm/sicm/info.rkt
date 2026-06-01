@@ -22,6 +22,7 @@
                           #rx"sicm[/|\\\\]numerics"
                           #rx"sicm[/|\\\\]poly"
                           #rx"sicm[/|\\\\]parameters"
+                          #rx"sicm[/|\\\\]repl"
                           #rx"sicm[/|\\\\]rkt[/|\\\\]"
                           #rx"sicm[/|\\\\]simplify"
                           #rx"sicm[/|\\\\]solve"

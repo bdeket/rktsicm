@@ -21,7 +21,7 @@ Usually it is more interesting to see the result as a list of symbols and number
 @codeblock{
  (let ([P (current-print)]) (current-print (λ (a) (P (simplify a)))))
 }
-However, some simplifications can take a long time. Functions are opaque to the simplifier, so unless applied to a symbol, the output will not be any more informative.
+This can be anabled by instantiating @racket[sicm/repl]. However, some simplifications can take a long time. Functions are opaque to the simplifier, so unless applied to a symbol, the output will not be any more informative.
 
 @para{}
 Representing literal mathematical objects is possible: for example @racket['f] could represent a number, a vector, a function, etc. To make it clear that it represents a function it should be defined with @racket[(literal-function 'f)]. If just the quoted symbol @racket['f] is used the default is to treat it as @racket[(literal-number 'f)].

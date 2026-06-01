@@ -43,7 +43,6 @@
 
 (define (show-notes)
   (set! *last-notes-shown* *last-notes*)
-  (newline)
   (display "#| ")
   (for-each (lambda (note)
               (newline)
@@ -51,5 +50,6 @@
               (let ((sig (eq-get note 'rules)))
                 (if sig (pp sig))))
             *last-notes*)
-  (display "|#"))
+  (display "|#")
+  (newline))
 ;;bdk;; insert 1 end
