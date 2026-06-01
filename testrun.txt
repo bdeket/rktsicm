@@ -8,7 +8,7 @@
    7                     0.0 ./rktsicm/sicm/tests/calculus/basis.rkt
   14             1       0.5 ./rktsicm/sicm/tests/calculus/connection.rkt
    4                     0.0 ./rktsicm/sicm/tests/calculus/coord.rkt
-  28                     1.0 ./rktsicm/sicm/tests/calculus/covariant-derivative.rkt
+  28                     0.5 ./rktsicm/sicm/tests/calculus/covariant-derivative.rkt
   10                  2  0.5 ./rktsicm/sicm/tests/calculus/curvature.rkt
    9                     0.0 ./rktsicm/sicm/tests/calculus/dgutils.rkt
    1                     0.0 ./rktsicm/sicm/tests/calculus/exterior-derivative.rkt
@@ -26,7 +26,7 @@
   18                  2  0.5 ./rktsicm/sicm/tests/calculus/so3.rkt
    5                     0.0 ./rktsicm/sicm/tests/calculus/tensors.rkt
   10                  1  1.0 ./rktsicm/sicm/tests/calculus/vector-calculus.rkt
-  11                     0.5 ./rktsicm/sicm/tests/calculus/vector-fields.rkt
+  11                     0.0 ./rktsicm/sicm/tests/calculus/vector-fields.rkt
    8                     0.0 ./rktsicm/sicm/tests/calculus/wedge.rkt
    7                  1  0.0 ./rktsicm/sicm/tests/display/exdisplay.rkt
    4                  1  0.0 ./rktsicm/sicm/tests/display/pp.rkt
@@ -156,8 +156,8 @@
    2                     0.0 ./rktsicm/sicm/tests/simplify/symbenv.rkt
    1                     0.0 ./rktsicm/sicm/tests/simplify/syntax.rkt
    3                     0.0 ./rktsicm/sicm/tests/simplify/unifier-rule-simplifier.rkt
-  47                     0.0 ./rktsicm/sicm/tests/solve/solve-utils.rkt
-  99                  4  0.0 ./rktsicm/sicm/tests/solve/solve.rkt
+  48                     0.0 ./rktsicm/sicm/tests/solve/solve-utils.rkt
+ 102                  4  0.0 ./rktsicm/sicm/tests/solve/solve.rkt
   12                     0.0 ./rktsicm/sicm/tests/stream-error.rkt
    7                     0.0 ./rktsicm/sicm/tests/units/hms-dms-radians.rkt
    2                     0.0 ./rktsicm/sicm/tests/units/system-extra.rkt
@@ -166,11 +166,11 @@
   19                  2  0.0 ./rktsicm/sicm/tests/units/with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1709             2   68 17.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
-runtime: 3.95m
+1713             2   68 16.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
+runtime: 3.8666666666666667m
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1709             2   68 21.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
-runtime: 4.216666666666667m
+1713             2   68 22.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
+runtime: 4.15m
 
 Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz 12-cores 4000MHz

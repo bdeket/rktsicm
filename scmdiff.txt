@@ -141,7 +141,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
  2 difference(s) found in simplify/symbenv
  1 difference(s) found in simplify/syntax
  7 difference(s) found in solve/solve-utils
-11 difference(s) found in solve/solve
+23 difference(s) found in solve/solve
  5 difference(s) found in units/SI-units
 18 difference(s) found in units/constants
  4 difference(s) found in units/hms-dms-radians

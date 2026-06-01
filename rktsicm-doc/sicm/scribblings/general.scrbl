@@ -403,17 +403,79 @@ Outside of @racket[with-limited-time], @racket[allocated-time-expired?] will alw
 @;*************************************************************************************************
 @section{sets}
 @defmodule[sicm/general/sets #:packages ("rktsicm")]
-@(let ()
-   (local-require (for-label sicm/general/sets))
-   @deftempproc*[<numbers adjoin-set difference-sets duplications? element-set? empty-set empty-set?
-                 eq-set/adjoin eq-set/difference eq-set/empty? eq-set/equal? eq-set/intersection
-                 eq-set/make-empty eq-set/member? eq-set/remove eq-set/subset? eq-set/union
-                 intersect-sets list->set list-adjoin list-difference list-intersection list-union
-                 make-sets-package multi-set/adjoin multi-set/difference multi-set/element?
-                 multi-set/empty multi-set/empty? multi-set/first multi-set/intersection
-                 multi-set/remove multi-set/rest multi-set/union numbers real-numbers remove-duplicates
-                 remove-set same-set? set->list singleton-set singleton-set? subset-sets? subset?
-                 symbols union-sets])
+@subsection{List set}
+List sets work on lists, elements are compared with @racket[simple:equal?], uniqueness is note enforced.
+@deftogether[[@defproc[(list-adjoin [item any/c] [set2 list?]) list?]
+              @defproc[(list-union  [set1 list?] [set2 list?]) list?]
+              @defproc[(list-intersection [set1 list?] [set2 list?]) list?]
+              @defproc[(list-difference [set1 list?] [set2 list?]) list?]
+              @defproc[(subset? [set1 list?] [set2 list?]) boolean?]
+              @defproc[(same-set? [set1 list?] [set2 list?]) boolean?]]]{
+ Functions on list sets. New elements added to a set (set2) will not be duplicates.
+}
+@defproc[(duplications? [set1 list?]) list?]{
+ Check if a set has duplicates.
+}
+@deftogether[[
+              @defproc[(remove-duplicates [set1 list?]) list?]]]{
+ Remove duplicates from a set.
+}
+
+@subsection{eq-set}
+eq-sets work on list, elements are compared with @racket[eq?], uniqueness is note enforced.
+@deftogether[[@defproc[(eq-set/make-empty) '()]
+              @defproc[(eq-set/empty? [set2 list?]) boolean?]
+              @defproc[(eq-set/member? [item any/c] [set2 list?]) boolean?]
+              @defproc[(eq-set/adjoin [item any/c] [set2 list?]) list?]
+              @defproc[(eq-set/remove [item any/c] [set2 list?]) list?]
+              @defproc[(eq-set/union  [set1 list?] [set2 list?]) list?]
+              @defproc[(eq-set/intersection [set1 list?] [set2 list?]) list?]
+              @defproc[(eq-set/difference [set1 list?] [set2 list?]) list?]
+              @defproc[(eq-set/subset? [set1 list?] [set2 list?]) boolean?]
+              @defproc[(eq-set/equal? [set1 list?] [set2 list?]) boolean?]]]{
+ Functions on eq-sets. New elements added to a set (set2) will not be duplicates.
+}
+
+@subsection{multi-set}
+multi-sets work on list, no uniqueness is note enforced.
+@deftogether[[@defproc[(multi-set/make-empty) '()]
+              @defproc[(multi-set/empty? [set2 list?]) boolean?]
+              @defproc[(multi-set/element? [item any/c] [set2 list?]) boolean?]
+              @defproc[(multi-set/first  [set2 list?]) any/c]
+              @defproc[(multi-set/rest   [set2 list?]) list?]
+              @defproc[(multi-set/adjoin [item any/c] [set2 list?]) list?]
+              @defproc[(multi-set/remove [item any/c] [set2 list?]) list?]
+              @defproc[(multi-set/union  [set1 list?] [set2 list?]) list?]
+              @defproc[(multi-set/intersection [set1 list?] [set2 list?]) list?]
+              @defproc[(multi-set/difference [set1 list?] [set2 list?]) list?]]]{
+ Functions on multi-sets.
+}
+
+@subsection{Dedicated set}
+@deftogether[[@defproc[(make-sets-package [equal? (-> A A boolean?)] [less-than (-> A A boolean?)]) sets-package]
+              @defproc[(empty-set  [sp sets-package]) empty-set]
+              @defproc[(empty-set? [sp sets-package]) (-> any/c boolean?)]
+              @defproc[(singleton-set  [sp sets-package]) (-> A A-set)]
+              @defproc[(singleton-set? [sp sets-package]) (-> any/c boolean?)]
+              @defproc[(adjoin-set [sp sets-package]) (-> A A-set A-set)]
+              @defproc[(remove-set [sp sets-package]) (-> A A-set A-set)]
+              @defproc[(element-set? [sp sets-package]) (-> A A-set boolean?)]
+              @defproc[(intersect-sets [sp sets-package]) (-> A-set A-set A-set)]
+              @defproc[(union-sets [sp sets-package]) (-> A-set A-set A-set)]
+              @defproc[(difference-sets [sp sets-package]) (-> A-set A-set A-set)]
+              @defproc[(subset-sets? [sp sets-package]) (-> A-set A-set boolean?)]
+              @defproc[(list->set [sp sets-package]) (-> (listof A) A-set)]
+              @defproc[(set->list [sp sets-package]) (-> A-set (listof A))]]]{
+ Constructor and accessors for @racket{sets-package}s. This are set functions working on ordered sets.
+}
+@deftogether[[@defthing[symbols Symbol-set]
+              @defthing[real-numbers Real-set]
+              @defthing[number-numbers Number-set]]]{
+ Predefined @racket{sets-package}s for @racket{symbol?}s, @racket{real?}s and @racket{number?}s.
+}
+@defproc[(<numbers [n1 number?] [n2 number?]) boolean?]{
+ The order function for the numbers set.
+}
 
 @;*************************************************************************************************
 @section{stack-queue}

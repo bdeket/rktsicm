@@ -78,13 +78,13 @@ The general strategy is:
      go to step #1.
 |#
 
-(define (make-solution resid-eqs resid-vars substs tough)
-  (list resid-eqs resid-vars substs tough))
+(struct solution (resid-eqs resid-vars substs tough) #:transparent
+  #:extra-constructor-name make-solution)
 
-(define (residual-equations solution) (car solution))
-(define (residual-variables solution) (cadr solution))
-(define (substitutions solution) (caddr solution))
-(define (tough-equations solution) (cadddr solution))
+(define residual-equations solution-resid-eqs)
+(define residual-variables solution-resid-vars)
+(define substitutions      solution-substs)
+(define tough-equations    solution-tough)
 
 
 (define *outstanding-contradictions* (make-parameter (gensym 'undefined)))
@@ -580,13 +580,14 @@ The general strategy is:
                      (lset-union simple:equal? (equation-justifications equation) justs)))))
 
 (define (make-substitution var value justs)
-  (if (any (lambda (just)
-             (and (root-premise? just)
-                  (member (root-premise-opposite just)
-                          justs
-                          simple:equal?)))
-           justs)
-      (begin (error "Aargh-subst") #f))
+  (when (any (lambda (just)
+               (and (root-premise? just)
+                    (member (root-premise-opposite just)
+                            justs
+                            simple:equal?)))
+             justs)
+    (raise-argument-error 'make-substitution
+                          "non-conflicting justifications" justs))
   (list (list '= var (s:simplify value)) justs))
 
 (define (substitution-variable subst) (cadar subst))
@@ -594,22 +595,21 @@ The general strategy is:
 (define (substitution-justifications subst) (cadr subst))
 
 
-(define (make-equation expr justs)
+(struct equation (expression justifications variables) #:transparent)
+
+(define (make-equation expr [justs (list (gensym 'eq:))])
   (let* ((specs (standardize-equation expr '() '() #f))
          (pexpr (car specs))
          (vspecs (cadr specs)))
-    (if (any (lambda (just)
-               (and (root-premise? just)
-                    (member (root-premise-opposite just)
-                            justs
-                            simple:equal?)))
-             justs)
-        (begin (error "Aargh-eqn") #f))
-    (list pexpr justs vspecs)))
-
-(define (equation-expression eqn) (car eqn))
-(define (equation-justifications eqn) (cadr eqn))
-(define (equation-variables eqn) (caddr eqn))
+    (when (any (lambda (just)
+                 (and (root-premise? just)
+                      (member (root-premise-opposite just)
+                              justs
+                              simple:equal?)))
+               justs)
+      (raise-argument-error 'make-equation
+                          "non-conflicting justifications" justs))
+    (equation pexpr justs vspecs)))
 
 (define s:simplify g:simplify)
 
@@ -1423,6 +1423,11 @@ done
            (make-equation e (list (symbol 'eq: n))))
          resids
          (iota (length resids))))
+  (define (solution->list sol) (list (residual-equations sol)
+                                     (residual-variables sol)
+                                     (substitutions sol)
+                                     (tough-equations sol)))
+  (define (list->solution lst) (apply solution lst))
   (define (make-substitutions news olds expression)
     (assert (= (length news) (length olds)))
     (let lp ((n news) (o olds) (expression expression))
@@ -1455,9 +1460,12 @@ done
                                                            (s:simplify resid))))
                  (s:fringe struct)))))
          (solns
-          (make-substitutions knowns internal-knowns
-                              (make-substitutions unknowns internal-unknowns
-                                                  (solve-incremental eqns internal-unknowns)))))
+          (solve-incremental eqns internal-unknowns
+                             (λ (sol fail)
+                               (list->solution
+                                (make-substitutions knowns internal-knowns
+                                                    (make-substitutions unknowns internal-unknowns
+                                                                        (solution->list sol))))))))
     (if (not (or (default-object? show-eqns?)
                  (not show-eqns?)))
         (println eqns))
@@ -1467,7 +1475,7 @@ done
                              (map substitution-variable (substitutions solns))
                              (map simplify (s:fringe struct)))))
     |#
-    (cons '*solution* solns)))
+    solns))
 
 #|
 (simple-solve

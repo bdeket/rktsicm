@@ -2,7 +2,8 @@
 
 (require rackunit)
 
-(require "../../solve.rkt"
+(require "../../solve/solve-utils.rkt"
+         "../../solve/solve.rkt"
          "../../general/list-utils.rkt"
          "../helper.rkt")
 
@@ -14,6 +15,17 @@
 (define Ts (list (make-equation '(* z 4) '(C))))
 (define (sol #:E [E Es] #:V [V Vs] #:S [S Ss] #:T [T Ts])
   (make-solution E V S T))
+
+(define-syntax-rule (->equ rst ...) (equation `rst ...))
+(define-syntax-rule (->sol ((a ...) ...) b c ((d ...) ...))
+  (solution (list (->equ a ...) ...) `b `c (list (->equ d ...) ...)))
+(define-syntax-rule (full-solutions (a b c d) ...)
+  (list 'full-solutions (->sol a b c d) ...))
+(define-syntax-rule (underdetermined (a b c d) ...)
+  (list 'underdetermined (->sol a b c d) ...))
+(define-syntax-rule (parameters-constrained (a b c d) ...)
+  (list 'parameters-constrained (->sol a b c d) ...))
+(define-syntax-rule (contradictions (lst ...) ...) (list 'contradictions (->equ lst ...) ...))
 
 ;***************************************************************************************************
 ;* from solve-utils.rkt                                                                            *
@@ -156,8 +168,8 @@
     "equivalent-solution?"
     (define S1 (sol))
     (check-true (equivalent-solutions? S1 (sol #:E (list (make-equation '(+ 3 x) '(A)))
-                                        #:S (list (make-substitution 'y '(+ 3 x) '(B)))
-                                        #:T (list (make-equation '(* z 4.) '(C))))))
+                                               #:S (list (make-substitution 'y '(+ 3 x) '(B)))
+                                               #:T (list (make-equation '(* z 4.) '(C))))))
     (check-false (equivalent-solutions? S1 (sol #:E (list (make-equation '(+ 3 x) '(D))))))
     (check-false (equivalent-solutions? S1 (sol #:E (list (make-equation '(+ 4 x) '(A))))))
     (check-false (equivalent-solutions? S1 (sol #:V (list 'z))))
@@ -210,7 +222,7 @@
                   (make-substitution 'x 3 '(A)))
     (check-equal? (substitution-variable-entry 'x
                                                (make-solution '() '() (list (make-substitution 'y 3 '(A))) '()))
-                   #f))
+                  #f))
    ;; ************ actual functionality ************
    (test-case
     "collect-best-solutions"
@@ -264,8 +276,8 @@
                          #:S (list (make-substitution 'y '(+ 3 z) '(A))
                                    (make-substitution 'x '(+ 4 z) '(B)))))
           (define S* (sol #:E '() #:V '() #:T '()
-                         #:S (list (make-substitution 'x '(+ 4 z) '(B))
-                                   (make-substitution 'y '(+ 3 z) '(A)))))
+                          #:S (list (make-substitution 'x '(+ 4 z) '(B))
+                                    (make-substitution 'y '(+ 3 z) '(A)))))
           ;; succeed sorts substitutions
           (check-equal? (default-succeed S fail) 'go-to-next)
           (check-equal? (all) (list (list S*) '() '() '() '())))
@@ -292,7 +304,7 @@
     "test-solver"
     ;;TODO; remove this export?
     (check-equal? (out->string (test-solver (list (make-equation '(+ (* 3 x) 5) '(A))) '(x)))
-                  "#|\n(full-solutions (() () (((= x -5/3) (A))) ()))\n|#\n"))
+                  "#|\n(full-solutions #(struct:solution () () (((= x -5/3) (A))) ()))\n|#\n"))
    (test-case
     "solve-equations"
     (define (all) (list (*complete-solutions*) (*underdetermined-solutions*) (*with-residual-equations*) (*with-tough-equations*) (*with-extra-equations*)))
@@ -303,7 +315,7 @@
                    [*with-extra-equations*      'bad])
       (check-equal? (all) '(very very very very bad))
       (check-equal? (solve-equations (list (make-equation '(+ x 3) '(A))) '(x))
-                    '(full-solutions (() () (((= x -3) (A))) ())))
+                    (full-solutions (() () (((= x -3) (A))) ())))
       (check-equal? (all) '(very very very very bad))))
    ;*************************************************************************************************
    (check-equal?
@@ -311,7 +323,7 @@
      (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
      '(x y))
-    '(full-solutions (() () (((= x 2) (A B)) ((= y 1) (A B))) ())))
+    (full-solutions (() () (((= x 2) (A B)) ((= y 1) (A B))) ())))
 
    (check-equal?
     (solve-equations
@@ -319,14 +331,14 @@
            (make-equation '(+  x   y      2)  (list 'B))
            (make-equation '(+  x          1)  (list 'C)))
      '(x y z))
-    '(full-solutions (() () (((= x -1) (C)) ((= y -1) (B C)) ((= z 1) (A B))) ())))
+    (full-solutions (() () (((= x -1) (C)) ((= y -1) (B C)) ((= z 1) (A B))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x)     y  -5)  (list 'B)))
      '(x y))
-    '(contradictions (-2 (A B) ()) (2 (B A) ())))
+    (contradictions (-2 (A B) ()) (2 (B A) ())))
 
    (check-equal?
     (solve-equations
@@ -334,38 +346,38 @@
            (make-equation '(-  5 (- x y))                       (list 'B))
            (make-equation '(-  3 (+ (* (sqrt x) z) (square y))) (list 'C)))
      '(x y z))
-    '(full-solutions (() () (((= x 4) (A B)) ((= y -1) (A B)) ((= z 1) (A B C))) ())))
+    (full-solutions (() () (((= x 4) (A B)) ((= y -1) (A B)) ((= z 1) (A B C))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (* (+ a b) (- a c)) c) (list 'A))
            (make-equation '(- 3 (+ a b))             (list 'B)))
      '(a b c))
-    '(underdetermined (() (c) (((= a (* 2/3 c)) (A B)) ((= b (+ 3 (* -2/3 c))) (A B))) ())))
+    (underdetermined (() (c) (((= a (* 2/3 c)) (A B)) ((= b (+ 3 (* -2/3 c))) (A B))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
            (make-equation '(- 3 (- a c))  (list 'B)))
      '(a b c))
-    '(underdetermined (() (c) (((= a (+ 3 c)) (B)) ((= b (+ -3 (* -4/3 c))) (A B))) ())))
+    (underdetermined (() (c) (((= a (+ 3 c)) (B)) ((= b (+ -3 (* -4/3 c))) (A B))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
            (make-equation '(- 3 (- a b))  (list 'B)))
      '(a b c))
-    '(underdetermined
-      (()
-       (a)
-       (((= b (+ -3 a)) (A B))
-        ((= c (/ (+ (* 2 (expt a 2)) (* -3 a)) (+ -4 (* 2 a)))) (A B)))
-       ())
-      (()
-       (b)
-       (((= a (+ 3 b)) (B))
-        ((= c (/ (+ 9 (* 2 (expt b 2)) (* 9 b)) (+ 2 (* 2 b)))) (A B)))
-       ())))
+    (underdetermined
+     (()
+      (a)
+      (((= b (+ -3 a)) (A B))
+       ((= c (/ (+ (* 2 (expt a 2)) (* -3 a)) (+ -4 (* 2 a)))) (A B)))
+      ())
+     (()
+      (b)
+      (((= a (+ 3 b)) (B))
+       ((= c (/ (+ 9 (* 2 (expt b 2)) (* 9 b)) (+ 2 (* 2 b)))) (A B)))
+      ())))
 
    (check-equal?
     (solve-equations
@@ -373,85 +385,85 @@
            (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
      '(x y z))
-    '(full-solutions (() () (((= x 2) (A B)) ((= y 1) (A B)) ((= z -1/2) (A B C))) ())))
+    (full-solutions (() () (((= x 2) (A B)) ((= y 1) (A B)) ((= z -1/2) (A B C))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(- 200/3 (/ 1 (+ (/ 1 R1) (/ 1 R2))))  (list 'A))
            (make-equation '(-  1/3 (/ R2 (+ R1 R2)))  (list 'B)))
      '(R1 R2))
-    `(full-solutions
-      (()
-       ()
-       (((= R1 0) (A B ,(hypothetical (- quadratic -6 600 0))))
-        ((= R2 0) (A B ,(hypothetical (- quadratic -6 600 0)))))
-       ())
-      (()
-       ()
-       (((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))
-        ((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0)))))
-       ())))
+    (full-solutions
+     (()
+      ()
+      (((= R1 0) (A B ,(hypothetical (- quadratic -6 600 0))))
+       ((= R2 0) (A B ,(hypothetical (- quadratic -6 600 0)))))
+      ())
+     (()
+      ()
+      (((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))
+       ((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0)))))
+      ())))
 
    (check (λ (x y) (lset= equal? x y))
           (solve-equations
            (list (make-equation '(- (* 1/3 (+ R1 R2)) R2)  (list 'B))
                  (make-equation '(- (* 200/3 (+ R1 R2)) (* R1 R2))  (list 'A)))
            '(R1 R2))
-          `(full-solutions
-            (()
-             ()
-             (((= R1 0) (A B ,(hypothetical (- quadratic -6 600 0))))
-              ((= R2 0) (A B ,(hypothetical (- quadratic -6 600 0)))))
-             ())
-            (()
-             ()
-             (((= R1 0) (A B ,(hypothetical (- quadratic -2 200 0))))
-              ((= R2 0) (A B ,(hypothetical (- quadratic -6 600 0)))))
-             ())
-            (()
-             ()
-             (((= R1 0) (A B ,(hypothetical (- quadratic -6 600 0))))
-              ((= R2 0) (A B ,(hypothetical (- quadratic -2 200 0)))))
-             ())
-            (()
-             ()
-             (((= R1 0) (A B ,(hypothetical (- quadratic -2 200 0))))
-              ((= R2 0) (A B ,(hypothetical (- quadratic -2 200 0)))))
-             ())
-            (()
-             ()
-             (((= R1 200) (A B ,(hypothetical (+ quadratic -2 200 0))))
-              ((= R2 100) (A B ,(hypothetical (+ quadratic -2 200 0)))))
-             ())
-            (()
-             ()
-             (((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))
-              ((= R2 100) (A B ,(hypothetical (+ quadratic -2 200 0)))))
-             ())
-            (()
-             ()
-             (((= R1 200) (A B ,(hypothetical (+ quadratic -2 200 0))))
-              ((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0)))))
-             ())
-            (()
-             ()
-             (((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))
-              ((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0)))))
-             ())))
+          (full-solutions
+           (()
+            ()
+            (((= R1 0) (A B ,(hypothetical (- quadratic -6 600 0))))
+             ((= R2 0) (A B ,(hypothetical (- quadratic -6 600 0)))))
+            ())
+           (()
+            ()
+            (((= R1 0) (A B ,(hypothetical (- quadratic -2 200 0))))
+             ((= R2 0) (A B ,(hypothetical (- quadratic -6 600 0)))))
+            ())
+           (()
+            ()
+            (((= R1 0) (A B ,(hypothetical (- quadratic -6 600 0))))
+             ((= R2 0) (A B ,(hypothetical (- quadratic -2 200 0)))))
+            ())
+           (()
+            ()
+            (((= R1 0) (A B ,(hypothetical (- quadratic -2 200 0))))
+             ((= R2 0) (A B ,(hypothetical (- quadratic -2 200 0)))))
+            ())
+           (()
+            ()
+            (((= R1 200) (A B ,(hypothetical (+ quadratic -2 200 0))))
+             ((= R2 100) (A B ,(hypothetical (+ quadratic -2 200 0)))))
+            ())
+           (()
+            ()
+            (((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))
+             ((= R2 100) (A B ,(hypothetical (+ quadratic -2 200 0)))))
+            ())
+           (()
+            ()
+            (((= R1 200) (A B ,(hypothetical (+ quadratic -2 200 0))))
+             ((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0)))))
+            ())
+           (()
+            ()
+            (((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))
+             ((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0)))))
+            ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(- (expt x 2) 1)  (list 'A))
            (make-equation '(- x 1)  (list 'B)))
      '(x))
-    '(full-solutions (() () (((= x 1) (B))) ())))
+    (full-solutions (() () (((= x 1) (B))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(- (expt x 2) 1)  (list 'A))
            (make-equation '(- x -1)  (list 'B)))
      '(x))
-    '(full-solutions (() () (((= x -1) (B))) ())))
+    (full-solutions (() () (((= x -1) (B))) ())))
 
    (check-equal?
     (solve-equations
@@ -459,12 +471,12 @@
            (make-equation '(- (expt y 2) 9) (list 'B))
            (make-equation '(- (- y x) 1) (list 'C)))
      '(x y))
-    `(full-solutions
-      (()
-       ()
-       (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
-        ((= y 3) (B ,(hypothetical (- quadratic 1 0 -9)))))
-       ())))
+    (full-solutions
+     (()
+      ()
+      (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
+       ((= y 3) (B ,(hypothetical (- quadratic 1 0 -9)))))
+      ())))
 
    (check-equal?
     (solve-equations
@@ -472,7 +484,7 @@
            (make-equation '(- (expt y 2) 9) (list 'B))
            (make-equation '(- (- y x) 2) (list 'C)))
      '(x y))
-    `(contradictions
+    (contradictions
       (7 (B C A ,(hypothetical (- quadratic 1 -9 20))) ())
       (16 (B C A ,(hypothetical (+ quadratic 1 -9 20))) ())
       (2 (C A B ,(hypothetical (- quadratic 1 0 -9))) ())
@@ -565,40 +577,40 @@
                  (make-equation '(- (expt y 2) z) (list 'B))
                  (make-equation '(- (- y x) 2) (list 'C)))
            '(x y))
-          `(parameters-constrained
-            ((((+ 16 (* -1 z)) (B C A ,(hypothetical (- quadratic 1 -5 6))) (z)))
-             ()
-             (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
-              ((= y 4) (A C ,(hypothetical (- quadratic 1 -5 6)))))
-             ())
-            ((((+ 16 (* -1 z)) (B C A ,(hypothetical (- quadratic 1 -9 20))) (z)))
-             ()
-             (((= x 2) (A C ,(hypothetical (- quadratic 1 -9 20))))
-              ((= y 4) (A C ,(hypothetical (- quadratic 1 -9 20)))))
-             ())
-            ((((+ 20 z (* 9 (sqrt z))) (A C B ,(hypothetical (- quadratic 1 0 (* -1 z))))
+          (parameters-constrained
+           ((((+ 16 (* -1 z)) (B C A ,(hypothetical (- quadratic 1 -5 6))) (z)))
+            ()
+            (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
+             ((= y 4) (A C ,(hypothetical (- quadratic 1 -5 6)))))
+            ())
+           ((((+ 16 (* -1 z)) (B C A ,(hypothetical (- quadratic 1 -9 20))) (z)))
+            ()
+            (((= x 2) (A C ,(hypothetical (- quadratic 1 -9 20))))
+             ((= y 4) (A C ,(hypothetical (- quadratic 1 -9 20)))))
+            ())
+           ((((+ 20 z (* 9 (sqrt z))) (A C B ,(hypothetical (- quadratic 1 0 (* -1 z))))
+                                      (z)))
+            ()
+            (((= x (+ -2 (* -1 (sqrt z))))
+              (B C ,(hypothetical (- quadratic 1 0 (* -1 z)))))
+             ((= y (* -1 (sqrt z))) (B ,(hypothetical (- quadratic 1 0 (* -1 z))))))
+            ())
+           ((((+ 20 z (* -9 (sqrt z))) (A C B ,(hypothetical (+ quadratic 1 0 (* -1 z))))
                                        (z)))
-             ()
-             (((= x (+ -2 (* -1 (sqrt z))))
-               (B C ,(hypothetical (- quadratic 1 0 (* -1 z)))))
-              ((= y (* -1 (sqrt z))) (B ,(hypothetical (- quadratic 1 0 (* -1 z))))))
-             ())
-            ((((+ 20 z (* -9 (sqrt z))) (A C B ,(hypothetical (+ quadratic 1 0 (* -1 z))))
-                                        (z)))
-             ()
-             (((= x (+ -2 (sqrt z))) (B C ,(hypothetical (+ quadratic 1 0 (* -1 z)))))
-              ((= y (sqrt z)) (B ,(hypothetical (+ quadratic 1 0 (* -1 z))))))
-             ())
-            ((((+ 25 (* -1 z)) (B C A ,(hypothetical (+ quadratic 1 -9 20))) (z)))
-             ()
-             (((= x 3) (A C ,(hypothetical (+ quadratic 1 -9 20))))
-              ((= y 5) (A C ,(hypothetical (+ quadratic 1 -9 20)))))
-             ())
-            ((((+ 25 (* -1 z)) (B C A ,(hypothetical (+ quadratic 1 -5 6))) (z)))
-             ()
-             (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= y 5) (A C ,(hypothetical (+ quadratic 1 -5 6)))))
-             ())))
+            ()
+            (((= x (+ -2 (sqrt z))) (B C ,(hypothetical (+ quadratic 1 0 (* -1 z)))))
+             ((= y (sqrt z)) (B ,(hypothetical (+ quadratic 1 0 (* -1 z))))))
+            ())
+           ((((+ 25 (* -1 z)) (B C A ,(hypothetical (+ quadratic 1 -9 20))) (z)))
+            ()
+            (((= x 3) (A C ,(hypothetical (+ quadratic 1 -9 20))))
+             ((= y 5) (A C ,(hypothetical (+ quadratic 1 -9 20)))))
+            ())
+           ((((+ 25 (* -1 z)) (B C A ,(hypothetical (+ quadratic 1 -5 6))) (z)))
+            ()
+            (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= y 5) (A C ,(hypothetical (+ quadratic 1 -5 6)))))
+            ())))
 
    (check (λ (x y) (lset= equal? x y))
           (solve-equations
@@ -606,117 +618,117 @@
                  (make-equation '(- (expt y 2) z) (list 'B))
                  (make-equation '(- (- y x) 2) (list 'C)))
            '(x y z))
-          `(full-solutions
-            (()
-             ()
-             (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
-              ((= y 4) (A C ,(hypothetical (- quadratic 1 -9 20))))
-              ((= z 16) (A B C ,(hypothetical (- quadratic 1 -9 20)))))
-             ())
-            (()
-             ()
-             (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
-              ((= y 4) (A C ,(hypothetical (- quadratic 1 -5 6))))
-              ((= z 16) (A B C ,(hypothetical (- quadratic 1 -9 20)))))
-             ())
-            (()
-             ()
-             (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
-              ((= y 4) (A C ,(hypothetical (- quadratic 1 -9 20))))
-              ((= z 16) (A B C ,(hypothetical (- quadratic 1 -5 6)))))
-             ())
-            (()
-             ()
-             (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
-              ((= y 4) (A C ,(hypothetical (- quadratic 1 -5 6))))
-              ((= z 16) (A B C ,(hypothetical (- quadratic 1 -5 6)))))
-             ())
-            (()
-             ()
-             (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= y 5) (A C ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -5 6)))))
-             ())
-            (()
-             ()
-             (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= y 5) (A C ,(hypothetical (+ quadratic 1 -9 20))))
-              ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -5 6)))))
-             ())
-            (()
-             ()
-             (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= y 5) (A C ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -9 20)))))
-             ())
-            (()
-             ()
-             (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
-              ((= y 5) (A C ,(hypothetical (+ quadratic 1 -9 20))))
-              ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -9 20)))))
-             ())))
+          (full-solutions
+           (()
+            ()
+            (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
+             ((= y 4) (A C ,(hypothetical (- quadratic 1 -9 20))))
+             ((= z 16) (A B C ,(hypothetical (- quadratic 1 -9 20)))))
+            ())
+           (()
+            ()
+            (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
+             ((= y 4) (A C ,(hypothetical (- quadratic 1 -5 6))))
+             ((= z 16) (A B C ,(hypothetical (- quadratic 1 -9 20)))))
+            ())
+           (()
+            ()
+            (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
+             ((= y 4) (A C ,(hypothetical (- quadratic 1 -9 20))))
+             ((= z 16) (A B C ,(hypothetical (- quadratic 1 -5 6)))))
+            ())
+           (()
+            ()
+            (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))
+             ((= y 4) (A C ,(hypothetical (- quadratic 1 -5 6))))
+             ((= z 16) (A B C ,(hypothetical (- quadratic 1 -5 6)))))
+            ())
+           (()
+            ()
+            (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= y 5) (A C ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -5 6)))))
+            ())
+           (()
+            ()
+            (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= y 5) (A C ,(hypothetical (+ quadratic 1 -9 20))))
+             ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -5 6)))))
+            ())
+           (()
+            ()
+            (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= y 5) (A C ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -9 20)))))
+            ())
+           (()
+            ()
+            (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))
+             ((= y 5) (A C ,(hypothetical (+ quadratic 1 -9 20))))
+             ((= z 25) (A B C ,(hypothetical (+ quadratic 1 -9 20)))))
+            ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A)))
      '(x))
-    `(full-solutions
-      (() () (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))) ())
-      (() () (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))) ())))
+    (full-solutions
+     (() () (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))) ())
+     (() () (((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6))))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
            (make-equation '(+ (expt x 2) (* -7 x) 10)  (list 'B)))
      '(x))
-    `(full-solutions
-      (() () (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))) ())
-      (() () (((= x 2) (B ,(hypothetical (- quadratic 1 -7 10))))) ())))
+    (full-solutions
+     (() () (((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))) ())
+     (() () (((= x 2) (B ,(hypothetical (- quadratic 1 -7 10))))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
            (make-equation '(+ (expt x 2) (* a x) 10)  (list 'B)))
      '(a x))
-    `(full-solutions
-      (()
-       ()
-       (((= a -7) (A B ,(hypothetical (- quadratic 1 -5 6))))
-        ((= x 2) (A ,(hypothetical (- quadratic 1 -5 6)))))
-       ())
-      (()
-       ()
-       (((= a -19/3) (A B ,(hypothetical (+ quadratic 1 -5 6))))
-        ((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6)))))
-       ())))
+    (full-solutions
+     (()
+      ()
+      (((= a -7) (A B ,(hypothetical (- quadratic 1 -5 6))))
+       ((= x 2) (A ,(hypothetical (- quadratic 1 -5 6)))))
+      ())
+     (()
+      ()
+      (((= a -19/3) (A B ,(hypothetical (+ quadratic 1 -5 6))))
+       ((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6)))))
+      ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(- 2 (sqrt (+ x 1)))  (list 'A)))
      '(x))
-    `(full-solutions (() () (((= x 3) (A))) ())))
+    (full-solutions (() () (((= x 3) (A))) ())))
 
    (check-equal?
     (solve-equations
      (list (make-equation '(- 2 (acos (sqrt (+ x 1))))  (list 'A)))
      '(x))
-    `(full-solutions (() () (((= x (* -1 (expt (sin 2) 2))) (A))) ())))
+    (full-solutions (() () (((= x (* -1 (expt (sin 2) 2))) (A))) ())))
 
    (check-within
     (solve-equations
      (list (make-equation '(+ 1 x (square x))  (list 'A)))
      '(x))
-    `(full-solutions
-      (()
-       ()
-       (((= x -.5000000000000001+.8660254037844387i)
-         (A ,(hypothetical (- quadratic 1 1 1)))))
-       ())
-      (()
-       ()
-       (((= x -1/2-.8660254037844386i)
-         (A ,(hypothetical (+ quadratic 1 1 1)))))
-       ()))
+    (full-solutions
+     (()
+      ()
+      (((= x -.5000000000000001+.8660254037844387i)
+        (A ,(hypothetical (- quadratic 1 1 1)))))
+      ())
+     (()
+      ()
+      (((= x -1/2-.8660254037844386i)
+        (A ,(hypothetical (+ quadratic 1 1 1)))))
+      ()))
     5e-16)
 
 
@@ -726,18 +738,42 @@
            (make-equation '(+ (square y) 3) (list 'B))
            (make-equation '(- (* 2 x) (-  y 1)) (list 'C)))
      '(x y))
-    `(full-solutions
-      (()
-       ()
-       (((= x -1/2+.8660254037844388i) (A ,(hypothetical (- quadratic 1 1 1))))
-        ((= y +1.7320508075688776i) (B ,(hypothetical (- quadratic 1 0 3)))))
-       ())
-      (()
-       ()
-       (((= x -1/2-.8660254037844386i) (A ,(hypothetical (+ quadratic 1 1 1))))
-        ((= y -1.7320508075688772i) (B ,(hypothetical (+ quadratic 1 0 3)))))
-       ()))
+    (full-solutions
+     (()
+      ()
+      (((= x -1/2+.8660254037844388i) (A ,(hypothetical (- quadratic 1 1 1))))
+       ((= y +1.7320508075688776i) (B ,(hypothetical (- quadratic 1 0 3)))))
+      ())
+     (()
+      ()
+      (((= x -1/2-.8660254037844386i) (A ,(hypothetical (+ quadratic 1 1 1))))
+       ((= y -1.7320508075688772i) (B ,(hypothetical (+ quadratic 1 0 3)))))
+      ()))
     5e-16)
+
+   (test-case
+    "solution explosion"
+    ;; TODO: solution explosion
+    (check-equal?
+     (solve-equations (list (make-equation '(* (- x 4) (- x 5)) '(eq0))
+                            (make-equation '(- x y) '(eq1)))
+                      '(x y))
+     (full-solutions (() () (((= x 4) (eq0 ,(hypothetical (- quadratic 1 -9 20))))
+                             ((= y 4) (eq0 eq1 ,(hypothetical (- quadratic 1 -9 20))))) ())
+                     (() () (((= x 5) (eq0 ,(hypothetical (+ quadratic 1 -9 20))))
+                             ((= y 5) (eq0 eq1 ,(hypothetical (+ quadratic 1 -9 20))))) ())))
+    (check-equal?
+     (solve-equations (list (make-equation '(* (- x 4) (- x 5)) '(eq0))
+                            (make-equation '(- (* 5 x) y) '(eq1)))
+                      '(x y))
+     (full-solutions (() () (((= x 4)  (eq0     ,(hypothetical (- quadratic 1 -9 20))))
+                             ((= y 20) (eq0 eq1 ,(hypothetical (- quadratic 1/25 -9/5 20))))) ())
+                     (() () (((= x 4)  (eq0     ,(hypothetical (- quadratic 1 -9 20))))
+                             ((= y 20) (eq0 eq1 ,(hypothetical (- quadratic 1 -9 20))))) ())
+                     (() () (((= x 5)  (eq0     ,(hypothetical (+ quadratic 1 -9 20))))
+                             ((= y 25) (eq0 eq1 ,(hypothetical (+ quadratic 1 -9 20))))) ())
+                     (() () (((= x 5)  (eq0     ,(hypothetical (+ quadratic 1 -9 20))))
+                             ((= y 25) (eq0 eq1 ,(hypothetical (+ quadratic 1/25 -9/5 20))))) ()))))
    ))
 
 (module+ test

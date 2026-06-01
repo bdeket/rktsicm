@@ -5,11 +5,18 @@
 
 ;some examples litered troughout the files of calculus/*
 ;kernel
-(require "../../solve.rkt"
+(require "../../solve/solve.rkt"
          "../../general/list-utils.rkt"
          "../helper.rkt")
 
 (define-syntax-rule (hypothetical x) (make-hypothetical 'x #f))
+
+(define-syntax-rule (->equ rst ...) (equation `rst ...))
+(define-syntax-rule (->sol ((a ...) ...) b c ((d ...) ...))
+  (solution (list (->equ a ...) ...) `b `c (list (->equ d ...) ...)))
+(define-syntax-rule (contradictions (lst ...) ...) (list 'contradictions (->equ lst ...) ...))
+(define-syntax-rule (*solution* a b c d) (->sol a b c d))
+
 ;***************************************************************************************************
 ;* from solve.rkt                                                                                  *
 ;***************************************************************************************************
@@ -50,18 +57,23 @@
     (check-equal? (substitution-justifications S) '(A))
     (define AA (make-root-premise-pair 'A))
     (check-not-exn (λ () (make-substitution 'x '(+ 3 y) (list (car AA)))))
-    (check-exn #px"Aargh-subst" ;; TODO this error message can be better
+    (check-exn #px"make-substitution: contract violation\n  expected: non-conflicting justifications\n  given: "
                (λ () (make-substitution 'x '(+ 3 y) (list (car AA) 'B (cadr AA))))))
    (test-case
     "make-equation"
-    (define E (make-equation '(+ 3 x) '(A)))
-    (check-equal? (equation-expression E) '(+ 3 x))
+    (define Ee '(+ 3 x))
+    (define E (make-equation Ee '(A)))
+    (check-equal? (equation-expression E) Ee)
     (check-equal? (equation-justifications E) '(A))
     (check-equal? (equation-variables E) '(x))
     (check-equal? (equation-expression (make-equation '(+ x 3 x) '(A))) '(+ 3 (* 2 x)))
+    (define E2 (make-equation Ee))
+    (check-equal? (equation-expression E2) Ee)
+    (check-true   (let ([j (equation-justifications E)])(and (list j) (= (length j) 1) (symbol? (car j)))))
+    (check-equal? (equation-variables E2) '(x))
     (define AA (make-root-premise-pair 'A))
     (check-not-exn (λ () (make-equation '(+ 3 y) (list (car AA)))))
-    (check-exn #px"Aargh-eqn" ;; TODO this error message can be better
+    (check-exn #px"make-equation: contract violation\n  expected: non-conflicting justifications\n  given: "
                (λ () (make-equation '(+ 3 y) (list (car AA) 'B (cadr AA))))))
    (test-case
     "make-contradiction"
@@ -249,34 +261,34 @@
                                           (kernel2 (exp kernel1)))
                                         vector fail)))
     (check-equal? (kernel-subproblem 'x '(+ (* -1 a kernel3) kernel2 i) ;; more than one kernel in analyzed
-                                        '((kernel1 x)
-                                          (kernel2 (exp kernel1))
-                                          (kernel3 (+ 3 kernel2)))
-                                        vector fail)
+                                     '((kernel1 x)
+                                       (kernel2 (exp kernel1))
+                                       (kernel3 (+ 3 kernel2)))
+                                     vector fail)
                   'done)
     (check-equal? (kernel-subproblem 'x '(+ (* -1 a kernel3) a i)
-                                        '((kernel1 (tan x))
-                                          (kernel2 (exp kernel1))
-                                          (kernel3 (sin kernel2)))
-                                        vector fail)
+                                     '((kernel1 (tan x))
+                                       (kernel2 (exp kernel1))
+                                       (kernel3 (sin kernel2)))
+                                     vector fail)
                   (vector '(- (* -1 (atan (log (asin (/ (+ a i) a))) 1))) fail))
     (check-equal? (kernel-subproblem 'x '(+ (* -1 a kernel3) a i)
-                                        '((kernel1 (+ x 3))
-                                          (kernel2 (+ kernel1 2)) ;; + is not invertible
-                                          (kernel3 (sin kernel2)))
-                                        vector fail)
+                                     '((kernel1 (+ x 3))
+                                       (kernel2 (+ kernel1 2)) ;; + is not invertible
+                                       (kernel3 (sin kernel2)))
+                                     vector fail)
                   'done)
     (check-equal? (kernel-subproblem 'x '(+ (* -1 a kernel3) a i)
-                                        '((kernel1 (+ x 3))
-                                          (kernel2 (exp kernel1))
-                                          (kernel3 (sin kernel2)))
-                                        vector fail)
+                                     '((kernel1 (+ x 3))
+                                       (kernel2 (exp kernel1))
+                                       (kernel3 (sin kernel2)))
+                                     vector fail)
                   (vector '(- (+ 3 (* -1 (log (asin (/ (+ a i) a)))))) fail))
     (check-equal? (kernel-subproblem 'x '(+ (* -1 a kernel3) a i)
-                                        '((kernel1 (tan x))
-                                          (kernel2 (exp kernel1 kernel1));; two arguments to an invertible func (should not be possible)
-                                          (kernel3 (sin kernel2)))
-                                        vector fail)
+                                     '((kernel1 (tan x))
+                                       (kernel2 (exp kernel1 kernel1));; two arguments to an invertible func (should not be possible)
+                                       (kernel3 (sin kernel2)))
+                                     vector fail)
                   'done)
     )
    (test-case
@@ -376,14 +388,14 @@
     (check-equal? (apply-substitutions E (list (make-substitution 'z '(* 2 x) '(A))))
                   '((+ x y 3)))
     (check-equal? (apply-substitutions E (list (make-substitution 'x '(* 2 z) '(A))
-                                                        (make-substitution 'y '(* z z) '(B))))
+                                               (make-substitution 'y '(* z z) '(B))))
                   '((+ 3 (expt z 2) (* 2 z)) A B))
     (check-equal? (apply-substitutions E (list (make-substitution 'x '(* 2 y) '(A))
-                                                        (make-substitution 'y '(* z z) '(B))))
+                                               (make-substitution 'y '(* z z) '(B))))
                   '((+ 3 (* 3 (expt z 2))) A B))
     ;; TODO should x be eliminated?
     (check-equal? (apply-substitutions E (list (make-substitution 'x '(* 2 z) '(A))
-                                                        (make-substitution 'y '(* z x) '(B))))
+                                               (make-substitution 'y '(* z x) '(B))))
                   '((+ 3 (* x z) (* 2 z)) A B)))
    (test-case
     "apply-susbstitutions-to-equation"
@@ -392,14 +404,14 @@
     (check-equal? (apply-substitutions-to-equation E (list (make-substitution 'z '(* 2 x) '(A))))
                   (make-equation '(+ x y 3) '(C)))
     (check-equal? (apply-substitutions-to-equation E (list (make-substitution 'x '(* 2 z) '(A))
-                                                        (make-substitution 'y '(* z z) '(B))))
+                                                           (make-substitution 'y '(* z z) '(B))))
                   (make-equation '(+ 3 (expt z 2) (* 2 z)) '(B A C)))
     (check-equal? (apply-substitutions-to-equation E (list (make-substitution 'x '(* 2 y) '(A))
-                                                        (make-substitution 'y '(* z z) '(B))))
+                                                           (make-substitution 'y '(* z z) '(B))))
                   (make-equation '(+ 3 (* 3 (expt z 2))) '(B A C)))
     ;; TODO should x be eliminated?
     (check-equal? (apply-substitutions-to-equation E (list (make-substitution 'x '(* 2 z) '(A))
-                                                        (make-substitution 'y '(* z x) '(B))))
+                                                           (make-substitution 'y '(* z x) '(B))))
                   (make-equation '(+ 3 (* x z) (* 2 z)) '(B A C))))
    (test-case
     "max-exponent"
@@ -495,34 +507,34 @@
    (test-case
     "solve-incremental"
     (check-equal? (solve-incremental (list (make-equation 'x '(A))) '(x))
-                  (list '() '() (list (make-substitution 'x 0 '(A))) '()))
+                  (->sol () () ,(list (make-substitution 'x 0 '(A))) ()))
     (check-equal? (solve-incremental (list (make-equation 3 '(A))) '(x))
-                  '(contradictions (3 (A) ())))
+                  (contradictions (3 (A) ())))
     (check-equal? (solve-incremental (list (make-equation '(+ 1 (expt x 3)) '(A))) '(x))
                   '(failed . #f))
     (let ([ans (solve-incremental (list (make-equation 'x '(A))) '(x) up down)])
       (check-true (vector? ans))
-      (check-equal? (vector-ref ans 0) (list '() '() (list (make-substitution 'x 0 '(A))) '()))
+      (check-equal? (vector-ref ans 0) (->sol () () ,(list (make-substitution 'x 0 '(A))) ()))
       (check-equal? ((vector-ref ans 1)) (down)))
     (check-equal? (solve-incremental (list (make-equation 3 '(A))) '(x) up down)
                   (down))
     ;; TODO this should be solvable (multiple hypotheticals?)
     (check-equal? (solve-incremental (list (make-equation '(+ 1 (expt x 3)) '(A))) '(x) up down)
                   (down))
-    (check-equal? (solve-incremental '() '()) '(() () () ()))
+    (check-equal? (solve-incremental '() '()) (->sol () () () ()))
 
     (check-equal? (solve-incremental (list (make-equation 3 '(A))) '())
                   '(failed . #f))
     (check-equal? (solve-incremental '() '(x))
-                  '(() (x) () ()))
+                  (->sol () (x) () ()))
     (skip ;; TODO - this should fail (contradiction?)
      (solve-incremental (list (make-equation '(+ x -3) '(A))
                               (make-equation '(+ (cos x) -3) '(B)))
                         '(x)))
     (check-equal? (solve-incremental (list (make-equation '(+ x -3) '(A))
-                           (make-equation '(+ 4 x) '(B)))
-                        '(x))
-                  '(contradictions (-7 (A B) ()) (7 (B A) ()))))
+                                           (make-equation '(+ 4 x) '(B)))
+                                     '(x))
+                  (contradictions (-7 (A B) ()) (7 (B A) ()))))
    ;**************************************************************************************************
    (check-equal?
     (standardize-equation '(- (* 3 ((D f) t))
@@ -554,7 +566,7 @@
      (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
      '(x y))
-    '(() () (((= y 1) (B A)) ((= x 2) (B A))) ()))
+    (->sol () () (((= y 1) (B A)) ((= x 2) (B A))) ()))
 
    (check-equal?
     (solve-incremental
@@ -562,7 +574,7 @@
            (make-equation '(+  x   y      2)  (list 'B))
            (make-equation '(+  x          1)  (list 'C)))
      '(x y z))
-    '(() () (((= z 1) (A B C)) ((= y -1) (B C)) ((= x -1) (C))) ()))
+    (->sol () () (((= z 1) (A B C)) ((= y -1) (B C)) ((= x -1) (C))) ()))
 
    (check-equal?
     (solve-incremental
@@ -570,7 +582,7 @@
            (make-equation '(+  x   y      2)  (list 'B))
            (make-equation '(+  x   y   z  1)  (list 'A)))
      '(x y z))
-    '(() () (((= z 1) (A B C)) ((= y -1) (B C)) ((= x -1) (C))) ()))
+    (->sol () () (((= z 1) (A B C)) ((= y -1) (B C)) ((= x -1) (C))) ()))
 
    ;;; The following signals a contradiction, as it should:
 
@@ -579,7 +591,7 @@
      (list (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x)     y  -5)  (list 'B)))
      '(x y))
-    '(contradictions (-2 (A B) ()) (2 (B A) ())))
+    (contradictions (-2 (A B) ()) (2 (B A) ())))
 
    ;;; Some slightly nonlinear systems can be solved:
    (check-equal?
@@ -588,7 +600,7 @@
            (make-equation '(-  5 (- x y))  (list 'B))
            (make-equation '(-  3 (+ (* (sqrt x) z) (square y)))  (list 'C)))
      '(x y z))
-    '(() () (((= z 1) (C B A)) ((= y -1) (B A)) ((= x 4) (B A))) ()))
+    (->sol () () (((= z 1) (C B A)) ((= y -1) (B A)) ((= x 4) (B A))) ()))
 
    ;;; Underdetermined systems can be reduced:
    (check-equal?
@@ -596,14 +608,14 @@
      (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
            (make-equation '(- 3 (+ a b))  (list 'B)))
      '(a b c))
-    '(() (c) (((= b (+ 3 (* -2/3 c))) (A B)) ((= a (* 2/3 c)) (A B))) ()))
+    (->sol () (c) (((= b (+ 3 (* -2/3 c))) (A B)) ((= a (* 2/3 c)) (A B))) ()))
 
    (check-equal?
     (solve-incremental
      (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
            (make-equation '(- 3 (- a c))  (list 'B)))
      '(a b c))
-    '(() (c) (((= b (+ -3 (* -4/3 c))) (A B)) ((= a (+ 3 c)) (B))) ()))
+    (->sol () (c) (((= b (+ -3 (* -4/3 c))) (A B)) ((= a (+ 3 c)) (B))) ()))
 
    ;;; Even very hard ones are clarified.
    (check-equal?
@@ -611,11 +623,12 @@
      (list (make-equation '(+ (* (+ a b) (- a c)) c)  (list 'A))
            (make-equation '(- 3 (- a b))  (list 'B)))
      '(a b c))
-    '(()
-      (b)
-      (((= c (/ (+ 9 (* 2 (expt b 2)) (* 9 b)) (+ 2 (* 2 b)))) (A B))
+    (->sol
+     ()
+     (b)
+     (((= c (/ (+ 9 (* 2 (expt b 2)) (* 9 b)) (+ 2 (* 2 b)))) (A B))
        ((= a (+ 3 b)) (B)))
-      ()))
+     ()))
 
    ;;; The following are permutations of the solution sequence
    (check-equal?
@@ -624,7 +637,7 @@
            (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
      '(x y z))
-    '(() () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ()))
+    (->sol () () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ()))
 
    (check-equal?
     (solve-incremental
@@ -632,7 +645,7 @@
            (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
      '(z x y))
-    '(() () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ()))
+    (->sol () () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ()))
 
    (check-equal?
     (solve-incremental
@@ -643,7 +656,7 @@
     ;'(() () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ())
     ;previous test seems to sugest that if two equations are equal-difficulty, the order of the
     ;the variables should be followed, this test seems to suggest something else intirely
-    '(() () (((= z -1/2) (C B A)) ((= x 2) (B A)) ((= y 1) (B A))) ()))
+    (->sol () () (((= z -1/2) (C B A)) ((= x 2) (B A)) ((= y 1) (B A))) ()))
 
    (check-equal?
     (solve-incremental
@@ -654,7 +667,7 @@
     ;'(() () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ())
     ;previous test seems to sugest that if two equations are equal-difficulty, the order of the
     ;the variables should be followed, this test seems to suggest something else intirely
-    '(() () (((= z -1/2) (C B A)) ((= x 2) (B A)) ((= y 1) (B A))) ()))
+    (->sol () () (((= z -1/2) (C B A)) ((= x 2) (B A)) ((= y 1) (B A))) ()))
 
    (check-equal?
     (solve-incremental
@@ -665,7 +678,7 @@
     ;'(() () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ())
     ;previous test seems to sugest that if two equations are equal-difficulty, the order of the
     ;the variables should be followed, this test seems to suggest something else intirely
-    '(() () (((= z -1/2) (C B A)) ((= x 2) (B A)) ((= y 1) (B A))) ()))
+    (->sol () () (((= z -1/2) (C B A)) ((= x 2) (B A)) ((= y 1) (B A))) ()))
 
    (check-equal?
     (solve-incremental
@@ -673,7 +686,7 @@
            (make-equation '(+ (* 3 x)     y  -7)  (list 'A))
            (make-equation '(+ (* 3 x) (- y)  -5)  (list 'B)))
      '(x z y))
-    '(() () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ()))
+    (->sol () () (((= z -1/2) (C B A)) ((= y 1) (B A)) ((= x 2) (B A))) ()))
 
    ;;; This wins somehow...
    (check-equal?
@@ -681,32 +694,32 @@
      (list (make-equation '(- 200/3 (/ 1 (+ (/ 1 R1) (/ 1 R2))))  (list 'A))
            (make-equation '(-  1/3 (/ R2 (+ R1 R2)))  (list 'B)))
      '(R1 R2))
-    `(() () (((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0))))
-             ((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))) ()))
+    (->sol () () (((= R2 100) (A B ,(hypothetical (+ quadratic -6 600 0))))
+                  ((= R1 200) (A B ,(hypothetical (+ quadratic -6 600 0))))) ()))
 
    (check-equal?
     (solve-incremental
      (list (make-equation '(- 200/3 (/ 1 (+ (/ 1 R1) (/ 1 R2))))  (list 'A))
            (make-equation '(-  1/3 (/ R2 (+ R1 R2)))  (list 'B)))
      '(R2 R1))
-    `(() () (((= R1 200) (A B ,(hypothetical (+ quadratic 3 -600 0))))
-             ((= R2 100) (A B ,(hypothetical (+ quadratic 3 -600 0))))) ()))
+    (->sol () () (((= R1 200) (A B ,(hypothetical (+ quadratic 3 -600 0))))
+                        ((= R2 100) (A B ,(hypothetical (+ quadratic 3 -600 0))))) ()))
 
    (check-equal?
-   (solve-incremental
-    (list (make-equation '(- (* 1/3 (+ R1 R2)) R2)  (list 'B))
-          (make-equation '(- (* 200/3 (+ R1 R2)) (* R1 R2))  (list 'A)))
-    '(R1 R2))
-   `(() () (((= R2 100) (B A ,(hypothetical (+ quadratic -2 200 0))))
-            ((= R1 200) (B A ,(hypothetical (+ quadratic -2 200 0))))) ()))
+    (solve-incremental
+     (list (make-equation '(- (* 1/3 (+ R1 R2)) R2)  (list 'B))
+           (make-equation '(- (* 200/3 (+ R1 R2)) (* R1 R2))  (list 'A)))
+     '(R1 R2))
+    (->sol () () (((= R2 100) (B A ,(hypothetical (+ quadratic -2 200 0))))
+                        ((= R1 200) (B A ,(hypothetical (+ quadratic -2 200 0))))) ()))
 
    (check-equal?
- (solve-incremental
-  (list (make-equation '(- (* 1/3 (+ R1 R2)) R2)  (list 'B))
-        (make-equation '(- (* 200/3 (+ R1 R2)) (* R1 R2))  (list 'A)))
-  '(R2 R1))
- `(() () (((= R1 200) (B A ,(hypothetical (+ quadratic -1/2 100 0))))
-          ((= R2 100) (B A ,(hypothetical (+ quadratic -1/2 100 0))))) ()))
+    (solve-incremental
+     (list (make-equation '(- (* 1/3 (+ R1 R2)) R2)  (list 'B))
+           (make-equation '(- (* 200/3 (+ R1 R2)) (* R1 R2))  (list 'A)))
+     '(R2 R1))
+    (->sol () () (((= R1 200) (B A ,(hypothetical (+ quadratic -1/2 100 0))))
+                        ((= R2 100) (B A ,(hypothetical (+ quadratic -1/2 100 0))))) ()))
 
    ;; how did we avoid the extra root, R2=0 & R1=0, that satisfies the
    ;; given equations but not the original problem?
@@ -719,12 +732,12 @@
                                (lambda (sol fail) (println sol) (fail))
                                (lambda () 'done)))
                  (string-append
-                  "(list '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())\n"
-                  "(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
-                  "(list '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())\n"
-                  "(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
-                  "(list '() '() (list (list '(= R2 100) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f))) (list '(= R1 200) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f)))) '())\n"
-                  "(list '() '() (list (list '(= R2 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f))) (list '(= R1 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f)))) '())\n"))
+                  "(solution '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())\n"
+                  "(solution '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
+                  "(solution '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())\n"
+                  "(solution '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
+                  "(solution '() '() (list (list '(= R2 100) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f))) (list '(= R1 200) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f)))) '())\n"
+                  "(solution '() '() (list (list '(= R2 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f))) (list '(= R1 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f)))) '())\n"))
    (skip ;;TODO investigate above problem of missing 0 solution (see solve/solve)
     )
 
@@ -734,24 +747,24 @@
      (list (make-equation '(- (expt x 2) 1)  (list 'A))
            (make-equation '(- x 1)  (list 'B)))
      '(x))
-    '(() () (((= x 1) (B))) ()))
+    (->sol () () (((= x 1) (B))) ()))
 
    (check-equal?
     (solve-incremental
      (list (make-equation '(- (expt x 2) 1)  (list 'A))
            (make-equation '(- x -1)  (list 'B)))
      '(x))
-    '(() () (((= x -1) (B))) ()))
+    (->sol () () (((= x -1) (B))) ()))
 
    ;;; It doesn't to look at A to get answer, but A constrains the answer.
    (check-equal?
-      (solve-incremental
-       (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
-             (make-equation '(- (expt y 2) 9) (list 'B))
-             (make-equation '(- (- y x) 1) (list 'C)))
-       '(x y))
-      `(() () (((= y 3) (C A ,(hypothetical (- quadratic 1 -5 6))))
-               ((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))) ()))
+    (solve-incremental
+     (list (make-equation '(+ (expt x 2) (* -5 x) 6)  (list 'A))
+           (make-equation '(- (expt y 2) 9) (list 'B))
+           (make-equation '(- (- y x) 1) (list 'C)))
+     '(x y))
+    (->sol () () (((= y 3) (C A ,(hypothetical (- quadratic 1 -5 6))))
+                        ((= x 2) (A ,(hypothetical (- quadratic 1 -5 6))))) ()))
 
    (check-equal?
     (solve-incremental
@@ -759,7 +772,7 @@
            (make-equation '(- (expt y 2) 9) (list 'B))
            (make-equation '(- (- y x) 2) (list 'C)))
      '(x y))
-    `(contradictions
+    (contradictions
       (7 (B C A ,(hypothetical (- quadratic 1 -9 20))) ())
       (16 (B C A ,(hypothetical (+ quadratic 1 -9 20))) ())
       (2 (C A B ,(hypothetical (- quadratic 1 0 -9))) ())
@@ -854,11 +867,11 @@
            (make-equation '(- (expt y 2) z) (list 'B))
            (make-equation '(- (- y x) 2) (list 'C)))
      '(x y))
-    `((((+ 25 (* -1 z)) (B C A ,(hypothetical (+ quadratic 1 -5 6))) (z)))
-      ()
-      (((= y 5) (C A ,(hypothetical (+ quadratic 1 -5 6))))
-       ((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6)))))
-      ()))
+    (->sol (((+ 25 (* -1 z)) (B C A ,(hypothetical (+ quadratic 1 -5 6))) (z)))
+           ()
+           (((= y 5) (C A ,(hypothetical (+ quadratic 1 -5 6))))
+            ((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6)))))
+           ()))
 
    ;;; But we can ask to solve for z
    (check-equal?
@@ -867,12 +880,12 @@
            (make-equation '(- (expt y 2) z) (list 'B))
            (make-equation '(- (- y x) 2) (list 'C)))
      '(x y z))
-    `(()
-      ()
-      (((= z 25) (B C A ,(hypothetical (+ quadratic 1 -5 6))))
-       ((= y 5) (C A ,(hypothetical (+ quadratic 1 -5 6))))
-       ((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6)))))
-      ()))
+    (->sol ()
+           ()
+           (((= z 25) (B C A ,(hypothetical (+ quadratic 1 -5 6))))
+            ((= y 5) (C A ,(hypothetical (+ quadratic 1 -5 6))))
+            ((= x 3) (A ,(hypothetical (+ quadratic 1 -5 6)))))
+           ()))
 
    ;;; Multiple results can be obtained.
    #|
@@ -905,13 +918,13 @@ Some things are not right, see solve/solve
     (solve-incremental
      (list (make-equation '(- 2 (sqrt (+ x 1)))  (list 'A)))
      '(x))
-    '(() () (((= x 3) (A))) ()))
+    (->sol () () (((= x 3) (A))) ()))
 
    (check-equal?
     (solve-incremental
      (list (make-equation '(- 2 (acos (sqrt (+ x 1))))  (list 'A)))
      '(x))
-    '(() () (((= x (* -1 (expt (sin 2) 2))) (A))) ())
+    (->sol () () (((= x (* -1 (expt (sin 2) 2))) (A))) ())
     #; ;equivalent
     '(() () (((= x (+ -1 (expt (cos 2) 2))) (A))) ()))
 
@@ -1057,9 +1070,9 @@ Some things are not right, see solve/solve
          ())  ; no equations considered tough (no way to isolate)
        )
      ;; bdk ;; order is not preserved but the solution is the same
-     (check-equal? (list-ref solution 0) (list-ref textbooksolution 0)) ;; '()
-     (check-true (lset= eq? (list-ref solution 1) (list-ref textbooksolution 1)))
-     (for ([sub (in-list (list-ref solution 2))])
+     (check-equal? (residual-equations solution) (list-ref textbooksolution 0)) ;; '()
+     (check-true (lset= eq? (residual-variables solution) (list-ref textbooksolution 1)))
+     (for ([sub (in-list (substitutions solution))])
        (define var (cadar sub))
        (define expr (caddar sub))
        (define just (cadr sub))
@@ -1068,12 +1081,14 @@ Some things are not right, see solve/solve
        (check-not-false tsub (format "No sub for var ~a" var))
        (check-true (lset= eq? just (cadr tsub)) (format "Different justifications for var ~a" var))
        (check-equal? expr (caddar tsub) (format "Different result for var ~a" var)))
-     (check-equal? (list-ref solution 3) (list-ref textbooksolution 3)) ;; '()
+     (check-equal? (tough-equations solution) (list-ref textbooksolution 3)) ;; '()
      ;;; Check
      (check-equal?
       (map (lambda (equation)
-             (apply-substitutions-to-equation equation
-                                              (substitutions solution)))
+             (define eq
+               (apply-substitutions-to-equation equation
+                                                (substitutions solution)))
+             (list (equation-expression eq) (equation-justifications eq) (equation-variables eq)))
            equations)
       '((0 (B F H D K E J A) ())
         (0 (F H D B) ())
@@ -1095,21 +1110,30 @@ Some things are not right, see solve/solve
      (up '(+ (* 3 x)     y  -7)
          '(+ (* 3 x) (- y)  -5))
      '(x y))
-    '(*solution* ()
-                 ()
-                 (((= y 1) (eq:1 eq:0))
-                  ((= x 2) (eq:1 eq:0)))
-                 ()) )
+    (*solution* ()
+                ()
+                (((= y 1) (eq:1 eq:0))
+                 ((= x 2) (eq:1 eq:0)))
+                ()) )
    (check-equal?
     (simple-solve
      (up '(+ (* 3 x)     y  -7)
          '(+ (* 3 x) (- y)  z))
      '(x y) '(z))
-    '(*solution* ()
-                 ()
-                 (((= y (+ 7/2 (* 1/2 z))) (eq:0 eq:1))
-                  ((= x (+ 7/6 (* -1/6 z))) (eq:0 eq:1)))
-                 ()))
+    (*solution* ()
+                ()
+                (((= y (+ 7/2 (* 1/2 z))) (eq:0 eq:1))
+                 ((= x (+ 7/6 (* -1/6 z))) (eq:0 eq:1)))
+                ()))
+   (check-equal?
+    (simple-solve (up '(* (+ x 4)(- x 4))) '(x))
+    (*solution* () () (((= x -4) (eq:0 ,(hypothetical (+ quadratic 1 0 -16))))) ()))
+   (check-equal?
+    (simple-solve '(up (f x) (+ (f x) 3)) '((f x)))
+    '(failed . #f))
+   (check-equal?
+    (simple-solve (up '(f x) '(+ (f x) 3)) '((f x)))
+    (contradictions (3 (eq:0 eq:1) ()) (-3 (eq:1 eq:0) ())))
 
    (test-case
     "printing 1"
@@ -1124,16 +1148,16 @@ Some things are not right, see solve/solve
                 (begin0 (get-output-string (current-output-port))
                         (close-output-port (current-output-port))))))
     (check-equal? ans
-                  '(*solution* ()
-                               ()
-                               (((= (g y) 1) (eq:1 eq:0))
-                                ((= (f x) 2) (eq:1 eq:0)))
-                               ()) )
-    (define ans2 (cadr (call-with-input-string str read)))
+                  (*solution* ()
+                              ()
+                              (((= (g y) 1) (eq:1 eq:0))
+                               ((= (f x) 2) (eq:1 eq:0)))
+                              ()) )
+    (define ans2 (call-with-input-string str read))
     (check-unique-match? ans2
                          (G439 G440)
-                         `(((+ -5 (* 3 ,G439) (* -1 ,G440)) (eq:0) (,G440 ,G439))
-                           ((+ -7 (* 3 ,G439) ,G440) (eq:1) (,G440 ,G439)))))
+                         `(list (equation '(+ -5 (* 3 ,G439) (* -1 ,G440)) '(eq:0) '(,G440 ,G439))
+                                (equation '(+ -7 (* 3 ,G439) ,G440) '(eq:1) '(,G440 ,G439)))))
 
    (test-case
     "printing 2"
@@ -1148,16 +1172,16 @@ Some things are not right, see solve/solve
                 (begin0 (get-output-string (current-output-port))
                         (close-output-port (current-output-port))))))
     (check-equal? ans
-                  '(*solution* ()
-                               ()
-                               (((= (g y) (+ -5/2 (* -1/2 (H q)))) (eq:1 eq:0))
-                                ((= (f x) (+ 5/6 (* -1/6 (H q)))) (eq:1 eq:0)))
-                               ()))
-    (define ans2 (cadr (call-with-input-string str read)))
+                  (*solution* ()
+                              ()
+                              (((= (g y) (+ -5/2 (* -1/2 (H q)))) (eq:1 eq:0))
+                               ((= (f x) (+ 5/6 (* -1/6 (H q)))) (eq:1 eq:0)))
+                              ()))
+    (define ans2 (call-with-input-string str read))
     (check-unique-match? ans2
                          (x57 x58 k59)
-                         `(((+ -5 (* 3 ,x57) (* -1 ,x58)) (eq:0) (,x58 ,x57))
-                           ((+ ,k59 (* 3 ,x57) ,x58) (eq:1) (,x58 ,x57 ,k59)))))
+                         `(list (equation '(+ -5 (* 3 ,x57) (* -1 ,x58)) '(eq:0) '(,x58 ,x57))
+                                (equation '(+ ,k59 (* 3 ,x57) ,x58) '(eq:1) '(,x58 ,x57 ,k59)))))
    ))
 
 (module+ test
