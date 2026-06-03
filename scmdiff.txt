@@ -133,7 +133,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
  9 difference(s) found in simplify/pcf
  3 difference(s) found in simplify/rcf
  1 difference(s) found in simplify/rule-syntax
-15 difference(s) found in simplify/rules
+16 difference(s) found in simplify/rules
 14 difference(s) found in simplify/simplify
  4 difference(s) found in simplify/sparse-gcd
  2 difference(s) found in simplify/sparse-interpolate

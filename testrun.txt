@@ -81,7 +81,7 @@
   24                  2  0.0 ./rktsicm/sicm/tests/mechanics/Hamiltonian.rkt
    9                     0.0 ./rktsicm/sicm/tests/mechanics/Lagrangian-transformations.rkt
   22                     0.0 ./rktsicm/sicm/tests/mechanics/Lagrangian.rkt
-   5                     0.0 ./rktsicm/sicm/tests/mechanics/Lie-transform.rkt
+   5                     0.5 ./rktsicm/sicm/tests/mechanics/Lie-transform.rkt
    1                     0.0 ./rktsicm/sicm/tests/mechanics/Noether.rkt
    5                     0.0 ./rktsicm/sicm/tests/mechanics/Routhian.rkt
    6                     0.0 ./rktsicm/sicm/tests/mechanics/action.rkt
@@ -167,10 +167,10 @@
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
 1713             2   68 16.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
-runtime: 3.85m
+runtime: 3.8666666666666667m
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1713             2   68 22.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
-runtime: 4.166666666666667m
+1713             2   68 25.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
+runtime: 4.533333333333333m
 
 Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz 12-cores 4000MHz

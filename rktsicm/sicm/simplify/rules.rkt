@@ -733,6 +733,12 @@
             (assume! `(= (atan (sin ,xs) (cos ,xs)) ,xs) `atan-sin-cos)))
      (: x) )
 
+   ( (atan (cos (? x)) (sin (? x)))
+     (and inverse-simplify?
+          (let ((xs (rcf:simplify x)))
+            (assume! `(= (atan (cos ,xs) (sin ,xs)) (- (* 1/2 :pi) ,xs)) `atan-cos-sin)))
+     (- (* 1/2 :pi) (: x)) )
+
    ( (asin (cos (? x)))
      (and inverse-simplify?
           (let ((xs (rcf:simplify x)))

@@ -378,6 +378,8 @@
     (check-equal? (triginv `(tan (acos ,X))) `(/ (sqrt (- 1 (expt ,X 2))) ,X))
     (check-equal? (triginv `(atan (sin ,X) (cos ,X))) X)
     (check-notes "#| \n'(assuming (= (atan (sin ~a) (cos ~a)) ~a))\n'(atan-sin-cos)\n|#" X X X)
+    (check-equal? (triginv `(atan (cos ,X) (sin ,X))) `(- (* 1/2 :pi) ,X))
+    (check-notes "#| \n'(assuming (= (atan (cos ~a) (sin ~a)) (- (* 1/2 :pi) ~a)))\n'(atan-cos-sin)\n|#" X X X)
     (check-equal? (triginv `(asin (cos ,X))) `(- (* 1/2 :pi) ,X))
     (check-notes "#| \n'(assuming (= (asin (cos ~a)) (- (* 1/2 :pi) ~a)))\n'(asin-cos)\n|#" X X)
     (check-equal? (triginv `(acos (sin ,X))) `(- (* 1/2 :pi) ,X))
