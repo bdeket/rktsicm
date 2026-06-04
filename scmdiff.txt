@@ -40,7 +40,7 @@ could not find: ../../racket/test/sicm/scmutils-20230902/units.scm
  1 difference(s) found in calculus/frame-maker
  4 difference(s) found in calculus/indexed
 26 difference(s) found in calculus/manifold
- 2 difference(s) found in calculus/maps
+ 3 difference(s) found in calculus/maps
  5 difference(s) found in calculus/metric
  2 difference(s) found in calculus/so3
  1 difference(s) found in calculus/tensors

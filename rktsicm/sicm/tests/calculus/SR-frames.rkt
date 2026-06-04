@@ -9,12 +9,9 @@
 (define :c (*c*))
 
 (provide the-tests)
-;; in below use (up...) instead of a fixed #(0 0 0 0)
+;; TODO: in below use (up...) instead of a fixed #(0 0 0 0)
 ;; if tests are run multiple times the second wil be always eq? running
 ;; into problems with ownership (see frame-maker: claim!)
-;; TODO: this file very seldom throws following error: "stream: reentrant or broken delay"
-;; not yet sure what is the cause, for now only triggered when run from
-;; command-line, in parallel with other tests
 (define the-tests
   (test-suite
    "calculus/SR-frames"

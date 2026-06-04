@@ -8,7 +8,7 @@
    7                     0.0 ./rktsicm/sicm/tests/calculus/basis.rkt
   14             1       0.5 ./rktsicm/sicm/tests/calculus/connection.rkt
    4                     0.0 ./rktsicm/sicm/tests/calculus/coord.rkt
-  28                     0.5 ./rktsicm/sicm/tests/calculus/covariant-derivative.rkt
+  28                     1.0 ./rktsicm/sicm/tests/calculus/covariant-derivative.rkt
   10                  2  0.5 ./rktsicm/sicm/tests/calculus/curvature.rkt
    9                     0.0 ./rktsicm/sicm/tests/calculus/dgutils.rkt
    1                     0.0 ./rktsicm/sicm/tests/calculus/exterior-derivative.rkt
@@ -20,13 +20,13 @@
    3                     0.0 ./rktsicm/sicm/tests/calculus/interior-product.rkt
   13                     0.0 ./rktsicm/sicm/tests/calculus/manifold-extra.rkt
   15                  3  0.0 ./rktsicm/sicm/tests/calculus/manifold.rkt
-  15                  1  0.5 ./rktsicm/sicm/tests/calculus/maps.rkt
-  20                  1  0.0 ./rktsicm/sicm/tests/calculus/metric.rkt
+  15                     0.5 ./rktsicm/sicm/tests/calculus/maps.rkt
+  20                     0.0 ./rktsicm/sicm/tests/calculus/metric.rkt
    1                     0.0 ./rktsicm/sicm/tests/calculus/ode.rkt
   18                  2  0.5 ./rktsicm/sicm/tests/calculus/so3.rkt
    5                     0.0 ./rktsicm/sicm/tests/calculus/tensors.rkt
   10                  1  1.0 ./rktsicm/sicm/tests/calculus/vector-calculus.rkt
-  11                     0.0 ./rktsicm/sicm/tests/calculus/vector-fields.rkt
+  11                     0.5 ./rktsicm/sicm/tests/calculus/vector-fields.rkt
    8                     0.0 ./rktsicm/sicm/tests/calculus/wedge.rkt
    7                  1  0.0 ./rktsicm/sicm/tests/display/exdisplay.rkt
    4                  1  0.0 ./rktsicm/sicm/tests/display/pp.rkt
@@ -166,11 +166,11 @@
   19                  2  0.0 ./rktsicm/sicm/tests/units/with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1713             2   68 16.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
-runtime: 3.8666666666666667m
+1713             2   66 17.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
+runtime: 4.066666666666666m
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1713             2   68 25.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
-runtime: 4.533333333333333m
+1713             2   66 24.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
+runtime: 4.433333333333334m
 
 Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz 12-cores 4000MHz

@@ -19,11 +19,15 @@
     (check-simplified? ((R2-rect '->coords) ((literal-manifold-map 'µ R1-rect R2-rect) pt1-rect))
                        '(up (µ^0 x) (µ^1 x)))
     (check-simplified? ((R1-rect '->coords) ((literal-manifold-map 'µ R2-rect R1-rect) pt2-rect))
-                       '(up (µ^0 (up x y))))
+                       '(µ^0 (up x y)))
     (check-simplified? ((R1-rect '->coords) ((literal-manifold-map 'µ R2-polar R1-rect) pt2-rect))
-                       '(up (µ^0 (up (sqrt (+ (expt x 2) (expt y 2))) (atan y x)))))
+                       '(µ^0 (up (sqrt (+ (expt x 2) (expt y 2))) (atan y x))))
     (check-simplified? ((R1-rect '->coords) ((literal-manifold-map 'µ R2-rect R1-rect) pt2-polar))
-                       '(up (µ^0 (up (* r (cos α)) (* r (sin α)))))))
+                       '(µ^0 (up (* r (cos α)) (* r (sin α)))))
+    (check-simplified? ((R3-rect '->coords) ((literal-manifold-map 'µ R2-rect R3-rect) pt2-polar))
+                       '(up (µ^0 (up (* r (cos α)) (* r (sin α))))
+                            (µ^1 (up (* r (cos α)) (* r (sin α))))
+                            (µ^2 (up (* r (cos α)) (* r (sin α)))))))
    (test-case
     "pullback / pushforward"
     ;; ((pulback n->m) f-on-m);; so 1->2 function on 2 applied on a point in 1
@@ -73,11 +77,14 @@
                     (((partial 1) µ^0) (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
                     (((partial 0) f) (up (µ^0 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y))))
                                          (µ^1 (up (µ^-1^0 (up x y)) (µ^-1^1 (up x y)))))))))
-    (skip ;; this should work, but something is wrong in the literal-manifold-function
-          ;; 1D manifold allow both Real and (Up Real) as it's coordinate, but the literal function does not
-          ;; it does work if fM is identity
-     (test-it R2-rect R1-rect))
-    )
+    (test-it R2-rect R1-rect
+             '(+ (* (V^0 (up (µ^-1^0 x) (µ^-1^1 x)))
+                    (((partial 0) µ^0) (up (µ^-1^0 x) (µ^-1^1 x)))
+                    ((D f) (µ^0 (up (µ^-1^0 x) (µ^-1^1 x)))))
+                 (* (V^1 (up (µ^-1^0 x) (µ^-1^1 x)))
+                    (((partial 1) µ^0) (up (µ^-1^0 x) (µ^-1^1 x)))
+                    ((D f) (µ^0 (up (µ^-1^0 x) (µ^-1^1 x)))))))
+    (test-it R1-rect R3-rect))
    (test-case
     "vector-field->vector-field-over-map"
     (define vf ((vector-field->vector-field-over-map (literal-manifold-map 'µ R1-rect R2-rect))

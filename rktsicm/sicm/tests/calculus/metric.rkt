@@ -117,19 +117,22 @@
                   (list 1form-field? 1form-field?)))
    (test-case
     "metric-over-map"
-    (skip ;; TODO -- g should be on M but I only manage to get it working with R3 (N)
-     )
-    (define (g-on-M vf1 vf2) ((+ vf1 vf2) (literal-manifold-function 'mf R3-rect)))
-    (define MM (metric-over-map (literal-manifold-map 'µNM R3-rect R2-polar) g-on-M))
-    (define Vµ (MM (literal-vector-field 'V1 R3-rect) (literal-vector-field 'V2 R3-rect)))
-    (check-simplified? (Vµ ((point R3-rect) #(x y z)))
-                       '(+ (* (V1^0 (up x y z)) (((partial 0) mf) (up x y z)))
-                           (* (V2^0 (up x y z)) (((partial 0) mf) (up x y z)))
-                           (* (V1^1 (up x y z)) (((partial 1) mf) (up x y z)))
-                           (* (V2^1 (up x y z)) (((partial 1) mf) (up x y z)))
-                           (* (V1^2 (up x y z)) (((partial 2) mf) (up x y z)))
-                           (* (V2^2 (up x y z)) (((partial 2) mf) (up x y z)))))
-    (check-equal? (argument-types MM) (list vector-field? vector-field?)))
+    (define (test M N rslt)
+      (define (g-on-M vf1 vf2) ((+ vf1 vf2) (literal-manifold-function 'mf M)))
+      (define MM (metric-over-map (literal-manifold-map 'µNM M N) g-on-M))
+      (define Vµ (MM (literal-vector-field 'V1 M) (literal-vector-field 'V2 M)))
+      (check-simplified? (Vµ ((point M) (M 'coordinate-prototype)))
+                         rslt)
+      (check-equal? (argument-types MM) (list vector-field? vector-field?)))
+    (test R3-rect R2-polar
+          '(+ (* (V1^0 (up x0 x1 x2)) (((partial 0) mf) (up x0 x1 x2)))
+              (* (V2^0 (up x0 x1 x2)) (((partial 0) mf) (up x0 x1 x2)))
+              (* (V1^1 (up x0 x1 x2)) (((partial 1) mf) (up x0 x1 x2)))
+              (* (V2^1 (up x0 x1 x2)) (((partial 1) mf) (up x0 x1 x2)))
+              (* (V1^2 (up x0 x1 x2)) (((partial 2) mf) (up x0 x1 x2)))
+              (* (V2^2 (up x0 x1 x2)) (((partial 2) mf) (up x0 x1 x2)))))
+    (test R1-rect R2-polar
+          '(up (+ (* (V1^0 x0) ((D mf) x0)) (* (V2^0 x0) ((D mf) x0))))))
    (test-case
     "drop1 / raise1"
     ;; tensor 0,1 <-> 1,0 : covector <-> vector : down <-> up

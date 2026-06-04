@@ -73,14 +73,16 @@
     (let ((sig (if (fix:= n 1) (-> Real Real) (-> (UP* Real n) Real))))
       (procedure-rename ;;bdk;; nicer name for diffop
        (compose (target '->point)
-                (s:generate m 'up
-                            (lambda (i)
-                              (literal-function
-                               (string->symbol
-                                (string-append (symbol->string name)
-                                               "^"
-                                               (number->string i)))
-                               sig)))
+                (if (= m 1)
+                    (literal-function (string->symbol (format "~a^0" name)) sig)
+                    (s:generate m 'up
+                                (lambda (i)
+                                  (literal-function
+                                   (string->symbol
+                                    (string-append (symbol->string name)
+                                                   "^"
+                                                   (number->string i)))
+                                   sig))))
                 (source '->coords))
        name))))
 
