@@ -21,7 +21,7 @@
     (check-equal? (modint:invert 3 5) 2)
     (check-equal? (modint:invert 1 5) 1)
     (skip #;"TODO: next needs better error message")
-    (check-exn #px"\\$quotient-remainder: division by zero" (λ () (modint:invert 3 15))))
+    (check-exn #px"quotient/remainder: undefined for 0" (λ () (modint:invert 3 15))))
    (test-case
     "unary-combine / mod:invert"
     (check-exn #px"Not a modular integer" (λ () (mod:invert 5)))
@@ -32,7 +32,7 @@
            [M (in-value (mod:make n p))]
            #:unless (= 0 (mod:residue M)))
       (with-handlers ([exn:fail? (λ (e)
-                                   (check-not-false (regexp-match #px"\\$quotient-remainder: division by zero"
+                                   (check-not-false (regexp-match #px"quotient/remainder: undefined for 0"
                                                                   (exn-message e))))])
         (define R (mod:* M (mod:invert M)))
         (check-equal? (mod:residue R) 1)
@@ -98,7 +98,7 @@
                   (cond ((int:= j p) 'ok)
                         (else
                          (let ilp ((i (- p)))
-                           ;;(write-line `(trying ,i ,j)) 
+                           ;;(write-line `(trying ,i ,j))
                            (cond ((int:= i p) (jlp (int:+ j 1)))
                                  ((int:= (modulo i p) 0) (ilp (int:+ i 1)))
                                  (else

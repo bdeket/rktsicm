@@ -76,13 +76,21 @@
   (check-exn exn:fail?
              (λ () (check-simplified? (let ([a 1])(sleep 100)a) 1 #:timeout .1))))
 (module+ test
-  (check-equal? (my-test-runner (test-suite "test-the-test"
-                                            (check-true #t) ;; ok
-                                            (check-true #f) ;; fail
-                                            (check-true (/ 0)) ;; err
-                                            (check-simplified? (let ([a 1]) (sleep 100) a) 'a #:timeout .1)
-                                            (check-simplified? (let ([a 1]) (sleep 100) a) 1 #:timeout .1)
-                                            (skip (check-true #t))
-                                            (skip (check-true #f))
-                                            ))
-                #(1 1 1 2 2)))
+  (require racket/port)
+  (check-equal? (parameterize ([current-error-port (open-output-nowhere 'nergens)])
+                  ;; ^^ don't show internal test errors -- they are expected: If they are not present
+                  ;;    the surrounding check-equal? wil fail.
+                  (my-test-runner (test-suite "test-the-test"
+                                              (check-true #t) ;; ok
+                                              (check-true #f) ;; fail
+                                              (check-true #t) ;; ok
+                                              (check-true (/ 0)) ;; err
+                                              (check-simplified? (let ([a 1]) (sleep 100) a) 'a #:timeout .1) ;; timeout or fai
+                                              (check-true #t) ;; ok
+                                              (check-simplified? (let ([a 1]) (sleep 100) a) 1 #:timeout .1) ;; timeout or ok
+                                              (skip (check-true #t)) ;; skip or ok
+                                              (skip (check-true #f)) ;; skip or fail
+                                              (check-true #f) ;; fail
+                                              )))
+                ;; ok - fail - err - timeout - skip
+                #(  3      2     1         2      2)))

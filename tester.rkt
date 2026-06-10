@@ -79,7 +79,7 @@
                                         (string-length (f SUM)))))
                     (list summary-total summary-failed summary-error summary-timeout summary-skip
                           (λ (x) (let ([t (summary-time x)])(if (number? t) (/ (round (/ t 30000.)) 2) t))))))
-  (define (1line sum)
+  (define (1line sum . extra)
     (displayln
      (apply string-append
             (add-between `(,@(map (λ (f) (~a #:min-width (cdr f)
@@ -87,7 +87,11 @@
                                              (let ([a ((car f) sum)])
                                                (if (eqv? a 0) "" a))))
                                   data)
-                           ,(let ([lbl (summary-label sum)])(if (list? lbl) (path->string (cadr lbl)) lbl)))
+                           ,(let ([lbl (summary-label sum)])
+                              (regexp-replace* #px"\\\\"
+                                               (if (list? lbl) (path->string (cadr lbl)) lbl)
+                                               "/"))
+                           ,@extra)
                          " "))))
   (1line SUM)
   (displayln "--------------------------------------------------------------")
@@ -95,7 +99,7 @@
     (1line f))
   (displayln "--------------------------------------------------------------")
   (1line SUM)
-  (1line total))
+  (1line total "----" (let ([b (banner)]) (substring b 0 (- (string-length b) 1)))))
 
 ;; ------------------------------------------------------------------------------------------------
 (require racket/match

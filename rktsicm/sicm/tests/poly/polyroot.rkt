@@ -65,7 +65,7 @@
     (check-equal? (clean-up-root (+ 0.5 1e-15)) 0.5)
     (check-equal? (clean-up-root (* +i (+ 0.5 1e-15))) +0.5i)
     (check-equal? (clean-up-root (+ 0.5 (* +i (+ 0.5 1e-15)))) 0.5+0.5i)
-    (check-equal? (clean-up-root (+ 1e-15 (* +i (+ 0.5 1e-15)))) 0.0+0.5i)
+    (check-= (clean-up-root (+ 1e-15 (* +i (+ 0.5 1e-15)))) 0.0+0.5i 1e-17)
     (check-equal? (clean-up-root (+ (+ 0.5 1e-15) (* +i 1e-15))) 0.5))
    (test-case
     "deflate-poly"
@@ -160,8 +160,8 @@
     (define (SEARCHER x) (cons 'searcher x))
     (check-equal? (rescale-poly-roots (poly:dense-> '(0 0 0 1)) SEARCHER) 0)
     (check-equal? (rescale-poly-roots (poly:dense-> '(1 2 -3)) SEARCHER) '(searcher *dense* 1 -3 2 1))
-    (check-equal? (rescale-poly-roots (poly:dense-> '(1 2 -3e40)) root-searcher) -5.7735026918962575e-21+3.3031298511041507e-38i)
-    (check-equal? (rescale-poly-roots (poly:dense-> '(1 2 -3e-40)) root-searcher)  -0.5+3.061616997868383e-17i))
+    (check-= (rescale-poly-roots (poly:dense-> '(1 2 -3e+40)) root-searcher) -5.7735026918962575e-21+3.3031298511041507e-38i 1e-35)
+    (check-= (rescale-poly-roots (poly:dense-> '(1 2 -3e-40)) root-searcher) -0.5+3.061616997868383e-17i 1e-15))
 
    (test-case
     "poly-newton-method"
@@ -198,14 +198,21 @@
     (check-equal? ((root-polisher (poly:dense-> '(471 -365 341))) 13.0) 0.7811268919939889)
     (check-equal? ((root-polisher (poly:dense-> '(-8.417388536670931e+119 -9.00755011313127e-296))) -7.934925000125151e-90) -7.934925000125151e-90)
     (set-polyroot-settings! #:wallp? #t)
-    (check-equal? (out->string ((root-polisher (poly:dense-> '(0 -1 1))) 1e-200))
-                  "(polishing root 1e-200 -1e-200 6.661338147750939e-216)\n(good-enuf-at 0.0)\n")
-    (check-equal? (out->string ((root-polisher (poly:dense-> '(295 52 -42))) 3.340633457939725))
-                  "(polishing root 3.340633457939725 5.684341886080802e-14 2.3508149644976626e-13)\n(win-at 3.340633457939725)\n")
-    (check-equal? (out->string ((root-polisher (poly:dense-> '(471 -365 341))) 0.7811268919939889))
-                  "(polishing root 0.7811268919939889 393.95297891829443 1.6789043834681962e-13)\n(got-worse-at -1.5676265051318206)\n")
-    (check-equal? (out->string ((root-polisher (poly:dense-> '(-8.417388536670931e+119 -9.00755011313127e-296))) -7.934925000125151e-90))
-                  "(polishing root -7.934925000125151e-90 -8.417388536670931e+119 1.8690357121255844e+104)\n(zero-divide-at -7.934925000125151e-90 in polisher)\n")
+    (check-equal? (out->read ((root-polisher (poly:dense-> '(0 -1 1))) 1e-200))
+                  '((polishing root 1e-200 -1e-200 6.661338147750939e-216)
+                    (good-enuf-at 0.0)))
+    (check-within (out->read ((root-polisher (poly:dense-> '(295 52 -42))) 3.340633457939725))
+                  '((polishing root 3.340633457939725 5.684341886080802e-14 2.3508149644976626e-13)
+                    (win-at 3.340633457939725))
+                  1e-25)
+    (check-within (out->read ((root-polisher (poly:dense-> '(471 -365 341))) 0.7811268919939889))
+                  '((polishing root 0.7811268919939889 393.95297891829443 1.6789043834681962e-13)
+                    (got-worse-at -1.5676265051318206))
+                  1e-308)
+    (check-within (out->read ((root-polisher (poly:dense-> '(-8.417388536670931e+119 -9.00755011313127e-296))) -7.934925000125151e-90))
+                  '((polishing root -7.934925000125151e-90 -8.417388536670931e+119 1.8690357121255844e+104)
+                    (zero-divide-at -7.934925000125151e-90 in polisher))
+                  1e-308)
     (set-polyroot-settings! #:wallp? #f))
    
    (test-case

@@ -718,13 +718,13 @@
                                '(R1 R2)
                                (lambda (sol fail) (println sol) (fail))
                                (lambda () 'done)))
-                 "(list '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())
-(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())
-(list '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())
-(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())
-(list '() '() (list (list '(= R2 100) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f))) (list '(= R1 200) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f)))) '())
-(list '() '() (list (list '(= R2 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f))) (list '(= R1 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f)))) '())
-")
+                 (string-append
+                  "(list '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())\n"
+                  "(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
+                  "(list '() '() (list (list '(= R2 100) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f))) (list '(= R1 200) (list 'B 'A (hypothetical '(+ quadratic -2 200 0) #f)))) '())\n"
+                  "(list '() '() (list (list '(= R2 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f))) (list '(= R1 0) (list 'B 'A (hypothetical '(- quadratic -2 200 0) #f)))) '())\n"
+                  "(list '() '() (list (list '(= R2 100) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f))) (list '(= R1 200) (list 'A 'B (hypothetical '(+ quadratic -6 600 0) #f)))) '())\n"
+                  "(list '() '() (list (list '(= R2 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f))) (list '(= R1 0) (list 'A 'B (hypothetical '(- quadratic -6 600 0) #f)))) '())\n"))
    
 (skip ;;TODO investigate above problem of missing 0 solution (see solve/solve)
    )

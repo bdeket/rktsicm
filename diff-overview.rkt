@@ -14,6 +14,8 @@
 (define scmutil-dir (make-parameter scmutil-cur))
 (define rktsicm-dir "./rktsicm/sicm/")
 
+(define (==> . fs) (λ (t) (for/fold ([T t])([f (in-list fs)]) (f T))))
+
 ;***************************************************************************************************
 (define scm-lhs difference-old-lhs)
 (define scm-len difference-old-len)
@@ -30,6 +32,7 @@
       scm-remove-declare
       scm-clean-optional
       scm-clean-rest
+      ;scm-clean-numbers
       no-square-brackets
       trim-whitespace))
 (define (->rkt-lines rkt)
@@ -141,6 +144,22 @@
 
 (define scm-clean-optional (clean-smthng #px"#!optional" "#:optional"))
 (define scm-clean-rest (clean-smthng #px"#!rest" "."))
+(define scm-clean-numbers
+  (let* ([mm (λ (a b)
+               (clean-smthng (pregexp (format " ~a([ \\)]|$)" a))
+                             (format " ~a\\1" b)))]
+         [make (λ (a)
+                 (define b (format ":n:~a" a))
+                 (==> (mm (format "~a" a) b)
+                      (mm (format ":~a" a) b)
+                      (mm (format ":+~a" a) (format ":n:+~a" a))
+                      (mm (format ":-~a" a) (format ":n:-~a" a))))])
+    (==> (mm ":zero" ":n:zero")
+         (mm ":one"  ":n:one")
+         (mm ":-one" ":n:-one")
+         (make "pi")
+         (make "2pi")
+         (clean-smthng #px"\\*machine-epsilon\\*" ":n:machine-epsilon"))))
 
 
 ;***************************************************************************************************
@@ -287,16 +306,16 @@
 (~> (for*/list ([d (in-directory rktsicm-dir)]
                 [s0 (in-value (path->string d))]
                 #:when (regexp-match #px"\\.(rkt|scm)$" s0)
-                #:when (regexp-match #px"\\\\" s0)
-                #:unless (or (regexp-match #px"/lang\\\\" s0)
-                             (regexp-match #px"/rkt\\\\" s0)
-                             (regexp-match #px"/tests\\\\" s0)
-                             (regexp-match #px"/rkt\\\\" s0)
-                             (regexp-match #px"/calculus\\\\manifold\\\\" s0)
-                             (regexp-match #px"/calculus\\\\indexed\\\\" s0)
-                             (regexp-match #px"/kernel\\\\cstm\\\\" s0)
-                             (regexp-match #px"/kernel\\\\todo\\\\" s0)
-                             (regexp-match #px"/simplify\\\\pcfpf\\\\" s0))
+                #:when (regexp-match #px"[/|\\\\]" s0)
+                #:unless (or (regexp-match #px"/lang[/|\\\\]" s0)
+                             (regexp-match #px"/rkt[/|\\\\]" s0)
+                             (regexp-match #px"/tests[/|\\\\]" s0)
+                             (regexp-match #px"/rkt[/|\\\\]" s0)
+                             (regexp-match #px"/calculus[/|\\\\]manifold[/|\\\\]" s0)
+                             (regexp-match #px"/calculus[/|\\\\]indexed[/|\\\\]" s0)
+                             (regexp-match #px"/kernel[/|\\\\]cstm[/|\\\\]" s0)
+                             (regexp-match #px"/kernel[/|\\\\]todo[/|\\\\]" s0)
+                             (regexp-match #px"/simplify[/|\\\\]pcfpf[/|\\\\]" s0))
                 [file (in-value (regexp-replace #px"\\.rkt$" (regexp-replace rktsicm-dir s0 "") ""))]
                 [s1 (in-value (regexp-replace #px"rkt$" (regexp-replace rktsicm-dir s0 (scmutil-dir)) "scm"))]
                 #:when (if (file-exists? s1) #t
@@ -309,6 +328,7 @@
       ;(displayln (format "~a difference(s) found in ~a" (length ds) file))
       (cons (length ds) file)
       )
+    ((λ (x) (when (null? x) (println "no files found")) x) _)
     ;(sort _ < #:key car)
     (map (λ (x)
            (displayln (format "~a difference(s) found in ~a" (~r (car x) #:min-width 2) (regexp-replace* #px"\\\\" (cdr x) "/")))

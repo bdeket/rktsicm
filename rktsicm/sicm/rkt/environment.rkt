@@ -98,11 +98,16 @@
 ;(mk bind-default-condition-handler)
 
 (define (object-name object . environments)
-  (for*/first ([e (in-list environments)]
-               [b (in-list (namespace-mapped-symbols e))]
-               [o (in-value (namespace-variable-value b #t (λ () (gensym)) e))]
-               #:when (eq? object o))
-    b))
+  (define candidates
+    (for*/list ([e (in-list environments)]
+                [b (in-list (namespace-mapped-symbols e))]
+                [o (in-value (namespace-variable-value b #t (λ () (gensym)) e))]
+                #:when (eq? object o))
+      b))
+  (cond
+    [(null? candidates) #f]
+    [(null? (cdr candidates)) (car candidates)]
+    [else (car (sort candidates < #:key (λ (x) (string-length (format "~a" x)))))]))
 
 (define (nearest-repl/environment) (current-namespace))
 (define (environment? env) (namespace? env))

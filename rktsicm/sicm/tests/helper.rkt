@@ -14,7 +14,7 @@
          )
 
 (provide check-unique-match?
-         accumulate out->string skip
+         accumulate out->string out->read skip
          ;clear-arguments suppress-arguments rename-part
          )
 
@@ -91,6 +91,18 @@
 ;***************************************************************************************************
 (define-syntax-rule (out->string body ...)
   (call-with-output-string (λ (out) (parameterize ([current-output-port out]) body ...))))
+(define-syntax-rule (out->read body ...)
+  (call-with-input-string (out->string body ...)
+                          (λ (in)
+                            (let lp ([nxt (read in)])
+                              (if (eof-object? nxt)
+                                  '()
+                                  (cons nxt (lp (read in))))))))
+(module+ test
+  (check-equal? (out->string (display 4) (+ 4 1) (display (- 4 1)))
+                "43")
+  (check-equal? (out->read (display '(+ 4 3)) '(+ 5 2) (display "(* 7 6 4)"))
+                '((+ 4 3)(* 7 6 4))))
 
 ;***************************************************************************************************
 

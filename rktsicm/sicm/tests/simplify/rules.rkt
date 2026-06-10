@@ -5,7 +5,7 @@
          racket/list
          "../../simplify/rules.rkt"
          "../../general/notes.rkt"
-         (only-in "../../kernel.rkt") ;; we need the scmutils-base-environment loaded
+         (only-in "../../kernel.rkt" :pi) ;; we need the scmutils-base-environment loaded
          (only-in (submod "../../general/memoize.rkt" ALL) *memoizers* memoizer-fun memoizer-info)
          "../helper.rkt")
 
@@ -27,6 +27,23 @@
 
 (define-syntax-rule (check-notes notes rst ...) (check-equal? (out->string (clear-notes!)(show-notes)) (format notes rst ...)))
 (define-syntax-rule (no-new-notes) (check-notes "\n#| |#"))
+
+(define (check-settings vec)
+  (check-equal? (vector log-exp-simplify?
+                        exponent-product-simplify?
+                        ^1/2->sqrt?
+                        sqrt-factor-simplify?
+                        aggressive-atan-simplify?
+                        inverse-simplify?
+                        sin-cos-simplify?
+                        half-angle-simplify?
+                        ignore-zero?
+                        commute-partials?
+                        divide-numbers-through-simplify?
+                        trig-product-to-sum-simplify?
+                        (symbol? :pi))
+                vec))
+(define startup-settings (vector #t #t #t #t #t #t #t #t #t #t #t #t #f))
 
 (provide the-tests)
 (define the-tests
@@ -62,12 +79,14 @@
     (check-predicate more-than-two?         '(5 9.4) '(x 2 -7  3+3i -8.)))
    (test-case
     "universal-reductions"
+    (check-settings startup-settings)
     (skip
      ;;TODO;; this depends on :pi being a symbol? (or not) => fix units/constans -> symbolic-constants
      )
     )
    (test-case
     "non-negative-factors"
+    (check-settings startup-settings)
     (check-false  (non-negative-factors 3 -5 'id))
     (check-equal? (non-negative-factors 3  5 'id) 'OK)
     (check-equal? (non-negative-factors 3 'x 'id) 'noted)
@@ -77,6 +96,7 @@
     (no-new-notes))
    (test-case
     "list<"
+    (check-settings startup-settings)
     (check-true  (list< '() '(1)))
     (check-true  (list< '(1) '(4)))
     (check-true  (list< '(1 3) '(1 4)))
@@ -85,6 +105,7 @@
     (check-false (list< '(1) '())))
    (test-case
     "pi-predicates"
+    (check-settings startup-settings)
     (check-predicate zero-mod-pi?   '(:pi (* 4 :pi)) '(:2pi (* 1/2 :pi) 3 x)) ;;TODO: :2pi should be translated
     (check-predicate pi/2-mod-2pi?  '((* 1/2 :pi) (* -7/2 :pi)) '(0 :pi (* -1/2 :pi) 3 x)) ;;TODO: :pi/2 should be translated
     (check-predicate -pi/2-mod-2pi? '((* -1/2 :pi) (* 7/2 :pi)) '(0 :pi (*  1/2 :pi) 3 x))
@@ -95,6 +116,7 @@
     (check-predicate -pi/4-mod-pi?  '((* -1/4 :pi) (* 7/4 :pi)) '(0 :pi (* -3/4 :pi) 3 x)))
    (test-case
     "half-angle-formula"
+    (check-settings startup-settings)
     ;;TODO;; can we improve this? (the assume! part)
     (check-equal? (sin-half-angle-formula 'theta)
                   '(sqrt (/ (- 1 (cos theta)) 2)))
@@ -105,6 +127,7 @@
     (no-new-notes))
    (test-case
     "flush-obvious-ones"
+    (check-settings startup-settings)
     (check-equal? (sincos-flush-ones `(+ (expt (sin x) 7) x c (expt (cos x) 5)))
                   '(+ (* (expt (sin x) 2) (expt (sin x) 1) (expt (sin x) 2) (expt (sin x) 2))
                       (* (expt (cos x) 2) (expt (cos x) 1) (expt (cos x) 2))
@@ -114,6 +137,7 @@
     (no-new-notes))
    (test-case
     "simplify-and-canonicalize"
+    (check-settings startup-settings)
     (check-equal? ((simplify-and-canonicalize (λ (x) x) error) 'expr)
                   ;; if the new expr is the same don't canonicalize
                   'expr)
@@ -122,6 +146,7 @@
                   5))
    (test-case
     "simplify-until-stable"
+    (check-settings startup-settings)
     ;; keep applying the rules and canon until answer is the same
     (define (idd x) x)
     (define (rev x) (cons (car x) (reverse (cdr x))))
@@ -138,10 +163,12 @@
                   '(+)))
    (test-case
     "only-if"
+    (check-settings startup-settings)
     (check-equal? ((only-if number? exp) 0) 1)
     (check-equal? ((only-if number? exp) 'x) 'x))
    (test-case
     "clear-square-roots-of-perfect-squares"
+    (check-settings startup-settings)
     (check-equal? (clear-square-roots-of-perfect-squares '(/ (sqrt (+ (expt a 2) (* 2 a b) (expt b 2)))
                                                              (+ a b)))
                   1)
@@ -155,6 +182,7 @@
 
    (test-case
     "trig-exand"
+    (check-settings startup-settings)
     ;; not sure if these are good tests...
     (define expr '(+ (magnitude (expt x 4)) (sin (+ (exp (log x)) y)) (expt (sin z) 2) (expt (cos (+ x y)) 3) (expt (cos z) 2)))
     (define ans1 '(+ 1 (* (expt x 2) (expt (conjugate x) 2)) (expt (cos (+ x y)) 3) (sin (+ x y))))
@@ -177,6 +205,9 @@
     (no-new-notes)
     (check-equal? (trigcontract expr) ans2)
     (no-new-notes)
+    ;; TODO this test fails when run with the tester in BC
+    ;;      if run in drracket or individually it works correctly
+    ;;      find out what is the state influencing the test
     (check-equal? (full-simplify expr)
                   '(/ (+ (* 8 (expt (conjugate x) 2) (expt x 2))
                          (* (+ (* (+ (* (+ (* (+ (* (+ (* 5 (cos x)) (* 0-3i (sin x))) (cos x))
