@@ -3,7 +3,6 @@ compiled/
 
 # coverage output
 /coverage/
-/docs/
 
 # common backups, autosaves, lock files, OS meta-files
 *~
