@@ -24,7 +24,7 @@
 
 (define (watch-it wallp message)
   (lambda (e)
-    (if wallp
+    (if (wallp)
         (begin (newline)
                (display message)
                (pp e)))

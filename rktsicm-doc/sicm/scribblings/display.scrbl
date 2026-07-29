@@ -33,7 +33,19 @@ Generate a Latex-formula for the expression of @racket[expr]. The original scmut
 
 @;*************************************************************************************************
 @;PP
-@deftempproc*[pp wallp-pp watch-it pp-it cpp]
+@defproc[(pp [obj any/c] [port output-port? (current-output-port)] [as-code? boolean? #f]) void?]{
+ An alias for @racket[println]. The original @racket[pp] would print the definition of a function if @racket[as-code?] is @racket[#t]. Currently, unfortunateley, this is not implemented.
+}
+@defproc[(pp-it [obj any/c]) any/c]{ Prints the @racket[obj]ect and returns it. }
+@defproc[(cpp [obj any/c] [port output-port? (current-output-port)]) void?]{
+ Prints the @racket[obj]ect to the port with some extra decoration.
+}
+@defproc[(wall-pp [print? boolean?] [obj any/c] ...) void?]{
+ Prints each @racket[obj]ect on a new line, if @racket[print?] is @racket[#t]. Otherwise nothing is printed.
+}
+@defproc[((wall-it [param parameter?] [message any/c]) [obj any/c]) any/c]{
+ Creates a function that will print the fixed @racket[message] and supplied @racket[obj]ect if @racket[param] does not evalutate to @racket[#f]. It will always return the @racket[obj]ect.
+}
 
 @;*************************************************************************************************
 @;PRINT

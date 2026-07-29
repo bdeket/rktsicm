@@ -27,15 +27,17 @@
                   "1\n"))
    (test-case
     "watch-it"
+    (define param (make-parameter #t))
     (check-equal? (accumulate acc (acc (call-with-output-string
                                         (λ (out)
                                           (parameterize ([current-output-port out])
-                                            (acc ((watch-it #t "vier:") 5)))))))
+                                            (acc ((watch-it param "vier:") 5)))))))
                   '(5 "\nvier:5\n"))
-    (check-equal? (accumulate acc (acc (call-with-output-string
-                                        (λ (out)
-                                          (parameterize ([current-output-port out])
-                                            (acc ((watch-it #f "vier:") 5)))))))
+    (check-equal? (accumulate acc (acc (parameterize ([param #f])
+                                         (call-with-output-string
+                                          (λ (out)
+                                            (parameterize ([current-output-port out])
+                                              (acc ((watch-it param "vier:") 5))))))))
                   '(5 "")))
    (test-case
     "cpp"
