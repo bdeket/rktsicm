@@ -2,7 +2,7 @@
 
 (require rackunit
          "../../rkt/glue.rkt"
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" pp)
          "../../general/assert.rkt"
          "../../simplify/sparse-interpolate.rkt"
          "../../simplify/sparse.rkt"

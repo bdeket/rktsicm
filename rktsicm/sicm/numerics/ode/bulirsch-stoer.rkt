@@ -6,7 +6,7 @@
                   fix:< fix:+ fix:- fix:* fix:1+
                   flo:= flo:< flo:+ flo:- flo:* flo:/ flo:expt)
          (only-in "../../rkt/define.rkt" define default-object? define-integrable)
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" pp)
          "../../kernel-intr.rkt"
          "advance.rkt"
          "../signals/cph-dsp/flovec.rkt"

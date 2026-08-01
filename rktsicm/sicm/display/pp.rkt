@@ -3,8 +3,14 @@
 (provide (all-defined-out) pp)
 
 (require (only-in "../rkt/glue.rkt" if true)
-         (only-in "../rkt/define.rkt" define default-object?)
-         (only-in "../rkt/todo.rkt" pp))
+         (only-in "../rkt/define.rkt" define default-object?))
+
+(define (pp datum [port (current-output-port)] [as-code? #f])
+  ;; (pp (lambda (x) x) port true) should print
+  ;;;; (lambda (x) x)
+  ;; but racket will print
+  ;;;; #<procedure>
+  (println datum port (if as-code? 1 0)))
 
 ;;bdk;; insert 1
 ;;;for printing things out

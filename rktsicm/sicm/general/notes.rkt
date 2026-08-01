@@ -4,7 +4,7 @@
 
 (require (only-in "../rkt/glue.rkt" if)
          (only-in "../rkt/define.rkt" define)
-         (only-in "../rkt/todo.rkt" pp)
+         (only-in "../display/pp.rkt" pp)
          "list-utils.rkt"
          "eq-properties.rkt")
 

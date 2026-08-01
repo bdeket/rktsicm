@@ -7,7 +7,7 @@
                   fix:< fix:= fix:> fix:+ fix:- fix:zero? fix:>= fix:fixnum?
                   int:zero? int:quotient int:-)
          (only-in racket/list dropf)
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" pp)
          "../../general/assert.rkt"
          "../../general/list-utils.rkt"
          "../../general/resource-limit.rkt"

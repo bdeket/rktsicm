@@ -5,7 +5,7 @@
 (require (only-in "../../rkt/glue.rkt" if write-line false let*
                   fix:+)
          (only-in "../../rkt/define.rkt" define default-object?)
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" pp)
          "../../kernel-intr.rkt"
          "../linear/gauss-jordan.rkt"
          "advance.rkt"

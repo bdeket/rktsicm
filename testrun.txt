@@ -8,7 +8,7 @@
    7                     0.0 ./rktsicm/sicm/tests/calculus/basis.rkt
   14             1       0.5 ./rktsicm/sicm/tests/calculus/connection.rkt
    4                     0.0 ./rktsicm/sicm/tests/calculus/coord.rkt
-  28                     1.0 ./rktsicm/sicm/tests/calculus/covariant-derivative.rkt
+  28                     0.5 ./rktsicm/sicm/tests/calculus/covariant-derivative.rkt
   10                  2  0.5 ./rktsicm/sicm/tests/calculus/curvature.rkt
    9                     0.0 ./rktsicm/sicm/tests/calculus/dgutils.rkt
    1                     0.0 ./rktsicm/sicm/tests/calculus/exterior-derivative.rkt
@@ -166,11 +166,11 @@
   19                  2  0.0 ./rktsicm/sicm/tests/units/with-units.rkt
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1713             2   66 17.5 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [cs].
-runtime: 4.066666666666666m
+1713             2   66 16.5 TOTAL ---- Welcome to Racket v9.3.0.2-2026-07-29-5db875cf62 [cs].
+runtime: 3.9m
 --------------------------------------------------------------
  TOT FAIL ERR TOUT SKIP TIME NAME
-1713             2   66 24.0 TOTAL ---- Welcome to Racket v9.2.0.5-2026-06-09-5c4c0bf12c [bc].
-runtime: 4.433333333333334m
+1713             2   66 22.0 TOTAL ---- Welcome to Racket v9.3.0.2-2026-07-29-5db875cf62 [bc].
+runtime: 4.2m
 
 Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz 12-cores 4000MHz

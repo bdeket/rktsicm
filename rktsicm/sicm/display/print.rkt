@@ -4,7 +4,7 @@
 
 (require (only-in "../rkt/glue.rkt" if undefined-value? hash-table? pathname? any)
          (only-in "../rkt/define.rkt" define default-object?)
-         (only-in "../rkt/todo.rkt" pp)
+         (only-in "../display/pp.rkt" pp)
          (only-in "../rkt/environment.rkt" generic-environment rule-environment numerical-environment scmutils-base-environment system-global-environment)
          "../general/assert.rkt"
          "../general/memoize.rkt"
@@ -15,14 +15,7 @@
          (only-in "../simplify/split-poly.rkt" poly:factor)
          "exdisplay.rkt"
          "suppress-args.rkt"
-         (only-in "../rkt/todo.rkt" todos)
          )
-
-(todos todo
-       [#:from "???"
-        with-si-units->expression]
-       )
-(require 'todo)
 
 (define canonicalize-numbers (make-generic-operator 1 'canonicalize-numbers values))
 (assign-operation canonicalize-numbers (λ (expr) (and (number? expr) *heuristic-numbers*)) heuristic-canonicalize-complex)

@@ -12,7 +12,6 @@
          "../strutl.rkt"
          "../types.rkt"
          "generic.rkt"
-         (only-in "../../rkt/todo.rkt" div-coeff sub-coeff expt-coeff)
          )
 (define-values (assign-operation pseries:assign-operations)
   (make-assign-operations 'pseries))

@@ -9,7 +9,6 @@
          (except-out (all-from-out racket/base) #%app apply))
 
 (require (for-syntax racket/base)
-         (only-in "../rkt/todo.rkt" bind-condition-handler use-value condition-type:floating-point-underflow)
          "../parameters.rkt"
          "cstm/generic.rkt")
 

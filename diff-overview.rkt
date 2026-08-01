@@ -322,7 +322,7 @@
                            (begin
                              (when (member RKT-START (file->lines d) string=?)
                                (error (format "Could not find scm file for file with startline:\n  rkt: ~a\n  scm: ~a" d s1)))
-                             (displayln (format "could not find: ~a" s1)) #f))
+                             (displayln (format "could not find: ~a" (regexp-replace* #px"\\\\" s1 "/"))) #f))
                 [ds (in-value (make-diff (->scm-lines s1) (->rkt-lines s0)))]
                 #:unless (null? ds))
       ;(displayln (format "~a difference(s) found in ~a" (length ds) file))

@@ -5,7 +5,6 @@
 
 (require (only-in "../rkt/glue.rkt" if delv warn for-all?
                   fix:< fix:=)
-         (only-in "../rkt/todo.rkt" diff-memoize-1arg diff-memoize-2arg)
          "../general/list-utils.rkt"
          "../general/logic-utils.rkt"
          (only-in "../general/equals.rkt" simple:equal?)
@@ -23,6 +22,11 @@
          )
 (define-values (assign-operation diff:assign-operations)
   (make-assign-operations 'diff))
+
+;; the load-sequence of scmutils binds these by default to identity
+;; (with the option to change them to linear-memoize-1arg and linear-memoize)
+(define (diff-memoize-1arg fct) (warn (format "diff-memoize-1arg: not moizing - ~a" fct)) fct)
+(define (diff-memoize-2arg fct) (warn (format "diff-memoize-2arg: not moizing - ~a" fct)) fct)
 
 ;;bdk;; start original file
 

@@ -4,7 +4,7 @@
 
 (require (only-in "../rkt/glue.rkt" if there-exists?
                   fix:= fix:> fix:<= fix:+ fix:-)
-         (only-in "../rkt/todo.rkt" pp)
+         (only-in "../display/pp.rkt" pp)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "../general/permute.rkt"

@@ -1,15 +1,13 @@
 #lang racket/base
 
-(provide (except-out (all-defined-out) clean-weak-alist clean-subtable-alist clean-alist)
+(provide (all-defined-out)
          (rename-out [ALT-CLEAN-WEAK-ALIST clean-weak-alist])
          gc-reclaimed-object?)
 
 (require "../rkt/fixnum.rkt"
          "../rkt/if.rkt"
-         "../rkt/gcreclaimed.rkt"
-         (only-in "../rkt/todo.rkt" todo set-cdr!))
+         "../rkt/gcreclaimed.rkt")
 
-(todo clean-expression-table "canonicalizer")
 (define (ALT-CLEAN-WEAK-ALIST W) (purge-list W 0))
 
 ;; set-car! is only used to invalidate pairs -> this is solved in purge-list by rechecking
@@ -149,34 +147,34 @@
                 this)))
         this)))
 
-(define (clean-weak-alist weak-alist)
-  (clean-alist weak-alist
-               (lambda (p)
-                 (if (not (weak-pair? p))
-                     (raise-argument-error 'clean-weak-alist "weak-alist" weak-alist))
-                 (not (gc-reclaimed-object? (weak-car p))))))
-
-(define (clean-subtable-alist alist)
-  (clean-alist alist
-               (lambda (p)
-                 (if (not (pair? p))
-                     (raise-argument-error 'clean-subtable-alist "weak-alist" alist))
-                 (clean-expression-table (cdr p)))))
-
-(define (clean-alist alist clean-association)
-  (let clean-head ((this alist))
-    (if (pair? this)
-        (let ((next (cdr this)))
-          (if (clean-association (car this))
-              (begin
-                (let clean-tail ((this next) (prev this))
-                  (if (pair? this)
-                      (let ((next (cdr this)))
-                        (if (clean-association (car this))
-                            (clean-tail next this)
-                            (begin
-                              (set-cdr! prev next)
-                              (clean-tail next prev))))))
-                this)
-              (clean-head next)))
-        this)))
+;;brm;;(define (clean-weak-alist weak-alist)
+;;brm;;  (clean-alist weak-alist
+;;brm;;               (lambda (p)
+;;brm;;                 (if (not (weak-pair? p))
+;;brm;;                     (raise-argument-error 'clean-weak-alist "weak-alist" weak-alist))
+;;brm;;                 (not (gc-reclaimed-object? (weak-car p))))))
+;;brm;;
+;;brm;;(define (clean-subtable-alist alist)
+;;brm;;  (clean-alist alist
+;;brm;;               (lambda (p)
+;;brm;;                 (if (not (pair? p))
+;;brm;;                     (raise-argument-error 'clean-subtable-alist "weak-alist" alist))
+;;brm;;                 (clean-expression-table (cdr p)))))
+;;brm;;
+;;brm;;(define (clean-alist alist clean-association)
+;;brm;;  (let clean-head ((this alist))
+;;brm;;    (if (pair? this)
+;;brm;;        (let ((next (cdr this)))
+;;brm;;          (if (clean-association (car this))
+;;brm;;              (begin
+;;brm;;                (let clean-tail ((this next) (prev this))
+;;brm;;                  (if (pair? this)
+;;brm;;                      (let ((next (cdr this)))
+;;brm;;                        (if (clean-association (car this))
+;;brm;;                            (clean-tail next this)
+;;brm;;                            (begin
+;;brm;;                              (set-cdr! prev next)
+;;brm;;                              (clean-tail next prev))))))
+;;brm;;                this)
+;;brm;;              (clean-head next)))
+;;brm;;        this)))

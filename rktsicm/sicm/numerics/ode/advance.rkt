@@ -5,7 +5,7 @@
 (require (only-in "../../rkt/glue.rkt" if subvector make-initialized-vector false define-integrable 1+ write-line
                   fix:= fix:< fix:> fix:+ fix:- fix:1+)
          (only-in "../../rkt/define.rkt" define default-object?)
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" pp)
          "../../general/assert.rkt"
          "../../general/table.rkt"
          "../../kernel-intr.rkt"

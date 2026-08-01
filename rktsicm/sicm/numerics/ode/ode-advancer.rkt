@@ -4,7 +4,7 @@
 
 (require (only-in "../../rkt/glue.rkt" if write-line symbol-upcase symbol-downcase)
          (only-in "../../rkt/define.rkt" define)
-         (only-in "../../rkt/todo.rkt" pp)
+         (only-in "../../display/pp.rkt" pp)
          "be.rkt"
          "bulirsch-stoer.rkt"
          "gear.rkt"

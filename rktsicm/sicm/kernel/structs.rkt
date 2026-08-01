@@ -7,7 +7,6 @@
                   there-exists? generate-uninterned-symbol every
                   fix:= fix:> fix:< fix:+ fix:-)
          (only-in "../rkt/define.rkt" define default-object?)
-         (only-in "../rkt/todo.rkt" bkpt)
          "../general/assert.rkt"
          "../general/list-utils.rkt"
          "numeric.rkt"
@@ -96,7 +95,7 @@
                      (lambda (i)
                        (g:* v1 (s:ref v2 i)))))
         (else
-         (bkpt "Incompatible multiplication" v1 v2))))
+         (error "Incompatible multiplication" v1 v2))))
 
 (define *allowing-incompatible-multiplication* (make-parameter #t))
 
